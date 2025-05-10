@@ -74,13 +74,13 @@
     "defaults": {
       "adjustIndistinguishableColors": "always",
       "colorScheme": "CGA",
-      "experimental.repositionCursorWithMouse": true,
+      "experimental.repositionCursorWithMouse": false,  // causes screen to scroll to the bottom after clicking
       "font": {
-        "face": "Cascadia Code"
+        "face": "Cascadia Mono"
       },
       "intenseTextStyle": "all",
       "opacity": 85,
-      "snapOnInput": false,
+      "snapOnInput": true,
       "useAcrylic": true
     },
     "list": [
