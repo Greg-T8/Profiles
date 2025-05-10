@@ -49,6 +49,161 @@
     "C:/Users/gregt/AppData/Roaming/Code/User/prompts": true
   },
   "dashboard.openOnStartup": "empty workspace",
+  "dashboard.displayProjectPath": true,
+  "dashboard.projectData": [
+    {
+      "groupName": "Languages",
+      "id": "languagesr8vqt8qtfmaionob2",
+      "projects": [
+        {
+          "color": "#FF0000",
+          "id": "ccuafy3ubfkmaiopv9m",
+          "isGitRepo": true,
+          "name": "C & C++",
+          "path": "vscode-remote://wsl+CCode/home/gtate/learningC-CPP/LearningC-CPP.code-workspace"
+        },
+        {
+          "isGitRepo": true,
+          "id": "javascript0hsy4zmv8maip9liw",
+          "name": "JavaScript",
+          "path": "c:\\Users\\gregt\\LocalCode\\LearningJavaScript\\LearningJavaScript.code-workspace",
+          "color": "#8338EC"
+        },
+        {
+          "isGitRepo": true,
+          "id": "cssn994kkqa1maipb2cr",
+          "name": "CSS",
+          "path": "c:\\Users\\gregt\\LocalCode\\LearningCSS\\LearningCSS.code-workspace",
+          "color": "linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%)"
+        },
+        {
+          "isGitRepo": true,
+          "id": "dotnet1yfn5aeo3maipbmkz",
+          "name": "DotNet",
+          "path": "c:\\Users\\gregt\\LocalCode\\LearningDotNet\\LearningDotNet.code-workspace",
+          "color": "#549be2"
+        },
+        {
+          "isGitRepo": true,
+          "id": "pythondjfx2c4xpmaipc5yr",
+          "name": "Python",
+          "path": "c:\\Users\\gregt\\LocalCode\\LearningPython\\LearningPython.code-workspace",
+          "color": "#63b76c"
+        },
+        {
+          "isGitRepo": true,
+          "id": "gozf35umda8maipd20o",
+          "name": "Go",
+          "path": "c:\\Users\\gregt\\LocalCode\\LearningGo\\LearningGo.code-workspace",
+          "color": "#8acbda"
+        },
+        {
+          "isGitRepo": true,
+          "id": "sql3x3abfahimaipebde",
+          "name": "SQL",
+          "path": "vscode-remote://wsl+MySQL/home/gtate/learningSQL/LearningSQL.code-workspace",
+          "color": "#dbf24f"
+        }
+      ]
+    },
+    {
+      "id": "systemst4o1r3thtmaipjfoi",
+      "groupName": "Systems",
+      "projects": [
+        {
+          "isGitRepo": true,
+          "id": "blogpv73e3qmemaiq8lv8",
+          "name": "Blog",
+          "path": "c:\\Users\\gregt\\LocalCode\\Blog",
+          "color": "#e1e34c"
+        },
+        {
+          "isGitRepo": true,
+          "id": "terraformtj10gu54zmaiq95o3",
+          "name": "Terraform",
+          "path": "c:\\Users\\gregt\\LocalCode\\LearningTerraform\\LearningTerraform.code-workspace",
+          "color": "#2e5c42"
+        },
+        {
+          "isGitRepo": true,
+          "id": "kubernetesy1abqtua2maiqapak",
+          "name": "Kubernetes",
+          "path": "vscode-remote://wsl+Kubernetes/home/gtate/LearningKubernetes/LearningKubernetes.code-workspace",
+          "color": "#4869d7"
+        },
+        {
+          "isGitRepo": true,
+          "id": "kalilinuxaad79g6zwmaiqc4sh",
+          "name": "Kali Linux",
+          "path": "vscode-remote://wsl+Kali/home/gtate/LearningOffsec/LearningOffsec.code-workspace",
+          "color": "linear-gradient(43deg, #581dd3 0%, #d23ed8 100%)"
+        }
+      ]
+    },
+    {
+      "id": "workysmri3ipqmaipjirc",
+      "groupName": "Work",
+      "projects": [
+        {
+          "isGitRepo": true,
+          "id": "infscriptszd34qajbimaiqcp06",
+          "name": "INF - Scripts",
+          "path": "c:\\Users\\gregt\\OneDrive - Quisitive\\Code\\Azure DevOps\\INF - Scripts",
+          "color": "#00b3e2"
+        }
+      ]
+    },
+    {
+      "id": "profiles2ce7zszmvmaipjlz7",
+      "groupName": "Profiles",
+      "projects": [
+        {
+          "isGitRepo": true,
+          "id": "githubprofilehmhoxw6k5maiqd6ny",
+          "name": "GitHub Profile",
+          "path": "c:\\Users\\gregt\\OneDrive\\Code\\GitHub\\GitHubProfile",
+          "color": "#e916a0"
+        },
+        {
+          "isGitRepo": true,
+          "id": "kinesisadv360propzyl5z5ldmaiqdlui",
+          "name": "KinesisAdv360Pro",
+          "path": "c:\\Users\\gregt\\OneDrive\\Code\\GitHub\\KinesisAdv360Pro",
+          "color": "#863c3c"
+        },
+        {
+          "isGitRepo": true,
+          "id": "neovim4vkv167demaiqe71b",
+          "name": "Neovim",
+          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\nvim",
+          "color": "#8EABC1"
+        },
+        {
+          "isGitRepo": true,
+          "id": "powershellz7gs6blw9maiqej5p",
+          "name": "PowerShell",
+          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\PowerShell",
+          "color": "#529bc0"
+        },
+        {
+          "isGitRepo": true,
+          "id": "vscodeoodjqtkzxmaiqetz9",
+          "name": "VSCode",
+          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\VSCode",
+          "color": "#DCB20C"
+        },
+        {
+          "isGitRepo": true,
+          "id": "windowsterminalgumg8ku9kmaiqf605",
+          "name": "Windows Terminal",
+          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\Windows Terminal",
+          "color": "#0290fd"
+        }
+      ]
+    }
+  ],
+  "dashboard.projectTileWidth": 350,
+  "dashboard.storeProjectsInSettings": true,
   "debug.inlineValues": "auto",
   "diffEditor.ignoreTrimWhitespace": true,
   "editor.acceptSuggestionOnCommitCharacter": false,
@@ -287,7 +442,9 @@
   "markdown.extension.list.indentationSize": "adaptive",
   "markdown.extension.toc.levels": "2..5",
   "markdown.extension.toc.omittedFromToc": {
-    "notes.md": ["## Contents"]
+    "notes.md": [
+      "## Contents"
+    ]
   },
   "markdown.extension.toc.orderedList": false,
   "markdown.extension.toc.unorderedList.marker": "-",
@@ -317,7 +474,9 @@
     "**/bin": true,
     "**/obj": true
   },
-  "security.allowedUNCHosts": ["wsl.localhost"],
+  "security.allowedUNCHosts": [
+    "wsl.localhost"
+  ],
   "security.workspace.trust.untrustedFiles": "open",
   "settingsSync.ignoredSettings": [
     "chat.promptFilesLocations",
@@ -360,7 +519,10 @@
       "source": "PowerShell"
     },
     "PowerShell (No Profile)": {
-      "args": ["-NoLogo", "-NoProfile"],
+      "args": [
+        "-NoLogo",
+        "-NoProfile"
+      ],
       "icon": "terminal-powershell",
       "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
     },
@@ -392,8 +554,30 @@
       "command": "vscode-neovim.lua"
     }
   },
-  "vscode-neovim.ctrlKeysForInsertMode": ["d", "h", "j", "m", "o", "r", "t", "u", "w"],
-  "vscode-neovim.ctrlKeysForNormalMode": ["e", "d", "h", "j", "m", "o", "r", "t", "u", "w", "y"],
+  "vscode-neovim.ctrlKeysForInsertMode": [
+    "d",
+    "h",
+    "j",
+    "m",
+    "o",
+    "r",
+    "t",
+    "u",
+    "w"
+  ],
+  "vscode-neovim.ctrlKeysForNormalMode": [
+    "e",
+    "d",
+    "h",
+    "j",
+    "m",
+    "o",
+    "r",
+    "t",
+    "u",
+    "w",
+    "y"
+  ],
   "vscode-neovim.neovimClean": false,
   "vscode-neovim.neovimExecutablePaths.win32": "C:/Program Files/Neovim/bin/nvim.exe",
   "vscode-neovim.neovimWidth": 500,
@@ -567,5 +751,67 @@
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-  "workbench.tips.enabled": true
+  "workbench.tips.enabled": true,
+  "dashboard.recentColors": [
+    [
+      "#52001F",
+      "Castro"
+    ],
+    [
+      "#DCB20C",
+      "Galliano"
+    ],
+    [
+      "#DBDBDB",
+      "Alto"
+    ],
+    [
+      "#8EABC1",
+      "Nepal"
+    ],
+    [
+      "#FFFFFF",
+      "White"
+    ],
+    [
+      "#FEF5F1",
+      "Provincial Pink"
+    ],
+    [
+      "#D87C63",
+      "Japonica"
+    ],
+    [
+      "#F57584",
+      "Froly"
+    ],
+    [
+      "#D0F0C0",
+      "Tea Green"
+    ],
+    [
+      "#8C6495",
+      "Trendy Pink"
+    ],
+    [
+      "#63B76C",
+      "Fern"
+    ],
+    [
+      "#ACB78E",
+      "Swamp Green"
+    ],
+    [
+      "#98811B",
+      "Hacienda"
+    ],
+    [
+      "#19535F",
+      "Midnight green"
+    ],
+    [
+      "#3a86ff",
+      "Azure"
+    ]
+  ]
 }
