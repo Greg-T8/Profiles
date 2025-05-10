@@ -63,8 +63,8 @@
   "editor.cursorStyle": "line-thin",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.detectIndentation": false,
-  "editor.fontFamily": "Cascadia Code",
-  "editor.fontLigatures": "'ss01', 'ss02', 'ss03', 'ss04', 'ss05', 'ss06', 'zero', 'onum', 'calt'",
+  "editor.fontFamily": "Cascadia Code, Consolas",
+  "editor.fontLigatures": "'calt', 'ss01'",
   "editor.fontSize": 14,
   "editor.fontWeight": "normal",
   "editor.formatOnType": true,
@@ -91,6 +91,16 @@
   "editor.suggestSelection": "recentlyUsed",
   "editor.tabCompletion": "off",
   "editor.tabSize": 4,
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "scope": "comment.line",
+        "settings": {
+          "fontStyle": "italic"
+        }
+      },
+    ]
+  },
   "editor.useTabStops": true,
   "editor.wordSeparators": "-.$,\"<>",
   "editor.wordWrap": "off",
@@ -277,9 +287,7 @@
   "markdown.extension.list.indentationSize": "adaptive",
   "markdown.extension.toc.levels": "2..5",
   "markdown.extension.toc.omittedFromToc": {
-    "notes.md": [
-      "## Contents"
-    ]
+    "notes.md": ["## Contents"]
   },
   "markdown.extension.toc.orderedList": false,
   "markdown.extension.toc.unorderedList.marker": "-",
@@ -309,9 +317,7 @@
     "**/bin": true,
     "**/obj": true
   },
-  "security.allowedUNCHosts": [
-    "wsl.localhost"
-  ],
+  "security.allowedUNCHosts": ["wsl.localhost"],
   "security.workspace.trust.untrustedFiles": "open",
   "settingsSync.ignoredSettings": [
     "chat.promptFilesLocations",
@@ -331,7 +337,7 @@
   "terminal.integrated.defaultProfile.linux": "zsh",
   "terminal.integrated.defaultProfile.windows": "PowerShell",
   "terminal.integrated.enableMultiLinePasteWarning": "auto",
-  "terminal.integrated.fontFamily": "Cascadia Code",
+  "terminal.integrated.fontFamily": "Cascadia Mono",
   "terminal.integrated.fontSize": 14,
   "terminal.integrated.fontWeight": "400",
   "terminal.integrated.profiles.linux": {
@@ -354,10 +360,7 @@
       "source": "PowerShell"
     },
     "PowerShell (No Profile)": {
-      "args": [
-        "-NoLogo",
-        "-NoProfile"
-      ],
+      "args": ["-NoLogo", "-NoProfile"],
       "icon": "terminal-powershell",
       "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
     },
@@ -389,30 +392,8 @@
       "command": "vscode-neovim.lua"
     }
   },
-  "vscode-neovim.ctrlKeysForInsertMode": [
-    "d",
-    "h",
-    "j",
-    "m",
-    "o",
-    "r",
-    "t",
-    "u",
-    "w"
-  ],
-  "vscode-neovim.ctrlKeysForNormalMode": [
-    "e",
-    "d",
-    "h",
-    "j",
-    "m",
-    "o",
-    "r",
-    "t",
-    "u",
-    "w",
-    "y"
-  ],
+  "vscode-neovim.ctrlKeysForInsertMode": ["d", "h", "j", "m", "o", "r", "t", "u", "w"],
+  "vscode-neovim.ctrlKeysForNormalMode": ["e", "d", "h", "j", "m", "o", "r", "t", "u", "w", "y"],
   "vscode-neovim.neovimClean": false,
   "vscode-neovim.neovimExecutablePaths.win32": "C:/Program Files/Neovim/bin/nvim.exe",
   "vscode-neovim.neovimWidth": 500,
@@ -485,6 +466,7 @@
     "editor.suggestSelection",
     "editor.inlineSuggest.syntaxHighlightingEnabled",
     "editor.tabCompletion",
+    "editor.tokenColorCustomizations",
     "editor.useTabStops",
     "explorer.confirmDelete",
     "explorer.confirmDragAndDrop",
