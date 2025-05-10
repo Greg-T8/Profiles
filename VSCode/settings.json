@@ -1,0 +1,560 @@
+{
+  // My VSCode settings
+  "[c]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "[jsonc]": {
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "prettier.printWidth": 110,
+    "prettier.tabWidth": 2
+  },
+  "[markdown]": {
+    "editor.autoClosingBrackets": "never",
+    "editor.defaultFormatter": "yzhang.markdown-all-in-one",
+    "editor.detectIndentation": false,
+    "editor.fontFamily": "Fira Code",
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.wordWrap": "on",
+    "files.trimTrailingWhitespace": false
+  },
+  "[mysql]": {
+    "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
+  },
+  "[plaintext]": {
+    "editor.detectIndentation": false,
+    "editor.insertSpaces": false,
+    "editor.tabSize": 2,
+    "editor.wordWrap": "on",
+    "files.trimTrailingWhitespace": false
+  },
+  "[powershell]": {
+    "editor.defaultFormatter": "ms-vscode.powershell"
+  },
+  "[xml]": {
+    "editor.defaultFormatter": "PrateekMahendrakar.prettyxml"
+  },
+  "betterAlign.alignAfterTypeEnter": false,
+  "betterAlign.indentBase": "firstline",
+  "chat.agent.enabled": true,
+  "chat.promptFiles": true,
+  "chat.promptFilesLocations": {
+    "C:/Users/gregt/AppData/Roaming/Code/User/prompts": true
+  },
+  "dashboard.openOnStartup": "empty workspace",
+  "debug.inlineValues": "auto",
+  "diffEditor.ignoreTrimWhitespace": true,
+  "editor.acceptSuggestionOnCommitCharacter": false,
+  "editor.acceptSuggestionOnEnter": "off",
+  "editor.accessibilitySupport": "off",
+  "editor.autoClosingBrackets": "beforeWhitespace",
+  "editor.autoClosingQuotes": "never",
+  "editor.autoIndent": "full",
+  "editor.bracketPairColorization.enabled": true,
+  "editor.cursorBlinking": "smooth",
+  "editor.cursorSmoothCaretAnimation": "on",
+  "editor.cursorStyle": "line-thin",
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.detectIndentation": false,
+  "editor.fontFamily": "Cascadia Code",
+  "editor.fontLigatures": "'ss01', 'ss02', 'ss03', 'ss04', 'ss05', 'ss06', 'zero', 'onum', 'calt'",
+  "editor.fontSize": 14,
+  "editor.fontWeight": "normal",
+  "editor.formatOnType": true,
+  "editor.guides.bracketPairs": "active",
+  "editor.guides.bracketPairsHorizontal": true,
+  "editor.guides.highlightActiveBracketPair": true,
+  "editor.guides.highlightActiveIndentation": true,
+  "editor.inlineSuggest.edits.showCollapsed": false,
+  "editor.inlineSuggest.enabled": true, // Controls Copilot suggestions
+  "editor.inlineSuggest.syntaxHighlightingEnabled": true,
+  "editor.insertSpaces": false,
+  "editor.lineNumbers": "relative",
+  "editor.minimap.enabled": false,
+  "editor.parameterHints.enabled": false,
+  "editor.quickSuggestions": {
+    "comments": false,
+    "other": false,
+    "strings": false
+  },
+  "editor.quickSuggestionsDelay": 250, // Previously 1000
+  "editor.snippetSuggestions": "top",
+  "editor.suggest.showSnippets": false,
+  "editor.suggestOnTriggerCharacters": true, // Controls whether Intellisense pops up when hitting a period
+  "editor.suggestSelection": "recentlyUsed",
+  "editor.tabCompletion": "off",
+  "editor.tabSize": 4,
+  "editor.useTabStops": true,
+  "editor.wordSeparators": "-.$,\"<>",
+  "editor.wordWrap": "off",
+  "explorer.confirmDelete": false,
+  "explorer.confirmDragAndDrop": false,
+  "explorer.sortOrder": "default",
+  "extensions.experimental.affinity": {
+    "asvetliakov.vscode-neovim": 1,
+    "vscodevim.vim": 1
+  },
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 10000,
+  "files.hotExit": "onExitAndWindowClose",
+  "files.trimFinalNewlines": true,
+  "files.trimTrailingWhitespace": true,
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "github.copilot.chat.agent.thinkingTool": true, // Updated on 2025-04-17
+  "github.copilot.chat.codeGeneration.instructions": [],
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "text": "If any staged files reside under a /Books/<book name>/chapter folder, e.g. ch01, prefix the commit message with the relavent chapter number,e.g Ch01, corresponding to the folder; otherwise, do not include the prefix."
+    },
+    {
+      "text": "Include the prefix 'Notes' in the commit message when modifying markdown files."
+    }
+  ],
+  "github.copilot.chat.search.semanticTextResults": true,
+  "github.copilot.editor.enableCodeActions": true,
+  "github.copilot.enable": {
+    "*": true,
+    "c": false,
+    "csharp": true,
+    "javascript": true,
+    "markdown": true,
+    "plaintext": true,
+    "powershell": true,
+    "python": true,
+    "scminput": false
+  },
+  "github.copilot.nextEditSuggestions.enabled": true,
+  "github.copilot.renameSuggestions.triggerAutomatically": true,
+  "github.copilot.selectedCompletionModel": "",
+  "hediet.vscode-drawio.appearance": "automatic",
+  "hediet.vscode-drawio.codeLinkActivated": false,
+  "hediet.vscode-drawio.colorNames": {
+    "00B3E2": "Quisitive Blue",
+    "3E3E4B": "Quisitive Black",
+    "4B8E6C": "Personal Green",
+    "5881BA": "Personal Blue Grey",
+    "C0C0C0": "Personal Light Grey"
+  },
+  "hediet.vscode-drawio.customColorSchemes": [
+    [
+      {
+        "fill": "light-dark(#2B5CA8,transparent)",
+        "font": "light-dark(#FFFFFF, #FFFFFF)",
+        "fontSize": "34",
+        "stroke": "light-dark(#000000,#5881BA)",
+        "title": "Filled Shape w/ Text"
+      },
+      {
+        "fill": "light-dark(#FFFFFF,transparent)",
+        "font": "light-dark(#000000, #C0C0C0)",
+        "fontSize": "34",
+        "stroke": "light-dark(#000000,#5881BA)",
+        "title": "Blank Shape w/ Text"
+      }
+    ],
+    [
+      {
+        "fill": "light-dark(#00B3E2,#B2E8F6)",
+        "font": "light-dark(#FFFFFF, #3E3E4B)",
+        "stroke": "light-dark(#3E3E4B)",
+        "title": "Quisitive Basic"
+      }
+    ]
+  ],
+  "hediet.vscode-drawio.customFonts": [
+    "Shantell Sans",
+    "Sofia Pro",
+    "Cascadia Code",
+    "Fira Code",
+    "Fira Mono"
+  ],
+  "hediet.vscode-drawio.customLibraries": [
+    {
+      "file": "C:/Users/gregt/OneDrive/Apps/draw.io/hashicorp-draw-io.xml",
+      "libName": "Hashicorp Basic"
+    }
+  ],
+  "hediet.vscode-drawio.defaultEdgeStyle": {
+    "endArrow": "blockThin",
+    "endSize": "12",
+    "fontColor": "light-dark(#000000, #FFFFFF)",
+    "fontFamily": "Shantell Sans",
+    "fontSize": "18",
+    "fontSource": "https://fonts.googleapis.com/css?family=Shantell+Sans",
+    "strokeColor": "light-dark(#2B5CA8,#5881BA)",
+    "strokeWidth": "2"
+  },
+  "hediet.vscode-drawio.defaultVertexStyle": {
+    "arcsize": "6",
+    "fillColor": "light-dark(#2B5CA8,transparent)",
+    "fontColor": "light-dark(#000000, #b8b8ba)",
+    "fontFamily": "Shantell Sans",
+    "fontSize": "18",
+    "fontSource": "https://fonts.googleapis.com/css?family=Shantell+Sans",
+    "rounded": "1",
+    "strokeColor": "light-dark(#000000,#5881BA)",
+    "strokeWidth": "2"
+  },
+  "hediet.vscode-drawio.presetColors": [
+    "5881ba",
+    "c0c0c0",
+    "4b8e6c",
+    "FFFFFF",
+    "00B3E2",
+    "3E3E4B",
+    "E5F7FC",
+    "EBEDED",
+    "B2E8F6",
+    "E2F2E8",
+    "8DB9D9",
+    "D3EDF1",
+    "2DCCD3",
+    "00AD93",
+    "AD1AAC",
+    "F15D23",
+    "FAC458",
+    "DDE2E2"
+  ],
+  "hediet.vscode-drawio.styles": [
+    {
+      "commonStyle": {
+        "fontFamily": "Shantell Sans",
+        "fontSize": "18",
+        "fontSource": "https://fonts.googleapis.com/css?family=Shantell+Sans",
+        "strokeWidth": "2"
+      },
+      "edgeStyle": {
+        "endArrow": "blockThin",
+        "endSize": "12",
+        "fontColor": "light-dark(#000000, #FFFFFF)",
+        "strokeColor": "light-dark(#2B5CA8,#5881BA)"
+      },
+      "vertexStyle": {
+        "arcSize": "6",
+        "fillColor": "light-dark(#3c6f83,transparent)",
+        "fontColor": "light-dark(#FFFFFF, #b8b8ba)",
+        "rounded": "1",
+        "strokeColor": "light-dark(#000000,#5881BA)"
+      }
+    },
+    {
+      "commonStyle": {
+        "arcSize": "13",
+        "fillColor": "light-dark(#00B3E2,#E5F7FC)",
+        "fontColor": "light-dark(#FFFFFF, #3E3E4B)",
+        "fontFamily": "Sofia Pro",
+        "fontSize": "22",
+        "opacity": "100",
+        "rounded": "1",
+        "strokeColor": "light-dark(#3E3E4B,#00B3E2)",
+        "strokeWidth": "2"
+      }
+    }
+  ],
+  "hediet.vscode-drawio.theme": "min",
+  "html.autoClosingTags": true,
+  "html.autoCreateQuotes": false,
+  "inlineChat.finishOnType": true,
+  "inlineChat.holdToSpeech": true,
+  "markdown.copyFiles.destination": {
+    "*": "images/${unixTime}.png"
+  },
+  "markdown.editor.filePaste.enabled": "always",
+  // "markdown.editor.filePaste.enabled": true,
+  "markdown.extension.completion.enabled": false,
+  "markdown.extension.completion.respectVscodeSearchExclude": true,
+  "markdown.extension.completion.root": ".",
+  "markdown.extension.list.indentationSize": "adaptive",
+  "markdown.extension.toc.levels": "2..5",
+  "markdown.extension.toc.omittedFromToc": {
+    "notes.md": ["## Contents"]
+  },
+  "markdown.extension.toc.orderedList": false,
+  "markdown.extension.toc.unorderedList.marker": "-",
+  "markdown.extension.toc.updateOnSave": true,
+  "markdown.preview.fontSize": 14,
+  "markdown.preview.lineHeight": 1.4,
+  "markdown.preview.scrollEditorWithPreview": false,
+  "markdown.preview.scrollPreviewWithEditor": true,
+  "markdown.updateLinksOnFileMove.enabled": "always",
+  "markdownlint.config": {
+    "MD033": false,
+    "MD045": false
+  },
+  "markdownlint.run": "onSave",
+  "MarkdownPaste.enableImgTag": true,
+  "MarkdownPaste.nameBase": "${datetime|yyyyMMDDHHmmss}",
+  "MarkdownPaste.path": "${fileDirname}/images",
+  "MarkdownPaste.silence": false,
+  "prettyxml.settings.indentSpaceLength": 2,
+  "rewrap.autoWrap.enabled": false,
+  "rewrap.autoWrap.notification": "icon",
+  "rewrap.doubleSentenceSpacing": false,
+  "rewrap.reformat": false,
+  "rewrap.wholeComment": false,
+  "rewrap.wrappingColumn": 80,
+  "search.exclude": {
+    "**/bin": true,
+    "**/obj": true
+  },
+  "security.allowedUNCHosts": ["wsl.localhost"],
+  "security.workspace.trust.untrustedFiles": "open",
+  "settingsSync.ignoredSettings": [
+    "chat.promptFilesLocations",
+    "dashboard.openOnStartup",
+    "powershell.scriptAnalysis.settingsPath"
+  ],
+  "terminal.integrated.commandsToSkipShell": [
+    "workbench.action.toggleAuxiliaryBar",
+    "workbench.action.toggleSidebarVisibility",
+    "workbench.action.focusActiveEditorGroup",
+    "workbench.action.focusSideBar",
+    "workbench.action.focusAuxiliaryBar",
+    "workbench.action.increaseViewSize",
+    "workbench.action.decreaseViewSize"
+  ],
+  "terminal.integrated.copyOnSelection": true,
+  "terminal.integrated.defaultProfile.linux": "zsh",
+  "terminal.integrated.defaultProfile.windows": "PowerShell",
+  "terminal.integrated.enableMultiLinePasteWarning": "auto",
+  "terminal.integrated.fontFamily": "Cascadia Code",
+  "terminal.integrated.fontSize": 14,
+  "terminal.integrated.fontWeight": "400",
+  "terminal.integrated.profiles.linux": {
+    "bash": {
+      "icon": "terminal-bash",
+      "path": "bash"
+    },
+    "JavaScript Debug Terminal": null,
+    "tmux": null,
+    "zsh": {
+      "path": "zsh"
+    }
+  },
+  "terminal.integrated.profiles.windows": {
+    "Command Prompt": null,
+    "Git Bash": null,
+    "JavaScript Debug Terminal": null,
+    "PowerShell": {
+      "icon": "terminal-powershell",
+      "source": "PowerShell"
+    },
+    "PowerShell (No Profile)": {
+      "args": ["-NoLogo", "-NoProfile"],
+      "icon": "terminal-powershell",
+      "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
+    },
+    "Windows PowerShell": {
+      "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
+    }
+  },
+  "terminal.integrated.shellIntegration.decorationsEnabled": "never",
+  "terminal.integrated.shellIntegration.showCommandGuide": true,
+  "terminal.integrated.suggest.enabled": false,
+  "terminal.integrated.suggest.quickSuggestions": {
+    "arguments": "on",
+    "commands": "on",
+    "unknown": "on"
+  },
+  "terminal.integrated.useWslProfiles": false,
+  "vscode-neovim.compositeKeys": {
+    "jj": {
+      "command": "vscode-neovim.escape"
+    },
+    "jk": {
+      "args": [
+        [
+          "local code = require('vscode')",
+          "code.action('vscode-neovim.escape')",
+          "code.action('workbench.action.files.save')"
+        ]
+      ],
+      "command": "vscode-neovim.lua"
+    }
+  },
+  "vscode-neovim.ctrlKeysForInsertMode": ["d", "h", "j", "m", "o", "r", "t", "u", "w"],
+  "vscode-neovim.ctrlKeysForNormalMode": ["e", "d", "h", "j", "m", "o", "r", "t", "u", "w", "y"],
+  "vscode-neovim.neovimClean": false,
+  "vscode-neovim.neovimExecutablePaths.win32": "C:/Program Files/Neovim/bin/nvim.exe",
+  "vscode-neovim.neovimWidth": 500,
+  "window.newWindowDimensions": "inherit",
+  "window.restoreWindows": "none",
+  "window.zoomLevel": 2,
+  "workbench.activityBar.location": "top",
+  "workbench.colorCustomizations": {
+    "statusBar.background": "#005f5f",
+    "statusBar.debuggingBackground": "#005f5f",
+    "statusBar.debuggingForeground": "#ffffff",
+    "statusBar.foreground": "#ffffff",
+    "statusBar.noFolderBackground": "#005f5f"
+  },
+  "workbench.colorTheme": "Default Dark Modern",
+  "workbench.editor.enablePreview": true,
+  "workbench.editor.enablePreviewFromQuickOpen": true,
+  "workbench.editor.highlightModifiedTabs": true,
+  "workbench.editor.limit.enabled": true,
+  "workbench.editor.limit.perEditorGroup": true,
+  "workbench.editor.limit.value": 5,
+  "workbench.editor.wrapTabs": true,
+  "workbench.editorAssociations": {
+    "*.svg": "hediet.vscode-drawio-text"
+  },
+  "workbench.iconTheme": "vs-seti",
+  "workbench.panel.defaultLocation": "bottom",
+  "workbench.productIconTheme": "Default",
+  "workbench.settings.applyToAllProfiles": [
+    "betterAlign.alignAfterTypeEnter",
+    "betterAlign.indentBase",
+    "chat.agent.enable",
+    "chat.promptFilesLocations",
+    "cSpell.enabled",
+    "cSpell.allowCompoundWords",
+    "cSpell.showAutocompleteSuggestions",
+    "cSpell.showSuggestionsLinkInEditorContextMenu",
+    "cSpell.suggestionMenuType",
+    "cSpell.dictionaries",
+    "cSpell.dictionaryDefinitions",
+    "cSpell.language",
+    "cSpell.languageSettings",
+    "debug.inlineValues",
+    "editor.autoClosingBrackets",
+    "editor.autoClosingQuotes",
+    "editor.autoIndent",
+    "editor.bracketPairColorization.enabled",
+    "editor.defaultFormatter",
+    "editor.detectIndentation",
+    "editor.fontFamily",
+    "editor.fontLigatures",
+    "editor.fontSize",
+    "editor.fontWeight",
+    "editor.formatOnType",
+    "editor.guides.bracketPairs",
+    "editor.guides.bracketPairsHorizontal",
+    "editor.guides.highlightActiveBracketPair",
+    "editor.guides.highlightActiveIndentation",
+    "editor.inlineSuggest.enabled",
+    "editor.inlineSuggest.edits.showCollapsed",
+    "editor.lineNumbers",
+    "editor.minimap.enabled",
+    "editor.wordSeparators",
+    "editor.quickSuggestions",
+    "editor.quickSuggestionsDelay",
+    "editor.parameterHints.enabled",
+    "editor.suggestOnTriggerCharacters",
+    "editor.suggest.showSnippets",
+    "editor.snippetSuggestions",
+    "editor.suggestSelection",
+    "editor.inlineSuggest.syntaxHighlightingEnabled",
+    "editor.tabCompletion",
+    "editor.useTabStops",
+    "explorer.confirmDelete",
+    "explorer.confirmDragAndDrop",
+    "explorer.sortOrder",
+    "extensions.experimental.affinity",
+    "files.autoSave",
+    "files.autoSaveDelay",
+    "files.hotExit",
+    "files.trimFinalNewlines",
+    "files.trimTrailingWhitespace", // Would like to override only in markdown files
+    "git.autofetch",
+    "git.confirmSync",
+    "git.enableSmartCommit",
+    "github.copilot.chat.agent.thinkingTool",
+    "github.copilot.chat.codeGeneration.instructions",
+    "github.copilot.chat.codeGeneration.useInstructionFiles",
+    "github.copilot.chat.commitMessageGeneration.instructions",
+    "github.copilot.chat.search.semanticTextResults",
+    "github.copilot.editor.enableAutoCompletions",
+    "github.copilot.enable",
+    "github.copilot.nextEditSuggestions.enabled",
+    "hediet.vscode-drawio.appearance",
+    "hediet.vscode-drawio.codeLinkActivated",
+    "hediet.vscode-drawio.colorNames",
+    "hediet.vscode-drawio.customColorSchemes",
+    "hediet.vscode-drawio.customFonts",
+    "hediet.vscode-drawio.customLibraries",
+    "hediet.vscode-drawio.defaultEdgeStyle",
+    "hediet.vscode-drawio.defaultVertexStyle",
+    "hediet.vscode-drawio.presetColors",
+    "hediet.vscode-drawio.styles",
+    "hediet.vscode-drawio.theme",
+    "inlineChat.finishOnType",
+    "inlineChat.holdToSpeech",
+    "html.autoCreateQuotes",
+    "html.autoClosingTags",
+    "markdown.copyFiles.destination",
+    "markdown.editor.filePaste.enabled",
+    "markdown.extension.completion.enabled",
+    "markdown.extension.completion.root",
+    "markdown.extension.list.indentationSize",
+    "markdown.extension.completion.respectVscodeSearchExclude",
+    "markdown.extension.preview.autoShowPreviewToSide",
+    "markdown.extension.toc.omittedFromToc",
+    "markdown.extension.toc.orderedList",
+    "markdown.extension.toc.unorderedList.marker",
+    "markdown.extension.toc.updateOnSave",
+    "markdown.extension.toc.levels",
+    "markdown.preview.scrollEditorWithPreview",
+    "markdown.preview.scrollPreviewWithEditor",
+    "markdown.preview.fontSize",
+    "markdown.preview.lineHeight",
+    "markdown.updateLinksOnFileMove.enabled",
+    "markdownlint.run",
+    "MarkdownPaste.silence",
+    "MarkdownPaste.path",
+    "MarkdownPaste.nameBase",
+    "MarkdownPaste.enableImgTag",
+    "markdownlint.config",
+    "markdownPasteImage.showFilePathConfirmInputBox",
+    "prettyxml.settings.indentSpaceLength",
+    "rewrap.autoWrap.enabled",
+    "rewrap.autoWrap.notification",
+    "rewrap.doubleSentenceSpacing",
+    "rewrap.reformat",
+    "rewrap.wholeComment",
+    "search.exclude",
+    "settingsSync.ignoredSettings",
+    "terminal.useWslProfiles",
+    "terminal.integrated.commandsToSkipShell",
+    "terminal.integrated.copyOnSelection",
+    "terminal.integrated.shellIntegration.decorationsEnabled",
+    "terminal.integrated.defaultProfile.linux",
+    "terminal.integrated.defaultProfile.windows",
+    "terminal.integrated.profiles.linux",
+    "terminal.integrated.profiles.windows",
+    "terminal.integrated.shellIntegration.showCommandGuide",
+    "terminal.integrated.suggest.enabled",
+    "terminal.integrated.suggest.quickSuggestions",
+    "vscode-neovim.ctrlKeysForNormalMode",
+    "vscode-neovim.ctrlKeysForInsertMode",
+    "vscode-neovim.compositeKeys",
+    "vscode-neovim.neovimClean",
+    "vscode-neovim.neovimExecutablePaths.win32",
+    "vscode-neovim.neovimWidth",
+    "window.newWindowDimensions",
+    "window.restoreWindows",
+    "window.zoomLevel",
+    "workbench.activityBar.location",
+    "workbench.editorAssociations",
+    "workbench.experimental.enableNewProfilesUI",
+    "workbench.panel.defaultLocation",
+    "workbench.startupEditor",
+    "workbench.settings.editor",
+    "workbench.iconTheme",
+    "workbench.productIconTheme"
+  ],
+  "workbench.settings.editor": "json",
+  "workbench.settings.openDefaultSettings": false,
+  "workbench.startupEditor": "welcomePageInEmptyWorkbench",
+"workbench.tips.enabled": true,
+"[cpp]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools"
+}
+}
