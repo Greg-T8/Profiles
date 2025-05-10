@@ -48,8 +48,8 @@
   "chat.promptFilesLocations": {
     "C:/Users/gregt/AppData/Roaming/Code/User/prompts": true
   },
-  "dashboard.openOnStartup": "empty workspace",
   "dashboard.displayProjectPath": true,
+  "dashboard.openOnStartup": "empty workspace",
   "dashboard.projectData": [
     {
       "groupName": "Languages",
@@ -63,146 +63,208 @@
           "path": "vscode-remote://wsl+CCode/home/gtate/learningC-CPP/LearningC-CPP.code-workspace"
         },
         {
-          "isGitRepo": true,
+          "color": "#8338EC",
           "id": "javascript0hsy4zmv8maip9liw",
+          "isGitRepo": true,
           "name": "JavaScript",
-          "path": "c:\\Users\\gregt\\LocalCode\\LearningJavaScript\\LearningJavaScript.code-workspace",
-          "color": "#8338EC"
+          "path": "c:\\Users\\gregt\\LocalCode\\LearningJavaScript\\LearningJavaScript.code-workspace"
         },
         {
-          "isGitRepo": true,
+          "color": "linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%)",
           "id": "cssn994kkqa1maipb2cr",
+          "isGitRepo": true,
           "name": "CSS",
-          "path": "c:\\Users\\gregt\\LocalCode\\LearningCSS\\LearningCSS.code-workspace",
-          "color": "linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%)"
+          "path": "c:\\Users\\gregt\\LocalCode\\LearningCSS\\LearningCSS.code-workspace"
         },
         {
-          "isGitRepo": true,
+          "color": "#549be2",
           "id": "dotnet1yfn5aeo3maipbmkz",
+          "isGitRepo": true,
           "name": "DotNet",
-          "path": "c:\\Users\\gregt\\LocalCode\\LearningDotNet\\LearningDotNet.code-workspace",
-          "color": "#549be2"
+          "path": "c:\\Users\\gregt\\LocalCode\\LearningDotNet\\LearningDotNet.code-workspace"
         },
         {
-          "isGitRepo": true,
+          "color": "#63b76c",
           "id": "pythondjfx2c4xpmaipc5yr",
+          "isGitRepo": true,
           "name": "Python",
-          "path": "c:\\Users\\gregt\\LocalCode\\LearningPython\\LearningPython.code-workspace",
-          "color": "#63b76c"
+          "path": "c:\\Users\\gregt\\LocalCode\\LearningPython\\LearningPython.code-workspace"
         },
         {
-          "isGitRepo": true,
+          "color": "#8acbda",
           "id": "gozf35umda8maipd20o",
+          "isGitRepo": true,
           "name": "Go",
-          "path": "c:\\Users\\gregt\\LocalCode\\LearningGo\\LearningGo.code-workspace",
-          "color": "#8acbda"
+          "path": "c:\\Users\\gregt\\LocalCode\\LearningGo\\LearningGo.code-workspace"
         },
         {
-          "isGitRepo": true,
+          "color": "#dbf24f",
           "id": "sql3x3abfahimaipebde",
+          "isGitRepo": true,
           "name": "SQL",
-          "path": "vscode-remote://wsl+MySQL/home/gtate/learningSQL/LearningSQL.code-workspace",
-          "color": "#dbf24f"
+          "path": "vscode-remote://wsl+MySQL/home/gtate/learningSQL/LearningSQL.code-workspace"
         }
       ]
     },
     {
-      "id": "systemst4o1r3thtmaipjfoi",
       "groupName": "Systems",
+      "id": "systemst4o1r3thtmaipjfoi",
       "projects": [
         {
-          "isGitRepo": true,
+          "color": "#e1e34c",
           "id": "blogpv73e3qmemaiq8lv8",
+          "isGitRepo": true,
           "name": "Blog",
-          "path": "c:\\Users\\gregt\\LocalCode\\Blog",
-          "color": "#e1e34c"
+          "path": "c:\\Users\\gregt\\LocalCode\\Blog"
         },
         {
-          "isGitRepo": true,
+          "color": "#2e5c42",
           "id": "terraformtj10gu54zmaiq95o3",
+          "isGitRepo": true,
           "name": "Terraform",
-          "path": "c:\\Users\\gregt\\LocalCode\\LearningTerraform\\LearningTerraform.code-workspace",
-          "color": "#2e5c42"
+          "path": "c:\\Users\\gregt\\LocalCode\\LearningTerraform\\LearningTerraform.code-workspace"
         },
         {
-          "isGitRepo": true,
+          "color": "#4869d7",
           "id": "kubernetesy1abqtua2maiqapak",
+          "isGitRepo": true,
           "name": "Kubernetes",
-          "path": "vscode-remote://wsl+Kubernetes/home/gtate/LearningKubernetes/LearningKubernetes.code-workspace",
-          "color": "#4869d7"
+          "path": "vscode-remote://wsl+Kubernetes/home/gtate/LearningKubernetes/LearningKubernetes.code-workspace"
         },
         {
-          "isGitRepo": true,
+          "color": "linear-gradient(43deg, #581dd3 0%, #d23ed8 100%)",
           "id": "kalilinuxaad79g6zwmaiqc4sh",
+          "isGitRepo": true,
           "name": "Kali Linux",
-          "path": "vscode-remote://wsl+Kali/home/gtate/LearningOffsec/LearningOffsec.code-workspace",
-          "color": "linear-gradient(43deg, #581dd3 0%, #d23ed8 100%)"
+          "path": "vscode-remote://wsl+Kali/home/gtate/LearningOffsec/LearningOffsec.code-workspace"
         }
       ]
     },
     {
-      "id": "workysmri3ipqmaipjirc",
       "groupName": "Work",
+      "id": "workysmri3ipqmaipjirc",
       "projects": [
         {
-          "isGitRepo": true,
+          "color": "#00b3e2",
           "id": "infscriptszd34qajbimaiqcp06",
+          "isGitRepo": true,
           "name": "INF - Scripts",
-          "path": "c:\\Users\\gregt\\OneDrive - Quisitive\\Code\\Azure DevOps\\INF - Scripts",
-          "color": "#00b3e2"
+          "path": "c:\\Users\\gregt\\OneDrive - Quisitive\\Code\\Azure DevOps\\INF - Scripts"
         }
       ]
     },
     {
-      "id": "profiles2ce7zszmvmaipjlz7",
       "groupName": "Profiles",
+      "id": "profiles2ce7zszmvmaipjlz7",
       "projects": [
         {
-          "isGitRepo": true,
+          "color": "#e916a0",
           "id": "githubprofilehmhoxw6k5maiqd6ny",
+          "isGitRepo": true,
           "name": "GitHub Profile",
-          "path": "c:\\Users\\gregt\\OneDrive\\Code\\GitHub\\GitHubProfile",
-          "color": "#e916a0"
+          "path": "c:\\Users\\gregt\\OneDrive\\Code\\GitHub\\GitHubProfile"
         },
         {
-          "isGitRepo": true,
+          "color": "#863c3c",
           "id": "kinesisadv360propzyl5z5ldmaiqdlui",
+          "isGitRepo": true,
           "name": "KinesisAdv360Pro",
-          "path": "c:\\Users\\gregt\\OneDrive\\Code\\GitHub\\KinesisAdv360Pro",
-          "color": "#863c3c"
+          "path": "c:\\Users\\gregt\\OneDrive\\Code\\GitHub\\KinesisAdv360Pro"
         },
         {
-          "isGitRepo": true,
+          "color": "#8EABC1",
           "id": "neovim4vkv167demaiqe71b",
+          "isGitRepo": true,
           "name": "Neovim",
-          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\nvim",
-          "color": "#8EABC1"
+          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\nvim"
         },
         {
-          "isGitRepo": true,
+          "color": "#529bc0",
           "id": "powershellz7gs6blw9maiqej5p",
+          "isGitRepo": true,
           "name": "PowerShell",
-          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\PowerShell",
-          "color": "#529bc0"
+          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\PowerShell"
         },
         {
-          "isGitRepo": true,
+          "color": "#DCB20C",
           "id": "vscodeoodjqtkzxmaiqetz9",
+          "isGitRepo": true,
           "name": "VSCode",
-          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\VSCode",
-          "color": "#DCB20C"
+          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\VSCode"
         },
         {
-          "isGitRepo": true,
+          "color": "#0290fd",
           "id": "windowsterminalgumg8ku9kmaiqf605",
+          "isGitRepo": true,
           "name": "Windows Terminal",
-          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\Windows Terminal",
-          "color": "#0290fd"
+          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\Windows Terminal"
         }
       ]
     }
   ],
   "dashboard.projectTileWidth": 350,
+  "dashboard.recentColors": [
+    [
+      "#52001F",
+      "Castro"
+    ],
+    [
+      "#DCB20C",
+      "Galliano"
+    ],
+    [
+      "#DBDBDB",
+      "Alto"
+    ],
+    [
+      "#8EABC1",
+      "Nepal"
+    ],
+    [
+      "#FFFFFF",
+      "White"
+    ],
+    [
+      "#FEF5F1",
+      "Provincial Pink"
+    ],
+    [
+      "#D87C63",
+      "Japonica"
+    ],
+    [
+      "#F57584",
+      "Froly"
+    ],
+    [
+      "#D0F0C0",
+      "Tea Green"
+    ],
+    [
+      "#8C6495",
+      "Trendy Pink"
+    ],
+    [
+      "#63B76C",
+      "Fern"
+    ],
+    [
+      "#ACB78E",
+      "Swamp Green"
+    ],
+    [
+      "#98811B",
+      "Hacienda"
+    ],
+    [
+      "#19535F",
+      "Midnight green"
+    ],
+    [
+      "#3a86ff",
+      "Azure"
+    ]
+  ],
   "dashboard.storeProjectsInSettings": true,
   "debug.inlineValues": "auto",
   "diffEditor.ignoreTrimWhitespace": true,
@@ -751,67 +813,5 @@
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-  "workbench.tips.enabled": true,
-  "dashboard.recentColors": [
-    [
-      "#52001F",
-      "Castro"
-    ],
-    [
-      "#DCB20C",
-      "Galliano"
-    ],
-    [
-      "#DBDBDB",
-      "Alto"
-    ],
-    [
-      "#8EABC1",
-      "Nepal"
-    ],
-    [
-      "#FFFFFF",
-      "White"
-    ],
-    [
-      "#FEF5F1",
-      "Provincial Pink"
-    ],
-    [
-      "#D87C63",
-      "Japonica"
-    ],
-    [
-      "#F57584",
-      "Froly"
-    ],
-    [
-      "#D0F0C0",
-      "Tea Green"
-    ],
-    [
-      "#8C6495",
-      "Trendy Pink"
-    ],
-    [
-      "#63B76C",
-      "Fern"
-    ],
-    [
-      "#ACB78E",
-      "Swamp Green"
-    ],
-    [
-      "#98811B",
-      "Hacienda"
-    ],
-    [
-      "#19535F",
-      "Midnight green"
-    ],
-    [
-      "#3a86ff",
-      "Azure"
-    ]
-  ]
+  "workbench.tips.enabled": true
 }
