@@ -3,6 +3,9 @@
   "[c]": {
     "editor.defaultFormatter": "ms-vscode.cpptools"
   },
+  "[cpp]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools"
+  },
   "[html]": {
     "editor.defaultFormatter": "vscode.html-language-features"
   },
@@ -274,7 +277,9 @@
   "markdown.extension.list.indentationSize": "adaptive",
   "markdown.extension.toc.levels": "2..5",
   "markdown.extension.toc.omittedFromToc": {
-    "notes.md": ["## Contents"]
+    "notes.md": [
+      "## Contents"
+    ]
   },
   "markdown.extension.toc.orderedList": false,
   "markdown.extension.toc.unorderedList.marker": "-",
@@ -304,7 +309,9 @@
     "**/bin": true,
     "**/obj": true
   },
-  "security.allowedUNCHosts": ["wsl.localhost"],
+  "security.allowedUNCHosts": [
+    "wsl.localhost"
+  ],
   "security.workspace.trust.untrustedFiles": "open",
   "settingsSync.ignoredSettings": [
     "chat.promptFilesLocations",
@@ -347,7 +354,10 @@
       "source": "PowerShell"
     },
     "PowerShell (No Profile)": {
-      "args": ["-NoLogo", "-NoProfile"],
+      "args": [
+        "-NoLogo",
+        "-NoProfile"
+      ],
       "icon": "terminal-powershell",
       "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
     },
@@ -379,8 +389,30 @@
       "command": "vscode-neovim.lua"
     }
   },
-  "vscode-neovim.ctrlKeysForInsertMode": ["d", "h", "j", "m", "o", "r", "t", "u", "w"],
-  "vscode-neovim.ctrlKeysForNormalMode": ["e", "d", "h", "j", "m", "o", "r", "t", "u", "w", "y"],
+  "vscode-neovim.ctrlKeysForInsertMode": [
+    "d",
+    "h",
+    "j",
+    "m",
+    "o",
+    "r",
+    "t",
+    "u",
+    "w"
+  ],
+  "vscode-neovim.ctrlKeysForNormalMode": [
+    "e",
+    "d",
+    "h",
+    "j",
+    "m",
+    "o",
+    "r",
+    "t",
+    "u",
+    "w",
+    "y"
+  ],
   "vscode-neovim.neovimClean": false,
   "vscode-neovim.neovimExecutablePaths.win32": "C:/Program Files/Neovim/bin/nvim.exe",
   "vscode-neovim.neovimWidth": 500,
@@ -553,8 +585,5 @@
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-"workbench.tips.enabled": true,
-"[cpp]": {
-    "editor.defaultFormatter": "ms-vscode.cpptools"
-}
+  "workbench.tips.enabled": true
 }
