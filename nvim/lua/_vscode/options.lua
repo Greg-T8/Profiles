@@ -20,11 +20,15 @@ vim.api.nvim_set_keymap('n', '<leader>it',
     "<Cmd>call VSCodeNotify('openInIntegratedTerminal')<CR>",
     { noremap = true, silent = true })
 
+-- Toggle code block when in markdown
+vim.api.nvim_set_keymap('n', '<leader>tc',
+    "<Cmd>call VSCodeNotify('markdown.extension.editing.toggleCodeBlock')<CR>a",
+    { noremap = true, silent = true })
+
 -- Open television file finder
 vim.api.nvim_set_keymap('n', '<leader>tvf',
     "<Cmd>call VSCodeNotify('television.ToggleFileFinder')<CR>",
     { noremap = true, silent = true })
-
 
 -- Open television text finder
 vim.api.nvim_set_keymap('n', '<leader>tvt',
