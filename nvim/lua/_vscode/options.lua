@@ -21,7 +21,7 @@ vim.api.nvim_set_keymap('n', '<leader>it',
     { noremap = true, silent = true })
 
 -- Toggle code block when in markdown
-vim.api.nvim_set_keymap('n', '<leader>tc',
+vim.api.nvim_set_keymap('n', '<leader>ic',
     "<Cmd>call VSCodeNotify('markdown.extension.editing.toggleCodeBlock')<CR>a",
     { noremap = true, silent = true })
 
