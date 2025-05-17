@@ -3,7 +3,6 @@ Always include a comment section at the top that describes the program.
 In the comment section, include the context in the book, if applicable.
 In the comment section, include my display name (Greg Tate).
 In the comment section, include today's date.
-Include my location (Austin, TX)
 
 # Comments for the intent of code blocks
 Include a comment above each code block that describes the intent of the code block.
