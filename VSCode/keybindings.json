@@ -471,5 +471,20 @@
       "key": "tab",
       "command": "-editor.action.inlineSuggest.jump",
       "when": "inlineEditIsVisible && tabShouldJumpToInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible"
+    },
+    {
+      "key": "ctrl+shift+tab",
+      "command": "-workbench.action.quickOpenNavigatePreviousInEditorPicker",
+      "when": "inEditorsPicker && inQuickOpen"
+    },
+    {
+      "key": "ctrl+shift+tab",
+      "command": "-workbench.action.quickOpenLeastRecentlyUsedEditorInGroup",
+      "when": "!activeEditorGroupEmpty"
+    },
+    {
+      "key": "ctrl+shift+tab",
+      "command": "hideSuggestWidget",
+      "when": "suggestWidgetVisible && textInputFocus"
     }
 ]
