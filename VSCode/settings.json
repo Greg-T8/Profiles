@@ -796,5 +796,8 @@
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-  "workbench.tips.enabled": true
+"workbench.tips.enabled": true,
+"[csharp]": {
+    "editor.defaultFormatter": "ms-dotnettools.csharp"
+}
 }
