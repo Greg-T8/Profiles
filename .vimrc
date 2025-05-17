@@ -6,6 +6,7 @@ set relativenumber
 set tabstop=4
 set shiftwidth=4
 set expandtab
+set showmode
 
 if &term =~ 'xterm' || &term =~ 'rxvt'
   " Change cursor to block in normal mode
@@ -41,7 +42,6 @@ imap <C-V>		<Esc>"+gpa
 
 cmap <C-V>		<C-R>+
 cmap <S-Insert>		<C-R>+
-
 
 imap <S-Insert>		<C-V>
 vmap <S-Insert>		<C-V>
