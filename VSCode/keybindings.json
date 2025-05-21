@@ -1,5 +1,13 @@
 // Place your key bindings in this file to override the defaults
 [
+  // Task keybindings
+  {
+    // Used for building C projects in the LearningC workspace
+    "key": "ctrl+alt+b",
+    "command": "workbench.action.tasks.runTask",
+    "args": "GCC Build",
+    "when": "config.workspaceKeybindings.gccbuild.enabled"
+  },
   // Terminal Overrides
   {
     //Terminal: Removed in favor of using terminal built-in Emacs command
@@ -335,7 +343,7 @@
     "key": "alt+v",
     "command": "workbench.action.focusActiveEditorGroup"
   },
-	{
+  {
     "key": "ctrl+shift+2",
     "command": "editor.action.inlineSuggest.showNext",
     "when": "inlineSuggestionVisible && !editorReadonly"
@@ -344,7 +352,7 @@
     "key": "alt+k",
     "command": "workbench.action.decreaseViewSize"
   },
-	{
+  {
     "key": "ctrl+shift+f",
     "command": "editor.action.selectHighlights",
     "when": "editorFocus"
@@ -369,7 +377,7 @@
     "command": "-editor.action.inlineSuggest.showPrevious",
     "when": "inlineSuggestionVisible && !editorReadonly"
   },
-	{
+  {
     "key": "alt+\\",
     "command": "-editor.action.inlineSuggest.trigger",
     "when": "editorTextFocus && !editorHasSelection && !inlineSuggestionsVisible"
@@ -427,64 +435,64 @@
     "key": "ctrl+j",
     "command": "-workbench.action.togglePanel"
   },
-	{
-		"key": "ctrl+q",
-		"command": "vscode-neovim.send",
-		"args": "<C-q>",
-		"when": "editorTextFocus && neovim.mode != insert",
-	},
-	{
-		"key": "ctrl+shift+2",
-		"command": "editor.action.inlineSuggest.trigger",
-		"when": "!editorReadonly && !inlineSuggestionVisible"
-	},
-	{
-		"key": "escape",
-		"command": "-editor.action.inlineSuggest.hide",
-		"when": "inlineEditIsVisible || inlineSuggestionVisible"
-    },
-    {
-        "key": "ctrl+shift+h",
-        "command": "terminal.focus"
-    },
-    {
-        "key": "ctrl+f",
-        "command": "-actions.find",
-        "when": "editorFocus || editorIsOpen"
-    },
-    {
-        "key": "ctrl+j",
-        "command": "list.focusDown",
-        "when": "terminalHasBeenCreated && terminalTabsFocus || terminalProcessSupported && terminalTabsFocus"
-    },
-    {
-        "key": "ctrl+k",
-        "command": "list.focusUp",
-        "when": "terminalHasBeenCreated && terminalTabsFocus || terminalProcessSupported && terminalTabsFocus"
-    },
-    {
-      "key": "ctrl+tab",
-      "command": "editor.action.inlineSuggest.jump",
-      "when": "inlineEditIsVisible && tabShouldJumpToInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible"
-    },
-    {
-      "key": "tab",
-      "command": "-editor.action.inlineSuggest.jump",
-      "when": "inlineEditIsVisible && tabShouldJumpToInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible"
-    },
-    {
-      "key": "ctrl+shift+tab",
-      "command": "-workbench.action.quickOpenNavigatePreviousInEditorPicker",
-      "when": "inEditorsPicker && inQuickOpen"
-    },
-    {
-      "key": "ctrl+shift+tab",
-      "command": "-workbench.action.quickOpenLeastRecentlyUsedEditorInGroup",
-      "when": "!activeEditorGroupEmpty"
-    },
-    {
-      "key": "ctrl+shift+tab",
-      "command": "hideSuggestWidget",
-      "when": "suggestWidgetVisible && textInputFocus"
-    }
+  {
+    "key": "ctrl+q",
+    "command": "vscode-neovim.send",
+    "args": "<C-q>",
+    "when": "editorTextFocus && neovim.mode != insert"
+  },
+  {
+    "key": "ctrl+shift+2",
+    "command": "editor.action.inlineSuggest.trigger",
+    "when": "!editorReadonly && !inlineSuggestionVisible"
+  },
+  {
+    "key": "escape",
+    "command": "-editor.action.inlineSuggest.hide",
+    "when": "inlineEditIsVisible || inlineSuggestionVisible"
+  },
+  {
+    "key": "ctrl+shift+h",
+    "command": "terminal.focus"
+  },
+  {
+    "key": "ctrl+f",
+    "command": "-actions.find",
+    "when": "editorFocus || editorIsOpen"
+  },
+  {
+    "key": "ctrl+j",
+    "command": "list.focusDown",
+    "when": "terminalHasBeenCreated && terminalTabsFocus || terminalProcessSupported && terminalTabsFocus"
+  },
+  {
+    "key": "ctrl+k",
+    "command": "list.focusUp",
+    "when": "terminalHasBeenCreated && terminalTabsFocus || terminalProcessSupported && terminalTabsFocus"
+  },
+  {
+    "key": "ctrl+tab",
+    "command": "editor.action.inlineSuggest.jump",
+    "when": "inlineEditIsVisible && tabShouldJumpToInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible"
+  },
+  {
+    "key": "tab",
+    "command": "-editor.action.inlineSuggest.jump",
+    "when": "inlineEditIsVisible && tabShouldJumpToInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible"
+  },
+  {
+    "key": "ctrl+shift+tab",
+    "command": "-workbench.action.quickOpenNavigatePreviousInEditorPicker",
+    "when": "inEditorsPicker && inQuickOpen"
+  },
+  {
+    "key": "ctrl+shift+tab",
+    "command": "-workbench.action.quickOpenLeastRecentlyUsedEditorInGroup",
+    "when": "!activeEditorGroupEmpty"
+  },
+  {
+    "key": "ctrl+shift+tab",
+    "command": "hideSuggestWidget",
+    "when": "suggestWidgetVisible && textInputFocus"
+  }
 ]
