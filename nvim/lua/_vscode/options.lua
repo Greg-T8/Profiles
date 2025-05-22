@@ -1,3 +1,6 @@
+-- Loads the VS Code API module
+local vscode = require('vscode')
+
 vim.opt.columns = 400
 
 -- Trigger move into new window
@@ -34,3 +37,18 @@ vim.api.nvim_set_keymap('n', '<leader>tvf',
 vim.api.nvim_set_keymap('n', '<leader>tvt',
     "<Cmd>call VSCodeNotify('television.ToggleTextFinder')<CR>",
     { noremap = true, silent = true })
+
+-- GCC Build functionality
+_G.build_if_gccbuild_enabled = function()
+  local enabled = vscode.get_config("workspaceKeybindings.gccbuild.enabled")
+  if enabled then
+    vim.cmd("call VSCodeNotify('workbench.action.tasks.runTask', 'GCC Build')")
+  else
+    print("GCC Build is disabled")
+  end
+end
+vim.api.nvim_set_keymap('n', '<leader>bc',
+    "<Cmd>lua build_if_gccbuild_enabled()<CR>",
+    { noremap = true, silent = true })
+
+    
