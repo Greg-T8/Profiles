@@ -1,13 +1,5 @@
 // Place your key bindings in this file to override the defaults
 [
-  // Task keybindings
-  {
-    // Used for building C projects in the LearningC workspace
-    "key": "ctrl+alt+b",
-    "command": "workbench.action.tasks.runTask",
-    "args": "GCC Build",
-    "when": "config.workspaceKeybindings.gccbuild.enabled"
-  },
   // Terminal Overrides
   {
     //Terminal: Removed in favor of using terminal built-in Emacs command
