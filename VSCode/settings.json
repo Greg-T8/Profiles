@@ -545,6 +545,7 @@
   "rewrap.wrappingColumn": 80,
   "search.exclude": {
     "**/bin": true,
+    "**/exe": true,
     "**/obj": true
   },
   "security.allowedUNCHosts": [
