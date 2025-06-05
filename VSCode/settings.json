@@ -313,15 +313,15 @@
   "editor.insertSpaces": false,
   "editor.lineNumbers": "relative",
   "editor.minimap.enabled": false,
-  "editor.parameterHints.enabled": false,
+  "editor.parameterHints.enabled": true,
   "editor.quickSuggestions": {
-    "comments": false,
-    "other": false,
-    "strings": false
+    "comments": true,
+    "other": true,
+    "strings": true
   },
   "editor.quickSuggestionsDelay": 250, // Previously 1000
   "editor.snippetSuggestions": "top",
-  "editor.suggest.showSnippets": false,
+  "editor.suggest.showSnippets": true,
   "editor.suggestOnTriggerCharacters": true, // Controls whether Intellisense pops up when hitting a period
   "editor.suggestSelection": "recentlyUsed",
   "editor.tabCompletion": "off",
@@ -368,15 +368,15 @@
   "github.copilot.chat.search.semanticTextResults": true,
   "github.copilot.editor.enableCodeActions": true,
   "github.copilot.enable": {
-    "*": true,
+    "*": false,
+    "plaintext": true,
+    "markdown": true,
+    "scminput": false,
     "c": false,
     "csharp": true,
     "javascript": true,
-    "markdown": true,
-    "plaintext": true,
     "powershell": true,
-    "python": true,
-    "scminput": false
+    "python": true
   },
   "github.copilot.nextEditSuggestions.enabled": true,
   "github.copilot.renameSuggestions.triggerAutomatically": true,
