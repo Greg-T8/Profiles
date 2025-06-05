@@ -140,6 +140,13 @@
           "isGitRepo": true,
           "name": "Kali Linux",
           "path": "vscode-remote://wsl+Kali/home/gtate/LearningOffsec/LearningOffsec.code-workspace"
+        },
+        {
+          "isGitRepo": true,
+          "id": "azuregna1o2c8nmbj6rjha",
+          "name": "Azure",
+          "path": "c:\\Users\\gregt\\LocalCode\\LearningAzure\\LearningAzure.code-workspace",
+          "color": "#4683ca"
         }
       ]
     },
@@ -215,6 +222,14 @@
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
     [
+      "#4683ca",
+      "Indigo"
+    ],
+    [
+      "#E5E0E1",
+      "Bon Jour"
+    ],
+    [
       "#E7CD8C",
       "Putty"
     ],
@@ -265,14 +280,6 @@
     [
       "#ACB78E",
       "Swamp Green"
-    ],
-    [
-      "#98811B",
-      "Hacienda"
-    ],
-    [
-      "#19535F",
-      "Midnight green"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
