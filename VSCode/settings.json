@@ -6,6 +6,9 @@
   "[cpp]": {
     "editor.defaultFormatter": "ms-vscode.cpptools"
   },
+  "[csharp]": {
+    "editor.defaultFormatter": "ms-dotnettools.csharp"
+  },
   "[html]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -200,11 +203,11 @@
           "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\Windows Terminal"
         },
         {
-          "isGitRepo": false,
+          "color": "#E7CD8C",
           "id": "sshuvtn5lsdumak0ocp9",
+          "isGitRepo": false,
           "name": "SSH",
-          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\ssh\\ssh.code-workspace",
-          "color": "#E7CD8C"
+          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\ssh\\ssh.code-workspace"
         }
       ]
     }
@@ -274,7 +277,7 @@
   ],
   "dashboard.storeProjectsInSettings": true,
   "debug.inlineValues": "auto",
-  "diffEditor.ignoreTrimWhitespace": true,
+  "diffEditor.ignoreTrimWhitespace": false,
   "editor.acceptSuggestionOnCommitCharacter": false,
   "editor.acceptSuggestionOnEnter": "off",
   "editor.accessibilitySupport": "off",
@@ -291,8 +294,8 @@
   "editor.fontLigatures": "'calt', 'ss01'",
   "editor.fontSize": 14,
   "editor.fontWeight": "normal",
-  "editor.formatOnType": true,
   "editor.formatOnPaste": false,
+  "editor.formatOnType": true,
   "editor.guides.bracketPairs": "active",
   "editor.guides.bracketPairsHorizontal": true,
   "editor.guides.highlightActiveBracketPair": true,
@@ -512,7 +515,9 @@
   "markdown.extension.list.indentationSize": "adaptive",
   "markdown.extension.toc.levels": "2..5",
   "markdown.extension.toc.omittedFromToc": {
-    "notes.md": ["## Contents"]
+    "notes.md": [
+      "## Contents"
+    ]
   },
   "markdown.extension.toc.orderedList": false,
   "markdown.extension.toc.unorderedList.marker": "-",
@@ -542,7 +547,9 @@
     "**/bin": true,
     "**/obj": true
   },
-  "security.allowedUNCHosts": ["wsl.localhost"],
+  "security.allowedUNCHosts": [
+    "wsl.localhost"
+  ],
   "security.workspace.trust.untrustedFiles": "open",
   "settingsSync.ignoredSettings": [
     "chat.promptFilesLocations",
@@ -585,7 +592,10 @@
       "source": "PowerShell"
     },
     "PowerShell (No Profile)": {
-      "args": ["-NoLogo", "-NoProfile"],
+      "args": [
+        "-NoLogo",
+        "-NoProfile"
+      ],
       "icon": "terminal-powershell",
       "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
     },
@@ -617,8 +627,30 @@
       "command": "vscode-neovim.lua"
     }
   },
-  "vscode-neovim.ctrlKeysForInsertMode": ["d", "h", "j", "m", "o", "r", "t", "u", "w"],
-  "vscode-neovim.ctrlKeysForNormalMode": ["e", "d", "h", "j", "m", "o", "r", "t", "u", "w", "y"],
+  "vscode-neovim.ctrlKeysForInsertMode": [
+    "d",
+    "h",
+    "j",
+    "m",
+    "o",
+    "r",
+    "t",
+    "u",
+    "w"
+  ],
+  "vscode-neovim.ctrlKeysForNormalMode": [
+    "e",
+    "d",
+    "h",
+    "j",
+    "m",
+    "o",
+    "r",
+    "t",
+    "u",
+    "w",
+    "y"
+  ],
   "vscode-neovim.neovimClean": false,
   "vscode-neovim.neovimExecutablePaths.win32": "C:/Program Files/Neovim/bin/nvim.exe",
   "vscode-neovim.neovimWidth": 500,
@@ -796,8 +828,5 @@
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-"workbench.tips.enabled": true,
-"[csharp]": {
-    "editor.defaultFormatter": "ms-dotnettools.csharp"
-}
+  "workbench.tips.enabled": true
 }
