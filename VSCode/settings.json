@@ -9,6 +9,9 @@
   "[csharp]": {
     "editor.defaultFormatter": "ms-dotnettools.csharp"
   },
+  "[go]": {
+    "editor.defaultFormatter": "golang.go"
+  },
   "[html]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -40,6 +43,12 @@
   },
   "[powershell]": {
     "editor.defaultFormatter": "ms-vscode.powershell"
+  },
+  "[terraform-vars]": {
+    "editor.defaultFormatter": "hashicorp.terraform"
+  },
+  "[terraform]": {
+    "editor.defaultFormatter": "hashicorp.terraform"
   },
   "[xml]": {
     "editor.defaultFormatter": "PrateekMahendrakar.prettyxml"
@@ -142,11 +151,11 @@
           "path": "vscode-remote://wsl+Kali/home/gtate/LearningOffsec/LearningOffsec.code-workspace"
         },
         {
-          "isGitRepo": true,
+          "color": "#4683ca",
           "id": "azuregna1o2c8nmbj6rjha",
+          "isGitRepo": true,
           "name": "Azure",
-          "path": "c:\\Users\\gregt\\LocalCode\\LearningAzure\\LearningAzure.code-workspace",
-          "color": "#4683ca"
+          "path": "c:\\Users\\gregt\\LocalCode\\LearningAzure\\LearningAzure.code-workspace"
         }
       ]
     },
@@ -369,14 +378,14 @@
   "github.copilot.editor.enableCodeActions": true,
   "github.copilot.enable": {
     "*": false,
-    "plaintext": true,
-    "markdown": true,
-    "scminput": false,
     "c": false,
     "csharp": true,
     "javascript": true,
+    "markdown": true,
+    "plaintext": true,
     "powershell": true,
-    "python": true
+    "python": true,
+    "scminput": false
   },
   "github.copilot.nextEditSuggestions.enabled": true,
   "github.copilot.renameSuggestions.triggerAutomatically": true,
@@ -836,14 +845,5 @@
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-"workbench.tips.enabled": true,
-"[go]": {
-    "editor.defaultFormatter": "golang.go"
-},
-"[terraform]": {
-    "editor.defaultFormatter": "hashicorp.terraform"
-},
-"[terraform-vars]": {
-    "editor.defaultFormatter": "hashicorp.terraform"
-}
+  "workbench.tips.enabled": true
 }
