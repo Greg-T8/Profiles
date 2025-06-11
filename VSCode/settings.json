@@ -836,5 +836,14 @@
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-  "workbench.tips.enabled": true
+"workbench.tips.enabled": true,
+"[go]": {
+    "editor.defaultFormatter": "golang.go"
+},
+"[terraform]": {
+    "editor.defaultFormatter": "hashicorp.terraform"
+},
+"[terraform-vars]": {
+    "editor.defaultFormatter": "hashicorp.terraform"
+}
 }
