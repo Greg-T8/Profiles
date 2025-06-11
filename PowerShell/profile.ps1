@@ -95,6 +95,17 @@ function CleanUpSnagitFolder {
     Get-ChildItem -Path $folderPath -File | Where-Object { $_.LastWriteTime -lt $cutoffDate } | Remove-Item -Force
 }
 
+function GetMicrosoftLicenseCatalog {
+    [OutputType([PSCustomObject[]])]
+    $url = 'https://learn.microsoft.com/en-us/entra/identity/users/licensing-service-plan-reference'
+    $response = Invoke-WebRequest -Uri $Url
+    $csvLink = $response.Links | Select-Object href | Where-Object { $_ -match 'csv' } |
+        Select-Object -ExpandProperty href
+    $licenseCatalog = Invoke-RestMethod -Uri $csvLink
+    $licenseCatalog = $licenseCatalog | ConvertFrom-Csv
+    Write-Output $licenseCatalog
+}
+
 function tempcode {
     param (
         [switch]$Clean

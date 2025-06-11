@@ -2,16 +2,7 @@ function Get-ClipboardExcel {
     Get-Clipboard | ConvertFrom-Csv -Delimiter "`t"
 }
 
-function GetMicrosoftLicenseCatalog {
-    [OutputType([PSCustomObject[]])]
-    $url = 'https://learn.microsoft.com/en-us/entra/identity/users/licensing-service-plan-reference'
-    $response = Invoke-WebRequest -Uri $Url
-    $csvLink = $response.Links | Select-Object href | Where-Object { $_ -match 'csv' } |
-        Select-Object -ExpandProperty href
-    $licenseCatalog = Invoke-RestMethod -Uri $csvLink
-    $licenseCatalog = $licenseCatalog | ConvertFrom-Csv
-    Write-Output $licenseCatalog
-}
+
 
 function RemoveOldModules {
     [OutputType()]
