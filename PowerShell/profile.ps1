@@ -29,11 +29,25 @@ if (Test-Path -Path ./functions.ps1) {
 
 if (Test-Path -Path $env:OneDriveCommercial/Code/WorkConfig.psd1) {
     $Work = Import-PowerShellDataFile -Path $env:OneDriveCommercial/Code/WorkConfig.psd1
+    $orderedAccounts = [ordered]@{}
+    foreach ($key in $Work.Accounts.Keys | Sort-Object) {
+        $orderedAccounts[$key] = $Work.Accounts[$key]
+    }
+    $Work.Accounts = $orderedAccounts
+
+    $orderedTenantIds = [ordered]@{}
+    foreach ($key in $Work.TenantIds.Keys | Sort-Object) {
+        $orderedTenantIds[$key] = $Work.TenantIds[$key]
+    }
+    $Work.TenantIds = $orderedTenantIds
+
+    $orderedSubscriptionIds = [ordered]@{}
+    foreach ($key in $Work.SubscritpionIds.Keys | Sort-Object) {
+        $orderedSubscriptionIds[$key] = $Work.SubscritpionIds[$key]
+    }
+    $Work.SubscritpionIds = $orderedSubscriptionIds
 }
 
-if (Test-Path -Path $env:OneDriveConsumer/Code/LabConfig.psd1) {
-    $Lab = Import-PowerShellDataFile -Path $env:OneDriveConsumer/Code/LabConfig.psd1
-}
 
 # Aliases
 Set-Alias -Name ll -Value Get-ChildItem -Force
