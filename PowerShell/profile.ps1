@@ -23,8 +23,8 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
     Set-PSReadLineOption -PredictionViewStyle ListView
 }
 
-if (Test-Path -Path ./functions.ps1) {
-    . ./functions.ps1
+if (Test-Path -Path "$env:OneDriveConsumer/Apps/Profiles/PowerShell/functions.ps1") {
+    . "$env:OneDriveConsumer/Apps/Profiles/PowerShell/functions.ps1"
 }
 
 if (Test-Path -Path $env:OneDriveCommercial/Code/PowerShell/WorkConfig.psd1) {
@@ -52,23 +52,6 @@ if (Test-Path -Path $env:OneDriveCommercial/Code/PowerShell/WorkConfig.psd1) {
 
 # Aliases
 Set-Alias -Name ll -Value Get-ChildItem -Force
-
-function touch {
-    param (
-        [Parameter(Mandatory=$true)]
-        [string]$Path
-    )
-
-    if (Test-Path $Path) {
-        # Update last modified time
-        (Get-Item $Path).LastWriteTime = Get-Date
-    } else {
-        # Create the file
-        New-Item -ItemType File -Path $Path | Out-Null
-    }
-}
-
-
 
 # Enable keyboard shortcuts
 if (-not (Get-Module PSReadline)) { Import-Module PSReadLine }
@@ -99,46 +82,6 @@ if ($Profile -match 'VSCode') {
     $UsingPoshGit = $true
     $EstablishedPoshGitSettings = $true
 }
-
-function ep {
-    code -n --profile 'PowerShell' $PROFILE.CurrentUserAllHosts
-}
-
-function CleanUpSnagitFolder {
-    $folderPath = 'C:\Users\gregt\OneDrive\Snagit'
-    $cutoffDate = (Get-Date).AddMonths(-1)
-    Get-ChildItem -Path $folderPath -File | Where-Object { $_.LastWriteTime -lt $cutoffDate } | Remove-Item -Force
-}
-
-function GetMicrosoftLicenseCatalog {
-    [OutputType([PSCustomObject[]])]
-    $url = 'https://learn.microsoft.com/en-us/entra/identity/users/licensing-service-plan-reference'
-    $response = Invoke-WebRequest -Uri $Url
-    $csvLink = $response.Links | Select-Object href | Where-Object { $_ -match 'csv' } |
-        Select-Object -ExpandProperty href
-    $licenseCatalog = Invoke-RestMethod -Uri $csvLink
-    $licenseCatalog = $licenseCatalog | ConvertFrom-Csv
-    Write-Output $licenseCatalog
-}
-
-function tempcode {
-    param (
-        [switch]$Clean
-    )
-    $tempDir = "$env:TEMP/tempvscode"
-    if (-not $Clean) {
-        # Open a new VSCode window with the current directory as the working directory
-        & code --user-data-dir=$tempDir --extensions-dir="$tempDir/extensions"
-        return
-    }
-    else {
-        # Remove the temp VSCode user data and extensions directories
-        if (Test-Path -Path $tempDir) {
-            Remove-Item -Path $tempDir -Recurse -Force
-        }
-    }
-}
-
 
 function prompt {
     # Apply Posh-Git settings if module is loaded or if current directory is a git repository
