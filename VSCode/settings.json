@@ -202,7 +202,7 @@
           "id": "powershellz7gs6blw9maiqej5p",
           "isGitRepo": true,
           "name": "PowerShell",
-          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\PowerShell"
+          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\PowerShell\\PowerShell.code-workspace"
         },
         {
           "color": "#DCB20C",
@@ -230,6 +230,10 @@
   ],
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
+    [
+      "#529bc0",
+      "Fountain Blue"
+    ],
     [
       "#4683ca",
       "Indigo"
@@ -285,10 +289,6 @@
     [
       "#63B76C",
       "Fern"
-    ],
-    [
-      "#ACB78E",
-      "Swamp Green"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
