@@ -29,6 +29,7 @@ if (Test-Path -Path ./functions.ps1) {
 
 if (Test-Path -Path $env:OneDriveCommercial/Code/WorkConfig.psd1) {
     $Work = Import-PowerShellDataFile -Path $env:OneDriveCommercial/Code/WorkConfig.psd1
+
     $orderedAccounts = [ordered]@{}
     foreach ($key in $Work.Accounts.Keys | Sort-Object) {
         $orderedAccounts[$key] = $Work.Accounts[$key]
