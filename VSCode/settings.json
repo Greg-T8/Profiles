@@ -38,7 +38,7 @@
     "editor.detectIndentation": false,
     "editor.insertSpaces": false,
     "editor.tabSize": 2,
-    "editor.wordWrap": "on",
+    "editor.wordWrap": "off",
     "files.trimTrailingWhitespace": false
   },
   "[powershell]": {
