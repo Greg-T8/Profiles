@@ -22,6 +22,7 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
     Set-PSReadLineOption -PredictionSource HistoryAndPlugin
     Set-PSReadLineOption -PredictionViewStyle ListView
 }
+
 if (Test-Path -Path "$env:OneDriveConsumer/Apps/Profiles/PowerShell/prompt.ps1") {
     . "$env:OneDriveConsumer/Apps/Profiles/PowerShell/prompt.ps1"
 }
