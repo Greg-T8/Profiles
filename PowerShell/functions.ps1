@@ -83,3 +83,82 @@ function touch {
         New-Item -ItemType File -Path $Path | Out-Null
     }
 }
+
+function Update-AllInstalledModules {
+    <#
+    .SYNOPSIS
+        Updates all installed PowerShell modules using PowerShellGet v2.
+    .DESCRIPTION
+        Ensures PSGallery is trusted, then updates all modules installed via Install-Module.
+    #>
+
+    [CmdletBinding()]
+    param()
+
+    # Ensure PowerShellGet v2 is available
+    if (-not (Get-Command Get-InstalledModule -ErrorAction SilentlyContinue)) {
+        Write-Error "PowerShellGet v2 not detected. This script requires the PowerShellGet module (v2)."
+        return
+    }
+
+    $repoName = 'PSGallery'
+    $repo = Get-PSRepository -Name $repoName -ErrorAction SilentlyContinue
+
+    if (-not $repo) {
+        Write-Error "Repository '$repoName' not found. Use Register-PSRepository to add it."
+        return
+    }
+
+    if (-not $repo.Trusted) {
+        Write-Host "Marking '$repoName' as a trusted repository..." -ForegroundColor Yellow
+        Set-PSRepository -Name $repoName -InstallationPolicy Trusted -ErrorAction Stop
+        Write-Host "✓ '$repoName' is now trusted." -ForegroundColor Green
+    }
+
+    $modules = Get-InstalledModule
+
+    foreach ($mod in $modules) {
+        try {
+            Write-Host "Updating module '$($mod.Name)'..." -ForegroundColor Cyan
+            Update-Module -Name $mod.Name -ErrorAction Stop
+            Write-Host "✓ Updated '$($mod.Name)'" -ForegroundColor Green
+        } catch {
+            Write-Warning "⚠ Failed to update '$($mod.Name)': $_"
+        }
+    }
+}
+
+function Remove-OldModuleVersions {
+    <#
+    .SYNOPSIS
+        Removes all versions of installed modules except for the most recent and second most recent.
+    .DESCRIPTION
+        Enumerates all installed module versions and uninstalls any version older than the newest two.
+    #>
+
+    [CmdletBinding(SupportsShouldProcess = $true)]
+    param()
+
+    $installedModules = Get-InstalledModule -AllVersions
+
+    $groupedModules = $installedModules |
+        Group-Object Name |
+        Where-Object { $_.Count -gt 2 }  # Only process modules with more than two versions
+
+    foreach ($moduleGroup in $groupedModules) {
+        $moduleName = $moduleGroup.Name
+        $versions = $moduleGroup.Group |
+            Sort-Object Version -Descending |
+            Select-Object -Skip 2  # Skip newest two versions
+
+        foreach ($old in $versions) {
+            try {
+                Write-Host "Removing $moduleName version $($old.Version)..." -ForegroundColor Yellow
+                Uninstall-Module -Name $moduleName -RequiredVersion $old.Version -Force -ErrorAction Stop
+                Write-Host "✓ Removed $moduleName v$($old.Version)" -ForegroundColor Green
+            } catch {
+                Write-Warning "⚠ Failed to remove $moduleName v$($old.Version): $_"
+            }
+        }
+    }
+}
