@@ -41,7 +41,7 @@ function GetMicrosoftLicenseCatalog {
 
 # Removes Snagit files older than one month from the OneDriveConsumer/Snagit folder.
 function CleanUpSnagitFolder {
-    $folderPath = "$env:OneDriveConsumer/Snagit"
+    $folderPath = "$env:USERPROFILE/Snagit Captures"
     $cutoffDate = (Get-Date).AddMonths(-1)
     Get-ChildItem -Path $folderPath -File | Where-Object { $_.LastWriteTime -lt $cutoffDate } | Remove-Item -Force
 }
