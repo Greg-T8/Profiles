@@ -9,6 +9,9 @@
   "[csharp]": {
     "editor.defaultFormatter": "ms-dotnettools.csharp"
   },
+  "[fsharp]": {
+    "editor.defaultFormatter": "Ionide.Ionide-fsharp"
+  },
   "[go]": {
     "editor.defaultFormatter": "golang.go"
   },
@@ -20,6 +23,9 @@
     "editor.tabSize": 2,
     "prettier.printWidth": 110,
     "prettier.tabWidth": 2
+  },
+  "[lua]": {
+    "editor.defaultFormatter": "sumneko.lua"
   },
   "[markdown]": {
     "editor.autoClosingBrackets": "never",
@@ -322,6 +328,7 @@
   "editor.insertSpaces": false,
   "editor.lineNumbers": "relative",
   "editor.minimap.enabled": false,
+  "editor.occurrencesHighlight": "off",
   "editor.parameterHints.enabled": true,
   "editor.quickSuggestions": {
     "comments": true,
@@ -355,7 +362,6 @@
     "asvetliakov.vscode-neovim": 1,
     "vscodevim.vim": 1
   },
-  "files.autoSave": "afterDelay",
   "files.autoSaveDelay": 10000,
   "files.hotExit": "onExitAndWindowClose",
   "files.trimFinalNewlines": true,
@@ -733,10 +739,10 @@
     "editor.inlineSuggest.edits.showCollapsed",
     "editor.lineNumbers",
     "editor.minimap.enabled",
-    "editor.wordSeparators",
+    "editor.occurrencesHighlight",
+    "editor.parameterHints.enabled",
     "editor.quickSuggestions",
     "editor.quickSuggestionsDelay",
-    "editor.parameterHints.enabled",
     "editor.suggestOnTriggerCharacters",
     "editor.suggest.showSnippets",
     "editor.snippetSuggestions",
@@ -745,6 +751,7 @@
     "editor.tabCompletion",
     "editor.tokenColorCustomizations",
     "editor.useTabStops",
+    "editor.wordSeparators",
     "explorer.confirmDelete",
     "explorer.confirmDragAndDrop",
     "explorer.sortOrder",
@@ -845,11 +852,5 @@
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-"workbench.tips.enabled": true,
-"[fsharp]": {
-    "editor.defaultFormatter": "Ionide.Ionide-fsharp"
-},
-"[lua]": {
-    "editor.defaultFormatter": "sumneko.lua"
-}
+  "workbench.tips.enabled": true
 }
