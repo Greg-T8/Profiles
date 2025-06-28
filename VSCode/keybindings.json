@@ -350,11 +350,6 @@
     "when": "editorFocus"
   },
   {
-    "key": "ctrl+shift+l",
-    "command": "-editor.action.selectHighlights",
-    "when": "editorFocus"
-  },
-  {
     "key": "shift+alt+i",
     "command": "-editor.action.insertCursorAtEndOfEachLineSelected",
     "when": "editorTextFocus"
