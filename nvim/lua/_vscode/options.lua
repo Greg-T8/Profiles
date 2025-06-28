@@ -50,5 +50,3 @@ end
 vim.api.nvim_set_keymap('n', '<leader>bc',
     "<Cmd>lua build_if_gccbuild_enabled()<CR>",
     { noremap = true, silent = true })
-
-    
