@@ -8,6 +8,16 @@ vim.api.nvim_set_keymap('n', '<leader>mw',
     "<Cmd>call VSCodeNotify('workbench.action.moveEditorToNewWindow')<CR>",
     { noremap = true, silent = true })
 
+-- Trigger move into new window
+vim.api.nvim_set_keymap('n', '<leader>vw',
+    "<Cmd>call VSCodeNotify('workbench.action.moveEditorToNewWindow')<CR>",
+    { noremap = true, silent = true })
+
+-- Markdown: Open preview to the side
+vim.api.nvim_set_keymap('n', '<leader>ve',
+    "<cmd>call VSCodeNotify('markdown.showPreviewToSide')<CR>",
+    { noremap = true, silent = true })
+
 -- Trigger inline chat
 vim.api.nvim_set_keymap('n', '<leader>ic',
     "<Cmd>call VSCodeNotify('workbench.action.chat.inlineVoiceChat')<CR>",
