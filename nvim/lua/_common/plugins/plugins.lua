@@ -11,23 +11,13 @@ return {
         end,
     },
     {
-        'echasnovski/mini.surround',
+        "kylechui/nvim-surround",
+        version = "^3.0.0", -- Use for stability; omit to use `main` branch for the latest features
+        event = "VeryLazy",
         config = function()
-            require('mini.surround').setup({
-                mappings = {
-                    add = "<leader>sa", -- Add surrounding in Normal and Visual modes
-                    delete = "<leader>sd", -- Delete surrounding
-                    find = "<leaderf>sf", -- Find surrounding (to the right)
-                    find_left = "<leader>sF", -- Find surrounding (to the left)
-                    highlight = "<leader>sh", -- Highlight surrounding
-                    replace = "<leader>sr", -- Replace surrounding
-                    update_n_lines = "<leader>sn", -- Update `n_lines`
-                },
-                -- Whether to respect selection type:
-                -- - Place surroundings on separate lines in linewise mode.
-                -- - Place surroundings on each line in blockwise mode.
-                respect_selection_type = false,
+            require("nvim-surround").setup({
+                -- Configuration here, or leave empty to use defaults
             })
-        end,
-    },
+        end
+    }
 }
