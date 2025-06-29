@@ -852,5 +852,6 @@
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-  "workbench.tips.enabled": true
+  "workbench.tips.enabled": true,
+  "files.autoSave": "afterDelay"
 }
