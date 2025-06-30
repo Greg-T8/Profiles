@@ -162,6 +162,13 @@
           "isGitRepo": true,
           "name": "Azure",
           "path": "c:\\Users\\gregt\\LocalCode\\LearningAzure\\LearningAzure.code-workspace"
+        },
+        {
+          "color": "#FF9900",
+          "id": "aws3f0o3qyn1mciy2e2m",
+          "isGitRepo": false,
+          "name": "AWS",
+          "path": "c:\\Users\\gregt\\LocalCode\\LearningAWS\\LearningAWS.code-workspace"
         }
       ]
     },
@@ -237,6 +244,10 @@
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
     [
+      "#FF9900",
+      "Orange Peel"
+    ],
+    [
       "#529bc0",
       "Fountain Blue"
     ],
@@ -291,10 +302,6 @@
     [
       "#8C6495",
       "Trendy Pink"
-    ],
-    [
-      "#63B76C",
-      "Fern"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
@@ -362,6 +369,7 @@
     "asvetliakov.vscode-neovim": 1,
     "vscodevim.vim": 1
   },
+  "files.autoSave": "afterDelay",
   "files.autoSaveDelay": 10000,
   "files.hotExit": "onExitAndWindowClose",
   "files.trimFinalNewlines": true,
@@ -852,6 +860,5 @@
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-  "workbench.tips.enabled": true,
-  "files.autoSave": "afterDelay"
+  "workbench.tips.enabled": true
 }
