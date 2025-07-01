@@ -18,6 +18,10 @@
   "[html]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "[javascript]": {
+    "editor.formatOnType": true,
+    "editor.insertSpaces": false
+  },
   "[jsonc]": {
     "editor.insertSpaces": true,
     "editor.tabSize": 2,
@@ -243,66 +247,21 @@
   ],
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
-    [
-      "#FF9900",
-      "Orange Peel"
-    ],
-    [
-      "#529bc0",
-      "Fountain Blue"
-    ],
-    [
-      "#4683ca",
-      "Indigo"
-    ],
-    [
-      "#E5E0E1",
-      "Bon Jour"
-    ],
-    [
-      "#E7CD8C",
-      "Putty"
-    ],
-    [
-      "#52001F",
-      "Castro"
-    ],
-    [
-      "#DCB20C",
-      "Galliano"
-    ],
-    [
-      "#DBDBDB",
-      "Alto"
-    ],
-    [
-      "#8EABC1",
-      "Nepal"
-    ],
-    [
-      "#FFFFFF",
-      "White"
-    ],
-    [
-      "#FEF5F1",
-      "Provincial Pink"
-    ],
-    [
-      "#D87C63",
-      "Japonica"
-    ],
-    [
-      "#F57584",
-      "Froly"
-    ],
-    [
-      "#D0F0C0",
-      "Tea Green"
-    ],
-    [
-      "#8C6495",
-      "Trendy Pink"
-    ]
+    ["#FF9900", "Orange Peel"],
+    ["#529bc0", "Fountain Blue"],
+    ["#4683ca", "Indigo"],
+    ["#E5E0E1", "Bon Jour"],
+    ["#E7CD8C", "Putty"],
+    ["#52001F", "Castro"],
+    ["#DCB20C", "Galliano"],
+    ["#DBDBDB", "Alto"],
+    ["#8EABC1", "Nepal"],
+    ["#FFFFFF", "White"],
+    ["#FEF5F1", "Provincial Pink"],
+    ["#D87C63", "Japonica"],
+    ["#F57584", "Froly"],
+    ["#D0F0C0", "Tea Green"],
+    ["#8C6495", "Trendy Pink"]
   ],
   "dashboard.storeProjectsInSettings": true,
   "debug.inlineValues": "auto",
@@ -534,6 +493,7 @@
   "html.autoCreateQuotes": false,
   "inlineChat.finishOnType": true,
   "inlineChat.holdToSpeech": true,
+  "javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
   "markdown.copyFiles.destination": {
     "*": "images/${unixTime}.png"
   },
@@ -545,9 +505,7 @@
   "markdown.extension.list.indentationSize": "adaptive",
   "markdown.extension.toc.levels": "2..5",
   "markdown.extension.toc.omittedFromToc": {
-    "notes.md": [
-      "## Contents"
-    ]
+    "notes.md": ["## Contents"]
   },
   "markdown.extension.toc.orderedList": false,
   "markdown.extension.toc.unorderedList.marker": "-",
@@ -578,9 +536,7 @@
     "**/exe": true,
     "**/obj": true
   },
-  "security.allowedUNCHosts": [
-    "wsl.localhost"
-  ],
+  "security.allowedUNCHosts": ["wsl.localhost"],
   "security.workspace.trust.untrustedFiles": "open",
   "settingsSync.ignoredSettings": [
     "chat.promptFilesLocations",
@@ -623,10 +579,7 @@
       "source": "PowerShell"
     },
     "PowerShell (No Profile)": {
-      "args": [
-        "-NoLogo",
-        "-NoProfile"
-      ],
+      "args": ["-NoLogo", "-NoProfile"],
       "icon": "terminal-powershell",
       "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
     },
@@ -658,30 +611,8 @@
       "command": "vscode-neovim.lua"
     }
   },
-  "vscode-neovim.ctrlKeysForInsertMode": [
-    "d",
-    "h",
-    "j",
-    "m",
-    "o",
-    "r",
-    "t",
-    "u",
-    "w"
-  ],
-  "vscode-neovim.ctrlKeysForNormalMode": [
-    "e",
-    "d",
-    "h",
-    "j",
-    "m",
-    "o",
-    "r",
-    "t",
-    "u",
-    "w",
-    "y"
-  ],
+  "vscode-neovim.ctrlKeysForInsertMode": ["d", "h", "j", "m", "o", "r", "t", "u", "w"],
+  "vscode-neovim.ctrlKeysForNormalMode": ["e", "d", "h", "j", "m", "o", "r", "t", "u", "w", "y"],
   "vscode-neovim.neovimClean": false,
   "vscode-neovim.neovimExecutablePaths.win32": "C:/Program Files/Neovim/bin/nvim.exe",
   "vscode-neovim.neovimWidth": 500,
@@ -795,6 +726,7 @@
     "inlineChat.holdToSpeech",
     "html.autoCreateQuotes",
     "html.autoClosingTags",
+    "javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces",
     "markdown.copyFiles.destination",
     "markdown.editor.filePaste.enabled",
     "markdown.extension.completion.enabled",
