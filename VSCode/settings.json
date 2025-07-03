@@ -241,12 +241,23 @@
           "isGitRepo": false,
           "name": "SSH",
           "path": "c:\\Users\\gregt\\OneDrive\\Apps\\ssh\\ssh.code-workspace"
+        },
+        {
+          "isGitRepo": true,
+          "id": "drawiod7v84rsbpmcnq2fwp",
+          "name": "draw.io",
+          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\draw.io",
+          "color": "#f0921c"
         }
       ]
     }
   ],
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
+    [
+      "#f0921c",
+      "Carrot Orange"
+    ],
     [
       "#f08604",
       "Tangerine"
@@ -302,10 +313,6 @@
     [
       "#F57584",
       "Froly"
-    ],
-    [
-      "#D0F0C0",
-      "Tea Green"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
