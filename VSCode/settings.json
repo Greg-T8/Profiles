@@ -247,21 +247,66 @@
   ],
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
-    ["#FF9900", "Orange Peel"],
-    ["#529bc0", "Fountain Blue"],
-    ["#4683ca", "Indigo"],
-    ["#E5E0E1", "Bon Jour"],
-    ["#E7CD8C", "Putty"],
-    ["#52001F", "Castro"],
-    ["#DCB20C", "Galliano"],
-    ["#DBDBDB", "Alto"],
-    ["#8EABC1", "Nepal"],
-    ["#FFFFFF", "White"],
-    ["#FEF5F1", "Provincial Pink"],
-    ["#D87C63", "Japonica"],
-    ["#F57584", "Froly"],
-    ["#D0F0C0", "Tea Green"],
-    ["#8C6495", "Trendy Pink"]
+    [
+      "#f08604",
+      "Tangerine"
+    ],
+    [
+      "#FF9900",
+      "Orange Peel"
+    ],
+    [
+      "#529bc0",
+      "Fountain Blue"
+    ],
+    [
+      "#4683ca",
+      "Indigo"
+    ],
+    [
+      "#E5E0E1",
+      "Bon Jour"
+    ],
+    [
+      "#E7CD8C",
+      "Putty"
+    ],
+    [
+      "#52001F",
+      "Castro"
+    ],
+    [
+      "#DCB20C",
+      "Galliano"
+    ],
+    [
+      "#DBDBDB",
+      "Alto"
+    ],
+    [
+      "#8EABC1",
+      "Nepal"
+    ],
+    [
+      "#FFFFFF",
+      "White"
+    ],
+    [
+      "#FEF5F1",
+      "Provincial Pink"
+    ],
+    [
+      "#D87C63",
+      "Japonica"
+    ],
+    [
+      "#F57584",
+      "Froly"
+    ],
+    [
+      "#D0F0C0",
+      "Tea Green"
+    ]
   ],
   "dashboard.storeProjectsInSettings": true,
   "debug.inlineValues": "auto",
