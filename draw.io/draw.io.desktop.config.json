@@ -1,4 +1,5 @@
 {
+  "autosaveDelay": 500,
   "colorNames": {
     "00B3E2": "Quisitive Blue",
     "3E3E4B": "Quisitive Black",
@@ -7,6 +8,14 @@
     "C0C0C0": "Personal Light Grey"
   },
   "customColorSchemes": [
+    [
+      {
+        "fill": "light-dark(#00B3E2,#B2E8F6)",
+        "font": "light-dark(#FFFFFF, #3E3E4B)",
+        "stroke": "light-dark(#00B3e2, #ffffff)",
+        "title": "Quisitive Basic"
+      }
+    ],
     [
       {
         "fill": "light-dark(#2B5CA8,transparent)",
@@ -22,14 +31,6 @@
         "stroke": "light-dark(#000000,#5881BA)",
         "title": "Blank Shape w/ Text"
       }
-    ],
-    [
-      {
-        "fill": "light-dark(#00B3E2,#B2E8F6)",
-        "font": "light-dark(#FFFFFF, #3E3E4B)",
-        "stroke": "light-dark(#3E3E4B)",
-        "title": "Quisitive Basic"
-      }
     ]
   ],
   "customFonts": ["Shantell Sans", "Sofia Pro"],
@@ -37,81 +38,74 @@
     "5881ba",
     "c0c0c0",
     "4b8e6c",
-    "FFFFFF",
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
+    null,
     "00B3E2",
-    "3E3E4B",
-    "E5F7FC",
-    "EBEDED",
-    "B2E8F6",
-    "E2F2E8",
-    "8DB9D9",
-    "D3EDF1",
-    "2DCCD3",
-    "00AD93",
-    "AD1AAC",
-    "F15D23",
-    "FAC458",
-    "DDE2E2"
+    "3E3E4B"
   ],
   "defaultEdgeStyle": {
+    "edgeStyle": "orthogonalEdgeStyle",
     "endArrow": "blockThin",
-    "endSize": "12",
-    "fontColor": "light-dark(#000000, #FFFFFF)",
-    "fontFamily": "Shantell Sans",
-    "fontSize": "18",
-    "fontSource": "https://fonts.googleapis.com/css?family=Shantell+Sans",
-    "strokeColor": "light-dark(#2B5CA8,#5881BA)",
+    "endFill": "1",
+    "jumpSize": "5",
+    "jumpStyle": "gap",
+    "rounded": "1",
+    "startFill": "0",
     "strokeWidth": "2"
   },
   "defaultFonts": ["Cascadia Code", "Fira Code", "Fira Mono"],
   "defaultGridEnabled": false,
   "defaultPageVisible": false,
   "defaultVertexStyle": {
-    "arcsize": "6",
-    "fillColor": "light-dark(#2B5CA8,transparent)",
-    "fontColor": "light-dark(#000000, #b8b8ba)",
-    "fontFamily": "Shantell Sans",
-    "fontSize": "18",
-    "fontSource": "https://fonts.googleapis.com/css?family=Shantell+Sans",
+    "arcSize": "2",
+    "fontSize": "11",
     "rounded": "1",
-    "strokeColor": "light-dark(#000000,#5881BA)",
     "strokeWidth": "2"
   },
+  "presetColors": ["B2E8F6", "2DCCD3", "00AD93", "AD1AAC", "F15D23", "FAC458"],
+  "sidebarTitles": true,
+  "sidebarTitleSize": "8",
   "styles": [
+    {},
     {
       "commonStyle": {
-        "fontFamily": "Shantell Sans",
-        "fontSize": "18",
-        "fontSource": "https://fonts.googleapis.com/css?family=Shantell+Sans",
-        "strokeWidth": "2"
-      },
-      "edgeStyle": {
-        "endArrow": "blockThin",
-        "endSize": "12",
-        "fontColor": "light-dark(#000000, #FFFFFF)",
-        "strokeColor": "light-dark(#2B5CA8,#5881BA)"
+        "fontFamily": "Sofia Pro"
       },
       "vertexStyle": {
-        "arcSize": "6",
-        "fillColor": "light-dark(#3c6f83,transparent)",
-        "fontColor": "light-dark(#FFFFFF, #b8b8ba)",
-        "rounded": "1",
-        "strokeColor": "light-dark(#000000,#5881BA)"
+        "fillColor": "light-dark(#ffffff, #e5f7fc)",
+        "fillOpacity": "50",
+        "fontColor": "light-dark(#3e3e4b, #ffffff)",
+        "strokeColor": "light-dark(#00b3e2, #ffffff)",
+        "strokeOpacity": "100"
+      },
+      "edgeStyle": {
+        "linecap": "round",
+        "strokeColor": "light-dark(#3e3e4b, #ffffff)"
       }
     },
     {
       "commonStyle": {
-        "arcSize": "13",
-        "fillColor": "light-dark(#00B3E2,#E5F7FC)",
-        "fontColor": "light-dark(#FFFFFF, #3E3E4B)",
-        "fontFamily": "Sofia Pro",
-        "fontSize": "22",
-        "opacity": "100",
-        "rounded": "1",
-        "strokeColor": "light-dark(#3E3E4B,#00B3E2)",
-        "strokeWidth": "2"
+        "fontFamily": "Shantell Sans",
+        "fontSource": "https://fonts.googleapis.com/css?family=Shantell+Sans"
+      },
+      "edgeStyle": {
+        "fontColor": "light-dark(#000000, #FFFFFF)",
+        "strokeColor": "light-dark(#2B5CA8,#5881BA)"
+      },
+      "vertexStyle": {
+        "fillColor": "light-dark(#3c6f83,transparent)",
+        "fontColor": "light-dark(#FFFFFF, #b8b8ba)",
+        "strokeColor": "light-dark(#000000,#5881BA)"
       }
     }
   ],
+  "updateDefaultStyle": false,
   "zoomWheel": true
 }
