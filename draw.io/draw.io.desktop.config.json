@@ -20,14 +20,12 @@
       {
         "fill": "light-dark(#2B5CA8,transparent)",
         "font": "light-dark(#FFFFFF, #FFFFFF)",
-        "fontSize": "34",
         "stroke": "light-dark(#000000,#5881BA)",
         "title": "Filled Shape w/ Text"
       },
       {
         "fill": "light-dark(#FFFFFF,transparent)",
         "font": "light-dark(#000000, #C0C0C0)",
-        "fontSize": "34",
         "stroke": "light-dark(#000000,#5881BA)",
         "title": "Blank Shape w/ Text"
       }
@@ -50,28 +48,31 @@
     "00B3E2",
     "3E3E4B"
   ],
+  "defaultEdgeLength": 100,
   "defaultEdgeStyle": {
-    "edgeStyle": "orthogonalEdgeStyle",
     "endArrow": "blockThin",
-    "endFill": "1",
-    "jumpSize": "5",
+    "endFill": 1,
+    "jumpSize": 5,
     "jumpStyle": "gap",
-    "rounded": "1",
-    "startFill": "0",
-    "strokeWidth": "2"
+    "linecap": "round",
+    "rounded": 1,
+    "startFill": 0,
+    "strokeWidth": 2,
+    "targetPerimeterSpacing": 2
   },
   "defaultFonts": ["Cascadia Code", "Fira Code", "Fira Mono"],
   "defaultGridEnabled": false,
   "defaultPageVisible": false,
   "defaultVertexStyle": {
-    "arcSize": "2",
-    "fontSize": "11",
-    "rounded": "1",
-    "strokeWidth": "2"
+    "arcSize": 2,
+    "fontSize": 11,
+    "rounded": 1,
+    "strokeWidth": 2,
+    "width": 140
   },
   "presetColors": ["B2E8F6", "2DCCD3", "00AD93", "AD1AAC", "F15D23", "FAC458"],
   "sidebarTitles": true,
-  "sidebarTitleSize": "8",
+  "sidebarTitleSize": 8,
   "styles": [
     {},
     {
@@ -80,13 +81,10 @@
       },
       "vertexStyle": {
         "fillColor": "light-dark(#ffffff, #e5f7fc)",
-        "fillOpacity": "50",
         "fontColor": "light-dark(#3e3e4b, #ffffff)",
-        "strokeColor": "light-dark(#00b3e2, #ffffff)",
-        "strokeOpacity": "100"
+        "strokeColor": "light-dark(#00b3e2, #ffffff)"
       },
       "edgeStyle": {
-        "linecap": "round",
         "strokeColor": "light-dark(#3e3e4b, #ffffff)"
       }
     },
