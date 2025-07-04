@@ -173,6 +173,13 @@
           "isGitRepo": false,
           "name": "AWS",
           "path": "c:\\Users\\gregt\\LocalCode\\LearningAWS\\LearningAWS.code-workspace"
+        },
+        {
+          "isGitRepo": false,
+          "id": "learningfabricvka7w9h34mcom57pi",
+          "name": "Fabric",
+          "path": "c:\\Users\\gregt\\LocalCode\\LearningFabric\\LearningFabric.code-workspace",
+          "color": "#10685f"
         }
       ]
     },
@@ -255,6 +262,10 @@
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
     [
+      "#10685f",
+      "Genoa"
+    ],
+    [
       "#f0921c",
       "Carrot Orange"
     ],
@@ -309,10 +320,6 @@
     [
       "#D87C63",
       "Japonica"
-    ],
-    [
-      "#F57584",
-      "Froly"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
