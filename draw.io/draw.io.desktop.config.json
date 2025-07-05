@@ -58,7 +58,8 @@
     "rounded": 1,
     "startFill": 0,
     "strokeWidth": 2,
-    "targetPerimeterSpacing": 2
+    "targetPerimeterSpacing": 2,
+    "strokeColor": "light-dark(#3e3e4b, #ffffff)"
   },
   "defaultFonts": ["Cascadia Code", "Fira Code", "Fira Mono"],
   "defaultGridEnabled": false,
@@ -68,13 +69,33 @@
     "fontSize": 11,
     "rounded": 1,
     "strokeWidth": 2,
-    "width": 140
+    "width": 140,
+    "fillColor": "light-dark(#ffffff, #e5f7fc)",
+    "fontColor": "light-dark(#3e3e4b, #ffffff)",
+    "strokeColor": "light-dark(#00b3e2, #ffffff)",
+    "fontFamily": "Sofia Pro"
+  },
+  "pageFormat": {
+	"width": 1100,
+	"height": 850
   },
   "presetColors": ["B2E8F6", "2DCCD3", "00AD93", "AD1AAC", "F15D23", "FAC458"],
   "sidebarTitles": true,
   "sidebarTitleSize": 8,
   "styles": [
-    {},
+    {
+      "commonStyle": {
+        "fontFamily": "Helvetica"
+      },
+      "vertexStyle": {
+        "fillColor": "light-dark(#ffffff, null)",
+        "fontColor": "light-dark(#000000, #ffffff)",
+        "strokeColor": "light-dark(#000000, #ffffff)"
+      },
+      "edgeStyle": {
+        "strokeColor": "light-dark(#000000, #ffffff)"
+	  }
+	},
     {
       "commonStyle": {
         "fontFamily": "Sofia Pro"
