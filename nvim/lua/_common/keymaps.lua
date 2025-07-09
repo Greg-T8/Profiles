@@ -20,10 +20,10 @@ vim.keymap.set("n", "<C-q>", "<C-v>", { desc = "Enter visual block mode", norema
 vim.keymap.set('n', 'G', 'G$', { desc = 'Go to end of line and center' })
 
 -- Add keymapping for centering cursor
-vim.keymap.set('n', '<C-u>', '<C-u>zz', { desc = 'Center cursor on screen' })
-vim.keymap.set('n', '<C-d>', '<C-d>zz', { desc = 'Half page down and center' })
-vim.keymap.set('n', '<C-f>', '<C-f>zz', { desc = 'Page down and center' })
-vim.keymap.set('n', '<C-b>', '<C-b>zz', { desc = 'Page up and center' })
+-- vim.keymap.set('n', '<C-u>', '<C-u>zz', { desc = 'Center cursor on screen' })
+-- vim.keymap.set('n', '<C-d>', '<C-d>zz', { desc = 'Half page down and center' })
+-- vim.keymap.set('n', '<C-f>', '<C-f>zz', { desc = 'Page down and center' })
+-- vim.keymap.set('n', '<C-b>', '<C-b>zz', { desc = 'Page up and center' })
 
 -- Insert mode --
 vim.keymap.set("i", "jk", "<ESC>", { desc = "Quick exit from insert mode", noremap = true, silent = true })
