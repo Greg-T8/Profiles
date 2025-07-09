@@ -193,6 +193,13 @@
           "isGitRepo": true,
           "name": "INF - Scripts",
           "path": "c:\\Users\\gregt\\OneDrive - Quisitive\\Code\\Azure DevOps\\INF - Scripts"
+        },
+        {
+          "isGitRepo": false,
+          "id": "qitrunbooksz58bj9gaqmcqptwpa",
+          "name": "Q IT Runbooks",
+          "path": "c:\\Users\\gregt\\LocalCode\\Azure Automation\\Quisitive\\it-automation-01",
+          "color": "#384555"
         }
       ]
     },
@@ -262,6 +269,10 @@
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
     [
+      "#384555",
+      "Oxford Blue"
+    ],
+    [
       "#10685f",
       "Genoa"
     ],
@@ -316,10 +327,6 @@
     [
       "#FEF5F1",
       "Provincial Pink"
-    ],
-    [
-      "#D87C63",
-      "Japonica"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
@@ -409,16 +416,17 @@
   "github.copilot.chat.search.semanticTextResults": true,
   "github.copilot.editor.enableCodeActions": true,
   "github.copilot.enable": {
-    "*": false,
+    "*": true,
+    "plaintext": true,
+    "markdown": true,
+    "scminput": false,
     "c": false,
     "csharp": true,
     "javascript": true,
-    "markdown": true,
-    "plaintext": true,
     "powershell": true,
     "python": true,
-    "scminput": false
-  },
+    "go": true
+},
   "github.copilot.nextEditSuggestions.enabled": true,
   "github.copilot.renameSuggestions.triggerAutomatically": true,
   "github.copilot.selectedCompletionModel": "",
