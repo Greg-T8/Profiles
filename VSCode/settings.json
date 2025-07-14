@@ -269,6 +269,14 @@
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
     [
+      "#d8bd16",
+      "Gold Tips"
+    ],
+    [
+      "#706555",
+      "Coffee"
+    ],
+    [
       "#384555",
       "Oxford Blue"
     ],
@@ -319,14 +327,6 @@
     [
       "#8EABC1",
       "Nepal"
-    ],
-    [
-      "#FFFFFF",
-      "White"
-    ],
-    [
-      "#FEF5F1",
-      "Provincial Pink"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
@@ -355,7 +355,7 @@
   "editor.guides.highlightActiveBracketPair": true,
   "editor.guides.highlightActiveIndentation": true,
   "editor.inlineSuggest.edits.showCollapsed": false,
-  "editor.inlineSuggest.enabled": true, // Controls Copilot suggestions
+  "editor.inlineSuggest.enabled": false, // Controls Copilot suggestions
   "editor.inlineSuggest.syntaxHighlightingEnabled": true,
   "editor.insertSpaces": false,
   "editor.lineNumbers": "relative",
@@ -364,7 +364,7 @@
   "editor.parameterHints.enabled": true,
   "editor.quickSuggestions": {
     "comments": true,
-    "other": true,
+    "other": false,
     "strings": true
   },
   "editor.quickSuggestionsDelay": 250, // Previously 1000
