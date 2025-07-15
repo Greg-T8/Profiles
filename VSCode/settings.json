@@ -180,6 +180,13 @@
           "name": "Fabric",
           "path": "c:\\Users\\gregt\\LocalCode\\LearningFabric\\LearningFabric.code-workspace",
           "color": "#10685f"
+        },
+        {
+          "isGitRepo": true,
+          "id": "identityxmkh8ee7hmd4bsb04",
+          "name": "Identity",
+          "path": "c:\\Users\\gregt\\LocalCode\\Identity\\Identity.code-workspace",
+          "color": "#796989"
         }
       ]
     },
@@ -269,6 +276,10 @@
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
     [
+      "#796989",
+      "Rum"
+    ],
+    [
       "#d8bd16",
       "Gold Tips"
     ],
@@ -323,10 +334,6 @@
     [
       "#DBDBDB",
       "Alto"
-    ],
-    [
-      "#8EABC1",
-      "Nepal"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
@@ -355,7 +362,7 @@
   "editor.guides.highlightActiveBracketPair": true,
   "editor.guides.highlightActiveIndentation": true,
   "editor.inlineSuggest.edits.showCollapsed": false,
-  "editor.inlineSuggest.enabled": false, // Controls Copilot suggestions
+  "editor.inlineSuggest.enabled": true, // Controls Copilot suggestions
   "editor.inlineSuggest.syntaxHighlightingEnabled": true,
   "editor.insertSpaces": false,
   "editor.lineNumbers": "relative",
