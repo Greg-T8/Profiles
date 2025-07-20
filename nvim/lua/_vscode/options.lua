@@ -9,12 +9,12 @@ vim.api.nvim_set_keymap('n', '<leader>mw',
     { noremap = true, silent = true })
 
 -- Trigger move into new window
-vim.api.nvim_set_keymap('n', '<leader>vw',
+vim.api.nvim_set_keymap('n', '<leader>dw',
     "<Cmd>call VSCodeNotify('workbench.action.moveEditorToNewWindow')<CR>",
     { noremap = true, silent = true })
 
 -- Markdown: Open preview to the side
-vim.api.nvim_set_keymap('n', '<leader>ve',
+vim.api.nvim_set_keymap('n', '<leader>de',
     "<cmd>call VSCodeNotify('markdown.showPreviewToSide')<CR>",
     { noremap = true, silent = true })
 
