@@ -58,8 +58,33 @@ Set-Alias -Name ll -Value Get-ChildItem -Force
 
 # Enable keyboard shortcuts
 if (-not (Get-Module PSReadline)) { Import-Module PSReadLine }
-Set-PSReadLineOption -EditMode Emacs
-Set-PSReadLineOption -ViModeIndicator 'Cursor'
+Set-PSReadLineOption -EditMode Vi
+Set-PSReadLineOption -PredictionSource History
 Set-PSReadLineKeyHandler -Chord Tab -Function TabCompleteNext
 Set-PSReadLineKeyHandler -Chord Shift+Tab -Function TabCompletePrevious
 Set-PSReadLineKeyHandler -Chord Ctrl+V -Function Paste
+if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
+    Set-PSReadLineOption -ViModeIndicator 'Cursor'
+    $env:EDITOR = 'nvim'
+    foreach ($mode in 'Command', 'Insert') {
+        Set-PSReadLineKeyHandler -Chord Ctrl+p -Function PreviousHistory -ViMode $mode
+        Set-PSReadLineKeyHandler -Chord Ctrl+n -Function NextHistory -ViMode $mode
+        Set-PSReadLineKeyHandler -Chord Alt+b -Function BackwardWord -ViMode $mode
+        Set-PSReadLineKeyHandler -Chord Alt+f -Function ForwardWord -ViMode $mode
+        Set-PSReadLineKeyHandler -Chord Ctrl+e -Function EndOfLine -ViMode $mode
+        Set-PSReadLineKeyHandler -Chord Ctrl+a -Function BeginningOfLine -ViMode $mode
+        Set-PSReadLineKeyHandler -Chord Ctrl+k -Function KillLine -ViMode $mode
+        Set-PSReadLineKeyHandler -Chord Ctrl+u -Function BackwardKillInput -ViMode $mode
+    }
+    function OnViModeChange {
+        if ($args[0] -eq 'Command') {
+            # Set the cursor to a blinking block.
+            Write-Host -NoNewline "`e[1 q"
+        }
+        else {
+            # Set the cursor to a blinking line.
+            Write-Host -NoNewline "`e[5 q"
+        }
+    }
+    Set-PSReadLineOption -ViModeIndicator Script -ViModeChangeHandler $Function:OnViModeChange
+}
