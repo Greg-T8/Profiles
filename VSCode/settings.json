@@ -16,7 +16,7 @@
     "editor.defaultFormatter": "golang.go"
   },
   "[html]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "vscode.html-language-features"
   },
   "[javascript]": {
     "editor.formatOnType": true,
@@ -275,66 +275,21 @@
   ],
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
-    [
-      "#796989",
-      "Rum"
-    ],
-    [
-      "#d8bd16",
-      "Gold Tips"
-    ],
-    [
-      "#706555",
-      "Coffee"
-    ],
-    [
-      "#384555",
-      "Oxford Blue"
-    ],
-    [
-      "#10685f",
-      "Genoa"
-    ],
-    [
-      "#f0921c",
-      "Carrot Orange"
-    ],
-    [
-      "#f08604",
-      "Tangerine"
-    ],
-    [
-      "#FF9900",
-      "Orange Peel"
-    ],
-    [
-      "#529bc0",
-      "Fountain Blue"
-    ],
-    [
-      "#4683ca",
-      "Indigo"
-    ],
-    [
-      "#E5E0E1",
-      "Bon Jour"
-    ],
-    [
-      "#E7CD8C",
-      "Putty"
-    ],
-    [
-      "#52001F",
-      "Castro"
-    ],
-    [
-      "#DCB20C",
-      "Galliano"
-    ],
-    [
-      "#DBDBDB",
-      "Alto"
-    ]
+    ["#796989", "Rum"],
+    ["#d8bd16", "Gold Tips"],
+    ["#706555", "Coffee"],
+    ["#384555", "Oxford Blue"],
+    ["#10685f", "Genoa"],
+    ["#f0921c", "Carrot Orange"],
+    ["#f08604", "Tangerine"],
+    ["#FF9900", "Orange Peel"],
+    ["#529bc0", "Fountain Blue"],
+    ["#4683ca", "Indigo"],
+    ["#E5E0E1", "Bon Jour"],
+    ["#E7CD8C", "Putty"],
+    ["#52001F", "Castro"],
+    ["#DCB20C", "Galliano"],
+    ["#DBDBDB", "Alto"]
   ],
   "dashboard.storeProjectsInSettings": true,
   "debug.inlineValues": "auto",
@@ -449,7 +404,7 @@
     "powershell": true,
     "python": true,
     "go": true
-},
+  },
   "github.copilot.nextEditSuggestions.enabled": true,
   "github.copilot.renameSuggestions.triggerAutomatically": true,
   "github.copilot.selectedCompletionModel": "",
@@ -677,14 +632,19 @@
       "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
     }
   },
-  "terminal.integrated.shellIntegration.decorationsEnabled": "never",
+  "terminal.integrated.shellIntegration.enabled": true,
+  "terminal.integrated.shellIntegration.decorationsEnabled": "both",
   "terminal.integrated.shellIntegration.showCommandGuide": true,
-  "terminal.integrated.suggest.enabled": false,
+  "terminal.integrated.stickyScroll.enabled": true,
+  "terminal.integrated.suggest.enabled": true,
+  "terminal.integrated.suggest.inlineSuggestion": "alwaysOnTopExceptExactMatch",
+
   "terminal.integrated.suggest.quickSuggestions": {
     "arguments": "on",
     "commands": "on",
     "unknown": "on"
   },
+  "terminal.integrated.suggest.showStatusBar": true,
   "terminal.integrated.useWslProfiles": false,
   "vscode-neovim.compositeKeys": {
     "jj": {
@@ -857,9 +817,14 @@
     "terminal.integrated.defaultProfile.windows",
     "terminal.integrated.profiles.linux",
     "terminal.integrated.profiles.windows",
+    "terminal.integrated.shellIntegration.enabled",
+    "terminal.integrated.shellIntegration.decorationsEnabled",
     "terminal.integrated.shellIntegration.showCommandGuide",
+    "terminal.integrated.stickyScroll.enabled",
     "terminal.integrated.suggest.enabled",
+    "terminal.integrated.suggest.inlineSuggestion",
     "terminal.integrated.suggest.quickSuggestions",
+    "terminal.integrated.suggest.showStatusBar",
     "vscode-neovim.ctrlKeysForNormalMode",
     "vscode-neovim.ctrlKeysForInsertMode",
     "vscode-neovim.compositeKeys",
