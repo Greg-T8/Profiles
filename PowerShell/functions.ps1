@@ -1,3 +1,9 @@
+# Reverts to the default dir function in cmd.exe
+function dir {
+    cmd /c dir $args
+}
+
+
 # Converts tab-delimited clipboard data to PowerShell objects (for Excel copy-paste).
 function Get-ClipboardExcel {
     Get-Clipboard | ConvertFrom-Csv -Delimiter "`t"

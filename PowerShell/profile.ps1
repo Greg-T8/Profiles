@@ -55,6 +55,7 @@ if (Test-Path -Path $env:OneDriveCommercial/Code/PowerShell/WorkConfig.psd1) {
 
 # Aliases
 Set-Alias -Name ll -Value Get-ChildItem -Force
+Remove-Item Alias:dir
 
 # Enable keyboard shortcuts
 if (-not (Get-Module PSReadline)) { Import-Module PSReadLine }
@@ -75,6 +76,7 @@ if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
         Set-PSReadLineKeyHandler -Chord Ctrl+a -Function BeginningOfLine -ViMode $mode
         Set-PSReadLineKeyHandler -Chord Ctrl+k -Function KillLine -ViMode $mode
         Set-PSReadLineKeyHandler -Chord Ctrl+u -Function BackwardKillInput -ViMode $mode
+        Set-PSReadLineKeyHandler -Chord Ctrl+w -Function BackwardKillWord -ViMode $mode
     }
     function OnViModeChange {
         if ($args[0] -eq 'Command') {
