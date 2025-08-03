@@ -57,6 +57,7 @@
             "keys": "alt+shift+d"
         }
     ],
+    "multiLinePasteWarning": false,
     "minimizeToNotificationArea": true,
     "newTabMenu":
     [
