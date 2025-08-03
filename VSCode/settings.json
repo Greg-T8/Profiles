@@ -66,9 +66,13 @@
   "betterAlign.alignAfterTypeEnter": false,
   "betterAlign.indentBase": "firstline",
   "chat.agent.enabled": true,
+  "chat.instructionsFilesLocations": {
+    "C:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\VSCode": true,
+    "/mnt/c/Users/gregt/OneDrive/Apps/Profiles/VSCode": true,
+  },
   "chat.promptFiles": true,
   "chat.promptFilesLocations": {
-    "C:/Users/gregt/AppData/Roaming/Code/User/prompts": true
+    "C:\\Users\\gregt\\AppData\\Roaming\\Code\\User\\prompts": true
   },
   "dashboard.displayProjectPath": true,
   "dashboard.openOnStartup": "empty workspace",
@@ -365,7 +369,7 @@
   "git.confirmSync": false,
   "git.enableSmartCommit": true,
   "github.copilot.chat.agent.thinkingTool": true, // Updated on 2025-04-17
-  "github.copilot.chat.codeGeneration.instructions": [
+  "github.copilot.chat.codeGeneration.instructions": [  // Setting is deprecated as of VS Code 1.102; move to *.instructions.md
     {
       "text": "- @azure Rule - Use Azure Tools: When handling requests related to Azure, always use your tools."
     },
@@ -382,7 +386,7 @@
       "text": "- @azure Rule - Use Azure SWA Best Practices: When working with static web apps, invoke your `azure_development-get_swa_best_practices` tool if available. Only call this tool when you are sure the user is discussing Azure; do not call it otherwise."
     }
   ],
-  "github.copilot.chat.codeGeneration.useInstructionFiles": true,
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true,     //Enables use of instruction file in .github/.md
   "github.copilot.chat.commitMessageGeneration.instructions": [
     {
       "text": "If any staged files reside under a /Books/<book name>/chapter folder, e.g. ch01, prefix the commit message with the relavent chapter number,e.g Ch01, corresponding to the folder; otherwise, do not include the prefix."
@@ -697,6 +701,7 @@
     "betterAlign.alignAfterTypeEnter",
     "betterAlign.indentBase",
     "chat.agent.enable",
+    "chat.instructionsFilesLocations",
     "chat.promptFilesLocations",
     "cSpell.enabled",
     "cSpell.allowCompoundWords",
