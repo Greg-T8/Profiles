@@ -5,9 +5,9 @@ description: "This file contains the coding standards and guidelines for Copilot
 
 # General Coding Standards
 
-## Header Section
+## Comment Header Section
 1. Always include a comment section at the top that describes the program.
-2. Include the context in the book, if applicable.
+2. Update the context field to reflect its context from the book.
 3. Include my display name (Greg Tate).
 4. If a date is present, do not alter it.
 
