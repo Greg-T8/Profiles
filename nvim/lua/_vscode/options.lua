@@ -33,6 +33,16 @@ vim.api.nvim_set_keymap('n', '<leader>it',
     "<Cmd>call VSCodeNotify('openInIntegratedTerminal')<CR>",
     { noremap = true, silent = true })
 
+-- Open in integrated terminal
+vim.api.nvim_set_keymap('n', '<leader>at',
+    "<Cmd>call VSCodeNotify('openInIntegratedTerminal')<CR>",
+    { noremap = true, silent = true })
+
+-- Toggle inline suggestions (VSCode Neovim)
+vim.api.nvim_set_keymap('n', '<leader>tis',
+  "<Cmd>call VSCodeNotify('settings.cycle.inlineSuggestToggle')<CR>",
+  { noremap = true, silent = true })
+
 -- Toggle code block when in markdown
 vim.api.nvim_set_keymap('n', '<leader>ic',
     "<Cmd>call VSCodeNotify('markdown.extension.editing.toggleCodeBlock')<CR>a",
