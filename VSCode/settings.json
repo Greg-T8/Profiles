@@ -67,8 +67,8 @@
   "betterAlign.indentBase": "firstline",
   "chat.agent.enabled": true,
   "chat.instructionsFilesLocations": {
-    "C:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\VSCode": true,
     "/mnt/c/Users/gregt/OneDrive/Apps/Profiles/VSCode": true,
+    "C:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\VSCode": true
   },
   "chat.promptFiles": true,
   "chat.promptFilesLocations": {
@@ -179,18 +179,18 @@
           "path": "c:\\Users\\gregt\\LocalCode\\LearningAWS\\LearningAWS.code-workspace"
         },
         {
-          "isGitRepo": false,
+          "color": "#10685f",
           "id": "learningfabricvka7w9h34mcom57pi",
+          "isGitRepo": false,
           "name": "Fabric",
-          "path": "c:\\Users\\gregt\\LocalCode\\LearningFabric\\LearningFabric.code-workspace",
-          "color": "#10685f"
+          "path": "c:\\Users\\gregt\\LocalCode\\LearningFabric\\LearningFabric.code-workspace"
         },
         {
-          "isGitRepo": true,
+          "color": "#796989",
           "id": "identityxmkh8ee7hmd4bsb04",
+          "isGitRepo": true,
           "name": "Identity",
-          "path": "c:\\Users\\gregt\\LocalCode\\Identity\\Identity.code-workspace",
-          "color": "#796989"
+          "path": "c:\\Users\\gregt\\LocalCode\\Identity\\Identity.code-workspace"
         }
       ]
     },
@@ -206,11 +206,11 @@
           "path": "c:\\Users\\gregt\\OneDrive - Quisitive\\Code\\Azure DevOps\\INF - Scripts"
         },
         {
-          "isGitRepo": false,
+          "color": "#384555",
           "id": "qitrunbooksz58bj9gaqmcqptwpa",
+          "isGitRepo": false,
           "name": "Q IT Runbooks",
-          "path": "c:\\Users\\gregt\\LocalCode\\Azure Automation\\Quisitive\\it-automation-01",
-          "color": "#384555"
+          "path": "c:\\Users\\gregt\\LocalCode\\Azure Automation\\Quisitive\\it-automation-01"
         }
       ]
     },
@@ -268,32 +268,77 @@
           "path": "c:\\Users\\gregt\\OneDrive\\Apps\\ssh\\ssh.code-workspace"
         },
         {
-          "isGitRepo": true,
+          "color": "#f0921c",
           "id": "drawiod7v84rsbpmcnq2fwp",
+          "isGitRepo": true,
           "name": "draw.io",
-          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\draw.io",
-          "color": "#f0921c"
+          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\draw.io"
         }
       ]
     }
   ],
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
-    ["#796989", "Rum"],
-    ["#d8bd16", "Gold Tips"],
-    ["#706555", "Coffee"],
-    ["#384555", "Oxford Blue"],
-    ["#10685f", "Genoa"],
-    ["#f0921c", "Carrot Orange"],
-    ["#f08604", "Tangerine"],
-    ["#FF9900", "Orange Peel"],
-    ["#529bc0", "Fountain Blue"],
-    ["#4683ca", "Indigo"],
-    ["#E5E0E1", "Bon Jour"],
-    ["#E7CD8C", "Putty"],
-    ["#52001F", "Castro"],
-    ["#DCB20C", "Galliano"],
-    ["#DBDBDB", "Alto"]
+    [
+      "#796989",
+      "Rum"
+    ],
+    [
+      "#d8bd16",
+      "Gold Tips"
+    ],
+    [
+      "#706555",
+      "Coffee"
+    ],
+    [
+      "#384555",
+      "Oxford Blue"
+    ],
+    [
+      "#10685f",
+      "Genoa"
+    ],
+    [
+      "#f0921c",
+      "Carrot Orange"
+    ],
+    [
+      "#f08604",
+      "Tangerine"
+    ],
+    [
+      "#FF9900",
+      "Orange Peel"
+    ],
+    [
+      "#529bc0",
+      "Fountain Blue"
+    ],
+    [
+      "#4683ca",
+      "Indigo"
+    ],
+    [
+      "#E5E0E1",
+      "Bon Jour"
+    ],
+    [
+      "#E7CD8C",
+      "Putty"
+    ],
+    [
+      "#52001F",
+      "Castro"
+    ],
+    [
+      "#DCB20C",
+      "Galliano"
+    ],
+    [
+      "#DBDBDB",
+      "Alto"
+    ]
   ],
   "dashboard.storeProjectsInSettings": true,
   "debug.inlineValues": "auto",
@@ -322,6 +367,7 @@
   "editor.guides.highlightActiveIndentation": true,
   "editor.inlineSuggest.edits.showCollapsed": false,
   "editor.inlineSuggest.enabled": true, // Controls Copilot suggestions
+  "editor.inlineSuggest.suppressSuggestions": true,
   "editor.inlineSuggest.syntaxHighlightingEnabled": true,
   "editor.insertSpaces": false,
   "editor.lineNumbers": "relative",
@@ -330,7 +376,7 @@
   "editor.parameterHints.enabled": true,
   "editor.quickSuggestions": {
     "comments": true,
-    "other": false,
+    "other": true,
     "strings": true
   },
   "editor.quickSuggestionsDelay": 250, // Previously 1000
@@ -369,7 +415,8 @@
   "git.confirmSync": false,
   "git.enableSmartCommit": true,
   "github.copilot.chat.agent.thinkingTool": true, // Updated on 2025-04-17
-  "github.copilot.chat.codeGeneration.instructions": [  // Setting is deprecated as of VS Code 1.102; move to *.instructions.md
+  "github.copilot.chat.codeGeneration.instructions": [
+    // Setting is deprecated as of VS Code 1.102; move to *.instructions.md
     {
       "text": "- @azure Rule - Use Azure Tools: When handling requests related to Azure, always use your tools."
     },
@@ -386,7 +433,7 @@
       "text": "- @azure Rule - Use Azure SWA Best Practices: When working with static web apps, invoke your `azure_development-get_swa_best_practices` tool if available. Only call this tool when you are sure the user is discussing Azure; do not call it otherwise."
     }
   ],
-  "github.copilot.chat.codeGeneration.useInstructionFiles": true,     //Enables use of instruction file in .github/.md
+  "github.copilot.chat.codeGeneration.useInstructionFiles": true, //Enables use of instruction file in .github/.md
   "github.copilot.chat.commitMessageGeneration.instructions": [
     {
       "text": "If any staged files reside under a /Books/<book name>/chapter folder, e.g. ch01, prefix the commit message with the relavent chapter number,e.g Ch01, corresponding to the folder; otherwise, do not include the prefix."
@@ -399,17 +446,17 @@
   "github.copilot.editor.enableCodeActions": true,
   "github.copilot.enable": {
     "*": true,
-    "plaintext": true,
-    "markdown": true,
-    "scminput": false,
-    "c": false,
+    "c": true,
     "csharp": true,
+    "go": true,
     "javascript": true,
+    "markdown": true,
+    "plaintext": true,
     "powershell": true,
     "python": true,
-    "go": true
+    "scminput": false
   },
-  "github.copilot.nextEditSuggestions.enabled": true,
+  "github.copilot.nextEditSuggestions.enabled": false,
   "github.copilot.renameSuggestions.triggerAutomatically": true,
   "github.copilot.selectedCompletionModel": "",
   "hediet.vscode-drawio.appearance": "automatic",
@@ -554,7 +601,9 @@
   "markdown.extension.list.indentationSize": "adaptive",
   "markdown.extension.toc.levels": "2..5",
   "markdown.extension.toc.omittedFromToc": {
-    "notes.md": ["## Contents"]
+    "notes.md": [
+      "## Contents"
+    ]
   },
   "markdown.extension.toc.orderedList": false,
   "markdown.extension.toc.unorderedList.marker": "-",
@@ -585,8 +634,24 @@
     "**/exe": true,
     "**/obj": true
   },
-  "security.allowedUNCHosts": ["wsl.localhost"],
+  "security.allowedUNCHosts": [
+    "wsl.localhost"
+  ],
   "security.workspace.trust.untrustedFiles": "open",
+  "settings.cycle": [
+    {
+      "id": "inlineSuggestToggle",
+      "overrideWorkspaceSettings": true,
+      "values": [
+        {
+          "editor.inlineSuggest.enabled": false
+        },
+        {
+          "editor.inlineSuggest.enabled": true
+        }
+      ]
+    }
+  ],
   "settingsSync.ignoredSettings": [
     "chat.promptFilesLocations",
     "dashboard.openOnStartup",
@@ -628,7 +693,10 @@
       "source": "PowerShell"
     },
     "PowerShell (No Profile)": {
-      "args": ["-NoLogo", "-NoProfile"],
+      "args": [
+        "-NoLogo",
+        "-NoProfile"
+      ],
       "icon": "terminal-powershell",
       "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
     },
@@ -636,17 +704,16 @@
       "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
     }
   },
-  "terminal.integrated.shellIntegration.enabled": true,
   "terminal.integrated.shellIntegration.decorationsEnabled": "both",
+  "terminal.integrated.shellIntegration.enabled": true,
   "terminal.integrated.shellIntegration.showCommandGuide": true,
   "terminal.integrated.stickyScroll.enabled": true,
-  "terminal.integrated.suggest.enabled": true,
+  "terminal.integrated.suggest.enabled": false,
   "terminal.integrated.suggest.inlineSuggestion": "alwaysOnTopExceptExactMatch",
-
   "terminal.integrated.suggest.quickSuggestions": {
-    "arguments": "on",
-    "commands": "on",
-    "unknown": "on"
+    "arguments": "off",
+    "commands": "off",
+    "unknown": "off"
   },
   "terminal.integrated.suggest.showStatusBar": true,
   "terminal.integrated.useWslProfiles": false,
@@ -665,8 +732,30 @@
       "command": "vscode-neovim.lua"
     }
   },
-  "vscode-neovim.ctrlKeysForInsertMode": ["d", "h", "j", "m", "o", "r", "t", "u", "w"],
-  "vscode-neovim.ctrlKeysForNormalMode": ["e", "d", "h", "j", "m", "o", "r", "t", "u", "w", "y"],
+  "vscode-neovim.ctrlKeysForInsertMode": [
+    "d",
+    "h",
+    "j",
+    "m",
+    "o",
+    "r",
+    "t",
+    "u",
+    "w"
+  ],
+  "vscode-neovim.ctrlKeysForNormalMode": [
+    "e",
+    "d",
+    "h",
+    "j",
+    "m",
+    "o",
+    "r",
+    "t",
+    "u",
+    "w",
+    "y"
+  ],
   "vscode-neovim.neovimClean": false,
   "vscode-neovim.neovimExecutablePaths.win32": "C:/Program Files/Neovim/bin/nvim.exe",
   "vscode-neovim.neovimWidth": 500,
@@ -741,6 +830,7 @@
     "editor.suggest.showSnippets",
     "editor.snippetSuggestions",
     "editor.suggestSelection",
+    "editor.inlineSuggest.suppressSuggestions",
     "editor.inlineSuggest.syntaxHighlightingEnabled",
     "editor.tabCompletion",
     "editor.tokenColorCustomizations",
@@ -813,6 +903,7 @@
     "rewrap.reformat",
     "rewrap.wholeComment",
     "search.exclude",
+    "settings.cycle",
     "settingsSync.ignoredSettings",
     "terminal.useWslProfiles",
     "terminal.integrated.commandsToSkipShell",
