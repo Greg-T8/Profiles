@@ -54,6 +54,9 @@
   "[powershell]": {
     "editor.defaultFormatter": "ms-vscode.powershell"
   },
+  "[snippets]": {
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
   "[terraform-vars]": {
     "editor.defaultFormatter": "hashicorp.terraform"
   },
@@ -366,7 +369,7 @@
   "editor.guides.highlightActiveBracketPair": true,
   "editor.guides.highlightActiveIndentation": true,
   "editor.inlineSuggest.edits.showCollapsed": false,
-  "editor.inlineSuggest.enabled": true, // Controls Copilot suggestions
+  "editor.inlineSuggest.enabled": false, // Controls Copilot suggestions
   "editor.inlineSuggest.suppressSuggestions": true,
   "editor.inlineSuggest.syntaxHighlightingEnabled": true,
   "editor.insertSpaces": false,
@@ -375,14 +378,14 @@
   "editor.occurrencesHighlight": "off",
   "editor.parameterHints.enabled": true,
   "editor.quickSuggestions": {
-    "comments": true,
-    "other": true,
-    "strings": true
+    "comments": false,
+    "other": false,
+    "strings": false
   },
   "editor.quickSuggestionsDelay": 250, // Previously 1000
   "editor.snippetSuggestions": "top",
   "editor.suggest.showSnippets": true,
-  "editor.suggestOnTriggerCharacters": true, // Controls whether Intellisense pops up when hitting a period
+  "editor.suggestOnTriggerCharacters": false, // Controls whether Intellisense pops up when hitting a period
   "editor.suggestSelection": "recentlyUsed",
   "editor.tabCompletion": "off",
   "editor.tabSize": 4,
@@ -415,24 +418,6 @@
   "git.confirmSync": false,
   "git.enableSmartCommit": true,
   "github.copilot.chat.agent.thinkingTool": true, // Updated on 2025-04-17
-  "github.copilot.chat.codeGeneration.instructions": [
-    // Setting is deprecated as of VS Code 1.102; move to *.instructions.md
-    {
-      "text": "- @azure Rule - Use Azure Tools: When handling requests related to Azure, always use your tools."
-    },
-    {
-      "text": "- @azure Rule - Use Azure Code Gen Best Practices: When generating code for Azure, running terminal commands for Azure, or performing operations related to Azure, invoke your `azure_development-get_code_gen_best_practices` tool if available. Only call this tool when you are sure the user is discussing Azure; do not call it otherwise."
-    },
-    {
-      "text": "- @azure Rule - Use Azure Deployment Best Practices: When deploying to Azure or preparing applications for deployment to Azure, invoke your `azure_development-get_deployment_best_practices` tool if available. Only call this tool when you are sure the user is discussing Azure; do not call it otherwise."
-    },
-    {
-      "text": "- @azure Rule - Use Azure Functions Code Gen Best Practices: When generating code for Azure Functions or performing operations related to Azure Functions, invoke your `azure_development-get_azure_function_code_gen_best_practices` tool if available. Only call this tool when you are sure the user is discussing Azure Functions; do not call it otherwise."
-    },
-    {
-      "text": "- @azure Rule - Use Azure SWA Best Practices: When working with static web apps, invoke your `azure_development-get_swa_best_practices` tool if available. Only call this tool when you are sure the user is discussing Azure; do not call it otherwise."
-    }
-  ],
   "github.copilot.chat.codeGeneration.useInstructionFiles": true, //Enables use of instruction file in .github/.md
   "github.copilot.chat.commitMessageGeneration.instructions": [
     {
@@ -708,7 +693,7 @@
   "terminal.integrated.shellIntegration.enabled": true,
   "terminal.integrated.shellIntegration.showCommandGuide": true,
   "terminal.integrated.stickyScroll.enabled": true,
-  "terminal.integrated.suggest.enabled": false,
+  "terminal.integrated.suggest.enabled": true,
   "terminal.integrated.suggest.inlineSuggestion": "alwaysOnTopExceptExactMatch",
   "terminal.integrated.suggest.quickSuggestions": {
     "arguments": "off",
@@ -716,6 +701,7 @@
     "unknown": "off"
   },
   "terminal.integrated.suggest.showStatusBar": true,
+  "terminal.integrated.suggest.suggestOnTriggerCharacters": false,
   "terminal.integrated.useWslProfiles": false,
   "vscode-neovim.compositeKeys": {
     "jj": {
@@ -914,13 +900,13 @@
     "terminal.integrated.profiles.linux",
     "terminal.integrated.profiles.windows",
     "terminal.integrated.shellIntegration.enabled",
-    "terminal.integrated.shellIntegration.decorationsEnabled",
     "terminal.integrated.shellIntegration.showCommandGuide",
     "terminal.integrated.stickyScroll.enabled",
     "terminal.integrated.suggest.enabled",
     "terminal.integrated.suggest.inlineSuggestion",
     "terminal.integrated.suggest.quickSuggestions",
     "terminal.integrated.suggest.showStatusBar",
+    "terminal.integrated.suggest.suggestOnTriggerCharacters",
     "vscode-neovim.ctrlKeysForNormalMode",
     "vscode-neovim.ctrlKeysForInsertMode",
     "vscode-neovim.compositeKeys",
