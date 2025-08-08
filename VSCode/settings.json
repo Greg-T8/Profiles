@@ -282,66 +282,21 @@
   ],
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
-    [
-      "#796989",
-      "Rum"
-    ],
-    [
-      "#d8bd16",
-      "Gold Tips"
-    ],
-    [
-      "#706555",
-      "Coffee"
-    ],
-    [
-      "#384555",
-      "Oxford Blue"
-    ],
-    [
-      "#10685f",
-      "Genoa"
-    ],
-    [
-      "#f0921c",
-      "Carrot Orange"
-    ],
-    [
-      "#f08604",
-      "Tangerine"
-    ],
-    [
-      "#FF9900",
-      "Orange Peel"
-    ],
-    [
-      "#529bc0",
-      "Fountain Blue"
-    ],
-    [
-      "#4683ca",
-      "Indigo"
-    ],
-    [
-      "#E5E0E1",
-      "Bon Jour"
-    ],
-    [
-      "#E7CD8C",
-      "Putty"
-    ],
-    [
-      "#52001F",
-      "Castro"
-    ],
-    [
-      "#DCB20C",
-      "Galliano"
-    ],
-    [
-      "#DBDBDB",
-      "Alto"
-    ]
+    ["#796989", "Rum"],
+    ["#d8bd16", "Gold Tips"],
+    ["#706555", "Coffee"],
+    ["#384555", "Oxford Blue"],
+    ["#10685f", "Genoa"],
+    ["#f0921c", "Carrot Orange"],
+    ["#f08604", "Tangerine"],
+    ["#FF9900", "Orange Peel"],
+    ["#529bc0", "Fountain Blue"],
+    ["#4683ca", "Indigo"],
+    ["#E5E0E1", "Bon Jour"],
+    ["#E7CD8C", "Putty"],
+    ["#52001F", "Castro"],
+    ["#DCB20C", "Galliano"],
+    ["#DBDBDB", "Alto"]
   ],
   "dashboard.storeProjectsInSettings": true,
   "debug.inlineValues": "auto",
@@ -369,23 +324,24 @@
   "editor.guides.highlightActiveBracketPair": true,
   "editor.guides.highlightActiveIndentation": true,
   "editor.inlineSuggest.edits.showCollapsed": false,
-  "editor.inlineSuggest.enabled": false, // Controls Copilot suggestions
+  "editor.inlineSuggest.enabled": true, // Controls Copilot suggestions
   "editor.inlineSuggest.suppressSuggestions": true,
   "editor.inlineSuggest.syntaxHighlightingEnabled": true,
   "editor.insertSpaces": false,
   "editor.lineNumbers": "relative",
   "editor.minimap.enabled": false,
   "editor.occurrencesHighlight": "off",
-  "editor.parameterHints.enabled": true,
+  "editor.parameterHints.enabled": false, // CTRL+SHIFT+SPACE to manually trigger
   "editor.quickSuggestions": {
     "comments": false,
     "other": false,
     "strings": false
   },
-  "editor.quickSuggestionsDelay": 250, // Previously 1000
+  "editor.quickSuggestionsDelay": 250,
   "editor.snippetSuggestions": "top",
-  "editor.suggest.showSnippets": true,
-  "editor.suggestOnTriggerCharacters": false, // Controls whether Intellisense pops up when hitting a period
+  "editor.suggest.showInlineDetails": true,
+  "editor.suggest.showStatusBar": true,
+  "editor.suggestOnTriggerCharacters": false, // Controls Intellisense; CTRL+SPACE to manually trigger
   "editor.suggestSelection": "recentlyUsed",
   "editor.tabCompletion": "off",
   "editor.tabSize": 4,
@@ -441,7 +397,7 @@
     "python": true,
     "scminput": false
   },
-  "github.copilot.nextEditSuggestions.enabled": false,
+  "github.copilot.nextEditSuggestions.enabled": true,
   "github.copilot.renameSuggestions.triggerAutomatically": true,
   "github.copilot.selectedCompletionModel": "",
   "hediet.vscode-drawio.appearance": "automatic",
@@ -586,9 +542,7 @@
   "markdown.extension.list.indentationSize": "adaptive",
   "markdown.extension.toc.levels": "2..5",
   "markdown.extension.toc.omittedFromToc": {
-    "notes.md": [
-      "## Contents"
-    ]
+    "notes.md": ["## Contents"]
   },
   "markdown.extension.toc.orderedList": false,
   "markdown.extension.toc.unorderedList.marker": "-",
@@ -619,9 +573,7 @@
     "**/exe": true,
     "**/obj": true
   },
-  "security.allowedUNCHosts": [
-    "wsl.localhost"
-  ],
+  "security.allowedUNCHosts": ["wsl.localhost"],
   "security.workspace.trust.untrustedFiles": "open",
   "settings.cycle": [
     {
@@ -633,6 +585,20 @@
         },
         {
           "editor.inlineSuggest.enabled": true
+        }
+      ]
+    },
+    {
+      "id": "intellisenseToggle",
+      "overrideWorkspaceSettings": true,
+      "values": [
+        {
+          "editor.parameterHints.enabled": true,
+          "editor.suggestOnTriggerCharacters": true
+        },
+        {
+          "editor.parameterHints.enabled": false,
+          "editor.suggestOnTriggerCharacters": false
         }
       ]
     }
@@ -678,10 +644,7 @@
       "source": "PowerShell"
     },
     "PowerShell (No Profile)": {
-      "args": [
-        "-NoLogo",
-        "-NoProfile"
-      ],
+      "args": ["-NoLogo", "-NoProfile"],
       "icon": "terminal-powershell",
       "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
     },
@@ -718,30 +681,8 @@
       "command": "vscode-neovim.lua"
     }
   },
-  "vscode-neovim.ctrlKeysForInsertMode": [
-    "d",
-    "h",
-    "j",
-    "m",
-    "o",
-    "r",
-    "t",
-    "u",
-    "w"
-  ],
-  "vscode-neovim.ctrlKeysForNormalMode": [
-    "e",
-    "d",
-    "h",
-    "j",
-    "m",
-    "o",
-    "r",
-    "t",
-    "u",
-    "w",
-    "y"
-  ],
+  "vscode-neovim.ctrlKeysForInsertMode": ["d", "h", "j", "m", "o", "r", "t", "u", "w"],
+  "vscode-neovim.ctrlKeysForNormalMode": ["e", "d", "h", "j", "m", "o", "r", "t", "u", "w", "y"],
   "vscode-neovim.neovimClean": false,
   "vscode-neovim.neovimExecutablePaths.win32": "C:/Program Files/Neovim/bin/nvim.exe",
   "vscode-neovim.neovimWidth": 500,
@@ -813,7 +754,10 @@
     "editor.quickSuggestions",
     "editor.quickSuggestionsDelay",
     "editor.suggestOnTriggerCharacters",
+    "editor.suggest.showInlineDetails",
     "editor.suggest.showSnippets",
+    "editor.suggest.showStatusBar",
+    "editor.suggest.showWords",
     "editor.snippetSuggestions",
     "editor.suggestSelection",
     "editor.inlineSuggest.suppressSuggestions",
