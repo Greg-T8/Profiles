@@ -43,6 +43,11 @@ vim.api.nvim_set_keymap('n', '<leader>tis',
   "<Cmd>call VSCodeNotify('settings.cycle.inlineSuggestToggle')<CR>",
   { noremap = true, silent = true })
 
+-- Toggle intellisense
+vim.api.nvim_set_keymap('n', '<leader>tii',
+    "<Cmd>call VSCodeNotify('settings.cycle.intellisenseToggle')<CR>",
+    { noremap = true, silent = true })
+
 -- Toggle code block when in markdown
 vim.api.nvim_set_keymap('n', '<leader>ic',
     "<Cmd>call VSCodeNotify('markdown.extension.editing.toggleCodeBlock')<CR>a",
