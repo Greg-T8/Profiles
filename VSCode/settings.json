@@ -601,6 +601,18 @@
           "editor.suggestOnTriggerCharacters": false
         }
       ]
+    },
+    {
+      "id": "nextEditSuggestionsToggle",
+      "overrideWorkspaceSettings": true,
+      "values": [
+        {
+          "github.copilot.nextEditSuggestions.enabled": true
+        },
+        {
+          "github.copilot.nextEditSuggestions.enabled": false
+        }
+      ]
     }
   ],
   "settingsSync.ignoredSettings": [
