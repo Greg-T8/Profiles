@@ -4,11 +4,6 @@ local vscode = require('vscode')
 vim.opt.columns = 400
 
 -- Trigger move into new window
-vim.api.nvim_set_keymap('n', '<leader>mw',
-    "<Cmd>call VSCodeNotify('workbench.action.moveEditorToNewWindow')<CR>",
-    { noremap = true, silent = true })
-
--- Trigger move into new window
 vim.api.nvim_set_keymap('n', '<leader>dw',
     "<Cmd>call VSCodeNotify('workbench.action.moveEditorToNewWindow')<CR>",
     { noremap = true, silent = true })
@@ -46,6 +41,11 @@ vim.api.nvim_set_keymap('n', '<leader>tis',
 -- Toggle intellisense
 vim.api.nvim_set_keymap('n', '<leader>tii',
     "<Cmd>call VSCodeNotify('settings.cycle.intellisenseToggle')<CR>",
+    { noremap = true, silent = true })
+
+-- Toggle Next Edit Suggestions
+vim.api.nvim_set_keymap('n', '<leader>nes',
+    "<Cmd>call VSCodeNotify('settings.cycle.nextEditSuggestionsToggle')<CR>",
     { noremap = true, silent = true })
 
 -- Toggle code block when in markdown
