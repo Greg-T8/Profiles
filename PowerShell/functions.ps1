@@ -168,3 +168,43 @@ function Remove-OldModuleVersions {
         }
     }
 }
+
+# Retrieves the Windows Experience Index (WEI) score and assessment date.
+function Get-WinExperienceIndex {
+    [CmdletBinding()]
+    param (
+        [switch]$Recalculate
+    )
+
+    if ($Recalculate) {
+        Write-Host "Running WinSAT assessment... This may take several minutes." -ForegroundColor Yellow
+        winsat formal | Out-Null
+    }
+
+    # Retrieve the latest WinSAT data
+    $result = Get-CimInstance -ClassName Win32_WinSAT
+
+    if (-not $result) {
+        Write-Error "No WinSAT results found. Try running with -Recalculate."
+        return
+    }
+
+    # Get latest assessment date from DataStore
+    $dataStore = Get-ChildItem "$env:WinDir\Performance\WinSAT\DataStore" `
+        -Filter "*Formal.Assessment*.WinSAT.xml" `
+        | Sort-Object LastWriteTime -Descending `
+        | Select-Object -First 1
+
+    $assessmentDate = if ($dataStore) { $dataStore.LastWriteTime } else { $null }
+
+    # Output results
+    [PSCustomObject]@{
+        CPUScore        = $result.CPUScore
+        D3DScore        = $result.D3DScore
+        DiskScore       = $result.DiskScore
+        GraphicsScore   = $result.GraphicsScore
+        MemoryScore     = $result.MemoryScore
+        WinSPRLevel     = $result.WinSPRLevel
+        AssessmentDate  = $assessmentDate
+    }
+}
