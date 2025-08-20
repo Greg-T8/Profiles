@@ -35,8 +35,8 @@ vim.api.nvim_set_keymap('n', '<leader>at',
 
 -- Toggle inline suggestions (VSCode Neovim)
 vim.api.nvim_set_keymap('n', '<leader>tis',
-  "<Cmd>call VSCodeNotify('settings.cycle.inlineSuggestToggle')<CR>",
-  { noremap = true, silent = true })
+    "<Cmd>call VSCodeNotify('settings.cycle.inlineSuggestToggle')<CR>",
+    { noremap = true, silent = true })
 
 -- Toggle intellisense
 vim.api.nvim_set_keymap('n', '<leader>tii',
@@ -65,13 +65,21 @@ vim.api.nvim_set_keymap('n', '<leader>tvt',
 
 -- GCC Build functionality
 _G.build_if_gccbuild_enabled = function()
-  local enabled = vscode.get_config("workspaceKeybindings.gccbuild.enabled")
-  if enabled then
-    vim.cmd("call VSCodeNotify('workbench.action.tasks.runTask', 'GCC Build')")
-  else
-    print("GCC Build is disabled")
-  end
+    local enabled = vscode.get_config("workspaceKeybindings.gccbuild.enabled")
+    if enabled then
+        vim.cmd("call VSCodeNotify('workbench.action.tasks.runTask', 'GCC Build')")
+    else
+        print("GCC Build is disabled")
+    end
 end
 vim.api.nvim_set_keymap('n', '<leader>bc',
     "<Cmd>lua build_if_gccbuild_enabled()<CR>",
     { noremap = true, silent = true })
+
+-- Visual mode: page down/up while KEEPING the selection
+local win_h = function() return vim.api.nvim_win_get_height(0) end
+local half  = function() return math.floor(win_h() / 2) end
+vim.keymap.set('x', '<C-f>', function() vim.cmd('normal! ' .. win_h() .. 'jzz') end, opts)
+vim.keymap.set('x', '<C-b>', function() vim.cmd('normal! ' .. win_h() .. 'kzz') end, opts)
+vim.keymap.set('x', '<C-d>', function() vim.cmd('normal! ' .. half() .. 'jzz') end, opts)
+vim.keymap.set('x', '<C-u>', function() vim.cmd('normal! ' .. half() .. 'kzz') end, opts)

@@ -11,12 +11,11 @@ local term_opts = { silent = true }
 --   command_mode = "c",
 --   operator_pending_mode = "o",
 
--- Normal mode --
 -- Add keymapping for saving with leader+s
 vim.keymap.set('n', '<leader>w', ':w<CR>', { desc = 'Save file' })
 vim.keymap.set("n", "<C-q>", "<C-v>", { desc = "Enter visual block mode", noremap = true, silent = true })
 
--- Change G to go to end of line
+-- Change G to go to the end of the last line
 vim.keymap.set('n', 'G', 'G$', { desc = 'Go to end of line and center' })
 
 -- Add keymapping for centering cursor
@@ -25,20 +24,10 @@ vim.keymap.set('n', '<C-d>', '<C-d>zz', { desc = 'Half page down and center' })
 vim.keymap.set('n', '<C-f>', '<C-f>zz', { desc = 'Page down and center' })
 vim.keymap.set('n', '<C-b>', '<C-b>zz', { desc = 'Page up and center' })
 
--- Insert mode --
-vim.keymap.set("i", "jk", "<ESC>", { desc = "Quick exit from insert mode", noremap = true, silent = true })
-
--- Visual mode --
-
--- Simulate page-size scrolling (haven't gotten this to work yet)
--- vim.keymap.set('v', '<C-e>', '40<C-e>', { desc = 'Scroll down in visual mode', noremap = true, silent = true })
--- vim.keymap.set('v', '<C-y>', '40<C-y>', { desc = 'Scroll up in visual mode', noremap = true, silent = true })
-
 -- Stay in indent mode
 vim.keymap.set("v", "<", "<gv", { desc = "Indent left and keep selection", noremap = true, silent = true })
 vim.keymap.set("v", ">", ">gv", { desc = "Indent right and keep selection", noremap = true, silent = true })
 
--- Visual block mode --
 -- Enter visual block mode using ctrl+q
 vim.keymap.set('n', '<C-v>', '<C-q>', { desc = 'Enter visual block mode', noremap = true, silent = true })
 
