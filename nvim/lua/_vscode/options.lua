@@ -79,7 +79,11 @@ vim.api.nvim_set_keymap('n', '<leader>bc',
 -- Visual mode: page down/up while KEEPING the selection
 local win_h = function() return vim.api.nvim_win_get_height(0) end
 local half  = function() return math.floor(win_h() / 2) end
-vim.keymap.set('x', '<C-f>', function() vim.cmd('normal! ' .. win_h() .. 'jzz') end, opts)
-vim.keymap.set('x', '<C-b>', function() vim.cmd('normal! ' .. win_h() .. 'kzz') end, opts)
-vim.keymap.set('x', '<C-d>', function() vim.cmd('normal! ' .. half() .. 'jzz') end, opts)
-vim.keymap.set('x', '<C-u>', function() vim.cmd('normal! ' .. half() .. 'kzz') end, opts)
+vim.keymap.set({'n', 'x'}, '<C-f>', function() vim.cmd('normal! ' .. win_h() .. 'jzz') end, opts)
+vim.keymap.set({'n', 'x'}, '<C-b>', function() vim.cmd('normal! ' .. win_h() .. 'kzz') end, opts)
+vim.keymap.set({'n', 'x'}, '<C-d>', function() vim.cmd('normal! ' .. half() .. 'jzz') end, opts)
+vim.keymap.set({'n', 'x'}, '<C-u>', function() vim.cmd('normal! ' .. half() .. 'kzz') end, opts)
+
+vim.keymap.set({ "n", "x", "i" }, "<C-S-l>", function()
+  require("vscode-multi-cursor").selectHighlights()
+end)

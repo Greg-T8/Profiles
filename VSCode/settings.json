@@ -323,7 +323,7 @@
   "editor.guides.bracketPairsHorizontal": true,
   "editor.guides.highlightActiveBracketPair": true,
   "editor.guides.highlightActiveIndentation": true,
-  "editor.inlineSuggest.enabled": true, // Controls Copilot suggestions
+  "editor.inlineSuggest.enabled": false, // Controls Copilot suggestions
   "editor.inlineSuggest.suppressSuggestions": true,
   "editor.inlineSuggest.syntaxHighlightingEnabled": true,
   "editor.insertSpaces": false,
@@ -395,7 +395,7 @@
     "python": true,
     "scminput": false
   },
-  "github.copilot.nextEditSuggestions.enabled": false,
+  "github.copilot.nextEditSuggestions.enabled": true,
   "github.copilot.renameSuggestions.triggerAutomatically": true,
   "github.copilot.selectedCompletionModel": "",
   "hediet.vscode-drawio.appearance": "automatic",

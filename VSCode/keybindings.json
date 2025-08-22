@@ -224,12 +224,12 @@
     "command": "-workbench.action.moveEditorToPreviousGroup"
   },
   {
-    "key": "ctrl+shift+l",
+    "key": "ctrl+alt+l",
     "command": "workbench.action.moveEditorToRightGroup",
     "when": "editorFocus"
   },
   {
-    "key": "ctrl+shift+h",
+    "key": "ctrl+alt+h",
     "command": "workbench.action.moveEditorToLeftGroup",
     "when": "editorFocus"
   },
@@ -343,11 +343,6 @@
   {
     "key": "alt+k",
     "command": "workbench.action.decreaseViewSize"
-  },
-  {
-    "key": "ctrl+shift+f",
-    "command": "editor.action.selectHighlights",
-    "when": "editorFocus"
   },
   {
     "key": "shift+alt+i",
@@ -511,11 +506,6 @@
     "when": "editorTextFocus && !editorReadonly && editorLangId =~ /^markdown$|^rmd$|^quarto$/"
   },
   {
-    "key": "ctrl+b",
-    "command": "-markdown.extension.editing.toggleBold",
-    "when": "editorTextFocus && !editorReadonly && editorLangId =~ /^markdown$|^rmd$|^quarto$/"
-  },
-  {
     "key": "ctrl+f",
     "command": "-vscode-neovim.ctrl-f",
     "when": "editorTextFocus && neovim.ctrlKeysNormal.f && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
@@ -558,5 +548,11 @@
     "command": "vscode-neovim.send",
     "args": "<C-u>",
     "when": "editorTextFocus && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
+  },
+  {
+    "args": "<C-S-l>",
+    "command": "vscode-neovim.send",
+    "key": "ctrl+shift+l",
+    "when": "editorFocus && neovim.init"
   }
 ]
