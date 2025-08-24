@@ -24,7 +24,7 @@ vim.api.nvim_set_keymap('n', '<leader>icu',
     { noremap = true, silent = true })
 
 -- Open in integrated terminal
-vim.api.nvim_set_keymap('n', '<leader>it',
+vim.api.nvim_set_keymap('n', '<leader>tt',
     "<Cmd>call VSCodeNotify('openInIntegratedTerminal')<CR>",
     { noremap = true, silent = true })
 
