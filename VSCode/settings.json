@@ -22,6 +22,12 @@
     "editor.formatOnType": true,
     "editor.insertSpaces": false
   },
+  "[json]": {
+    "editor.autoIndent": "advanced",
+    "editor.insertSpaces": true,
+    "editor.rulers": [110],
+    "editor.tabSize": 2
+  },
   "[jsonc]": {
     "editor.insertSpaces": true,
     "editor.tabSize": 2,
@@ -55,7 +61,10 @@
     "files.trimTrailingWhitespace": false
   },
   "[powershell]": {
-    "editor.defaultFormatter": "ms-vscode.powershell"
+    "editor.defaultFormatter": "ms-vscode.powershell",
+    "editor.rulers": [115],
+    "editor.tabSize": 4,
+    "rewrap.wrappingColumn": 115
   },
   "[snippets]": {
     "editor.defaultFormatter": "vscode.json-language-features"
@@ -68,6 +77,13 @@
   },
   "[xml]": {
     "editor.defaultFormatter": "PrateekMahendrakar.prettyxml"
+  },
+  "[yaml]": {
+    "diffEditor.ignoreTrimWhitespace": false,
+    "editor.autoIndent": "advanced",
+    "editor.insertSpaces": true,
+    "editor.rulers": [115],
+    "editor.tabSize": 2
   },
   "betterAlign.alignAfterTypeEnter": false,
   "betterAlign.indentBase": "firstline",
@@ -298,66 +314,21 @@
   ],
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
-    [
-      "#efbe00",
-      "Corn"
-    ],
-    [
-      "#E6F8F3",
-      "Off Green"
-    ],
-    [
-      "#796989",
-      "Rum"
-    ],
-    [
-      "#d8bd16",
-      "Gold Tips"
-    ],
-    [
-      "#706555",
-      "Coffee"
-    ],
-    [
-      "#384555",
-      "Oxford Blue"
-    ],
-    [
-      "#10685f",
-      "Genoa"
-    ],
-    [
-      "#f0921c",
-      "Carrot Orange"
-    ],
-    [
-      "#f08604",
-      "Tangerine"
-    ],
-    [
-      "#FF9900",
-      "Orange Peel"
-    ],
-    [
-      "#529bc0",
-      "Fountain Blue"
-    ],
-    [
-      "#4683ca",
-      "Indigo"
-    ],
-    [
-      "#E5E0E1",
-      "Bon Jour"
-    ],
-    [
-      "#E7CD8C",
-      "Putty"
-    ],
-    [
-      "#52001F",
-      "Castro"
-    ]
+    ["#efbe00", "Corn"],
+    ["#E6F8F3", "Off Green"],
+    ["#796989", "Rum"],
+    ["#d8bd16", "Gold Tips"],
+    ["#706555", "Coffee"],
+    ["#384555", "Oxford Blue"],
+    ["#10685f", "Genoa"],
+    ["#f0921c", "Carrot Orange"],
+    ["#f08604", "Tangerine"],
+    ["#FF9900", "Orange Peel"],
+    ["#529bc0", "Fountain Blue"],
+    ["#4683ca", "Indigo"],
+    ["#E5E0E1", "Bon Jour"],
+    ["#E7CD8C", "Putty"],
+    ["#52001F", "Castro"]
   ],
   "dashboard.storeProjectsInSettings": true,
   "debug.inlineValues": "auto",
@@ -456,7 +427,7 @@
     "python": true,
     "scminput": false
   },
-  "github.copilot.nextEditSuggestions.enabled": false,
+  "github.copilot.nextEditSuggestions.enabled": true,
   "github.copilot.renameSuggestions.triggerAutomatically": true,
   "github.copilot.selectedCompletionModel": "",
   "hediet.vscode-drawio.appearance": "automatic",
