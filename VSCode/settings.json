@@ -37,9 +37,12 @@
     "editor.detectIndentation": false,
     "editor.fontFamily": "Fira Code",
     "editor.insertSpaces": true,
+    "editor.rulers": [80],
     "editor.tabSize": 2,
-    "editor.wordWrap": "on",
-    "files.trimTrailingWhitespace": false
+    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrapColumn": 80,
+    "files.trimTrailingWhitespace": false,
+    "rewrap.wrappingColumn": 80
   },
   "[mysql]": {
     "editor.defaultFormatter": "inferrinizzard.prettier-sql-vscode"
@@ -278,25 +281,83 @@
           "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\draw.io"
         }
       ]
+    },
+    {
+      "id": "frameworks56xylv85xmfs0b96v",
+      "groupName": "Frameworks",
+      "projects": [
+        {
+          "isGitRepo": true,
+          "id": "learningframeworkugn5ub9x4mfs0c74f",
+          "name": "Learning Framework",
+          "path": "c:\\Users\\gregt\\LocalCode\\LearningFramework",
+          "color": "#efbe00"
+        }
+      ]
     }
   ],
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
-    ["#796989", "Rum"],
-    ["#d8bd16", "Gold Tips"],
-    ["#706555", "Coffee"],
-    ["#384555", "Oxford Blue"],
-    ["#10685f", "Genoa"],
-    ["#f0921c", "Carrot Orange"],
-    ["#f08604", "Tangerine"],
-    ["#FF9900", "Orange Peel"],
-    ["#529bc0", "Fountain Blue"],
-    ["#4683ca", "Indigo"],
-    ["#E5E0E1", "Bon Jour"],
-    ["#E7CD8C", "Putty"],
-    ["#52001F", "Castro"],
-    ["#DCB20C", "Galliano"],
-    ["#DBDBDB", "Alto"]
+    [
+      "#efbe00",
+      "Corn"
+    ],
+    [
+      "#E6F8F3",
+      "Off Green"
+    ],
+    [
+      "#796989",
+      "Rum"
+    ],
+    [
+      "#d8bd16",
+      "Gold Tips"
+    ],
+    [
+      "#706555",
+      "Coffee"
+    ],
+    [
+      "#384555",
+      "Oxford Blue"
+    ],
+    [
+      "#10685f",
+      "Genoa"
+    ],
+    [
+      "#f0921c",
+      "Carrot Orange"
+    ],
+    [
+      "#f08604",
+      "Tangerine"
+    ],
+    [
+      "#FF9900",
+      "Orange Peel"
+    ],
+    [
+      "#529bc0",
+      "Fountain Blue"
+    ],
+    [
+      "#4683ca",
+      "Indigo"
+    ],
+    [
+      "#E5E0E1",
+      "Bon Jour"
+    ],
+    [
+      "#E7CD8C",
+      "Putty"
+    ],
+    [
+      "#52001F",
+      "Castro"
+    ]
   ],
   "dashboard.storeProjectsInSettings": true,
   "debug.inlineValues": "auto",
@@ -663,7 +724,7 @@
   "terminal.integrated.shellIntegration.decorationsEnabled": "both",
   "terminal.integrated.shellIntegration.enabled": true,
   "terminal.integrated.shellIntegration.showCommandGuide": true,
-  "terminal.integrated.stickyScroll.enabled": true,
+  "terminal.integrated.stickyScroll.enabled": false,
   "terminal.integrated.suggest.enabled": true,
   "terminal.integrated.suggest.inlineSuggestion": "alwaysOnTopExceptExactMatch",
   "terminal.integrated.suggest.quickSuggestions": {
@@ -756,12 +817,15 @@
     "editor.guides.highlightActiveIndentation",
     "editor.inlineSuggest.enabled",
     "editor.inlineSuggest.edits.showCollapsed",
+    "editor.inlineSuggest.syntaxHighlightingEnabled",
+    "editor.inlineSuggest.suppressSuggestions",
     "editor.lineNumbers",
     "editor.minimap.enabled",
     "editor.occurrencesHighlight",
     "editor.parameterHints.enabled",
     "editor.quickSuggestions",
     "editor.quickSuggestionsDelay",
+    "editor.rulers",
     "editor.suggestOnTriggerCharacters",
     "editor.suggest.showInlineDetails",
     "editor.suggest.showSnippets",
@@ -769,8 +833,6 @@
     "editor.suggest.showWords",
     "editor.snippetSuggestions",
     "editor.suggestSelection",
-    "editor.inlineSuggest.suppressSuggestions",
-    "editor.inlineSuggest.syntaxHighlightingEnabled",
     "editor.tabCompletion",
     "editor.tokenColorCustomizations",
     "editor.useTabStops",
@@ -838,6 +900,7 @@
     "rewrap.doubleSentenceSpacing",
     "rewrap.reformat",
     "rewrap.wholeComment",
+    "rewrap.wrappingColumn",
     "search.exclude",
     "settings.cycle",
     "settingsSync.ignoredSettings",
@@ -880,5 +943,31 @@
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-  "workbench.tips.enabled": true
+  "workbench.tips.enabled": true,
+  "github.copilot.chat.codeGeneration.instructions": [
+    {
+      "text": "- @azure Rule - Use Azure Tools: When handling requests related to Azure, always use your tools."
+    },
+    {
+      "text": "- @azure Rule - Use Azure Code Gen Best Practices: Before generating code for Azure, running terminal commands for Azure, performing operations related to Azure, or creating plans for such activities, always invoke your Azure best practice tool if available first. Invoke the `get_bestpractices` tool to collect recommendations. Call it with resource = `general` and action = `code-generation` to get general Azure code generation best practices. Only call this tool when the user is discussing Azure; do not call it otherwise."
+    },
+    {
+      "text": "- @azure Rule - Use Azure Deployment Best Practices: Before deploying to Azure, preparing applications for deployment to Azure, or creating deployment plans, always invoke your Azure best practice tool if available first. Invoke the `get_bestpractices` tool to collect recommendations. Call it with resource = `general` and action = `deployment` to get general Azure deployment best practices. Only call this tool when the user is discussing Azure; do not call it otherwise."
+    },
+    {
+      "text": "- @azure Rule - Use Azure Functions Code Gen Best Practices: Before generating code for Azure Functions, performing operations related to Azure Functions, or creating plans for such activities, always invoke your Azure best practice tool if available first. Invoke the `get_bestpractices` tool to collect recommendations. Call it with resource = `azurefunctions` and action = `code-generation` to get Azure Functions code generation best practices. Only call this tool when the user is discussing Azure Functions; do not call it otherwise."
+    },
+    {
+      "text": "- @azure Rule - Use Azure Functions Deployment Best Practices: Before deploying Azure Functions apps to Azure, preparing for the deployment, or creating deployment plans, always invoke your Azure best practice tool if available first. Invoke the `get_bestpractices` tool to collect recommendations. Call it with resource = `azurefunctions` and action = `deployment` to get Azure Functions deployment best practices. Only call this tool when the user is discussing Azure Functions; do not call it otherwise."
+    },
+    {
+      "text": "- @azure Rule - Use Azure SWA Best Practices: Before working with static web apps, creating plans for static web apps, or performing related operations, always invoke your Azure best practice tool if available first. Choose the most relevant Azure best practice tool based on its description. Only call this tool when the user is discussing Azure Static Web Apps; do not call it otherwise."
+    },
+    {
+      "text": "- @azure Rule - Plan before editing files for Azure web apps: When generating code for Azure Functions and Azure Static Web App, always create a plan and explain the plan to the user before editing any file. Proceed with editing the files after getting consent from the user."
+    },
+    {
+      "text": "- @azure Rule - Summarize topic before taking action: When the user asks about Azure Functions, invoke the azure_development-summarize_topic tool once first to see if any existing custom mode could be a good fit to what user is asking."
+    }
+  ]
 }
