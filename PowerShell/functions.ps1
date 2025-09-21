@@ -84,7 +84,8 @@ function touch {
     if (Test-Path $Path) {
         # Update last modified time
         (Get-Item $Path).LastWriteTime = Get-Date
-    } else {
+    }
+    else {
         # Create the file
         New-Item -ItemType File -Path $Path | Out-Null
     }
@@ -103,7 +104,7 @@ function Update-AllInstalledModules {
 
     # Ensure PowerShellGet v2 is available
     if (-not (Get-Command Get-InstalledModule -ErrorAction SilentlyContinue)) {
-        Write-Error "PowerShellGet v2 not detected. This script requires the PowerShellGet module (v2)."
+        Write-Error 'PowerShellGet v2 not detected. This script requires the PowerShellGet module (v2).'
         return
     }
 
@@ -128,7 +129,8 @@ function Update-AllInstalledModules {
             Write-Host "Updating module '$($mod.Name)'..." -ForegroundColor Cyan
             Update-Module -Name $mod.Name -ErrorAction Stop
             Write-Host "✓ Updated '$($mod.Name)'" -ForegroundColor Green
-        } catch {
+        }
+        catch {
             Write-Warning "⚠ Failed to update '$($mod.Name)': $_"
         }
     }
@@ -162,7 +164,8 @@ function Remove-OldModuleVersions {
                 Write-Host "Removing $moduleName version $($old.Version)..." -ForegroundColor Yellow
                 Uninstall-Module -Name $moduleName -RequiredVersion $old.Version -Force -ErrorAction Stop
                 Write-Host "✓ Removed $moduleName v$($old.Version)" -ForegroundColor Green
-            } catch {
+            }
+            catch {
                 Write-Warning "⚠ Failed to remove $moduleName v$($old.Version): $_"
             }
         }
@@ -177,7 +180,7 @@ function Get-WinExperienceIndex {
     )
 
     if ($Recalculate) {
-        Write-Host "Running WinSAT assessment... This may take several minutes." -ForegroundColor Yellow
+        Write-Host 'Running WinSAT assessment... This may take several minutes.' -ForegroundColor Yellow
         winsat formal | Out-Null
     }
 
@@ -185,15 +188,15 @@ function Get-WinExperienceIndex {
     $result = Get-CimInstance -ClassName Win32_WinSAT
 
     if (-not $result) {
-        Write-Error "No WinSAT results found. Try running with -Recalculate."
+        Write-Error 'No WinSAT results found. Try running with -Recalculate.'
         return
     }
 
     # Get latest assessment date from DataStore
     $dataStore = Get-ChildItem "$env:WinDir\Performance\WinSAT\DataStore" `
-        -Filter "*Formal.Assessment*.WinSAT.xml" `
-        | Sort-Object LastWriteTime -Descending `
-        | Select-Object -First 1
+        -Filter '*Formal.Assessment*.WinSAT.xml' `
+    | Sort-Object LastWriteTime -Descending `
+    | Select-Object -First 1
 
     $assessmentDate = if ($dataStore) { $dataStore.LastWriteTime } else { $null }
 
