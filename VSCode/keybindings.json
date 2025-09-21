@@ -554,5 +554,15 @@
     "command": "vscode-neovim.send",
     "key": "ctrl+shift+l",
     "when": "editorFocus && neovim.init"
+  },
+  {
+    "key": "f2",
+    "command": "workbench.action.debug.continue",
+    "when": "debugState == 'stopped'"
+  },
+  {
+    "key": "f5",
+    "command": "-workbench.action.debug.continue",
+    "when": "debugState == 'stopped'"
   }
 ]
