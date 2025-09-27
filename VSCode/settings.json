@@ -583,8 +583,9 @@
   "markdown.preview.scrollPreviewWithEditor": true,
   "markdown.updateLinksOnFileMove.enabled": "always",
   "markdownlint.config": {
-    "MD033": false,
-    "MD045": false
+    "MD024": false,   // Allow multiple headers with the same name
+    "MD033": false,   // Allow inline HTML
+    "MD045": false,   // Omit alternate text from image links
   },
   "markdownlint.run": "onSave",
   "pasteimg.path": "${currentFileDir}/images",
