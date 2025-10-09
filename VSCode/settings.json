@@ -25,9 +25,7 @@
   "[json]": {
     "editor.autoIndent": "advanced",
     "editor.insertSpaces": true,
-    "editor.rulers": [
-      110
-    ],
+    "editor.rulers": [110],
     "editor.tabSize": 2
   },
   "[jsonc]": {
@@ -45,9 +43,7 @@
     "editor.detectIndentation": false,
     "editor.fontFamily": "Fira Code",
     "editor.insertSpaces": true,
-    "editor.rulers": [
-      80
-    ],
+    "editor.rulers": [80],
     "editor.tabSize": 2,
     "editor.wordWrap": "wordWrapColumn",
     "editor.wordWrapColumn": 80,
@@ -67,9 +63,7 @@
   },
   "[powershell]": {
     "editor.defaultFormatter": "ms-vscode.powershell",
-    "editor.rulers": [
-      115
-    ],
+    "editor.rulers": [115],
     "editor.tabSize": 4,
     "rewrap.wrappingColumn": 115
   },
@@ -89,18 +83,19 @@
     "diffEditor.ignoreTrimWhitespace": false,
     "editor.autoIndent": "advanced",
     "editor.insertSpaces": true,
-    "editor.rulers": [
-      115
-    ],
+    "editor.rulers": [115],
     "editor.tabSize": 2
   },
   "betterAlign.alignAfterTypeEnter": false,
   "betterAlign.indentBase": "firstline",
   "chat.agent.enabled": true,
+  "chat.agent.thinkingStyle": "collapsedPreview",
+  "chat.emptyState.history.enabled": true,
   "chat.instructionsFilesLocations": {
     "/mnt/c/Users/gregt/OneDrive/Apps/Profiles/VSCode": true,
     "C:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\VSCode": true
   },
+  "chat.mcp.gallery.enabled": true,
   "chat.promptFiles": true,
   "chat.promptFilesLocations": {
     "C:\\Users\\gregt\\AppData\\Roaming\\Code\\User\\prompts": true
@@ -323,66 +318,21 @@
   ],
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
-    [
-      "#efbe00",
-      "Corn"
-    ],
-    [
-      "#E6F8F3",
-      "Off Green"
-    ],
-    [
-      "#796989",
-      "Rum"
-    ],
-    [
-      "#d8bd16",
-      "Gold Tips"
-    ],
-    [
-      "#706555",
-      "Coffee"
-    ],
-    [
-      "#384555",
-      "Oxford Blue"
-    ],
-    [
-      "#10685f",
-      "Genoa"
-    ],
-    [
-      "#f0921c",
-      "Carrot Orange"
-    ],
-    [
-      "#f08604",
-      "Tangerine"
-    ],
-    [
-      "#FF9900",
-      "Orange Peel"
-    ],
-    [
-      "#529bc0",
-      "Fountain Blue"
-    ],
-    [
-      "#4683ca",
-      "Indigo"
-    ],
-    [
-      "#E5E0E1",
-      "Bon Jour"
-    ],
-    [
-      "#E7CD8C",
-      "Putty"
-    ],
-    [
-      "#52001F",
-      "Castro"
-    ]
+    ["#efbe00", "Corn"],
+    ["#E6F8F3", "Off Green"],
+    ["#796989", "Rum"],
+    ["#d8bd16", "Gold Tips"],
+    ["#706555", "Coffee"],
+    ["#384555", "Oxford Blue"],
+    ["#10685f", "Genoa"],
+    ["#f0921c", "Carrot Orange"],
+    ["#f08604", "Tangerine"],
+    ["#FF9900", "Orange Peel"],
+    ["#529bc0", "Fountain Blue"],
+    ["#4683ca", "Indigo"],
+    ["#E5E0E1", "Bon Jour"],
+    ["#E7CD8C", "Putty"],
+    ["#52001F", "Castro"]
   ],
   "dashboard.storeProjectsInSettings": true,
   "debug.inlineValues": "auto",
@@ -652,16 +602,14 @@
   "markdown.extension.list.indentationSize": "adaptive",
   "markdown.extension.toc.levels": "2..5",
   "markdown.extension.toc.omittedFromToc": {
-    "notes.md": [
-      "## Contents"
-    ]
+    "notes.md": ["## Contents"]
   },
   "markdown.extension.toc.orderedList": false,
   "markdown.extension.toc.unorderedList.marker": "*",
   "markdown.extension.toc.updateOnSave": true,
+  "markdown.preview.doubleClickToSwitchToEditor": true,
   "markdown.preview.fontSize": 14,
   "markdown.preview.lineHeight": 1.4,
-  "markdown.preview.doubleClickToSwitchToEditor": true,
   "markdown.preview.scrollEditorWithPreview": false,
   "markdown.preview.scrollPreviewWithEditor": true,
   "markdown.updateLinksOnFileMove.enabled": "always",
@@ -685,9 +633,7 @@
     "**/exe": true,
     "**/obj": true
   },
-  "security.allowedUNCHosts": [
-    "wsl.localhost"
-  ],
+  "security.allowedUNCHosts": ["wsl.localhost"],
   "security.workspace.trust.untrustedFiles": "open",
   "settings.cycle": [
     {
@@ -770,10 +716,7 @@
       "source": "PowerShell"
     },
     "PowerShell (No Profile)": {
-      "args": [
-        "-NoLogo",
-        "-NoProfile"
-      ],
+      "args": ["-NoLogo", "-NoProfile"],
       "icon": "terminal-powershell",
       "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
     },
@@ -810,28 +753,8 @@
       "command": "vscode-neovim.lua"
     }
   },
-  "vscode-neovim.ctrlKeysForInsertMode": [
-    "d",
-    "h",
-    "j",
-    "m",
-    "o",
-    "r",
-    "t",
-    "u",
-    "w"
-  ],
-  "vscode-neovim.ctrlKeysForNormalMode": [
-    "e",
-    "h",
-    "j",
-    "m",
-    "o",
-    "r",
-    "t",
-    "w",
-    "y"
-  ],
+  "vscode-neovim.ctrlKeysForInsertMode": ["d", "h", "j", "m", "o", "r", "t", "u", "w"],
+  "vscode-neovim.ctrlKeysForNormalMode": ["e", "h", "j", "m", "o", "r", "t", "w", "y"],
   "vscode-neovim.neovimClean": false,
   "vscode-neovim.neovimExecutablePaths.win32": "C:/Program Files/Neovim/bin/nvim.exe",
   "vscode-neovim.neovimWidth": 500,
@@ -843,7 +766,7 @@
   "workbench.colorCustomizations": {
     "titleBar.activeBackground": "#105447",
     "titleBar.activeForeground": "#ffffff",
-    "titleBar.inactiveBackground": "#033029",
+    "titleBar.inactiveBackground": "#033029"
   },
   "workbench.colorTheme": "Default Dark Modern",
   "workbench.editor.enablePreview": true,
@@ -863,7 +786,10 @@
     "betterAlign.alignAfterTypeEnter",
     "betterAlign.indentBase",
     "chat.agent.enable",
+    "chat.agent.thinkingStyle",
+    "chat.emptyState.history.enabled",
     "chat.instructionsFilesLocations",
+    "chat.mcp.gallery.enabled",
     "chat.promptFilesLocations",
     "cSpell.enabled",
     "cSpell.allowCompoundWords",
