@@ -35,3 +35,8 @@ vim.keymap.set("t", "<C-h>", "<C-\\><C-N><C-w>h", { desc = "Navigate to left win
 vim.keymap.set("t", "<C-j>", "<C-\\><C-N><C-w>j", { desc = "Navigate to bottom window from terminal", silent = true })
 vim.keymap.set("t", "<C-k>", "<C-\\><C-N><C-w>k", { desc = "Navigate to top window from terminal", silent = true })
 vim.keymap.set("t", "<C-l>", "<C-\\><C-N><C-w>l", { desc = "Navigate to right window from terminal", silent = true })
+
+-- Make CTRL+V behave like normal paste instead of Visual Block mode
+vim.keymap.set('n', '<C-v>', '"+p', { noremap = true, silent = true })   -- Normal mode
+vim.keymap.set('i', '<C-v>', '<C-r>+', { noremap = true, silent = true }) -- Insert mode
+vim.keymap.set('c', '<C-v>', '<C-r>+', { noremap = true, silent = true }) -- Command mode
