@@ -661,6 +661,7 @@
   "markdown.extension.toc.updateOnSave": true,
   "markdown.preview.fontSize": 14,
   "markdown.preview.lineHeight": 1.4,
+  "markdown.preview.doubleClickToSwitchToEditor": true,
   "markdown.preview.scrollEditorWithPreview": false,
   "markdown.preview.scrollPreviewWithEditor": true,
   "markdown.updateLinksOnFileMove.enabled": "always",
@@ -842,6 +843,7 @@
   "workbench.colorCustomizations": {
     "titleBar.activeBackground": "#105447",
     "titleBar.activeForeground": "#ffffff",
+    "titleBar.inactiveBackground": "#033029",
   },
   "workbench.colorTheme": "Default Dark Modern",
   "workbench.editor.enablePreview": true,
@@ -959,6 +961,7 @@
     "markdown.extension.toc.unorderedList.marker",
     "markdown.extension.toc.updateOnSave",
     "markdown.extension.toc.levels",
+    "markdown.preview.doubleClickToSwitchToEditor",
     "markdown.preview.scrollEditorWithPreview",
     "markdown.preview.scrollPreviewWithEditor",
     "markdown.preview.fontSize",
