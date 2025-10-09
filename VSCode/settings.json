@@ -838,6 +838,8 @@
     "editor.tabCompletion",
     "editor.tokenColorCustomizations",
     "editor.useTabStops",
+    "editor.wordWrap",
+    "editor.wordWrapColumn",
     "editor.wordSeparators",
     "explorer.confirmDelete",
     "explorer.confirmDragAndDrop",
