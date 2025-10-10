@@ -56,6 +56,7 @@ if (Test-Path -Path $env:OneDriveCommercial/Code/PowerShell/WorkConfig.psd1) {
 # Aliases
 Set-Alias -Name ll -Value Get-ChildItem -Force
 Set-Alias -name cfj -Value ConvertFrom-Json
+Set-Alias -Name tf -Value terraform
 Remove-Item Alias:dir
 
 # Enable keyboard shortcuts
