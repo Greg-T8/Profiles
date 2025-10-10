@@ -36,9 +36,23 @@ $Helpers = {
 	}
 }
 
-& $Main
+try {
+	Push-Location -Path $PSScriptRoot
+	& $Main
+}
+finally {
+	Pop-Location
+}
 ```
 
 ## Notes on general structure
 
 * The `$Main` block always comes first before the `$Helpers` block.
+
+# Other requirements
+
+* Use PowerShell-approved verbs in function names, namely verbs from this list: https://learn.microsoft.com/en-us/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands?view=powershell-7.5
+* In function names, keep the noun part singular (e.g., use `Get-Item` instead of `Get-Items`).
+	* When in doubt, use the following mapping:
+		* Validate -> Confirm
+	* When displaying output, use the verb `Show` instead of `Format`

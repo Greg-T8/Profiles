@@ -11,6 +11,19 @@ description: "This file contains the coding standards and guidelines for Copilot
 3. Include my display name (Greg Tate).
 4. If a date is present, do not alter it.
 
+## Header Format
+
+Use the following format for the header comment section:
+
+```Example
+# -------------------------------------------------------------------------
+# Program: DeleteUsersAzCli.ps1
+# Description: Delete (and optionally purge) Azure AD users listed in a JSON file
+# Context: AZ-104 lab - setup identity baseline (Microsoft Azure Administrator)
+# Author: Greg Tate
+# ------------------------------------------------------------------------
+```
+
 
 ## Commenting Rules
 1. You **must** add comments to all code blocks if and only if there is a blank line immediately above it.
