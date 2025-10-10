@@ -39,9 +39,11 @@
   },
   "[markdown]": {
     "editor.autoClosingBrackets": "never",
-    "editor.defaultFormatter": "yzhang.markdown-all-in-one",
+    "editor.defaultFormatter": "davidanson.vscode-markdownlint",
     "editor.detectIndentation": false,
     "editor.fontFamily": "Fira Code",
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
     "editor.insertSpaces": true,
     "editor.rulers": [80],
     "editor.tabSize": 2,
@@ -600,6 +602,7 @@
   "markdown.extension.completion.respectVscodeSearchExclude": true,
   "markdown.extension.completion.root": ".",
   "markdown.extension.list.indentationSize": "adaptive",
+  "markdown.extension.tableFormatter.normalizeIndentation": true,
   "markdown.extension.toc.levels": "2..5",
   "markdown.extension.toc.omittedFromToc": {
     "notes.md": ["## Contents"]
@@ -884,6 +887,7 @@
     "markdown.extension.list.indentationSize",
     "markdown.extension.completion.respectVscodeSearchExclude",
     "markdown.extension.preview.autoShowPreviewToSide",
+    "markdown.extension.tableFormatter.normalizeIndentation",
     "markdown.extension.toc.omittedFromToc",
     "markdown.extension.toc.orderedList",
     "markdown.extension.toc.unorderedList.marker",
