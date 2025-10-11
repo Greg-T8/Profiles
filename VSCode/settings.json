@@ -98,6 +98,9 @@
     "C:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\VSCode": true
   },
   "chat.mcp.gallery.enabled": true,
+  "chat.modeFilesLocations": {
+    "C:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\VSCode": true,
+  },
   "chat.promptFiles": true,
   "chat.promptFilesLocations": {
     "C:\\Users\\gregt\\AppData\\Roaming\\Code\\User\\prompts": true
@@ -793,6 +796,7 @@
     "chat.emptyState.history.enabled",
     "chat.instructionsFilesLocations",
     "chat.mcp.gallery.enabled",
+    "chat.modeFilesLocations",
     "chat.promptFilesLocations",
     "cSpell.enabled",
     "cSpell.allowCompoundWords",
