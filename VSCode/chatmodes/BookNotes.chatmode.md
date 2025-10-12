@@ -1,9 +1,9 @@
 ---
 description: Create a book-notes repo skeleton (folders, templates, first commit).
 # Choose tools you want available when this mode is active
-tools: ['files', 'terminal', 'git']
+tools: ['edit/createFile', 'edit/createDirectory', 'edit/editFiles', 'runCommands/runInTerminal', 'think']
 # Optional: pin a model; otherwise Copilot uses your current picker
-# model: Claude Sonnet 4
+model: Claude Sonnet 4.5
 ---
 # Book Notes Scaffolder — mode instructions
 
