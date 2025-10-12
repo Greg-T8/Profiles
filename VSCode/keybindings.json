@@ -605,4 +605,29 @@
     "command": "-workbench.action.debug.pause",
     "when": "debugState == 'running'"
   },
+  {
+    "key": "ctrl+shift+o",
+    "command": "workbench.action.chat.switchToNextModel",
+    "when": "chatIsEnabled && inChatInput"
+  },
+  {
+    "key": "ctrl+shift+k",
+    "command": "workbench.action.chat.openModePicker",
+    "when": "chatIsEnabled && inChatInput && chatLocation == 'panel'"
+  },
+  {
+    "key": "ctrl+.",
+    "command": "-workbench.action.chat.openModePicker",
+    "when": "chatIsEnabled && inChatInput && chatLocation == 'panel'"
+  },
+  {
+    "key": "ctrl+shift+l",
+    "command": "workbench.action.chat.openModelPicker",
+    "when": "chatIsEnabled && inChatInput"
+  },
+  {
+    "key": "ctrl+alt+.",
+    "command": "-workbench.action.chat.openModelPicker",
+    "when": "chatIsEnabled && inChatInput"
+  },
 ]
