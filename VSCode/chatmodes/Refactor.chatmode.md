@@ -1,7 +1,7 @@
 ---
 description: Safe, minimal-diff refactoring that follows our coding_guidelines.
-tools: ['search', 'usages']
-model: GPT-5-Codex (Preview)
+tools: ['edit/editFiles']
+model: GPT-5
 ---
 
 # Refactor Mode
