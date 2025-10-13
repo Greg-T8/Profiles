@@ -95,15 +95,15 @@
   "chat.emptyState.history.enabled": true,
   "chat.instructionsFilesLocations": {
     "/mnt/c/Users/gregt/OneDrive/Apps/Profiles/VSCode": true,
-    "C:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\VSCode\\instructions": true
+    "C:/Users/gregt/OneDrive/Apps/Profiles/VSCode/instructions": true
   },
   "chat.mcp.gallery.enabled": true,
   "chat.modeFilesLocations": {
-    "C:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\VSCode\\chatmodes": true,
+    "C:/Users/gregt/OneDrive/Apps/Profiles/VSCode/chatmodes": true,
   },
   "chat.promptFiles": true,
   "chat.promptFilesLocations": {
-    "C:\\Users\\gregt\\AppData\\Roaming\\Code\\User\\prompts": true
+    "C:/Users/gregt/AppData/Roaming/Code/User/prompts": true
   },
   "dashboard.displayProjectPath": true,
   "dashboard.openOnStartup": "empty workspace",
@@ -124,35 +124,35 @@
           "id": "javascript0hsy4zmv8maip9liw",
           "isGitRepo": true,
           "name": "JavaScript",
-          "path": "c:\\Users\\gregt\\LocalCode\\LearningJavaScript\\LearningJavaScript.code-workspace"
+          "path": "c:/Users/gregt/LocalCode/LearningJavaScript/LearningJavaScript.code-workspace"
         },
         {
           "color": "linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%)",
           "id": "cssn994kkqa1maipb2cr",
           "isGitRepo": true,
           "name": "CSS",
-          "path": "c:\\Users\\gregt\\LocalCode\\LearningCSS\\LearningCSS.code-workspace"
+          "path": "c:/Users/gregt/LocalCode/LearningCSS/LearningCSS.code-workspace"
         },
         {
           "color": "#549be2",
           "id": "dotnet1yfn5aeo3maipbmkz",
           "isGitRepo": true,
           "name": "DotNet",
-          "path": "c:\\Users\\gregt\\LocalCode\\LearningDotNet\\LearningDotNet.code-workspace"
+          "path": "c:/Users/gregt/LocalCode/LearningDotNet/LearningDotNet.code-workspace"
         },
         {
           "color": "#63b76c",
           "id": "pythondjfx2c4xpmaipc5yr",
           "isGitRepo": true,
           "name": "Python",
-          "path": "c:\\Users\\gregt\\LocalCode\\LearningPython\\LearningPython.code-workspace"
+          "path": "c:/Users/gregt/LocalCode/LearningPython/LearningPython.code-workspace"
         },
         {
           "color": "#8acbda",
           "id": "gozf35umda8maipd20o",
           "isGitRepo": true,
           "name": "Go",
-          "path": "c:\\Users\\gregt\\LocalCode\\LearningGo\\LearningGo.code-workspace"
+          "path": "c:/Users/gregt/LocalCode/LearningGo/LearningGo.code-workspace"
         },
         {
           "color": "#dbf24f",
@@ -172,14 +172,14 @@
           "id": "blogpv73e3qmemaiq8lv8",
           "isGitRepo": true,
           "name": "Blog",
-          "path": "c:\\Users\\gregt\\LocalCode\\Blog"
+          "path": "c:/Users/gregt/LocalCode/Blog"
         },
         {
           "color": "#2e5c42",
           "id": "terraformtj10gu54zmaiq95o3",
           "isGitRepo": true,
           "name": "Terraform",
-          "path": "c:\\Users\\gregt\\LocalCode\\LearningTerraform\\LearningTerraform.code-workspace"
+          "path": "c:/Users/gregt/LocalCode/LearningTerraform/LearningTerraform.code-workspace"
         },
         {
           "color": "#4869d7",
@@ -200,28 +200,28 @@
           "id": "azuregna1o2c8nmbj6rjha",
           "isGitRepo": true,
           "name": "Azure",
-          "path": "c:\\Users\\gregt\\LocalCode\\LearningAzure\\LearningAzure.code-workspace"
+          "path": "c:/Users/gregt/LocalCode/LearningAzure/LearningAzure.code-workspace"
         },
         {
           "color": "#FF9900",
           "id": "aws3f0o3qyn1mciy2e2m",
           "isGitRepo": false,
           "name": "AWS",
-          "path": "c:\\Users\\gregt\\LocalCode\\LearningAWS\\LearningAWS.code-workspace"
+          "path": "c:/Users/gregt/LocalCode/LearningAWS/LearningAWS.code-workspace"
         },
         {
           "color": "#10685f",
           "id": "learningfabricvka7w9h34mcom57pi",
           "isGitRepo": false,
           "name": "Fabric",
-          "path": "c:\\Users\\gregt\\LocalCode\\LearningFabric\\LearningFabric.code-workspace"
+          "path": "c:/Users/gregt/LocalCode/LearningFabric/LearningFabric.code-workspace"
         },
         {
           "color": "#796989",
           "id": "identityxmkh8ee7hmd4bsb04",
           "isGitRepo": true,
           "name": "Identity",
-          "path": "c:\\Users\\gregt\\LocalCode\\Identity\\Identity.code-workspace"
+          "path": "c:/Users/gregt/LocalCode/Identity/Identity.code-workspace"
         }
       ]
     },
@@ -234,14 +234,14 @@
           "id": "infscriptszd34qajbimaiqcp06",
           "isGitRepo": true,
           "name": "INF - Scripts",
-          "path": "c:\\Users\\gregt\\OneDrive - Quisitive\\Code\\Azure DevOps\\INF - Scripts"
+          "path": "c:/Users/gregt/OneDrive - Quisitive/Code/Azure DevOps/INF - Scripts"
         },
         {
           "color": "#384555",
           "id": "qitrunbooksz58bj9gaqmcqptwpa",
           "isGitRepo": false,
           "name": "Q IT Runbooks",
-          "path": "c:\\Users\\gregt\\LocalCode\\Azure Automation\\Quisitive\\it-automation-01"
+          "path": "c:/Users/gregt/LocalCode/Azure Automation/Quisitive/it-automation-01"
         }
       ]
     },
@@ -254,56 +254,56 @@
           "id": "githubprofilehmhoxw6k5maiqd6ny",
           "isGitRepo": true,
           "name": "GitHub Profile",
-          "path": "c:\\Users\\gregt\\OneDrive\\Code\\GitHub\\GitHubProfile"
+          "path": "c:/Users/gregt/OneDrive/Code/GitHub/GitHubProfile"
         },
         {
           "color": "#863c3c",
           "id": "kinesisadv360propzyl5z5ldmaiqdlui",
           "isGitRepo": true,
           "name": "KinesisAdv360Pro",
-          "path": "c:\\Users\\gregt\\OneDrive\\Code\\GitHub\\KinesisAdv360Pro"
+          "path": "c:/Users/gregt/OneDrive/Code/GitHub/KinesisAdv360Pro"
         },
         {
           "color": "#8EABC1",
           "id": "neovim4vkv167demaiqe71b",
           "isGitRepo": true,
           "name": "Neovim",
-          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\nvim"
+          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/nvim"
         },
         {
           "color": "#529bc0",
           "id": "powershellz7gs6blw9maiqej5p",
           "isGitRepo": true,
           "name": "PowerShell",
-          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\PowerShell\\PowerShell.code-workspace"
+          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/PowerShell/PowerShell.code-workspace"
         },
         {
           "color": "#DCB20C",
           "id": "vscodeoodjqtkzxmaiqetz9",
           "isGitRepo": true,
           "name": "VSCode",
-          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\VSCode"
+          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/VSCode"
         },
         {
           "color": "#0290fd",
           "id": "windowsterminalgumg8ku9kmaiqf605",
           "isGitRepo": true,
           "name": "Windows Terminal",
-          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\Windows Terminal"
+          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/Windows Terminal"
         },
         {
           "color": "#E7CD8C",
           "id": "sshuvtn5lsdumak0ocp9",
           "isGitRepo": false,
           "name": "SSH",
-          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\ssh\\ssh.code-workspace"
+          "path": "c:/Users/gregt/OneDrive/Apps/ssh/ssh.code-workspace"
         },
         {
           "color": "#f0921c",
           "id": "drawiod7v84rsbpmcnq2fwp",
           "isGitRepo": true,
           "name": "draw.io",
-          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\draw.io"
+          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/draw.io"
         }
       ]
     },
@@ -316,7 +316,7 @@
           "id": "learningframeworkugn5ub9x4mfs0c74f",
           "isGitRepo": true,
           "name": "Learning Framework",
-          "path": "c:\\Users\\gregt\\LocalCode\\LearningFramework"
+          "path": "c:/Users/gregt/LocalCode/LearningFramework"
         }
       ]
     }
