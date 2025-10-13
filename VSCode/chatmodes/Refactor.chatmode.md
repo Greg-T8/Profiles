@@ -1,8 +1,7 @@
 ---
 description: Safe, minimal-diff refactoring that follows our coding_guidelines.
-# Optionally pick tools/models; omit if you’re happy with defaults
-# tools: ['search', 'usages']
-model: Claude Sonnet 3.7
+tools: ['search', 'usages']
+model: GPT-5-Codex (Preview)
 ---
 
 # Refactor Mode
