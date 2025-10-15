@@ -10,7 +10,7 @@ vim.api.nvim_set_keymap('n', '<leader>dw',
 
 -- Markdown: Open preview to the side
 vim.api.nvim_set_keymap('n', '<leader>de',
-    "<cmd>call VSCodeNotify('markdown.showPreviewToSide')<CR>",
+    "<cmd>call VSCodeNotify('markdown-preview-enhanced.openPreviewToTheSide')<CR>",
     { noremap = true, silent = true })
 
 -- Trigger inline chat
