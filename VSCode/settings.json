@@ -638,6 +638,7 @@
   "markdown.updateLinksOnFileMove.enabled": "always",
   "markdownlint.config": {
     "MD024": false, // Allow multiple headers with the same name
+    "MD013": false, // Disable line length rule
     "MD033": false, // Allow inline HTML
     "MD045": false // Omit alternate text from image links
   },
