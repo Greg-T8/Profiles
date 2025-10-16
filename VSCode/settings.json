@@ -93,10 +93,7 @@
   "chat.agent.enabled": true,
   "chat.agent.thinkingStyle": "collapsedPreview",
   "chat.emptyState.history.enabled": true,
-  "chat.instructionsFilesLocations": {
-    "/mnt/c/Users/gregt/OneDrive/Apps/Profiles/VSCode": true,
-    "C:/Users/gregt/OneDrive/Apps/Profiles/VSCode/instructions": true
-  },
+  "chat.instructionsFilesLocations": {},
   "chat.mcp.gallery.enabled": true,
   "chat.modeFilesLocations": {
     "C:/Users/gregt/OneDrive/Apps/Profiles/VSCode/chatmodes": true
@@ -114,57 +111,64 @@
   "dashboard.openOnStartup": "empty workspace",
   "dashboard.projectData": [
     {
-      "groupName": "Languages",
-      "id": "languagesr8vqt8qtfmaionob2",
+      "groupName": "Profiles",
+      "id": "profiles2ce7zszmvmaipjlz7",
       "projects": [
         {
-          "color": "#549be2",
-          "id": "dotnet1yfn5aeo3maipbmkz",
+          "color": "#DCB20C",
+          "id": "vscodeoodjqtkzxmaiqetz9",
           "isGitRepo": true,
-          "name": "DotNet",
-          "path": "c:/Users/gregt/LocalCode/LearningDotNet/LearningDotNet.code-workspace"
+          "name": "VSCode",
+          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/VSCode"
         },
         {
-          "color": "#63b76c",
-          "id": "pythondjfx2c4xpmaipc5yr",
+          "color": "#8EABC1",
+          "id": "neovim4vkv167demaiqe71b",
           "isGitRepo": true,
-          "name": "Python",
-          "path": "c:/Users/gregt/LocalCode/LearningPython/LearningPython.code-workspace"
+          "name": "Neovim",
+          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/nvim"
         },
         {
-          "color": "#8338EC",
-          "id": "javascript0hsy4zmv8maip9liw",
+          "color": "#529bc0",
+          "id": "powershellz7gs6blw9maiqej5p",
           "isGitRepo": true,
-          "name": "JavaScript",
-          "path": "c:/Users/gregt/LocalCode/LearningJavaScript/LearningJavaScript.code-workspace"
+          "name": "PowerShell",
+          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/PowerShell/PowerShell.code-workspace"
         },
         {
-          "color": "#8acbda",
-          "id": "gozf35umda8maipd20o",
+          "color": "#863c3c",
+          "id": "kinesisadv360propzyl5z5ldmaiqdlui",
           "isGitRepo": true,
-          "name": "Go",
-          "path": "c:/Users/gregt/LocalCode/LearningGo/LearningGo.code-workspace"
+          "name": "KinesisAdv360Pro",
+          "path": "c:/Users/gregt/OneDrive/Code/GitHub/KinesisAdv360Pro"
         },
         {
-          "color": "#dbf24f",
-          "id": "sql3x3abfahimaipebde",
+          "color": "#e916a0",
+          "id": "githubprofilehmhoxw6k5maiqd6ny",
           "isGitRepo": true,
-          "name": "SQL",
-          "path": "vscode-remote://wsl+MySQL/home/gtate/learningSQL/LearningSQL.code-workspace"
+          "name": "GitHub Profile",
+          "path": "c:/Users/gregt/OneDrive/Code/GitHub/GitHubProfile"
         },
         {
-          "color": "#FF0000",
-          "id": "ccuafy3ubfkmaiopv9m",
+          "color": "#0290fd",
+          "id": "windowsterminalgumg8ku9kmaiqf605",
           "isGitRepo": true,
-          "name": "C & C++",
-          "path": "vscode-remote://wsl+CCode/home/gtate/learningC-CPP/LearningC-CPP.code-workspace"
+          "name": "Windows Terminal",
+          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/Windows Terminal"
         },
         {
-          "color": "linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%)",
-          "id": "cssn994kkqa1maipb2cr",
+          "color": "#E7CD8C",
+          "id": "sshuvtn5lsdumak0ocp9",
+          "isGitRepo": false,
+          "name": "SSH",
+          "path": "c:/Users/gregt/OneDrive/Apps/ssh/ssh.code-workspace"
+        },
+        {
+          "color": "#f0921c",
+          "id": "drawiod7v84rsbpmcnq2fwp",
           "isGitRepo": true,
-          "name": "CSS",
-          "path": "c:/Users/gregt/LocalCode/LearningCSS/LearningCSS.code-workspace"
+          "name": "draw.io",
+          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/draw.io"
         }
       ]
     },
@@ -231,6 +235,61 @@
       ]
     },
     {
+      "groupName": "Languages",
+      "id": "languagesr8vqt8qtfmaionob2",
+      "projects": [
+        {
+          "color": "#549be2",
+          "id": "dotnet1yfn5aeo3maipbmkz",
+          "isGitRepo": true,
+          "name": "DotNet",
+          "path": "c:/Users/gregt/LocalCode/LearningDotNet/LearningDotNet.code-workspace"
+        },
+        {
+          "color": "#63b76c",
+          "id": "pythondjfx2c4xpmaipc5yr",
+          "isGitRepo": true,
+          "name": "Python",
+          "path": "c:/Users/gregt/LocalCode/LearningPython/LearningPython.code-workspace"
+        },
+        {
+          "color": "#8338EC",
+          "id": "javascript0hsy4zmv8maip9liw",
+          "isGitRepo": true,
+          "name": "JavaScript",
+          "path": "c:/Users/gregt/LocalCode/LearningJavaScript/LearningJavaScript.code-workspace"
+        },
+        {
+          "color": "#8acbda",
+          "id": "gozf35umda8maipd20o",
+          "isGitRepo": true,
+          "name": "Go",
+          "path": "c:/Users/gregt/LocalCode/LearningGo/LearningGo.code-workspace"
+        },
+        {
+          "color": "#dbf24f",
+          "id": "sql3x3abfahimaipebde",
+          "isGitRepo": true,
+          "name": "SQL",
+          "path": "vscode-remote://wsl+MySQL/home/gtate/learningSQL/LearningSQL.code-workspace"
+        },
+        {
+          "color": "#FF0000",
+          "id": "ccuafy3ubfkmaiopv9m",
+          "isGitRepo": true,
+          "name": "C & C++",
+          "path": "vscode-remote://wsl+CCode/home/gtate/learningC-CPP/LearningC-CPP.code-workspace"
+        },
+        {
+          "color": "linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%)",
+          "id": "cssn994kkqa1maipb2cr",
+          "isGitRepo": true,
+          "name": "CSS",
+          "path": "c:/Users/gregt/LocalCode/LearningCSS/LearningCSS.code-workspace"
+        }
+      ]
+    },
+    {
       "groupName": "Work",
       "id": "workysmri3ipqmaipjirc",
       "projects": [
@@ -254,68 +313,6 @@
           "isGitRepo": true,
           "name": "ProDev",
           "path": "c:\\Users\\gregt\\LocalCode\\ProDev"
-        }
-      ]
-    },
-    {
-      "groupName": "Profiles",
-      "id": "profiles2ce7zszmvmaipjlz7",
-      "projects": [
-        {
-          "color": "#DCB20C",
-          "id": "vscodeoodjqtkzxmaiqetz9",
-          "isGitRepo": true,
-          "name": "VSCode",
-          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/VSCode"
-        },
-        {
-          "color": "#8EABC1",
-          "id": "neovim4vkv167demaiqe71b",
-          "isGitRepo": true,
-          "name": "Neovim",
-          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/nvim"
-        },
-        {
-          "color": "#529bc0",
-          "id": "powershellz7gs6blw9maiqej5p",
-          "isGitRepo": true,
-          "name": "PowerShell",
-          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/PowerShell/PowerShell.code-workspace"
-        },
-        {
-          "color": "#863c3c",
-          "id": "kinesisadv360propzyl5z5ldmaiqdlui",
-          "isGitRepo": true,
-          "name": "KinesisAdv360Pro",
-          "path": "c:/Users/gregt/OneDrive/Code/GitHub/KinesisAdv360Pro"
-        },
-        {
-          "color": "#e916a0",
-          "id": "githubprofilehmhoxw6k5maiqd6ny",
-          "isGitRepo": true,
-          "name": "GitHub Profile",
-          "path": "c:/Users/gregt/OneDrive/Code/GitHub/GitHubProfile"
-        },
-        {
-          "color": "#0290fd",
-          "id": "windowsterminalgumg8ku9kmaiqf605",
-          "isGitRepo": true,
-          "name": "Windows Terminal",
-          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/Windows Terminal"
-        },
-        {
-          "color": "#E7CD8C",
-          "id": "sshuvtn5lsdumak0ocp9",
-          "isGitRepo": false,
-          "name": "SSH",
-          "path": "c:/Users/gregt/OneDrive/Apps/ssh/ssh.code-workspace"
-        },
-        {
-          "color": "#f0921c",
-          "id": "drawiod7v84rsbpmcnq2fwp",
-          "isGitRepo": true,
-          "name": "draw.io",
-          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/draw.io"
         }
       ]
     },
