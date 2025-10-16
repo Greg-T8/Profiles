@@ -136,42 +136,6 @@ function Update-AllInstalledModules {
     }
 }
 
-function Remove-OldModuleVersions {
-    <#
-    .SYNOPSIS
-        Removes all versions of installed modules except for the most recent and second most recent.
-    .DESCRIPTION
-        Enumerates all installed module versions and uninstalls any version older than the newest two.
-    #>
-
-    [CmdletBinding(SupportsShouldProcess = $true)]
-    param()
-
-    $installedModules = Get-InstalledModule -AllVersions
-
-    $groupedModules = $installedModules |
-        Group-Object Name |
-        Where-Object { $_.Count -gt 2 }  # Only process modules with more than two versions
-
-    foreach ($moduleGroup in $groupedModules) {
-        $moduleName = $moduleGroup.Name
-        $versions = $moduleGroup.Group |
-            Sort-Object Version -Descending |
-            Select-Object -Skip 2  # Skip newest two versions
-
-        foreach ($old in $versions) {
-            try {
-                Write-Host "Removing $moduleName version $($old.Version)..." -ForegroundColor Yellow
-                Uninstall-Module -Name $moduleName -RequiredVersion $old.Version -Force -ErrorAction Stop
-                Write-Host "✓ Removed $moduleName v$($old.Version)" -ForegroundColor Green
-            }
-            catch {
-                Write-Warning "⚠ Failed to remove $moduleName v$($old.Version): $_"
-            }
-        }
-    }
-}
-
 # Retrieves the Windows Experience Index (WEI) score and assessment date.
 function Get-WinExperienceIndex {
     [CmdletBinding()]
@@ -209,5 +173,127 @@ function Get-WinExperienceIndex {
         MemoryScore     = $result.MemoryScore
         WinSPRLevel     = $result.WinSPRLevel
         AssessmentDate  = $assessmentDate
+    }
+}
+
+function Remove-OldModuleVersions {
+    <#
+    .SYNOPSIS
+      Uninstalls older versions of modules, keeping the newest per module name.
+
+    .DESCRIPTION
+      Uses PowerShellGet's Get-InstalledModule/Uninstall-Module to remove all
+      but the latest installed version of each target module. Targets can be:
+        - Specific names/patterns via -Name (supports wildcards)
+        - All Microsoft Graph modules via -IncludeGraph
+        - All Az modules via -IncludeAz
+
+      If modules are currently loaded, the function removes them from the session
+      first so they can be uninstalled cleanly.
+
+    .EXAMPLE
+      Remove-OldModuleVersions -IncludeGraph -IncludeAz -WhatIf
+
+    .EXAMPLE
+      Remove-OldModuleVersions -Name 'Pester','PSReadLine'
+
+    .EXAMPLE
+      Remove-OldModuleVersions -Name 'Microsoft.Graph.*','Az.*' -Confirm:$false
+
+    .NOTES
+      - Run as Administrator if some modules were installed to Program Files.
+      - Only modules installed via PowerShellGet are returned by Get-InstalledModule.
+  #>
+    [CmdletBinding(SupportsShouldProcess = $true, ConfirmImpact = 'Medium')]
+    param(
+        [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName)]
+        [string[]] $Name,
+
+        [switch] $IncludeGraph,
+        [switch] $IncludeAz,
+
+        # If set, also remove the latest (i.e., remove ALL versions).
+        [switch] $RemoveAll
+    )
+
+    begin {
+        # Build the target name list
+        $targets = @()
+        if ($IncludeGraph) { $targets += 'Microsoft.Graph*' }
+        if ($IncludeAz) { $targets += 'Az*' }
+        if ($Name) { $targets += $Name }
+
+        if (-not $targets) {
+            throw 'Specify at least one target via -Name, -IncludeGraph, or -IncludeAz.'
+        }
+
+        Write-Verbose ('Targets: {0}' -f (($targets | Select-Object -Unique) -join ', '))
+    }
+
+    process {
+        # Discover all installed module entries (all versions) for the targets
+        $installed = foreach ($pattern in ($targets | Select-Object -Unique)) {
+            try {
+                Get-Module -Name $pattern -ListAvailable -ErrorAction Stop
+            }
+            catch {
+                Write-Verbose "No installed modules matched pattern '$pattern'."
+            }
+        }
+
+        if (-not $installed) {
+            Write-Verbose 'No matching installed modules found.'
+            return
+        }
+
+        # Group by module name to compare versions
+        $byName = $installed | Group-Object Name
+
+        foreach ($group in $byName) {
+            $name = $group.Name
+            $versions = $group.Group | Sort-Object Version -Descending
+
+            # Determine which entries to remove
+            $toRemove = if ($RemoveAll) {
+                $versions
+            }
+            else {
+                $latest = $versions | Select-Object -First 1
+                $versions | Where-Object { $_.Version -ne $latest.Version }
+            }
+
+            if (-not $toRemove -or $toRemove.Count -eq 0) {
+                Write-Verbose "Nothing to remove for $name (already only latest)."
+                continue
+            }
+
+            # Ensure no version of this module is loaded in the current session
+            $loaded = Get-Module -Name $name -All
+            if ($loaded) {
+                Write-Verbose "Removing loaded module(s) for $name from the session..."
+                foreach ($lm in $loaded) {
+                    try {
+                        Remove-Module -ModuleInfo $lm -Force -ErrorAction Stop
+                    }
+                    catch {
+                        Write-Warning "Failed to Remove-Module $($lm.Name) $($lm.Version): $($_.Exception.Message)"
+                    }
+                }
+            }
+
+            # Uninstall targeted versions
+            foreach ($m in $toRemove) {
+                $desc = "$($m.Name) $($m.Version)"
+                if ($PSCmdlet.ShouldProcess($desc, 'Uninstall-Module')) {
+                    try {
+                        Uninstall-Module -Name $m.Name -RequiredVersion $m.Version -Force -ErrorAction Stop
+                        Write-Verbose "Uninstalled $desc"
+                    }
+                    catch {
+                        Write-Warning "Failed to uninstall $desc`: $($_.Exception.Message)"
+                    }
+                }
+            }
+        }
     }
 }
