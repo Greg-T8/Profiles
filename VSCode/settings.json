@@ -745,7 +745,7 @@
       "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
     }
   },
-  "terminal.integrated.shellIntegration.decorationsEnabled": "both",
+  "terminal.integrated.shellIntegration.decorationsEnabled": "overviewRuler",
   "terminal.integrated.shellIntegration.enabled": true,
   "terminal.integrated.shellIntegration.showCommandGuide": true,
   "terminal.integrated.stickyScroll.enabled": false,
