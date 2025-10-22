@@ -637,6 +637,7 @@
     "MD024": false, // Allow multiple headers with the same name
     "MD013": false, // Disable line length rule
     "MD033": false, // Allow inline HTML
+    "MD036": false, // Emphasis used instead of a header
     "MD045": false // Omit alternate text from image links
   },
   "markdownlint.run": "onSave",
@@ -978,5 +979,6 @@
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-  "workbench.tips.enabled": true
+"workbench.tips.enabled": true,
+"chat.editing.confirmEditRequestRemoval": false
 }

@@ -8,6 +8,9 @@ case $- in
       *) return;;
 esac
 
+# Enable vi command line editing mode
+set -o vi
+
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth
@@ -131,4 +134,3 @@ PS1=$'\n'\
 "${cyan}${box_arc_down_right}${box_horizontal}( \w"\
 $'\n'\
 "${cyan}${box_arc_up_right}${box_horizontal_short}${reset}\\$ "
-
