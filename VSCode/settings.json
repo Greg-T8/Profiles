@@ -744,6 +744,11 @@
     },
     "Windows PowerShell": {
       "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
+    },
+    "Ubuntu": {
+      "path": "wsl.exe",
+      "args": ["-d", "Ubuntu", "--cd", "~"],
+      "icon": "terminal-linux"
     }
   },
   "terminal.integrated.shellIntegration.decorationsEnabled": "overviewRuler",
