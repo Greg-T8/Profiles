@@ -11,6 +11,25 @@ esac
 # Enable vi command line editing mode
 set -o vi
 
+# Function to setup custom prompt
+setup_custom_prompt() {
+    # Define custom prompt characters
+    box_arc_down_right=$'\u256D'
+    box_horizontal=$'\u2500'
+    box_arc_up_right=$'\u2570'
+    box_horizontal_short=$'\u2574'
+
+    # Colored output
+    cyan='\[\e[36m\]' # Cyan color
+    reset='\[\e[0m\]' # Reset color
+
+    # Custom PS1 Prompt
+    PS1=$'\n'\
+"${cyan}${box_arc_down_right}${box_horizontal}( \w"\
+$'\n'\
+"${cyan}${box_arc_up_right}${box_horizontal_short}${reset}\\$ "
+}
+
 # don't put duplicate lines or lines starting with space in the history.
 # See bash(1) for more options
 HISTCONTROL=ignoreboth
@@ -60,7 +79,7 @@ if [ -n "$force_color_prompt" ]; then
 fi
 
 if [ "$color_prompt" = yes ]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    setup_custom_prompt
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
@@ -118,19 +137,3 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
-
-# Define custom prompt characters
-box_arc_down_right=$'\u256D'
-box_horizontal=$'\u2500'
-box_arc_up_right=$'\u2570'
-box_horizontal_short=$'\u2574'
-
-# Colored output
-cyan='\[\e[36m\]' # Cyan color
-reset='\[\e[0m\]' # Reset color
-
-# PS1 Prompt
-PS1=$'\n'\
-"${cyan}${box_arc_down_right}${box_horizontal}( \w"\
-$'\n'\
-"${cyan}${box_arc_up_right}${box_horizontal_short}${reset}\\$ "

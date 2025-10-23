@@ -1,23 +1,27 @@
-REM Set the command line editing mode to vi (instead of default emacs mode)
+# Set the command line editing mode to vi (instead of default emacs mode)
 set editing-mode vi
 
-REM Display the current vi mode in the command prompt
+# Display the current vi mode in the command prompt
 set show-mode-in-prompt on
 
-REM Set cursor style for vi insert mode (vertical bar cursor)
+# Set cursor style for vi insert mode (vertical bar cursor)
 set vi-ins-mode-string "\1\e[6 q\2"
 
-REM Set cursor style for vi command mode (block cursor)
+# Set cursor style for vi command mode (block cursor)
 set vi-cmd-mode-string "\1\e[2 q\2"
 
-REM Set timeout for key sequences to 10 milliseconds (faster mode switching)
+# Set timeout for key sequences to 10 milliseconds (faster mode switching)
 set keyseq-timeout 10
 
-set editing-mode vi
+# Additional vi mode keybindings
 $if mode=vi
     set keymap vi-insert
     "\C-p": previous-history
     "\C-n": next-history
     "\C-a": beginning-of-line
     "\C-e": end-of-line
+
+    set keymap vi-command
+    "\C-p": previous-history
+    "\C-n": next-history
 $endif
