@@ -8,10 +8,15 @@ case $- in
       *) return;;
 esac
 
-# Enable vi command line editing mode
+# Enable vi command line editing mode (uses ~/.inputrc vi settings)
 set -o vi
 
+# Export preferred editor for CLI tools (used by git, crontab, etc.)
+export EDITOR=vim
+export VISUAL=vim
+
 # Function to setup custom prompt
+# Defines box characters, colors, and PS1. Called when color_prompt is enabled.
 setup_custom_prompt() {
     # Define custom prompt characters
     box_arc_down_right=$'\u256D'
@@ -30,8 +35,7 @@ $'\n'\
 "${cyan}${box_arc_up_right}${box_horizontal_short}${reset}\\$ "
 }
 
-# don't put duplicate lines or lines starting with space in the history.
-# See bash(1) for more options
+# History behavior: don't record duplicate or leading-space commands
 HISTCONTROL=ignoreboth
 
 # append to the history file, don't overwrite it
@@ -79,6 +83,7 @@ if [ -n "$force_color_prompt" ]; then
 fi
 
 if [ "$color_prompt" = yes ]; then
+    # When color support is available, install the custom prompt
     setup_custom_prompt
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
