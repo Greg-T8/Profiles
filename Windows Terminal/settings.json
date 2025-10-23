@@ -1,10 +1,10 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions": 
+    "actions":
     [
         {
-            "command": 
+            "command":
             {
                 "action": "copy",
                 "singleLine": false
@@ -20,7 +20,7 @@
             "id": "User.find"
         },
         {
-            "command": 
+            "command":
             {
                 "action": "splitPane",
                 "split": "auto",
@@ -38,7 +38,7 @@
     "focusFollowMouse": true,
     "initialCols": 180,
     "initialRows": 50,
-    "keybindings": 
+    "keybindings":
     [
         {
             "id": "User.copy.644BA8F2",
@@ -58,7 +58,7 @@
         }
     ],
     "minimizeToNotificationArea": true,
-    "newTabMenu": 
+    "newTabMenu":
     [
         {
             "icon": null,
@@ -72,14 +72,14 @@
             "type": "remainingProfiles"
         }
     ],
-    "profiles": 
+    "profiles":
     {
-        "defaults": 
+        "defaults":
         {
             "adjustIndistinguishableColors": "always",
             "colorScheme": "CGA",
             "experimental.repositionCursorWithMouse": false,
-            "font": 
+            "font":
             {
                 "face": "Cascadia Mono"
             },
@@ -88,7 +88,7 @@
             "snapOnInput": true,
             "useAcrylic": true
         },
-        "list": 
+        "list":
         [
             {
                 "colorScheme": "Campbell Powershell",
@@ -104,11 +104,11 @@
                 "name": "Windows PowerShell"
             },
             {
-                "guid": "{51855cb2-8cce-5362-8f54-464b92b32386}",
-                "hidden": false,
-                "icon": "D:/WSL/Ubuntu/Ubuntu.png",
-                "name": "Ubuntu",
-                "source": "CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc"
+              "hidden": false,
+              "icon": "D:/WSL/Ubuntu/Ubuntu.png",
+              "name": "Ubuntu",
+              "source": "CanonicalGroupLimited.Ubuntu_79rhkp1fndgsc",
+              "guid": "{51855cb2-8cce-5362-8f54-464b92b32386}",
             },
             {
                 "colorScheme": "Campbell",

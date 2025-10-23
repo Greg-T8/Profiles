@@ -1,6 +1,9 @@
 # Set the command line editing mode to vi (instead of default emacs mode)
 set editing-mode vi
 
+# Disable bell sounds
+set bell-style none
+
 # Display the current vi mode in the command prompt
 set show-mode-in-prompt on
 
