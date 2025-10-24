@@ -13,6 +13,15 @@ SAVEHIST=1000                          # Number of commands to save to file
 HISTFILE=~/.zsh_history               # History file location
 
 # ==============================================================================
+# BELL CONFIGURATION
+# ==============================================================================
+# Disable all notification bells (audible and visual)
+setopt NO_BEEP                        # Disable beep on errors
+unsetopt BEEP                         # Alternative way to disable beep
+unsetopt LIST_BEEP                    # Disable beep on ambiguous completion
+unsetopt HIST_BEEP                    # Disable beep on history errors
+
+# ==============================================================================
 # VI MODE CONFIGURATION
 # ==============================================================================
 # Enable vi keybindings for command-line editing
