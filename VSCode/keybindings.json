@@ -620,9 +620,4 @@
     "command": "-workbench.action.chat.openModelPicker",
     "when": "chatIsEnabled && inChatInput"
   },
-  {
-    "key": "alt+k",
-    "command": "vscode-neovim.send",
-    "when": "neovim.init && neovim.recording || editorTextFocus && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
-  },
 ]
