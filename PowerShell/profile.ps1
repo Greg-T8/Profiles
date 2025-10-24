@@ -63,6 +63,7 @@ Remove-Item Alias:dir
 # Enable keyboard shortcuts
 if (-not (Get-Module PSReadline)) { Import-Module PSReadLine }
 Set-PSReadLineOption -EditMode Vi
+Set-PSReadLineOption -PredictionViewStyle InlineView
 Set-PSReadLineOption -PredictionSource HistoryAndPlugin -PredictionViewStyle ListView
 Set-PSReadLineKeyHandler -Chord Tab -Function TabCompleteNext
 Set-PSReadLineKeyHandler -Chord Shift+Tab -Function TabCompletePrevious
