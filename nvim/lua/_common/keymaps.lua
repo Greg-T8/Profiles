@@ -13,6 +13,7 @@ local term_opts = { silent = true }
 
 -- Add keymapping for saving with leader+s
 vim.keymap.set('n', '<leader>w', ':w<CR>', { desc = 'Save file' })
+vim.keymap.set('n', '<leader>wq', ':wq<CR>', { desc = 'Save and quit' })
 vim.keymap.set("n", "<C-q>", "<C-v>", { desc = "Enter visual block mode", noremap = true, silent = true })
 
 -- Change G to go to the end of the last line
@@ -35,3 +36,11 @@ vim.keymap.set('n', '<C-v>', '<C-q>', { desc = 'Enter visual block mode', norema
 vim.keymap.set("v", "p", '"_dP', { desc = "Paste without yanking replaced text", noremap = true, silent = true })
 
 -- Note: Line movement is now handled by vim-move plugin (Alt+j/k)
+
+-- Make :q always force quit without confirmation
+vim.api.nvim_create_user_command('Q', 'q!', {})
+vim.cmd('cnoreabbrev q Q')
+vim.cmd('cnoreabbrev wq wq!')
+
+-- Leader+q to force quit without confirmation
+vim.keymap.set('n', '<leader>q', ':q!<CR>', { desc = 'Force quit without saving', noremap = true, silent = true })
