@@ -25,7 +25,9 @@
   "[json]": {
     "editor.autoIndent": "advanced",
     "editor.insertSpaces": true,
-    "editor.rulers": [110],
+    "editor.rulers": [
+      110
+    ],
     "editor.tabSize": 2
   },
   "[jsonc]": {
@@ -45,7 +47,9 @@
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
     "editor.insertSpaces": true,
-    "editor.rulers": [80],
+    "editor.rulers": [
+      80
+    ],
     "editor.tabSize": 2,
     "editor.wordWrap": "wordWrapColumn",
     "editor.wordWrapColumn": 80,
@@ -65,7 +69,9 @@
   },
   "[powershell]": {
     "editor.defaultFormatter": "ms-vscode.powershell",
-    "editor.rulers": [115],
+    "editor.rulers": [
+      115
+    ],
     "editor.tabSize": 4,
     "rewrap.wrappingColumn": 115
   },
@@ -85,13 +91,16 @@
     "diffEditor.ignoreTrimWhitespace": false,
     "editor.autoIndent": "advanced",
     "editor.insertSpaces": true,
-    "editor.rulers": [115],
+    "editor.rulers": [
+      115
+    ],
     "editor.tabSize": 2
   },
   "betterAlign.alignAfterTypeEnter": false,
   "betterAlign.indentBase": "firstline",
   "chat.agent.enabled": true,
   "chat.agent.thinkingStyle": "collapsedPreview",
+  "chat.editing.confirmEditRequestRemoval": false,
   "chat.emptyState.history.enabled": true,
   "chat.instructionsFilesLocations": {},
   "chat.mcp.gallery.enabled": true,
@@ -332,21 +341,66 @@
   ],
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
-    ["#ACB78E", "Swamp Green"],
-    ["#516E3D", "Chalet Green"],
-    ["#0B1304", "Black Forest"],
-    ["#02A4D3", "Cerulean"],
-    ["#45B1E8", "Picton Blue"],
-    ["#A69279", "Donkey Brown"],
-    ["#FCD917", "Candlelight"],
-    ["#B7C3D0", "Heather"],
-    ["#FFEDBC", "Colonial White"],
-    ["#efbe00", "Corn"],
-    ["#E6F8F3", "Off Green"],
-    ["#796989", "Rum"],
-    ["#d8bd16", "Gold Tips"],
-    ["#706555", "Coffee"],
-    ["#384555", "Oxford Blue"]
+    [
+      "#ACB78E",
+      "Swamp Green"
+    ],
+    [
+      "#516E3D",
+      "Chalet Green"
+    ],
+    [
+      "#0B1304",
+      "Black Forest"
+    ],
+    [
+      "#02A4D3",
+      "Cerulean"
+    ],
+    [
+      "#45B1E8",
+      "Picton Blue"
+    ],
+    [
+      "#A69279",
+      "Donkey Brown"
+    ],
+    [
+      "#FCD917",
+      "Candlelight"
+    ],
+    [
+      "#B7C3D0",
+      "Heather"
+    ],
+    [
+      "#FFEDBC",
+      "Colonial White"
+    ],
+    [
+      "#efbe00",
+      "Corn"
+    ],
+    [
+      "#E6F8F3",
+      "Off Green"
+    ],
+    [
+      "#796989",
+      "Rum"
+    ],
+    [
+      "#d8bd16",
+      "Gold Tips"
+    ],
+    [
+      "#706555",
+      "Coffee"
+    ],
+    [
+      "#384555",
+      "Oxford Blue"
+    ]
   ],
   "dashboard.storeProjectsInSettings": true,
   "debug.inlineValues": "auto",
@@ -605,6 +659,11 @@
   "inlineChat.finishOnType": true,
   "inlineChat.holdToSpeech": true,
   "javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
+  "markdown-preview-enhanced.alwaysShowBacklinksInPreview": false,
+  "markdown-preview-enhanced.automaticallyShowPreviewOfMarkdownBeingEdited": false,
+  "markdown-preview-enhanced.hideDefaultVSCodeMarkdownPreviewButtons": false,
+  "markdown-preview-enhanced.previewMode": "Multiple Previews",
+  "markdown-preview-enhanced.previewTheme": "github-light.css",
   "markdown.copyFiles.destination": {
     "*": "images/${unixTime}.png"
   },
@@ -617,7 +676,9 @@
   "markdown.extension.tableFormatter.normalizeIndentation": true,
   "markdown.extension.toc.levels": "2..5",
   "markdown.extension.toc.omittedFromToc": {
-    "notes.md": ["## Contents"]
+    "notes.md": [
+      "## Contents"
+    ]
   },
   "markdown.extension.toc.orderedList": false,
   "markdown.extension.toc.unorderedList.marker": "*",
@@ -627,15 +688,10 @@
   "markdown.preview.lineHeight": 1.4,
   "markdown.preview.scrollEditorWithPreview": false,
   "markdown.preview.scrollPreviewWithEditor": true,
-  "markdown-preview-enhanced.alwaysShowBacklinksInPreview": false,
-  "markdown-preview-enhanced.automaticallyShowPreviewOfMarkdownBeingEdited": false,
-  "markdown-preview-enhanced.hideDefaultVSCodeMarkdownPreviewButtons": false,
-  "markdown-preview-enhanced.previewMode": "Multiple Previews",
-  "markdown-preview-enhanced.previewTheme": "github-light.css",
   "markdown.updateLinksOnFileMove.enabled": "always",
   "markdownlint.config": {
-    "MD024": false, // Allow multiple headers with the same name
     "MD013": false, // Disable line length rule
+    "MD024": false, // Allow multiple headers with the same name
     "MD033": false, // Allow inline HTML
     "MD036": false, // Emphasis used instead of a header
     "MD045": false // Omit alternate text from image links
@@ -655,7 +711,9 @@
     "**/exe": true,
     "**/obj": true
   },
-  "security.allowedUNCHosts": ["wsl.localhost"],
+  "security.allowedUNCHosts": [
+    "wsl.localhost"
+  ],
   "security.workspace.trust.untrustedFiles": "open",
   "settings.cycle": [
     {
@@ -737,18 +795,26 @@
       "icon": "terminal-powershell",
       "source": "PowerShell"
     },
+    "Ubuntu": {
+      "args": [
+        "-d",
+        "Ubuntu",
+        "--cd",
+        "~"
+      ],
+      "icon": "terminal-linux",
+      "path": "wsl.exe"
+    },
     "PowerShell (No Profile)": {
-      "args": ["-NoLogo", "-NoProfile"],
+      "args": [
+        "-NoLogo",
+        "-NoProfile"
+      ],
       "icon": "terminal-powershell",
       "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
     },
     "Windows PowerShell": {
       "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
-    },
-    "Ubuntu": {
-      "path": "wsl.exe",
-      "args": ["-d", "Ubuntu", "--cd", "~"],
-      "icon": "terminal-linux"
     }
   },
   "terminal.integrated.shellIntegration.decorationsEnabled": "overviewRuler",
@@ -780,8 +846,28 @@
       "command": "vscode-neovim.lua"
     }
   },
-  "vscode-neovim.ctrlKeysForInsertMode": ["d", "h", "j", "m", "o", "r", "t", "u", "w"],
-  "vscode-neovim.ctrlKeysForNormalMode": ["e", "h", "j", "m", "o", "r", "t", "w", "y"],
+  "vscode-neovim.ctrlKeysForInsertMode": [
+    "d",
+    "h",
+    "j",
+    "m",
+    "o",
+    "r",
+    "t",
+    "u",
+    "w"
+  ],
+  "vscode-neovim.ctrlKeysForNormalMode": [
+    "e",
+    "h",
+    "j",
+    "m",
+    "o",
+    "r",
+    "t",
+    "w",
+    "y"
+  ],
   "vscode-neovim.neovimClean": false,
   "vscode-neovim.neovimExecutablePaths.win32": "C:/Program Files/Neovim/bin/nvim.exe",
   "vscode-neovim.neovimWidth": 500,
@@ -984,6 +1070,5 @@
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-"workbench.tips.enabled": true,
-"chat.editing.confirmEditRequestRemoval": false
+  "workbench.tips.enabled": true
 }

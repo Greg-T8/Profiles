@@ -33,3 +33,5 @@ vim.keymap.set('n', '<C-v>', '<C-q>', { desc = 'Enter visual block mode', norema
 
 -- Move text up and down
 vim.keymap.set("v", "p", '"_dP', { desc = "Paste without yanking replaced text", noremap = true, silent = true })
+
+-- Note: Line movement is now handled by vim-move plugin (Alt+j/k)
