@@ -1,96 +1,127 @@
+# ==============================================================================
+# BASH CONFIGURATION
+# ==============================================================================
 # ~/.bashrc: executed by bash(1) for non-login shells.
-# see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
-# for examples
+# This configuration enables vi mode with visual feedback, custom prompts,
+# and various quality-of-life improvements.
+# See /usr/share/doc/bash/examples/startup-files for more examples.
 
+# ==============================================================================
+# INTERACTIVE SHELL CHECK
+# ==============================================================================
 # If not running interactively, don't do anything
 case $- in
     *i*) ;;
       *) return;;
 esac
 
+# ==============================================================================
+# VI MODE CONFIGURATION
+# ==============================================================================
 # Enable vi command line editing mode (uses ~/.inputrc vi settings)
 set -o vi
 
-# Export preferred editor for CLI tools (used by git, crontab, etc.)
+# Set default editors for CLI tools (git, crontab, etc.)
 export EDITOR=vim
 export VISUAL=vim
 
-# Function to setup custom prompt
-# Defines box characters, colors, and PS1. Called when color_prompt is enabled.
+# ==============================================================================
+# HISTORY SETTINGS
+# ==============================================================================
+# Don't record duplicate commands or commands starting with space
+HISTCONTROL=ignoreboth
+
+# Append to history file instead of overwriting it
+shopt -s histappend
+
+# History size settings
+HISTSIZE=1000                          # Commands to remember in current session
+HISTFILESIZE=2000                      # Commands to save in history file
+
+# ==============================================================================
+# SHELL OPTIONS
+# ==============================================================================
+# Check window size after each command and update LINES and COLUMNS
+shopt -s checkwinsize
+
+# Enable "**" pattern for recursive directory matching (uncomment if desired)
+#shopt -s globstar
+
+# ==============================================================================
+# LESS CONFIGURATION
+# ==============================================================================
+# Make less more friendly for non-text input files
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+
+# ==============================================================================
+# CHROOT IDENTIFICATION
+# ==============================================================================
+# Set variable identifying the chroot you work in (used in prompt)
+if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
+    debian_chroot=$(cat /etc/debian_chroot)
+fi
+
+# ==============================================================================
+# PROMPT CONFIGURATION
+# ==============================================================================
+# ------------------------------------------------------------------------------
+# Custom Prompt Function
+# ------------------------------------------------------------------------------
+# Two-line prompt with box-drawing characters
+# Format:
+#   ╭─( ~/path/to/directory
+#   ╰─╴$
 setup_custom_prompt() {
-    # Define custom prompt characters
-    box_arc_down_right=$'\u256D'
-    box_horizontal=$'\u2500'
-    box_arc_up_right=$'\u2570'
-    box_horizontal_short=$'\u2574'
+    # Define box-drawing characters (Unicode)
+    box_arc_down_right=$'\u256D'    # ╭
+    box_horizontal=$'\u2500'        # ─
+    box_arc_up_right=$'\u2570'      # ╰
+    box_horizontal_short=$'\u2574'  # ╴
 
-    # Colored output
-    cyan='\[\e[36m\]' # Cyan color
-    reset='\[\e[0m\]' # Reset color
+    # Define colors using ANSI escape sequences
+    cyan='\[\e[36m\]'               # Cyan color
+    reset='\[\e[0m\]'               # Reset color
 
-    # Custom PS1 Prompt
+    # Build custom PS1 prompt
     PS1=$'\n'\
 "${cyan}${box_arc_down_right}${box_horizontal}( \w"\
 $'\n'\
 "${cyan}${box_arc_up_right}${box_horizontal_short}${reset}\\$ "
 }
 
-# History behavior: don't record duplicate or leading-space commands
-HISTCONTROL=ignoreboth
-
-# append to the history file, don't overwrite it
-shopt -s histappend
-
-# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
-HISTSIZE=1000
-HISTFILESIZE=2000
-
-# check the window size after each command and, if necessary,
-# update the values of LINES and COLUMNS.
-shopt -s checkwinsize
-
-# If set, the pattern "**" used in a pathname expansion context will
-# match all files and zero or more directories and subdirectories.
-#shopt -s globstar
-
-# make less more friendly for non-text input files, see lesspipe(1)
-[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
-
-# set variable identifying the chroot you work in (used in the prompt below)
-if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
-    debian_chroot=$(cat /etc/debian_chroot)
-fi
-
-# set a fancy prompt (non-color, unless we know we "want" color)
+# ------------------------------------------------------------------------------
+# Color Detection
+# ------------------------------------------------------------------------------
+# Detect if terminal supports color
 case "$TERM" in
     xterm-color|*-256color) color_prompt=yes;;
 esac
 
-# uncomment for a colored prompt, if the terminal has the capability; turned
-# off by default to not distract the user: the focus in a terminal window
-# should be on the output of commands, not on the prompt
+# Force color prompt (uncomment to enable)
 #force_color_prompt=yes
 
 if [ -n "$force_color_prompt" ]; then
     if [ -x /usr/bin/tput ] && tput setaf 1 >&/dev/null; then
-	# We have color support; assume it's compliant with Ecma-48
-	# (ISO/IEC-6429). (Lack of such support is extremely rare, and such
-	# a case would tend to support setf rather than setaf.)
-	color_prompt=yes
+        # Terminal supports color (Ecma-48/ISO/IEC-6429 compliant)
+        color_prompt=yes
     else
-	color_prompt=
+        color_prompt=
     fi
 fi
 
+# Apply appropriate prompt based on color support
 if [ "$color_prompt" = yes ]; then
-    # When color support is available, install the custom prompt
     setup_custom_prompt
 else
+    # Fallback to simple prompt without colors
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
 unset color_prompt force_color_prompt
 
-# If this is an xterm set the title to user@host:dir
+# ------------------------------------------------------------------------------
+# Terminal Title Configuration
+# ------------------------------------------------------------------------------
+# Set xterm/rxvt title to user@host:dir
 case "$TERM" in
 xterm*|rxvt*)
     PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
@@ -99,42 +130,50 @@ xterm*|rxvt*)
     ;;
 esac
 
-# enable color support of ls and also add handy aliases
+# ==============================================================================
+# COLOR SUPPORT
+# ==============================================================================
+# Enable color support for ls and related commands
 if [ -x /usr/bin/dircolors ]; then
+    # Load dircolors configuration if available
     test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+
+    # Colorized command aliases
     alias ls='ls --color=auto'
     #alias dir='dir --color=auto'
     #alias vdir='vdir --color=auto'
-
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'
     alias egrep='egrep --color=auto'
 fi
 
-# colored GCC warnings and errors
+# Colored GCC warnings and errors (uncomment if desired)
 #export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-# some more ls aliases
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
+# ==============================================================================
+# ALIASES
+# ==============================================================================
+# ls command variations
+alias ll='ls -alF'                    # Long listing with hidden files and indicators
+alias la='ls -A'                      # Show hidden files except . and ..
+alias l='ls -CF'                      # Compact listing with indicators
 
-# Add an "alert" alias for long running commands.  Use like so:
-#   sleep 10; alert
+# Alert alias for long-running commands
+# Usage: sleep 10; alert
 alias alert='notify-send --urgency=low -i "$([ $? = 0 ] && echo terminal || echo error)" "$(history|tail -n1|sed -e '\''s/^\s*[0-9]\+\s*//;s/[;&|]\s*alert$//'\'')"'
 
-# Alias definitions.
-# You may want to put all your additions into a separate file like
-# ~/.bash_aliases, instead of adding them here directly.
-# See /usr/share/doc/bash-doc/examples in the bash-doc package.
-
+# ==============================================================================
+# EXTERNAL CONFIGURATION
+# ==============================================================================
+# Load additional aliases from separate file if it exists
 if [ -f ~/.bash_aliases ]; then
     . ~/.bash_aliases
 fi
 
-# enable programmable completion features (you don't need to enable
-# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
-# sources /etc/bash.bashrc).
+# ==============================================================================
+# PROGRAMMABLE COMPLETION
+# ==============================================================================
+# Enable bash completion features
 if ! shopt -oq posix; then
   if [ -f /usr/share/bash-completion/bash_completion ]; then
     . /usr/share/bash-completion/bash_completion

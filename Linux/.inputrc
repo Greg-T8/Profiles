@@ -1,30 +1,106 @@
-# Set the command line editing mode to vi (instead of default emacs mode)
+# ==============================================================================
+# READLINE CONFIGURATION
+# ==============================================================================
+# ~/.inputrc: Configuration for GNU Readline library
+# Used by bash, python REPL, and other readline-enabled applications
+# See: man 3 readline for full documentation
+
+# ==============================================================================
+# VI MODE CONFIGURATION
+# ==============================================================================
+# Enable vi editing mode (instead of default emacs mode)
 set editing-mode vi
 
-# Disable bell sounds
-set bell-style none
-
-# Display the current vi mode in the command prompt
+# ------------------------------------------------------------------------------
+# Mode String Configuration
+# ------------------------------------------------------------------------------
+# Display mode indicator in the prompt
+# Shows (cmd) for command mode, (ins) for insert mode
 set show-mode-in-prompt on
 
-# Set cursor style for vi insert mode (vertical bar cursor)
-set vi-ins-mode-string "\1\e[6 q\2"
+# Customize mode indicators with colors
+# Format: \1 = start non-printing, \2 = end non-printing
+# \e[1;32m = bold green, \e[0m = reset
+set vi-ins-mode-string \1\e[1;32m\2(ins)\1\e[0m\2
+set vi-cmd-mode-string \1\e[1;34m\2(cmd)\1\e[0m\2
 
-# Set cursor style for vi command mode (block cursor)
-set vi-cmd-mode-string "\1\e[2 q\2"
+# ------------------------------------------------------------------------------
+# Cursor Shape Configuration
+# ------------------------------------------------------------------------------
+# Change cursor shape based on vi mode
+# Block cursor (ESC [ 2 SP q) for command mode
+# Line cursor (ESC [ 6 SP q) for insert mode
+set keymap vi-command
+"\e[2 q": ""
+set keymap vi-insert
+"\e[6 q": ""
 
-# Set timeout for key sequences to 10 milliseconds (faster mode switching)
-set keyseq-timeout 10
+# ==============================================================================
+# COMPLETION SETTINGS
+# ==============================================================================
+# Treat hyphens and underscores as equivalent when completing
+set completion-map-case on
 
-# Additional vi mode keybindings
-$if mode=vi
-    set keymap vi-insert
-    "\C-p": previous-history
-    "\C-n": next-history
-    "\C-a": beginning-of-line
-    "\C-e": end-of-line
+# Display completions immediately without requiring double-tab
+set show-all-if-ambiguous on
 
-    set keymap vi-command
-    "\C-p": previous-history
-    "\C-n": next-history
-$endif
+# Show file type indicators (/, @, *) in completions
+set visible-stats on
+
+# Colorize completion candidates by file type
+set colored-stats on
+
+# Append slash to completed directory names
+set mark-directories on
+
+# ==============================================================================
+# SEARCH CONFIGURATION
+# ==============================================================================
+# Incremental history search with arrow keys
+# Up/Down arrows search history based on what's already typed
+"\e[A": history-search-backward
+"\e[B": history-search-forward
+
+# ==============================================================================
+# KEYBINDINGS - INSERT MODE
+# ==============================================================================
+set keymap vi-insert
+
+# History navigation
+"\C-p": previous-history          # Ctrl+P: previous command
+"\C-n": next-history              # Ctrl+N: next command
+
+# Word movement
+"\eb": backward-word              # Alt+B: move backward one word
+"\ef": forward-word               # Alt+F: move forward one word
+
+# Line navigation
+"\C-a": beginning-of-line         # Ctrl+A: go to start of line
+"\C-e": end-of-line               # Ctrl+E: go to end of line
+
+# Line editing
+"\C-k": kill-line                 # Ctrl+K: delete from cursor to end of line
+"\C-u": backward-kill-line        # Ctrl+U: delete from cursor to start of line
+"\C-w": backward-kill-word        # Ctrl+W: delete word before cursor
+
+# ==============================================================================
+# KEYBINDINGS - COMMAND MODE
+# ==============================================================================
+set keymap vi-command
+
+# History navigation (same as insert mode for consistency)
+"\C-p": previous-history          # Ctrl+P: previous command
+"\C-n": next-history              # Ctrl+N: next command
+
+# Word movement
+"\eb": backward-word              # Alt+B: move backward one word
+"\ef": forward-word               # Alt+F: move forward one word
+
+# Line navigation
+"\C-a": beginning-of-line         # Ctrl+A: go to start of line
+"\C-e": end-of-line               # Ctrl+E: go to end of line
+
+# Line editing
+"\C-k": kill-line                 # Ctrl+K: delete from cursor to end of line
+"\C-u": backward-kill-line        # Ctrl+U: delete from cursor to start of line
+"\C-w": backward-kill-word        # Ctrl+W: delete word before cursor
