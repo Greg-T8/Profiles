@@ -1,19 +1,58 @@
--- Loads the VS Code API module
+-- ==============================================================================
+-- VSCODE NEOVIM OPTIONS
+-- ==============================================================================
+-- VSCode-specific configuration and keybindings
+-- This file is only loaded when running Neovim inside VSCode
+
+-- ==============================================================================
+-- VSCODE API
+-- ==============================================================================
+-- Load the VSCode API module for interacting with VSCode commands
 local vscode = require('vscode')
 
-vim.opt.columns = 400
+-- ==============================================================================
+-- EDITOR SETTINGS
+-- ==============================================================================
+vim.opt.columns = 400               -- Set editor column width
 
--- Trigger move into new window
+-- ==============================================================================
+-- WINDOW MANAGEMENT
+-- ==============================================================================
+-- Move editor to new window
 vim.api.nvim_set_keymap('n', '<leader>dw',
     "<Cmd>call VSCodeNotify('workbench.action.moveEditorToNewWindow')<CR>",
     { noremap = true, silent = true })
 
--- Markdown: Open preview to the side
+-- ==============================================================================
+-- TERMINAL KEYBINDINGS
+-- ==============================================================================
+-- Open in integrated terminal
+vim.api.nvim_set_keymap('n', '<leader>tt',
+    "<Cmd>call VSCodeNotify('openInIntegratedTerminal')<CR>",
+    { noremap = true, silent = true })
+
+-- Alternative binding for integrated terminal
+vim.api.nvim_set_keymap('n', '<leader>at',
+    "<Cmd>call VSCodeNotify('openInIntegratedTerminal')<CR>",
+    { noremap = true, silent = true })
+
+-- ==============================================================================
+-- MARKDOWN KEYBINDINGS
+-- ==============================================================================
+-- Open markdown preview to the side
 vim.api.nvim_set_keymap('n', '<leader>de',
     "<cmd>call VSCodeNotify('markdown-preview-enhanced.openPreviewToTheSide')<CR>",
     { noremap = true, silent = true })
 
--- Trigger inline chat
+-- Toggle code block in markdown
+vim.api.nvim_set_keymap('n', '<leader>ic',
+    "<Cmd>call VSCodeNotify('markdown.extension.editing.toggleCodeBlock')<CR>a",
+    { noremap = true, silent = true })
+
+-- ==============================================================================
+-- COPILOT/CHAT KEYBINDINGS
+-- ==============================================================================
+-- Trigger inline voice chat
 vim.api.nvim_set_keymap('n', '<leader>ic',
     "<Cmd>call VSCodeNotify('workbench.action.chat.inlineVoiceChat')<CR>",
     { noremap = true, silent = true })
@@ -23,17 +62,10 @@ vim.api.nvim_set_keymap('n', '<leader>icu',
     "<Cmd>call VSCodeNotify('undo')<CR>",
     { noremap = true, silent = true })
 
--- Open in integrated terminal
-vim.api.nvim_set_keymap('n', '<leader>tt',
-    "<Cmd>call VSCodeNotify('openInIntegratedTerminal')<CR>",
-    { noremap = true, silent = true })
-
--- Open in integrated terminal
-vim.api.nvim_set_keymap('n', '<leader>at',
-    "<Cmd>call VSCodeNotify('openInIntegratedTerminal')<CR>",
-    { noremap = true, silent = true })
-
--- Toggle inline suggestions (VSCode Neovim)
+-- ==============================================================================
+-- INTELLISENSE TOGGLES
+-- ==============================================================================
+-- Toggle inline suggestions
 vim.api.nvim_set_keymap('n', '<leader>tis',
     "<Cmd>call VSCodeNotify('settings.cycle.inlineSuggestToggle')<CR>",
     { noremap = true, silent = true })
@@ -43,17 +75,15 @@ vim.api.nvim_set_keymap('n', '<leader>tii',
     "<Cmd>call VSCodeNotify('settings.cycle.intellisenseToggle')<CR>",
     { noremap = true, silent = true })
 
--- Toggle Next Edit Suggestions
+-- Toggle next edit suggestions
 vim.api.nvim_set_keymap('n', '<leader>nes',
     "<Cmd>call VSCodeNotify('settings.cycle.nextEditSuggestionsToggle')<CR>",
     { noremap = true, silent = true })
 
--- Toggle code block when in markdown
-vim.api.nvim_set_keymap('n', '<leader>ic',
-    "<Cmd>call VSCodeNotify('markdown.extension.editing.toggleCodeBlock')<CR>a",
-    { noremap = true, silent = true })
-
--- GCC Build functionality
+-- ==============================================================================
+-- BUILD TASKS
+-- ==============================================================================
+-- GCC Build functionality with configuration check
 _G.build_if_gccbuild_enabled = function()
     local enabled = vscode.get_config("workspaceKeybindings.gccbuild.enabled")
     if enabled then
@@ -62,18 +92,31 @@ _G.build_if_gccbuild_enabled = function()
         print("GCC Build is disabled")
     end
 end
+
+-- Trigger GCC build task
 vim.api.nvim_set_keymap('n', '<leader>bc',
     "<Cmd>lua build_if_gccbuild_enabled()<CR>",
     { noremap = true, silent = true })
 
--- Visual mode: page down/up while KEEPING the selection
+-- ==============================================================================
+-- SCROLLING BEHAVIOR
+-- ==============================================================================
+-- Custom scrolling that centers cursor and preserves visual selection
 local win_h = function() return vim.api.nvim_win_get_height(0) end
 local half  = function() return math.floor(win_h() / 2) end
-vim.keymap.set({'n', 'x'}, '<C-f>', function() vim.cmd('normal! ' .. win_h() .. 'jzz') end, opts)
-vim.keymap.set({'n', 'x'}, '<C-b>', function() vim.cmd('normal! ' .. win_h() .. 'kzz') end, opts)
-vim.keymap.set({'n', 'x'}, '<C-d>', function() vim.cmd('normal! ' .. half() .. 'jzz') end, opts)
-vim.keymap.set({'n', 'x'}, '<C-u>', function() vim.cmd('normal! ' .. half() .. 'kzz') end, opts)
 
+-- Full page scrolling with centering
+vim.keymap.set({'n', 'x'}, '<C-f>', function() vim.cmd('normal! ' .. win_h() .. 'jzz') end)
+vim.keymap.set({'n', 'x'}, '<C-b>', function() vim.cmd('normal! ' .. win_h() .. 'kzz') end)
+
+-- Half page scrolling with centering
+vim.keymap.set({'n', 'x'}, '<C-d>', function() vim.cmd('normal! ' .. half() .. 'jzz') end)
+vim.keymap.set({'n', 'x'}, '<C-u>', function() vim.cmd('normal! ' .. half() .. 'kzz') end)
+
+-- ==============================================================================
+-- MULTI-CURSOR
+-- ==============================================================================
+-- Select all highlights under cursor for multi-cursor editing
 vim.keymap.set({ "n", "x", "i" }, "<C-S-l>", function()
   require("vscode-multi-cursor").selectHighlights()
 end)

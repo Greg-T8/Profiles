@@ -1,46 +1,59 @@
-local opts = { noremap = true, silent = true }
+-- ==============================================================================
+-- COMMON KEYMAPS (Shared between Neovim and VSCode)
+-- ==============================================================================
+-- These keybindings apply to both native Neovim and VSCode Neovim
+-- Mode abbreviations:
+--   n  = normal_mode
+--   i  = insert_mode
+--   v  = visual_mode
+--   x  = visual_block_mode
+--   t  = term_mode
+--   c  = command_mode
+--   o  = operator_pending_mode
 
-local term_opts = { silent = true }
-
--- Modes
---   normal_mode = "n",
---   insert_mode = "i",
---   visual_mode = "v",
---   visual_block_mode = "x",
---   term_mode = "t",
---   command_mode = "c",
---   operator_pending_mode = "o",
-
--- Add keymapping for saving with leader+s
-vim.keymap.set('n', '<leader>w', ':w<CR>', { desc = 'Save file' })
-vim.keymap.set('n', '<leader>wq', ':wq<CR>', { desc = 'Save and quit' })
-vim.keymap.set("n", "<C-q>", "<C-v>", { desc = "Enter visual block mode", noremap = true, silent = true })
-
--- Change G to go to the end of the last line
-vim.keymap.set('n', 'G', 'G$', { desc = 'Go to end of line and center' })
-
--- Add keymapping for centering cursor
-vim.keymap.set('n', '<C-u>', '<C-u>zz', { desc = 'Center cursor on screen' })
-vim.keymap.set('n', '<C-d>', '<C-d>zz', { desc = 'Half page down and center' })
-vim.keymap.set('n', '<C-f>', '<C-f>zz', { desc = 'Page down and center' })
-vim.keymap.set('n', '<C-b>', '<C-b>zz', { desc = 'Page up and center' })
-
--- Stay in indent mode
-vim.keymap.set("v", "<", "<gv", { desc = "Indent left and keep selection", noremap = true, silent = true })
-vim.keymap.set("v", ">", ">gv", { desc = "Indent right and keep selection", noremap = true, silent = true })
-
--- Enter visual block mode using ctrl+q
-vim.keymap.set('n', '<C-v>', '<C-q>', { desc = 'Enter visual block mode', noremap = true, silent = true })
-
--- Move text up and down
-vim.keymap.set("v", "p", '"_dP', { desc = "Paste without yanking replaced text", noremap = true, silent = true })
-
--- Note: Line movement is now handled by vim-move plugin (Alt+j/k)
+-- ==============================================================================
+-- FILE OPERATIONS
+-- ==============================================================================
+-- Save and quit operations
+vim.keymap.set('n', '<leader>w', ':w<CR>', { desc = 'Save file', noremap = true, silent = true })
+vim.keymap.set('n', '<leader>wq', ':wq<CR>', { desc = 'Save and quit', noremap = true, silent = true })
+vim.keymap.set('n', '<leader>q', ':q!<CR>', { desc = 'Force quit without saving', noremap = true, silent = true })
 
 -- Make :q always force quit without confirmation
 vim.api.nvim_create_user_command('Q', 'q!', {})
 vim.cmd('cnoreabbrev q Q')
 vim.cmd('cnoreabbrev wq wq!')
 
--- Leader+q to force quit without confirmation
-vim.keymap.set('n', '<leader>q', ':q!<CR>', { desc = 'Force quit without saving', noremap = true, silent = true })
+-- ==============================================================================
+-- VISUAL BLOCK MODE
+-- ==============================================================================
+-- Enter visual block mode using Ctrl+Q (since Ctrl+V is remapped to paste)
+vim.keymap.set("n", "<C-q>", "<C-v>", { desc = "Enter visual block mode", noremap = true, silent = true })
+
+-- ==============================================================================
+-- CURSOR MOVEMENT WITH CENTERING
+-- ==============================================================================
+-- Center cursor after large movements
+vim.keymap.set('n', '<C-u>', '<C-u>zz', { desc = 'Half page up and center', noremap = true, silent = true })
+vim.keymap.set('n', '<C-d>', '<C-d>zz', { desc = 'Half page down and center', noremap = true, silent = true })
+vim.keymap.set('n', '<C-f>', '<C-f>zz', { desc = 'Full page down and center', noremap = true, silent = true })
+vim.keymap.set('n', '<C-b>', '<C-b>zz', { desc = 'Full page up and center', noremap = true, silent = true })
+
+-- Go to end of file and last character on line
+vim.keymap.set('n', 'G', 'G$', { desc = 'Go to end of last line', noremap = true, silent = true })
+
+-- ==============================================================================
+-- VISUAL MODE ENHANCEMENTS
+-- ==============================================================================
+-- Stay in indent mode after indenting
+vim.keymap.set("v", "<", "<gv", { desc = "Indent left and keep selection", noremap = true, silent = true })
+vim.keymap.set("v", ">", ">gv", { desc = "Indent right and keep selection", noremap = true, silent = true })
+
+-- Paste without yanking replaced text
+vim.keymap.set("v", "p", '"_dP', { desc = "Paste without yanking replaced text", noremap = true, silent = true })
+
+-- ==============================================================================
+-- TEXT MOVEMENT
+-- ==============================================================================
+-- Note: Line movement (Alt+j/k) is handled by vim-move plugin
+-- See _common/plugins/vim-move.lua for configuration
