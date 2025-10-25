@@ -176,6 +176,13 @@ function Get-WinExperienceIndex {
     }
 }
 
+function Get-WinGetUpdates {
+    Get-WinGetPackage |
+        Where-Object IsUpdateAvailable |
+        Select-Object Name, Id, InstalledVersion, IsUpdateAvailable,
+            @{n='AvailableVersions'; e={ $_.AvailableVersions | Select-Object -First 1 }}
+}
+
 function Remove-OldModuleVersions {
     <#
     .SYNOPSIS
