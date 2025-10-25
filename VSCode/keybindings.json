@@ -340,7 +340,7 @@
     "command": "editor.action.inlineSuggest.showNext",
     "when": "inlineSuggestionVisible && !editorReadonly"
   },
-{
+  {
     "key": "shift+alt+i",
     "command": "-editor.action.insertCursorAtEndOfEachLineSelected",
     "when": "editorTextFocus"
@@ -620,4 +620,28 @@
     "command": "-workbench.action.chat.openModelPicker",
     "when": "chatIsEnabled && inChatInput"
   },
+  {
+    "key": "alt+k",
+    "command": "vscode-neovim.send",
+    "args": "<M-k>",
+    "when": "editorTextFocus && neovim.init && neovim.mode == 'visual' && editorLangId not in 'neovim.editorLangIdExclusions'"
+  },
+  {
+    "key": "alt+j",
+    "command": "vscode-neovim.send",
+    "args": "<M-j>",
+    "when": "editorTextFocus && neovim.init && neovim.mode == 'visual' && editorLangId not in 'neovim.editorLangIdExclusions'"
+  },
+  {
+    "key": "alt+h",
+    "command": "vscode-neovim.send",
+    "args": "<M-h>",
+    "when": "editorTextFocus && neovim.init && neovim.mode == 'visual' && editorLangId not in 'neovim.editorLangIdExclusions'"
+  },
+  {
+    "key": "alt+l",
+    "command": "vscode-neovim.send",
+    "args": "<M-l>",
+    "when": "editorTextFocus && neovim.init && neovim.mode == 'visual' && editorLangId not in 'neovim.editorLangIdExclusions'"
+  }
 ]

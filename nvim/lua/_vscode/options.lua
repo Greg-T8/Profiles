@@ -74,23 +74,6 @@ vim.keymap.set({'n', 'x'}, '<C-b>', function() vim.cmd('normal! ' .. win_h() .. 
 vim.keymap.set({'n', 'x'}, '<C-d>', function() vim.cmd('normal! ' .. half() .. 'jzz') end, opts)
 vim.keymap.set({'n', 'x'}, '<C-u>', function() vim.cmd('normal! ' .. half() .. 'kzz') end, opts)
 
--- Move lines up/down using VSCode commands (replacing vim-move for VSCode)
-vim.keymap.set('n', '<A-j>', function()
-    vscode.call('editor.action.moveLinesDownAction')
-end, { noremap = true, silent = true })
-
-vim.keymap.set('n', '<A-k>', function()
-    vscode.call('editor.action.moveLinesUpAction')
-end, { noremap = true, silent = true })
-
-vim.keymap.set('v', '<A-j>', function()
-    vscode.call('editor.action.moveLinesDownAction')
-end, { noremap = true, silent = true })
-
-vim.keymap.set('v', '<A-k>', function()
-    vscode.call('editor.action.moveLinesUpAction')
-end, { noremap = true, silent = true })
-
 vim.keymap.set({ "n", "x", "i" }, "<C-S-l>", function()
   require("vscode-multi-cursor").selectHighlights()
 end)

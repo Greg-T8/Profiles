@@ -46,8 +46,8 @@ return {
             set("n", "<c-leftdrag>", mc.handleMouseDrag)
             set("n", "<c-leftrelease>", mc.handleMouseRelease)
 
-            -- Disable and enable cursors.
-            set({ "n", "x" }, "<c-q>", mc.toggleCursor)
+            -- Disable and enable cursors - use a different key to avoid conflict
+            set({ "n", "x" }, "<leader>mc", mc.toggleCursor)
 
             -- Mappings defined in a keymap layer only apply when there are
             -- multiple cursors. This lets you have overlapping mappings.

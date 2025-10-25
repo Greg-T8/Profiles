@@ -25,9 +25,7 @@
   "[json]": {
     "editor.autoIndent": "advanced",
     "editor.insertSpaces": true,
-    "editor.rulers": [
-      110
-    ],
+    "editor.rulers": [110],
     "editor.tabSize": 2
   },
   "[jsonc]": {
@@ -47,9 +45,7 @@
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
     "editor.insertSpaces": true,
-    "editor.rulers": [
-      80
-    ],
+    "editor.rulers": [80],
     "editor.tabSize": 2,
     "editor.wordWrap": "wordWrapColumn",
     "editor.wordWrapColumn": 80,
@@ -69,9 +65,7 @@
   },
   "[powershell]": {
     "editor.defaultFormatter": "ms-vscode.powershell",
-    "editor.rulers": [
-      115
-    ],
+    "editor.rulers": [115],
     "editor.tabSize": 4,
     "rewrap.wrappingColumn": 115
   },
@@ -91,9 +85,7 @@
     "diffEditor.ignoreTrimWhitespace": false,
     "editor.autoIndent": "advanced",
     "editor.insertSpaces": true,
-    "editor.rulers": [
-      115
-    ],
+    "editor.rulers": [115],
     "editor.tabSize": 2
   },
   "betterAlign.alignAfterTypeEnter": false,
@@ -341,66 +333,21 @@
   ],
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
-    [
-      "#ACB78E",
-      "Swamp Green"
-    ],
-    [
-      "#516E3D",
-      "Chalet Green"
-    ],
-    [
-      "#0B1304",
-      "Black Forest"
-    ],
-    [
-      "#02A4D3",
-      "Cerulean"
-    ],
-    [
-      "#45B1E8",
-      "Picton Blue"
-    ],
-    [
-      "#A69279",
-      "Donkey Brown"
-    ],
-    [
-      "#FCD917",
-      "Candlelight"
-    ],
-    [
-      "#B7C3D0",
-      "Heather"
-    ],
-    [
-      "#FFEDBC",
-      "Colonial White"
-    ],
-    [
-      "#efbe00",
-      "Corn"
-    ],
-    [
-      "#E6F8F3",
-      "Off Green"
-    ],
-    [
-      "#796989",
-      "Rum"
-    ],
-    [
-      "#d8bd16",
-      "Gold Tips"
-    ],
-    [
-      "#706555",
-      "Coffee"
-    ],
-    [
-      "#384555",
-      "Oxford Blue"
-    ]
+    ["#ACB78E", "Swamp Green"],
+    ["#516E3D", "Chalet Green"],
+    ["#0B1304", "Black Forest"],
+    ["#02A4D3", "Cerulean"],
+    ["#45B1E8", "Picton Blue"],
+    ["#A69279", "Donkey Brown"],
+    ["#FCD917", "Candlelight"],
+    ["#B7C3D0", "Heather"],
+    ["#FFEDBC", "Colonial White"],
+    ["#efbe00", "Corn"],
+    ["#E6F8F3", "Off Green"],
+    ["#796989", "Rum"],
+    ["#d8bd16", "Gold Tips"],
+    ["#706555", "Coffee"],
+    ["#384555", "Oxford Blue"]
   ],
   "dashboard.storeProjectsInSettings": true,
   "debug.inlineValues": "auto",
@@ -651,9 +598,7 @@
   "markdown.extension.tableFormatter.normalizeIndentation": true,
   "markdown.extension.toc.levels": "2..5",
   "markdown.extension.toc.omittedFromToc": {
-    "notes.md": [
-      "## Contents"
-    ]
+    "notes.md": ["## Contents"]
   },
   "markdown.extension.toc.orderedList": false,
   "markdown.extension.toc.unorderedList.marker": "*",
@@ -686,9 +631,7 @@
     "**/exe": true,
     "**/obj": true
   },
-  "security.allowedUNCHosts": [
-    "wsl.localhost"
-  ],
+  "security.allowedUNCHosts": ["wsl.localhost"],
   "security.workspace.trust.untrustedFiles": "open",
   "settings.cycle": [
     {
@@ -770,23 +713,15 @@
       "icon": "terminal-powershell",
       "source": "PowerShell"
     },
-    "Ubuntu": {
-      "args": [
-        "-d",
-        "Ubuntu",
-        "--cd",
-        "~"
-      ],
-      "icon": "terminal-linux",
-      "path": "wsl.exe"
-    },
     "PowerShell (No Profile)": {
-      "args": [
-        "-NoLogo",
-        "-NoProfile"
-      ],
+      "args": ["-NoLogo", "-NoProfile"],
       "icon": "terminal-powershell",
       "path": "C:/Program Files/PowerShell/7/pwsh.exe"
+    },
+    "Ubuntu": {
+      "args": ["-d", "Ubuntu", "--cd", "~"],
+      "icon": "terminal-linux",
+      "path": "wsl.exe"
     },
     "Windows PowerShell": {
       "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
@@ -821,32 +756,14 @@
       "command": "vscode-neovim.lua"
     }
   },
-  "vscode-neovim.ctrlKeysForInsertMode": [
-    "d",
-    "h",
-    "j",
-    "m",
-    "o",
-    "r",
-    "t",
-    "u",
-    "w"
-  ],
-  "vscode-neovim.ctrlKeysForNormalMode": [
-    "e",
-    "h",
-    "j",
-    "m",
-    "o",
-    "r",
-    "t",
-    "w",
-    "y"
-  ],
+  "vscode-neovim.ctrlKeysForInsertMode": ["d", "h", "j", "m", "o", "r", "t", "u", "w"],
+  "vscode-neovim.ctrlKeysForNormalMode": ["e", "h", "j", "m", "o", "r", "t", "w", "y"],
+  "vscode-neovim.logOutputToConsole": true,
   "vscode-neovim.neovimClean": false,
   "vscode-neovim.neovimExecutablePaths.win32": "C:/Program Files/Neovim/bin/nvim.exe",
   "vscode-neovim.neovimWidth": 500,
   "vscode-neovim.revealCursorScrollLine": true,
+  "vscode-neovim.statusLineSeparator": " ",
   "window.newWindowDimensions": "inherit",
   "window.restoreWindows": "none",
   "window.zoomLevel": 2,
@@ -1025,10 +942,12 @@
     "vscode-neovim.ctrlKeysForNormalMode",
     "vscode-neovim.ctrlKeysForInsertMode",
     "vscode-neovim.compositeKeys",
+    "vscode-neovim.logOutputToConsole",
     "vscode-neovim.neovimClean",
     "vscode-neovim.neovimExecutablePaths.win32",
     "vscode-neovim.revealCursorScrollLine",
     "vscode-neovim.neovimWidth",
+    "vscode-neovim.statusLineSeparator",
     "window.newWindowDimensions",
     "window.restoreWindows",
     "window.zoomLevel",
