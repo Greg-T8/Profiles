@@ -19,6 +19,7 @@ let mapleader = " "
 " Save and quit with leader+wq
 nnoremap <leader>w :w<CR>
 nnoremap <leader>wq :wq<CR>
+nnoremap <leader>q :q!<CR>
 
 " ==============================================================================
 " INSERT MODE NAVIGATION

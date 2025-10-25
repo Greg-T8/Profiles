@@ -17,10 +17,6 @@
 if ($PSVersionTable.PSEdition -eq 'Core') {
     $PSStyle.Formatting.Verbose = $PSStyle.Foreground.Cyan
     $PSStyle.Formatting.Warning = $PSStyle.Foreground.Yellow
-
-    # Enable PSReadline prediction
-    Set-PSReadLineOption -PredictionSource HistoryAndPlugin
-    Set-PSReadLineOption -PredictionViewStyle ListView
 }
 
 if (Test-Path -Path "$env:OneDriveConsumer/Apps/Profiles/PowerShell/prompt.ps1") {
@@ -64,7 +60,7 @@ Remove-Item Alias:dir
 if (-not (Get-Module PSReadline)) { Import-Module PSReadLine }
 Set-PSReadLineOption -EditMode Vi
 Set-PSReadLineOption -PredictionViewStyle InlineView
-Set-PSReadLineOption -PredictionSource HistoryAndPlugin -PredictionViewStyle ListView
+Set-PSReadLineOption -PredictionSource HistoryAndPlugin
 Set-PSReadLineKeyHandler -Chord Tab -Function TabCompleteNext
 Set-PSReadLineKeyHandler -Chord Shift+Tab -Function TabCompletePrevious
 Set-PSReadLineKeyHandler -Chord Ctrl+V -Function Paste
