@@ -54,7 +54,7 @@ Set-Alias -Name ll -Value Get-ChildItem -Force
 Set-Alias -name cfj -Value ConvertFrom-Json
 Set-Alias -Name tf -Value terraform
 Set-Alias -Name gim -Value Get-InstalledModule
-Remove-Item Alias:dir
+Remove-Item Alias:dir -ErrorAction SilentlyContinue
 
 # Enable keyboard shortcuts
 if (-not (Get-Module PSReadline)) { Import-Module PSReadLine }

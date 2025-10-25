@@ -304,3 +304,168 @@ function Remove-OldModuleVersions {
         }
     }
 }
+
+function Measure-ProfileLoad {
+    <#
+    .SYNOPSIS
+        Measures PowerShell profile loading time with detailed metrics.
+
+    .DESCRIPTION
+        Measures baseline PowerShell startup vs. profile load time and uses
+        Measure-Script to identify the slowest operations in the profile.
+
+    .PARAMETER Iterations
+        Number of iterations to run for averaging. Default is 3.
+
+    .EXAMPLE
+        Measure-ProfileLoad
+
+    .EXAMPLE
+        Measure-ProfileLoad -Iterations 5
+    #>
+    [CmdletBinding()]
+    param(
+        [int]$Iterations = 3
+    )
+
+    # Ensure PSProfiler module is available
+    if (-not (Get-Command Measure-Script -ErrorAction SilentlyContinue)) {
+        Write-Warning "PSProfiler module not found. Install with: Install-Module PSProfiler"
+        Write-Warning "Falling back to basic timing only..."
+    }
+
+    Write-Host "`nMeasuring PowerShell profile load times..." -ForegroundColor Cyan
+    Write-Host "Running $Iterations iterations...`n" -ForegroundColor Gray
+
+    # Measure baseline (no profile)
+    $baselineTimes = 1..$Iterations | ForEach-Object {
+        Write-Host "  Baseline $_/$Iterations..." -NoNewline
+        $ms = (Measure-Command { pwsh -NoProfile -Command "exit" }).TotalMilliseconds
+        Write-Host " $([math]::Round($ms, 2))ms" -ForegroundColor Gray
+        $ms
+    }
+
+    # Measure with profile
+    $profileTimes = 1..$Iterations | ForEach-Object {
+        Write-Host "  Profile $_/$Iterations..." -NoNewline
+        $ms = (Measure-Command { pwsh -Command "exit" }).TotalMilliseconds
+        Write-Host " $([math]::Round($ms, 2))ms" -ForegroundColor Gray
+        $ms
+    }
+
+    $avgBaseline = ($baselineTimes | Measure-Object -Average).Average
+    $avgWithProfile = ($profileTimes | Measure-Object -Average).Average
+    $avgOverhead = $avgWithProfile - $avgBaseline
+
+    # Get detailed line timing using Measure-Script
+    $topOpsTable = $null
+    if ((Test-Path $PROFILE.CurrentUserAllHosts) -and (Get-Command Measure-Script -ErrorAction SilentlyContinue)) {
+        Write-Host "`n  Analyzing profile with Measure-Script..." -ForegroundColor Gray
+        try {
+            $queue = [System.Collections.Generic.Queue[string]]::new()
+            $seen  = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+            $root  = (Resolve-Path $PROFILE.CurrentUserAllHosts).ProviderPath
+            $queue.Enqueue($root)
+
+            $allResults = @()
+
+            while ($queue.Count -gt 0) {
+                $scriptPath = $queue.Dequeue()
+                if (-not (Test-Path $scriptPath)) { continue }
+                if (-not $seen.Add($scriptPath)) { continue }
+
+                try {
+                    $results = Measure-Script -Path $scriptPath
+                    if ($results) {
+                        $allResults += $results | ForEach-Object {
+                            $_ | Add-Member -NotePropertyName Source -NotePropertyValue $scriptPath -PassThru
+                        }
+                    }
+                }
+                catch {
+                    Write-Verbose "Measure-Script failed for $scriptPath`: $_"
+                }
+
+                try {
+                    $dir = Split-Path $scriptPath
+                    Get-Content $scriptPath | ForEach-Object {
+                        if ($_ -match '^\s*\.\s+(.+?)\s*(#.*)?$') {
+                            $raw = $matches[1].Trim().Trim("'`"")
+                            if (-not $raw) { return }
+                            $expanded = $ExecutionContext.InvokeCommand.ExpandString($raw)
+                            $candidate = if (Test-Path $expanded) { $expanded } else { Join-Path $dir $expanded }
+                            if (Test-Path $candidate) {
+                                $resolved = (Resolve-Path $candidate -ErrorAction SilentlyContinue).ProviderPath
+                                if ($resolved) { $queue.Enqueue($resolved) }
+                            }
+                        }
+                    }
+                }
+                catch {
+                    Write-Verbose "Failed to inspect dot-sourced paths in $scriptPath`: $_"
+                }
+            }
+
+            if ($allResults) {
+                $topOps = $allResults |
+                    Sort-Object -Property {
+                        $et = $_.ExecutionTime
+                        if ($et -is [TimeSpan])       { $et.TotalMilliseconds }
+                        elseif ($et -is [double])     { [TimeSpan]::FromSeconds($et).TotalMilliseconds }
+                        elseif ($et -is [decimal])    { [TimeSpan]::FromSeconds([double]$et).TotalMilliseconds }
+                        elseif ($et -is [int] -or $et -is [long]) { [double]$et }
+                        else { 0 }
+                    } -Descending |
+                    Select-Object -First 5
+
+                if ($topOps) {
+                    $topOpsTable = $topOps |
+                        ForEach-Object {
+                            $execution = $_.ExecutionTime
+                            $timeSpan =
+                                if     ($execution -is [TimeSpan]) { $execution }
+                                elseif ($execution -is [double])   { [TimeSpan]::FromSeconds($execution) }
+                                elseif ($execution -is [decimal])  { [TimeSpan]::FromSeconds([double]$execution) }
+                                elseif ($execution -is [int] -or $execution -is [long]) { [TimeSpan]::FromMilliseconds($execution) }
+                                else { [TimeSpan]::Zero }
+
+                            [pscustomobject]@{
+                                Line        = $_.Line
+                                'Time Taken' = $timeSpan.ToString("mm':'ss'.'fffffff")
+                                Source      = if ($_.Source) { $_.Source } else { $root }
+                            }
+                        } |
+                        Format-Table -Property Line, 'Time Taken', Source -AutoSize | Out-String
+                }
+            }
+        }
+        catch {
+            Write-Warning "Measure-Script analysis failed: $_"
+        }
+    }
+
+    # Display results
+    Write-Host "`n=== Profile Load Performance ===" -ForegroundColor Cyan
+    Write-Host ("Baseline (no profile):  {0}ms" -f [math]::Round($avgBaseline, 2)) -ForegroundColor Green
+    Write-Host ("With profile:           {0}ms" -f [math]::Round($avgWithProfile, 2)) -ForegroundColor Yellow
+
+    $color = if ($avgOverhead -lt 500) { 'Green' } elseif ($avgOverhead -lt 1000) { 'Yellow' } else { 'Red' }
+    Write-Host ("Profile overhead:       {0}ms" -f [math]::Round($avgOverhead, 2)) -ForegroundColor $color
+
+    if ($topOpsTable) {
+        Write-Host "`n=== Top 5 Slowest Operations ===" -ForegroundColor Cyan
+        Write-Host ($topOpsTable.TrimEnd())
+    }
+    elseif ((Test-Path $PROFILE.CurrentUserAllHosts) -and (Get-Command Measure-Script -ErrorAction SilentlyContinue)) {
+        Write-Host "`n  (Measure-Script returned no data)" -ForegroundColor Gray
+    }
+
+    # Return summary
+    [PSCustomObject]@{
+        BaselineAvg     = [math]::Round($avgBaseline, 2)
+        WithProfileAvg  = [math]::Round($avgWithProfile, 2)
+        ProfileOverhead = [math]::Round($avgOverhead, 2)
+        BaselineTimes   = $baselineTimes | ForEach-Object { [math]::Round($_, 2) }
+        ProfileTimes    = $profileTimes  | ForEach-Object { [math]::Round($_, 2) }
+    }
+}
