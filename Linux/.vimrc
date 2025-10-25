@@ -14,6 +14,13 @@
 let mapleader = " "
 
 " ==============================================================================
+" LEADER KEY MAPPINGS
+" ==============================================================================
+" Save and quit with leader+wq
+nnoremap <leader>w :w<CR>
+nnoremap <leader>wq :wq<CR>
+
+" ==============================================================================
 " INSERT MODE NAVIGATION
 " ==============================================================================
 " Enable cursor movement in insert mode without leaving insert mode
