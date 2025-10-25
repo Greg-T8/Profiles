@@ -39,6 +39,10 @@ autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey -M vicmd 'v' edit-command-line
 
+# History navigation with Ctrl+P/N in insert mode
+bindkey -M viins '^P' up-line-or-history      # Ctrl+P: previous command
+bindkey -M viins '^N' down-line-or-history    # Ctrl+N: next command
+
 # ------------------------------------------------------------------------------
 # Cursor Shape Based on Vi Mode
 # ------------------------------------------------------------------------------
