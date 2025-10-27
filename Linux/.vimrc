@@ -29,6 +29,19 @@ inoremap <C-l> <Right>              " Ctrl+L: move cursor right
 inoremap <C-h> <Left>               " Ctrl+H: move cursor left
 
 " ==============================================================================
+" SELECT ALL KEYBINDINGS
+" ==============================================================================
+" Select all text with Ctrl+A
+nnoremap <C-a> ggVG                 " Normal mode: select all text
+inoremap <C-a> <Esc>ggVG            " Insert mode: select all text
+
+" ==============================================================================
+" VISUAL MODE KEYBINDINGS
+" ==============================================================================
+" Paste without yanking replaced text (matches Neovim behavior)
+xnoremap <leader>p "_dP
+
+" ==============================================================================
 " STARTUP BEHAVIOR
 " ==============================================================================
 " Start in insert mode automatically when vim launches
