@@ -127,7 +127,7 @@
           "id": "neovim4vkv167demaiqe71b",
           "isGitRepo": true,
           "name": "Neovim",
-          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/nvim"
+          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\Neovim"
         },
         {
           "color": "#529bc0",
@@ -333,21 +333,66 @@
   ],
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
-    ["#ACB78E", "Swamp Green"],
-    ["#516E3D", "Chalet Green"],
-    ["#0B1304", "Black Forest"],
-    ["#02A4D3", "Cerulean"],
-    ["#45B1E8", "Picton Blue"],
-    ["#A69279", "Donkey Brown"],
-    ["#FCD917", "Candlelight"],
-    ["#B7C3D0", "Heather"],
-    ["#FFEDBC", "Colonial White"],
-    ["#efbe00", "Corn"],
-    ["#E6F8F3", "Off Green"],
-    ["#796989", "Rum"],
-    ["#d8bd16", "Gold Tips"],
-    ["#706555", "Coffee"],
-    ["#384555", "Oxford Blue"]
+    [
+      "#8EABC1",
+      "Nepal"
+    ],
+    [
+      "#ACB78E",
+      "Swamp Green"
+    ],
+    [
+      "#516E3D",
+      "Chalet Green"
+    ],
+    [
+      "#0B1304",
+      "Black Forest"
+    ],
+    [
+      "#02A4D3",
+      "Cerulean"
+    ],
+    [
+      "#45B1E8",
+      "Picton Blue"
+    ],
+    [
+      "#A69279",
+      "Donkey Brown"
+    ],
+    [
+      "#FCD917",
+      "Candlelight"
+    ],
+    [
+      "#B7C3D0",
+      "Heather"
+    ],
+    [
+      "#FFEDBC",
+      "Colonial White"
+    ],
+    [
+      "#efbe00",
+      "Corn"
+    ],
+    [
+      "#E6F8F3",
+      "Off Green"
+    ],
+    [
+      "#796989",
+      "Rum"
+    ],
+    [
+      "#d8bd16",
+      "Gold Tips"
+    ],
+    [
+      "#706555",
+      "Coffee"
+    ]
   ],
   "dashboard.storeProjectsInSettings": true,
   "debug.inlineValues": "auto",
@@ -713,15 +758,15 @@
       "icon": "terminal-powershell",
       "source": "PowerShell"
     },
-    "PowerShell (No Profile)": {
-      "args": ["-NoLogo", "-NoProfile"],
-      "icon": "terminal-powershell",
-      "path": "C:/Program Files/PowerShell/7/pwsh.exe"
-    },
     "Ubuntu": {
       "args": ["-d", "Ubuntu", "--cd", "~"],
       "icon": "terminal-linux",
       "path": "wsl.exe"
+    },
+    "PowerShell (No Profile)": {
+      "args": ["-NoLogo", "-NoProfile"],
+      "icon": "terminal-powershell",
+      "path": "C:/Program Files/PowerShell/7/pwsh.exe"
     },
     "Windows PowerShell": {
       "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
