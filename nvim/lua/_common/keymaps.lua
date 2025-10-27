@@ -43,6 +43,13 @@ vim.keymap.set('n', '<C-b>', '<C-b>zz', { desc = 'Full page up and center', nore
 vim.keymap.set('n', 'G', 'G$', { desc = 'Go to end of last line', noremap = true, silent = true })
 
 -- ==============================================================================
+-- SELECT ALL
+-- ==============================================================================
+-- Select all text in the buffer
+vim.keymap.set("n", "<C-a>", "ggVG", { desc = "Select all text", noremap = true, silent = true })
+vim.keymap.set("i", "<C-a>", "<Esc>ggVG", { desc = "Select all text", noremap = true, silent = true })
+
+-- ==============================================================================
 -- VISUAL MODE ENHANCEMENTS
 -- ==============================================================================
 -- Stay in indent mode after indenting
@@ -57,12 +64,3 @@ vim.keymap.set("v", "<leader>p", '"_dP', { desc = "Paste without yanking replace
 -- ==============================================================================
 -- Note: Line movement (Alt+j/k) is handled by vim-move plugin
 -- See _common/plugins/vim-move.lua for configuration
-
--- ==============================================================================
--- INCREMENTAL TEXT SELECTION
--- ==============================================================================
--- Incremental text block selection is handled by treesitter
--- See _common/plugins/treesitter.lua for configuration
--- Keybindings:
---   <C-a> = Start/expand selection to next larger syntax node
---   <C-s> = Shrink selection to previous smaller syntax node
