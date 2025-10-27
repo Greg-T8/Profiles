@@ -15,7 +15,7 @@
 #>
 
 if ($PSVersionTable.PSEdition -eq 'Core') {
-    $PSStyle.Formatting.Verbose = $PSStyle.Foreground.Cyan
+		$PSStyle.Formatting.Verbose = $PSStyle.Foreground.Cyan
     $PSStyle.Formatting.Warning = $PSStyle.Foreground.Yellow
 }
 

@@ -50,10 +50,19 @@ vim.keymap.set("v", "<", "<gv", { desc = "Indent left and keep selection", norem
 vim.keymap.set("v", ">", ">gv", { desc = "Indent right and keep selection", noremap = true, silent = true })
 
 -- Paste without yanking replaced text
-vim.keymap.set("v", "p", '"_dP', { desc = "Paste without yanking replaced text", noremap = true, silent = true })
+vim.keymap.set("v", "<leader>p", '"_dP', { desc = "Paste without yanking replaced text", noremap = true, silent = true })
 
 -- ==============================================================================
 -- TEXT MOVEMENT
 -- ==============================================================================
 -- Note: Line movement (Alt+j/k) is handled by vim-move plugin
 -- See _common/plugins/vim-move.lua for configuration
+
+-- ==============================================================================
+-- INCREMENTAL TEXT SELECTION
+-- ==============================================================================
+-- Incremental text block selection is handled by treesitter
+-- See _common/plugins/treesitter.lua for configuration
+-- Keybindings:
+--   <C-a> = Start/expand selection to next larger syntax node
+--   <C-s> = Shrink selection to previous smaller syntax node
