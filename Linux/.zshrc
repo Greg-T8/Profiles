@@ -13,6 +13,40 @@ SAVEHIST=1000                          # Number of commands to save to file
 HISTFILE=~/.zsh_history               # History file location
 
 # ==============================================================================
+# HISTORY SUBSTRING SEARCH (PowerShell-like)
+# ==============================================================================
+# Type beginning of command, press Up/Down arrow to cycle through matches
+# Installation: git clone https://github.com/zsh-users/zsh-history-substring-search ~/.zsh/zsh-history-substring-search
+
+# Try to load zsh-history-substring-search from various locations
+if [ -f /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh ]; then
+    source /usr/share/zsh/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+elif [ -f ~/.zsh/zsh-history-substring-search/zsh-history-substring-search.zsh ]; then
+    source ~/.zsh/zsh-history-substring-search/zsh-history-substring-search.zsh
+elif [ -f ~/.oh-my-zsh/custom/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh ]; then
+    source ~/.oh-my-zsh/custom/plugins/zsh-history-substring-search/zsh-history-substring-search.zsh
+else
+    # Fallback to built-in history search (beginning of line only)
+    autoload -U history-search-end
+    zle -N history-beginning-search-backward-end history-search-end
+    zle -N history-beginning-search-forward-end history-search-end
+fi
+
+# Bind arrow keys for history search (works with both plugin and fallback)
+if (( $+functions[history-substring-search-up] )); then
+    # Plugin is loaded - use substring search (searches anywhere in command)
+    bindkey '^[[A' history-substring-search-up      # Up arrow
+    bindkey '^[[B' history-substring-search-down    # Down arrow
+else
+    # Use built-in search (only matches beginning of command)
+    bindkey '^[[A' history-beginning-search-backward-end  # Up arrow
+    bindkey '^[[B' history-beginning-search-forward-end   # Down arrow
+fi
+
+# Ctrl+R for reverse incremental search
+bindkey '^R' history-incremental-search-backward
+
+# ==============================================================================
 # BELL CONFIGURATION
 # ==============================================================================
 # Disable all notification bells (audible and visual)
@@ -29,6 +63,9 @@ bindkey -v
 
 # Reduce ESC key delay for faster mode switching (10ms instead of default 400ms)
 export KEYTIMEOUT=1
+
+# Disable bracketed paste to prevent last character capitalization issues
+unset zle_bracketed_paste
 
 # Set default editors for CLI tools (git, crontab, etc.)
 export EDITOR=vim

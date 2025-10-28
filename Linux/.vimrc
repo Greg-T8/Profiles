@@ -60,11 +60,18 @@ cnoreabbrev q q!
 " Syntax and Display
 " ------------------------------------------------------------------------------
 syntax on                           " Enable syntax highlighting
+colorscheme slate                   " Use slate color scheme
 set number                          " Show absolute line numbers
 set relativenumber                  " Show relative line numbers for easier motion
 set showmode                        " Display current mode (INSERT, VISUAL, etc.)
 set scrolloff=8                     " Keep 8 lines visible above/below cursor
 set showcmd                         " Show partial command in bottom right
+
+" ------------------------------------------------------------------------------
+" Line Wrapping
+" ------------------------------------------------------------------------------
+set nowrap                          " Don't wrap long lines
+set cpoptions+=n                    " Display line breaks in line number column
 
 " ------------------------------------------------------------------------------
 " Command-line Completion
