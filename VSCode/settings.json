@@ -802,7 +802,7 @@
     }
   },
   "vscode-neovim.ctrlKeysForInsertMode": ["d", "h", "j", "m", "o", "r", "t", "u", "w"],
-  "vscode-neovim.ctrlKeysForNormalMode": ["e", "h", "j", "m", "o", "r", "t", "w", "y"],
+  "vscode-neovim.ctrlKeysForNormalMode": ["e", "h", "j", "m", "o", "q", "r", "t", "w", "y"],
   "vscode-neovim.logOutputToConsole": true,
   "vscode-neovim.neovimClean": false,
   "vscode-neovim.neovimExecutablePaths.win32": "C:/Program Files/Neovim/bin/nvim.exe",
