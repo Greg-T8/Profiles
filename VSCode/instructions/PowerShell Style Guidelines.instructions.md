@@ -1,13 +1,93 @@
-# Providing a PowerShell one-liner with Proper Style
-
-- Break the PowerShell one-liner across multiple lines to improve readability.
-- Prioritize using pipeline (`|`) for line breaks.
-- Where the pipeline or comma aren't used, use the backtick (`) character for line continuation.
-
-
 # Generating a PowerShell Script with Proper Style
 
 Refactor the PowerShell script so that it adheres to the following style guidelines:
+
+## Formatting PowerShell Commands for Revision
+
+When providing a PowerShell command that is longer than one line, follow these guidelines to ensure proper style and readability:
+
+### Line Breaking Guidelines
+
+1. **Break long one-liners across multiple lines** to improve readability
+2. **Prioritize using the pipeline (`|`) for line breaks** - place each pipeline segment on its own line
+3. **Use the backtick (`` ` ``) character for line continuation** when breaking lines that don't naturally break at a pipeline or comma
+4. **Indent continuation lines** to show logical grouping and hierarchy
+5. **Expand aliases to full cmdlet names** for clarity (e.g., `Where-Object` instead of `?`, `Select-Object` instead of `select`)
+6. **Use consistent casing** - PascalCase for cmdlets and parameters
+
+### Formatting Examples
+
+#### Example 1: Pipeline with Hashtable
+
+**Before:**
+```powershell
+get-AzPolicyDefinition | ? displayname -match 'Configure virtual machines to be onboarded' | select displayname, @{n='Effect';e={$_.PolicyRule.then.effect}}
+```
+
+**After:**
+```powershell
+Get-AzPolicyDefinition |
+    Where-Object DisplayName -match 'Configure virtual machines to be onboarded' |
+    Select-Object DisplayName, @{
+        Name       = 'Effect'
+        Expression = { $_.PolicyRule.then.effect }
+    }
+```
+
+#### Example 2: Complex Hashtable
+
+**Before:**
+```powershell
+New-AzResourceGroupDeployment -ResourceGroupName "rg-prod" -TemplateFile .\template.json -TemplateParameterObject @{location='eastus';vmSize='Standard_D2s_v3';adminUsername='azureuser'}
+```
+
+**After:**
+```powershell
+New-AzResourceGroupDeployment `
+    -ResourceGroupName "rg-prod" `
+    -TemplateFile .\template.json `
+    -TemplateParameterObject @{
+        location      = 'eastus'
+        vmSize        = 'Standard_D2s_v3'
+        adminUsername = 'azureuser'
+    }
+```
+
+#### Example 3: Long Parameter List
+
+**Before:**
+```powershell
+New-AzVM -ResourceGroupName "myRG" -Name "myVM" -Location "eastus" -ImageName "Win2019Datacenter" -Size "Standard_D2s_v3" -Credential $cred -VirtualNetworkName "myVnet" -SubnetName "mySubnet"
+```
+
+**After:**
+```powershell
+New-AzVM `
+    -ResourceGroupName "myRG" `
+    -Name "myVM" `
+    -Location "eastus" `
+    -ImageName "Win2019Datacenter" `
+    -Size "Standard_D2s_v3" `
+    -Credential $cred `
+    -VirtualNetworkName "myVnet" `
+    -SubnetName "mySubnet"
+```
+
+### Key Improvements to Apply
+
+- **Expand common aliases:**
+  - `?` → `Where-Object`
+  - `select` → `Select-Object`
+  - `%` → `ForEach-Object`
+  - `ft` → `Format-Table`
+  - `fl` → `Format-List`
+
+- **Align hashtable properties** for visual clarity
+- **Use meaningful indentation** (typically 4 spaces)
+- **Keep related parameters together** when breaking lines
+- **Place opening braces on the same line** and closing braces on their own line
+
+
 
 ## General Program Structure
 
