@@ -13,4 +13,4 @@ vim.api.nvim_set_keymap('n', '<leader>vb', "<C-v>", { noremap = true, silent = t
 -- SEARCH HIGHLIGHTING
 -- ==============================================================================
 -- Clear search highlighting with leader+n
-vim.api.nvim_set_keymap('n', '<leader>n', ':nohlsearch<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader><space>', ':nohlsearch<CR>', { noremap = true, silent = true })
