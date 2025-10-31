@@ -1,6 +1,15 @@
+# Providing a PowerShell one-liner with Proper Style
+
+- Break the PowerShell one-liner across multiple lines to improve readability.
+- Prioritize using pipeline (`|`) for line breaks.
+- Where the pipeline or comma aren't used, use the backtick (`) character for line continuation.
+
+
+# Generating a PowerShell Script with Proper Style
+
 Refactor the PowerShell script so that it adheres to the following style guidelines:
 
-# General Program Structure
+## General Program Structure
 
 ```pwsh
 $Main = {
@@ -45,11 +54,11 @@ finally {
 }
 ```
 
-## Notes on general structure
+### Notes on general structure
 
 * The `$Main` block always comes first before the `$Helpers` block.
 
-# Other requirements
+## Other requirements
 
 * Use PowerShell-approved verbs in function names, namely verbs from this list: https://learn.microsoft.com/en-us/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands?view=powershell-7.5
 * In function names, keep the noun part singular (e.g., use `Get-Item` instead of `Get-Items`).
