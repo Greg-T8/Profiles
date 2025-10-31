@@ -16,6 +16,12 @@ case $- in
 esac
 
 # ==============================================================================
+# TERMINAL SETTINGS
+# ==============================================================================
+# Disable line wrapping for output (allows horizontal scrolling)
+tput rmam
+
+# ==============================================================================
 # VI MODE CONFIGURATION
 # ==============================================================================
 # Enable vi command line editing mode (uses ~/.inputrc vi settings)

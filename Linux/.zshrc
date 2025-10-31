@@ -22,6 +22,12 @@ unsetopt LIST_BEEP                    # Disable beep on ambiguous completion
 unsetopt HIST_BEEP                    # Disable beep on history errors
 
 # ==============================================================================
+# TERMINAL SETTINGS
+# ==============================================================================
+# Disable line wrapping for output (allows horizontal scrolling)
+tput rmam
+
+# ==============================================================================
 # VI MODE CONFIGURATION
 # ==============================================================================
 # Enable vi keybindings for command-line editing
