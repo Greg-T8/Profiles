@@ -15,7 +15,7 @@
 #>
 
 if ($PSVersionTable.PSEdition -eq 'Core') {
-		$PSStyle.Formatting.Verbose = $PSStyle.Foreground.Cyan
+    $PSStyle.Formatting.Verbose = $PSStyle.Foreground.Cyan
     $PSStyle.Formatting.Warning = $PSStyle.Foreground.Yellow
 }
 
@@ -51,7 +51,7 @@ if (Test-Path -Path $env:OneDriveCommercial/Code/PowerShell/WorkConfig.psd1) {
 
 # Aliases
 Set-Alias -Name ll -Value Get-ChildItem -Force
-Set-Alias -name cfj -Value ConvertFrom-Json
+Set-Alias -Name cfj -Value ConvertFrom-Json
 Set-Alias -Name tf -Value terraform
 Set-Alias -Name gim -Value Get-InstalledModule
 Remove-Item Alias:dir -ErrorAction SilentlyContinue
@@ -77,6 +77,16 @@ if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
         Set-PSReadLineKeyHandler -Chord Ctrl+k -Function KillLine -ViMode $mode
         Set-PSReadLineKeyHandler -Chord Ctrl+u -Function BackwardKillInput -ViMode $mode
         Set-PSReadLineKeyHandler -Chord Ctrl+w -Function BackwardKillWord -ViMode $mode
+
+        # Tab for traditional completion
+        Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
+
+        # Right Arrow to accept the current prediction
+        Set-PSReadLineKeyHandler -Key RightArrow -Function ForwardWord
+
+        # Ctrl+Right Arrow to accept the next word of the prediction
+        Set-PSReadLineKeyHandler -Key Ctrl+RightArrow -Function AcceptSuggestion
+
     }
     function OnViModeChange {
         if ($args[0] -eq 'Command') {
@@ -89,4 +99,7 @@ if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
         }
     }
     Set-PSReadLineOption -ViModeIndicator Script -ViModeChangeHandler $Function:OnViModeChange
+
+    # Set initial cursor to blinking line for Insert mode
+    Write-Host -NoNewline "`e[5 q"
 }

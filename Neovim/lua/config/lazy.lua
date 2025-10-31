@@ -78,7 +78,7 @@ require("lazy").setup({
     -- Plugin update checker
     checker = {
         enabled = true,         -- Check for plugin updates
-        notify  = true,        -- Show notification when updates are available
+        notify  = true,  		-- Show notification when updates are available
     },
 
     -- Environment-specific locations
