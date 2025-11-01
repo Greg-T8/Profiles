@@ -36,6 +36,7 @@ require("_common.keymaps")
 if vim.g.vscode then
     -- VSCode Neovim extension
     require("_vscode.options")
+    require("_vscode.keymaps")
 else
     -- Native Neovim
     require("_nvim.options")
