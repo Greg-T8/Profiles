@@ -131,20 +131,30 @@ end)
 -- ==============================================================================
 -- SEARCH NAVIGATION WITH CENTERING
 -- ==============================================================================
--- Center screen when searching for word under cursor
-vim.keymap.set('n', '*', function()
-  vim.cmd('normal! *zz')
+-- Search forward for word under cursor and center viewport
+vim.keymap.set("n", "*", function()
+  vim.cmd(":norm! *")                          -- Execute normal mode '*' command (search forward)
+  local curline = vim.fn.line(".")             -- Get current line number
+  vscode.call("revealLine", { args = {lineNumber = curline, at = "center"} })  -- Center viewport on current line
 end, { noremap = true, silent = true })
 
-vim.keymap.set('n', '#', function()
-  vim.cmd('normal! #zz')
+-- Search backward for word under cursor and center viewport
+vim.keymap.set("n", "#", function()
+  vim.cmd(":norm! #")                          -- Execute normal mode '#' command (search backward)
+  local curline = vim.fn.line(".")             -- Get current line number
+  vscode.call("revealLine", { args = {lineNumber = curline, at = "center"} })  -- Center viewport on current line
 end, { noremap = true, silent = true })
 
--- Center screen when navigating search results
-vim.keymap.set('n', 'n', function()
-  vim.cmd('normal! nzz')
+-- Jump to next search match and center viewport
+vim.keymap.set("n", "n", function()
+	vim.cmd(":norm! n")                          -- Execute normal mode 'n' command (next match)
+	local curline = vim.fn.line(".")             -- Get current line number
+	vscode.call("revealLine", { args = {lineNumber = curline, at = "center"} })  -- Center viewport on current line
 end, { noremap = true, silent = true })
 
-vim.keymap.set('n', 'N', function()
-  vim.cmd('normal! Nzz')
+-- Jump to previous search match and center viewport
+vim.keymap.set("n", "N", function()
+	vim.cmd(":norm! N")                          -- Execute normal mode 'N' command (previous match)
+	local curline = vim.fn.line(".")             -- Get current line number
+	vscode.call("revealLine", { args = {lineNumber = curline, at = "center"} })  -- Center viewport on current line
 end, { noremap = true, silent = true })
