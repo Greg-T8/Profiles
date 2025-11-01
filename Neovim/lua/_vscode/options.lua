@@ -122,6 +122,8 @@ vim.keymap.set('n', '<leader>i', '<C-a>', { desc = "Increment number", noremap =
 vim.keymap.set('n', '<leader>d', '<C-x>', { desc = "Decrement number", noremap = true, silent = true })
 vim.keymap.set('v', '<leader>i', '<C-a>', { desc = "Increment numbers in selection", noremap = true, silent = true })
 vim.keymap.set('v', '<leader>d', '<C-x>', { desc = "Decrement numbers in selection", noremap = true, silent = true })
+vim.keymap.set('v', 'g<leader>i', 'g<C-a>', { desc = "Increment numbers sequentially", noremap = true, silent = true })
+vim.keymap.set('v', 'g<leader>d', 'g<C-x>', { desc = "Decrement numbers sequentially", noremap = true, silent = true })
 
 -- ==============================================================================
 -- MULTI-CURSOR
