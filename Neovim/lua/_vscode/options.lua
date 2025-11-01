@@ -118,10 +118,10 @@ vim.keymap.set({'n', 'x'}, '<C-u>', function() vim.cmd('normal! ' .. half() .. '
 -- ==============================================================================
 -- Restore Vim's increment/decrement functionality since Ctrl+A and Ctrl+X are
 -- taken by VSCode for select all and cut
-vim.keymap.set('n', '<leader><C-a>', '<C-a>', { desc = "Increment number", noremap = true, silent = true })
-vim.keymap.set('n', '<leader><C-x>', '<C-x>', { desc = "Decrement number", noremap = true, silent = true })
-vim.keymap.set('v', '<leader><C-a>', '<C-a>', { desc = "Increment numbers in selection", noremap = true, silent = true })
-vim.keymap.set('v', '<leader><C-x>', '<C-x>', { desc = "Decrement numbers in selection", noremap = true, silent = true })
+vim.keymap.set('n', '<leader>i', '<C-a>', { desc = "Increment number", noremap = true, silent = true })
+vim.keymap.set('n', '<leader>d', '<C-x>', { desc = "Decrement number", noremap = true, silent = true })
+vim.keymap.set('v', '<leader>i', '<C-a>', { desc = "Increment numbers in selection", noremap = true, silent = true })
+vim.keymap.set('v', '<leader>d', '<C-x>', { desc = "Decrement numbers in selection", noremap = true, silent = true })
 
 -- ==============================================================================
 -- MULTI-CURSOR

@@ -1,6 +1,6 @@
 {
   "lazy.nvim": { "branch": "main", "commit": "f0f5bbb9e5bfae5e6468f9359ffea3d151418176" },
-  "leap.nvim": { "branch": "main", "commit": "44e3a60a7a62069e5c9445b7a8104612d4f060cb" },
+  "leap.nvim": { "branch": "main", "commit": "673517c316a0808a2f6948ed863e18c6cc03da21" },
   "multicursor.nvim": { "branch": "1.0", "commit": "0c6ceae228bf209e8b8717df9de500770c4e7022" },
   "nvim-surround": { "branch": "main", "commit": "fcfa7e02323d57bfacc3a141f8a74498e1522064" },
   "vim-move": { "branch": "master", "commit": "7fd34e479bba197451b800dca5c6fc5baba37bdb" },
