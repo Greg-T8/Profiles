@@ -114,6 +114,16 @@ vim.keymap.set({'n', 'x'}, '<C-d>', function() vim.cmd('normal! ' .. half() .. '
 vim.keymap.set({'n', 'x'}, '<C-u>', function() vim.cmd('normal! ' .. half() .. 'kzz') end)
 
 -- ==============================================================================
+-- NUMBER INCREMENT/DECREMENT
+-- ==============================================================================
+-- Restore Vim's increment/decrement functionality since Ctrl+A and Ctrl+X are
+-- taken by VSCode for select all and cut
+vim.keymap.set('n', '<leader><C-a>', '<C-a>', { desc = "Increment number", noremap = true, silent = true })
+vim.keymap.set('n', '<leader><C-x>', '<C-x>', { desc = "Decrement number", noremap = true, silent = true })
+vim.keymap.set('v', '<leader><C-a>', '<C-a>', { desc = "Increment numbers in selection", noremap = true, silent = true })
+vim.keymap.set('v', '<leader><C-x>', '<C-x>', { desc = "Decrement numbers in selection", noremap = true, silent = true })
+
+-- ==============================================================================
 -- MULTI-CURSOR
 -- ==============================================================================
 -- Select all highlights under cursor for multi-cursor editing
