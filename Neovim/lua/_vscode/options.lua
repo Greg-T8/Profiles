@@ -132,3 +132,24 @@ vim.keymap.set('v', 'g<leader>d', 'g<C-x>', { desc = "Decrement numbers sequenti
 vim.keymap.set({ "n", "x", "i" }, "<C-S-l>", function()
   require("vscode-multi-cursor").selectHighlights()
 end)
+
+-- ==============================================================================
+-- SEARCH NAVIGATION WITH CENTERING
+-- ==============================================================================
+-- Center screen when searching for word under cursor
+vim.keymap.set('n', '*', function()
+  vim.cmd('normal! *zz')
+end, { noremap = true, silent = true })
+
+vim.keymap.set('n', '#', function()
+  vim.cmd('normal! #zz')
+end, { noremap = true, silent = true })
+
+-- Center screen when navigating search results
+vim.keymap.set('n', 'n', function()
+  vim.cmd('normal! nzz')
+end, { noremap = true, silent = true })
+
+vim.keymap.set('n', 'N', function()
+  vim.cmd('normal! Nzz')
+end, { noremap = true, silent = true })

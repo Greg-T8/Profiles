@@ -67,3 +67,14 @@ vim.keymap.set("x", "<A-k>", ":move '<-2<CR>gv-gv", { desc = "Move visual block 
 vim.keymap.set('n', '<C-v>', '"+p', { desc = "Paste from system clipboard", noremap = true, silent = true })
 vim.keymap.set('i', '<C-v>', '<C-r>+', { desc = "Paste from system clipboard in insert mode", noremap = true, silent = true })
 vim.keymap.set('c', '<C-v>', '<C-r>+', { desc = "Paste from system clipboard in command mode", noremap = true, silent = true })
+
+-- ==============================================================================
+-- SEARCH NAVIGATION WITH CENTERING
+-- ==============================================================================
+-- Center screen when searching for word under cursor
+vim.keymap.set('n', '*', '*zz', { desc = 'Search word under cursor (forward) and center', noremap = true, silent = true })
+vim.keymap.set('n', '#', '#zz', { desc = 'Search word under cursor (backward) and center', noremap = true, silent = true })
+
+-- Center screen when navigating search results
+vim.keymap.set('n', 'n', 'nzz', { desc = 'Next search result and center', noremap = true, silent = true })
+vim.keymap.set('n', 'N', 'Nzz', { desc = 'Previous search result and center', noremap = true, silent = true })
