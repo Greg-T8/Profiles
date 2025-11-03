@@ -648,5 +648,14 @@
     "key": "ctrl+shift+k",
     "command": "workbench.action.terminal.split",
     "when": "terminalFocus && terminalProcessSupported || terminalFocus && terminalWebExtensionContributedProfile"
-  }
+  },
+  {
+    "key": "f1",
+    "command": "-workbench.action.showCommands",
+  },
+  {
+    "key": "f1",
+    "command": "workbench.action.showCommands",
+    "when": "!terminalFocus"
+  },
 ]
