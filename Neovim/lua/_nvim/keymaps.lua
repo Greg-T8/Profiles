@@ -63,8 +63,11 @@ vim.keymap.set("x", "<A-k>", ":move '<-2<CR>gv-gv", { desc = "Move visual block 
 -- ==============================================================================
 -- CLIPBOARD INTEGRATION
 -- ==============================================================================
--- Copy to system clipboard in normal mode
+-- Copy current line to system clipboard in normal mode
 vim.keymap.set('n', '<C-c>', '"+yy', { desc = "Copy line to system clipboard", noremap = true, silent = true })
+
+-- Copy selection to system clipboard in visual mode
+vim.keymap.set('v', '<C-c>', '"+y', { desc = "Copy selection to system clipboard", noremap = true, silent = true })
 
 -- Make Ctrl+V paste from system clipboard instead of visual block mode
 vim.keymap.set('n', '<C-v>', '"+p', { desc = "Paste from system clipboard", noremap = true, silent = true })
