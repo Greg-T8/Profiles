@@ -422,7 +422,7 @@
     "asvetliakov.vscode-neovim": 1,
     "vscodevim.vim": 1
   },
-  "files.autoSave": "afterDelay",
+  "files.autoSave": "off",
   "files.autoSaveDelay": 10000,
   "files.hotExit": "onExitAndWindowClose",
   "files.trimFinalNewlines": true,
