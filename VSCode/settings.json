@@ -967,13 +967,9 @@
     "workbench.productIconTheme",
     "workbench.startupEditor",
     "workbench.settings.editor",
-    "workbench.view.showQuietly"
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-  // "workbench.view.showQuietly": {
-  //   "workbench.panel.output": true
-  // },
   "workbench.tips.enabled": true
 }

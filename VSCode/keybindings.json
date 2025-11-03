@@ -264,10 +264,6 @@
     "when": "accessibilityHelpIsShown && accessibleViewHasAssignedKeybindings"
   },
   {
-    "key": "shift+alt+c",
-    "command": "workbench.action.terminal.toggleTerminal"
-  },
-  {
     "key": "shift+alt+e",
     "command": "workbench.action.toggleSidebarVisibility"
   },
@@ -643,5 +639,9 @@
     "command": "vscode-neovim.send",
     "args": "<M-l>",
     "when": "editorTextFocus && neovim.init && neovim.mode == 'visual' && editorLangId not in 'neovim.editorLangIdExclusions'"
+  },
+  {
+    "key": "shift+alt+c",
+    "command": "workbench.action.togglePanel"
   }
 ]
