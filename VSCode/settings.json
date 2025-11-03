@@ -9,6 +9,10 @@
   "[csharp]": {
     "editor.defaultFormatter": "ms-dotnettools.csharp"
   },
+  "[dts]": {
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "legale.dts-formatter"
+  },
   "[fsharp]": {
     "editor.defaultFormatter": "Ionide.Ionide-fsharp"
   },
@@ -107,8 +111,10 @@
     "C:/Users/gregt/AppData/Roaming/Code/User/prompts": true
   },
   "chat.tools.terminal.autoApprove": {
-    "git ls-tree": true
-},
+    "git ls-tree": true,
+    "git fetch": true,
+    "git checkout": true
+  },
   "dashboard.displayProjectPath": true,
   "dashboard.openOnStartup": "empty workspace",
   "dashboard.projectData": [
@@ -334,66 +340,21 @@
   ],
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
-    [
-      "#8EABC1",
-      "Nepal"
-    ],
-    [
-      "#ACB78E",
-      "Swamp Green"
-    ],
-    [
-      "#516E3D",
-      "Chalet Green"
-    ],
-    [
-      "#0B1304",
-      "Black Forest"
-    ],
-    [
-      "#02A4D3",
-      "Cerulean"
-    ],
-    [
-      "#45B1E8",
-      "Picton Blue"
-    ],
-    [
-      "#A69279",
-      "Donkey Brown"
-    ],
-    [
-      "#FCD917",
-      "Candlelight"
-    ],
-    [
-      "#B7C3D0",
-      "Heather"
-    ],
-    [
-      "#FFEDBC",
-      "Colonial White"
-    ],
-    [
-      "#efbe00",
-      "Corn"
-    ],
-    [
-      "#E6F8F3",
-      "Off Green"
-    ],
-    [
-      "#796989",
-      "Rum"
-    ],
-    [
-      "#d8bd16",
-      "Gold Tips"
-    ],
-    [
-      "#706555",
-      "Coffee"
-    ]
+    ["#8EABC1", "Nepal"],
+    ["#ACB78E", "Swamp Green"],
+    ["#516E3D", "Chalet Green"],
+    ["#0B1304", "Black Forest"],
+    ["#02A4D3", "Cerulean"],
+    ["#45B1E8", "Picton Blue"],
+    ["#A69279", "Donkey Brown"],
+    ["#FCD917", "Candlelight"],
+    ["#B7C3D0", "Heather"],
+    ["#FFEDBC", "Colonial White"],
+    ["#efbe00", "Corn"],
+    ["#E6F8F3", "Off Green"],
+    ["#796989", "Rum"],
+    ["#d8bd16", "Gold Tips"],
+    ["#706555", "Coffee"]
   ],
   "dashboard.storeProjectsInSettings": true,
   "debug.inlineValues": "auto",
@@ -493,7 +454,7 @@
     "python": true,
     "scminput": false
   },
-  "github.copilot.nextEditSuggestions.enabled": true,
+  "github.copilot.nextEditSuggestions.enabled": false,
   "github.copilot.renameSuggestions.triggerAutomatically": true,
   "github.copilot.selectedCompletionModel": "",
   "hediet.vscode-drawio.appearance": "automatic",
@@ -1005,10 +966,14 @@
     "workbench.panel.defaultLocation",
     "workbench.productIconTheme",
     "workbench.startupEditor",
-    "workbench.settings.editor"
+    "workbench.settings.editor",
+    "workbench.view.showQuietly"
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
+  // "workbench.view.showQuietly": {
+  //   "workbench.panel.output": true
+  // },
   "workbench.tips.enabled": true
 }
