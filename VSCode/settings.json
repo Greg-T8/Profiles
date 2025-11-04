@@ -10,8 +10,8 @@
     "editor.defaultFormatter": "ms-dotnettools.csharp"
   },
   "[dts]": {
-    "editor.insertSpaces": true,
-    "editor.defaultFormatter": "legale.dts-formatter"
+    "editor.defaultFormatter": "legale.dts-formatter",
+    "editor.insertSpaces": true
   },
   "[fsharp]": {
     "editor.defaultFormatter": "Ionide.Ionide-fsharp"
@@ -29,7 +29,9 @@
   "[json]": {
     "editor.autoIndent": "advanced",
     "editor.insertSpaces": true,
-    "editor.rulers": [110],
+    "editor.rulers": [
+      110
+    ],
     "editor.tabSize": 2
   },
   "[jsonc]": {
@@ -49,7 +51,9 @@
     "editor.formatOnPaste": true,
     "editor.formatOnSave": true,
     "editor.insertSpaces": true,
-    "editor.rulers": [80],
+    "editor.rulers": [
+      80
+    ],
     "editor.tabSize": 2,
     "editor.wordWrap": "wordWrapColumn",
     "editor.wordWrapColumn": 80,
@@ -69,7 +73,9 @@
   },
   "[powershell]": {
     "editor.defaultFormatter": "ms-vscode.powershell",
-    "editor.rulers": [115],
+    "editor.rulers": [
+      115
+    ],
     "editor.tabSize": 4,
     "rewrap.wrappingColumn": 115
   },
@@ -89,7 +95,9 @@
     "diffEditor.ignoreTrimWhitespace": false,
     "editor.autoIndent": "advanced",
     "editor.insertSpaces": true,
-    "editor.rulers": [115],
+    "editor.rulers": [
+      115
+    ],
     "editor.tabSize": 2
   },
   "betterAlign.alignAfterTypeEnter": false,
@@ -111,9 +119,9 @@
     "C:/Users/gregt/AppData/Roaming/Code/User/prompts": true
   },
   "chat.tools.terminal.autoApprove": {
-    "git ls-tree": true,
+    "git checkout": true,
     "git fetch": true,
-    "git checkout": true
+    "git ls-tree": true
   },
   "dashboard.displayProjectPath": true,
   "dashboard.openOnStartup": "empty workspace",
@@ -177,6 +185,13 @@
           "isGitRepo": true,
           "name": "draw.io",
           "path": "c:/Users/gregt/OneDrive/Apps/Profiles/draw.io"
+        },
+        {
+          "color": "#C1BAB0",
+          "id": "linux74t6w9m8lmhkdene8",
+          "isGitRepo": true,
+          "name": "Linux",
+          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\Linux"
         }
       ]
     },
@@ -340,21 +355,66 @@
   ],
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
-    ["#8EABC1", "Nepal"],
-    ["#ACB78E", "Swamp Green"],
-    ["#516E3D", "Chalet Green"],
-    ["#0B1304", "Black Forest"],
-    ["#02A4D3", "Cerulean"],
-    ["#45B1E8", "Picton Blue"],
-    ["#A69279", "Donkey Brown"],
-    ["#FCD917", "Candlelight"],
-    ["#B7C3D0", "Heather"],
-    ["#FFEDBC", "Colonial White"],
-    ["#efbe00", "Corn"],
-    ["#E6F8F3", "Off Green"],
-    ["#796989", "Rum"],
-    ["#d8bd16", "Gold Tips"],
-    ["#706555", "Coffee"]
+    [
+      "#C1BAB0",
+      "Tea"
+    ],
+    [
+      "#8EABC1",
+      "Nepal"
+    ],
+    [
+      "#ACB78E",
+      "Swamp Green"
+    ],
+    [
+      "#516E3D",
+      "Chalet Green"
+    ],
+    [
+      "#0B1304",
+      "Black Forest"
+    ],
+    [
+      "#02A4D3",
+      "Cerulean"
+    ],
+    [
+      "#45B1E8",
+      "Picton Blue"
+    ],
+    [
+      "#A69279",
+      "Donkey Brown"
+    ],
+    [
+      "#FCD917",
+      "Candlelight"
+    ],
+    [
+      "#B7C3D0",
+      "Heather"
+    ],
+    [
+      "#FFEDBC",
+      "Colonial White"
+    ],
+    [
+      "#efbe00",
+      "Corn"
+    ],
+    [
+      "#E6F8F3",
+      "Off Green"
+    ],
+    [
+      "#796989",
+      "Rum"
+    ],
+    [
+      "#d8bd16",
+      "Gold Tips"
+    ]
   ],
   "dashboard.storeProjectsInSettings": true,
   "debug.inlineValues": "auto",
@@ -454,7 +514,7 @@
     "python": true,
     "scminput": false
   },
-  "github.copilot.nextEditSuggestions.enabled": false,
+  "github.copilot.nextEditSuggestions.enabled": true,
   "github.copilot.renameSuggestions.triggerAutomatically": true,
   "github.copilot.selectedCompletionModel": "",
   "hediet.vscode-drawio.appearance": "automatic",
@@ -605,7 +665,9 @@
   "markdown.extension.tableFormatter.normalizeIndentation": true,
   "markdown.extension.toc.levels": "2..5",
   "markdown.extension.toc.omittedFromToc": {
-    "notes.md": ["## Contents"]
+    "notes.md": [
+      "## Contents"
+    ]
   },
   "markdown.extension.toc.orderedList": false,
   "markdown.extension.toc.unorderedList.marker": "*",
@@ -638,7 +700,9 @@
     "**/exe": true,
     "**/obj": true
   },
-  "security.allowedUNCHosts": ["wsl.localhost"],
+  "security.allowedUNCHosts": [
+    "wsl.localhost"
+  ],
   "security.workspace.trust.untrustedFiles": "open",
   "settings.cycle": [
     {
@@ -720,15 +784,23 @@
       "icon": "terminal-powershell",
       "source": "PowerShell"
     },
-    "Ubuntu": {
-      "args": ["-d", "Ubuntu", "--cd", "~"],
-      "icon": "terminal-linux",
-      "path": "wsl.exe"
-    },
     "PowerShell (No Profile)": {
-      "args": ["-NoLogo", "-NoProfile"],
+      "args": [
+        "-NoLogo",
+        "-NoProfile"
+      ],
       "icon": "terminal-powershell",
       "path": "C:/Program Files/PowerShell/7/pwsh.exe"
+    },
+    "Ubuntu": {
+      "args": [
+        "-d",
+        "Ubuntu",
+        "--cd",
+        "~"
+      ],
+      "icon": "terminal-linux",
+      "path": "wsl.exe"
     },
     "Windows PowerShell": {
       "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
@@ -737,6 +809,7 @@
   "terminal.integrated.shellIntegration.decorationsEnabled": "overviewRuler",
   "terminal.integrated.shellIntegration.enabled": true,
   "terminal.integrated.shellIntegration.showCommandGuide": true,
+  "terminal.integrated.splitCwd": "initial",
   "terminal.integrated.stickyScroll.enabled": false,
   "terminal.integrated.suggest.enabled": true,
   "terminal.integrated.suggest.inlineSuggestion": "alwaysOnTopExceptExactMatch",
@@ -763,8 +836,29 @@
       "command": "vscode-neovim.lua"
     }
   },
-  "vscode-neovim.ctrlKeysForInsertMode": ["d", "h", "j", "m", "o", "r", "t", "u", "w"],
-  "vscode-neovim.ctrlKeysForNormalMode": ["e", "h", "j", "m", "o", "q", "r", "t", "w", "y"],
+  "vscode-neovim.ctrlKeysForInsertMode": [
+    "d",
+    "h",
+    "j",
+    "m",
+    "o",
+    "r",
+    "t",
+    "u",
+    "w"
+  ],
+  "vscode-neovim.ctrlKeysForNormalMode": [
+    "e",
+    "h",
+    "j",
+    "m",
+    "o",
+    "q",
+    "r",
+    "t",
+    "w",
+    "y"
+  ],
   "vscode-neovim.logOutputToConsole": false,
   "vscode-neovim.neovimClean": false,
   "vscode-neovim.neovimExecutablePaths.win32": "C:/Program Files/Neovim/bin/nvim.exe",
@@ -941,6 +1035,7 @@
     "terminal.integrated.shellIntegration.enabled",
     "terminal.integrated.shellIntegration.showCommandGuide",
     "terminal.integrated.stickyScroll.enabled",
+    "terminal.integrated.splitCwd",
     "terminal.integrated.suggest.enabled",
     "terminal.integrated.suggest.inlineSuggestion",
     "terminal.integrated.suggest.quickSuggestions",
@@ -966,7 +1061,7 @@
     "workbench.panel.defaultLocation",
     "workbench.productIconTheme",
     "workbench.startupEditor",
-    "workbench.settings.editor",
+    "workbench.settings.editor"
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
