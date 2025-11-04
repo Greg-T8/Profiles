@@ -14,6 +14,8 @@
     - https://devblogs.microsoft.com/powershell/optimizing-your-profile/
 #>
 
+$ErrorActionPreference = 'Stop'
+
 if ($PSVersionTable.PSEdition -eq 'Core') {
     $PSStyle.Formatting.Verbose = $PSStyle.Foreground.Cyan
     $PSStyle.Formatting.Warning = $PSStyle.Foreground.Yellow
