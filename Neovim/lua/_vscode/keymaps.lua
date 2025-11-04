@@ -131,6 +131,16 @@ end)
 -- ==============================================================================
 -- SEARCH NAVIGATION WITH CENTERING
 -- ==============================================================================
+-- Center screen after completing a search with / or ?
+vim.keymap.set('c', '<CR>', function()
+  -- Check if we're in a search command (/ or ?)
+  local cmdtype = vim.fn.getcmdtype()
+  if cmdtype == '/' or cmdtype == '?' then
+    return '<CR><Cmd>lua vim.defer_fn(function() require("vscode").call("revealLine", { args = {lineNumber = vim.fn.line("."), at = "center"} }) end, 10)<CR>'
+  end
+  return '<CR>'
+end, { expr = true, desc = 'Execute command and center if search' })
+
 -- Search forward for word under cursor and center viewport
 vim.keymap.set("n", "*", function()
   vim.cmd(":norm! *")                          -- Execute normal mode '*' command (search forward)

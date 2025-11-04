@@ -77,6 +77,16 @@ vim.keymap.set('c', '<C-v>', '<C-r>+', { desc = "Paste from system clipboard in 
 -- ==============================================================================
 -- SEARCH NAVIGATION WITH CENTERING
 -- ==============================================================================
+-- Center screen after completing a search with / or ?
+vim.keymap.set('c', '<CR>', function()
+  -- Check if we're in a search command (/ or ?)
+  local cmdtype = vim.fn.getcmdtype()
+  if cmdtype == '/' or cmdtype == '?' then
+    return '<CR>zz'
+  end
+  return '<CR>'
+end, { expr = true, desc = 'Execute command and center if search' })
+
 -- Center screen when searching for word under cursor
 vim.keymap.set('n', '*', '*zz', { desc = 'Search word under cursor (forward) and center', noremap = true, silent = true })
 vim.keymap.set('n', '#', '#zz', { desc = 'Search word under cursor (backward) and center', noremap = true, silent = true })
