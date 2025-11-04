@@ -57,9 +57,16 @@ autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey -M vicmd 'v' edit-command-line
 
+# ------------------------------------------------------------------------------
+# Key Bindings
+# ------------------------------------------------------------------------------
 # History navigation with Ctrl+P/N in insert mode
 bindkey -M viins '^P' up-line-or-history      # Ctrl+P: previous command
 bindkey -M viins '^N' down-line-or-history    # Ctrl+N: next command
+
+# History search with Ctrl+R (fallback if fzf is not installed)
+bindkey -M viins '^R' history-incremental-search-backward
+bindkey -M vicmd '^R' history-incremental-search-backward
 
 # ------------------------------------------------------------------------------
 # Cursor Shape Based on Vi Mode
@@ -127,9 +134,27 @@ alias cls='clear'                     # Windows-style clear command
 # ==============================================================================
 # PLUGINS
 # ==============================================================================
-# Load zsh-autosuggestions if installed
+# ------------------------------------------------------------------------------
+# FZF - Fuzzy Finder (PowerShell-like list view for history)
+# ------------------------------------------------------------------------------
+# Provides interactive list view for command history (replaces Ctrl+R)
+# Installation: sudo apt install fzf
+# Features:
+#   Ctrl+R - History search with list view
+#   Ctrl+T - File finder
+#   Alt+C  - Directory changer
+if [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]; then
+    source /usr/share/doc/fzf/examples/key-bindings.zsh
+elif [ -f ~/.fzf/shell/key-bindings.zsh ]; then
+    source ~/.fzf/shell/key-bindings.zsh
+fi
+
+# ------------------------------------------------------------------------------
+# Zsh Autosuggestions (PowerShell-like inline predictions)
+# ------------------------------------------------------------------------------
 # Provides fish-like autosuggestions based on command history
 # Installation: git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosuggestions
+# Usage: Press → (right arrow) to accept suggestion
 if [[ -f ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh ]]; then
     source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 fi

@@ -155,6 +155,39 @@ install_zsh() {
     fi
 }
 
+# Install and configure FZF
+install_fzf() {
+    section "Installing and Configuring FZF"
+
+    # Check if fzf is already installed
+    if command -v fzf &> /dev/null; then
+        warning "FZF is already installed"
+        fzf --version
+        return 0
+    fi
+
+    # Install fzf via apt
+    info "Installing FZF..."
+    sudo apt update
+    sudo apt install fzf -y
+
+    # Verify installation
+    if command -v fzf &> /dev/null; then
+        success "FZF installed successfully"
+        fzf --version
+    else
+        error "Failed to install FZF"
+        return 1
+    fi
+
+    # Verify key bindings file exists
+    if [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]; then
+        success "FZF key bindings available for ZSH"
+    else
+        warning "FZF key bindings file not found at expected location"
+    fi
+}
+
 # Install and configure tmux
 install_tmux() {
     section "Installing and Configuring tmux"
@@ -226,6 +259,8 @@ show_summary() {
     echo "  - Vi mode enabled in bash, zsh, and vim"
     echo "  - Custom prompts with git integration (zsh)"
     echo "  - tmux with custom keybindings (prefix: backtick)"
+    echo "  - FZF for PowerShell-like history list view"
+    echo "  - zsh-autosuggestions for inline predictions"
     echo "  - All configuration files linked to Windows profile"
     echo ""
     info "Quick reference:"
@@ -234,6 +269,12 @@ show_summary() {
     echo "  tmux split vertical: \` + -"
     echo "  tmux reload config: \` + r"
     echo "  View all tmux bindings: \` + ?"
+    echo ""
+    info "ZSH/FZF shortcuts:"
+    echo "  Ctrl+R - Search command history (list view)"
+    echo "  Ctrl+T - Search and insert files"
+    echo "  Alt+C  - Change directory interactively"
+    echo "  → (right arrow) - Accept inline suggestion"
     echo ""
 }
 
@@ -263,6 +304,7 @@ main() {
     create_symlinks
     install_additional_tools
     install_zsh
+    install_fzf
     install_tmux
 
     # Display completion message
