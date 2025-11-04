@@ -1,4 +1,3 @@
-````instructions
 # Generating Shell Scripts with Proper Style (Linux/POSIX)
 
 Refactor the shell script so that it adheres to the following style guidelines:
@@ -207,7 +206,7 @@ main "$@"
 
 ### Notes on General Structure
 
-* The `main()` function should be defined early and called at the end
+* The `main()` function should be defined early (place it near the top) and called at the end
 * Use `set -euo pipefail` for safer script execution
 * Define constants with `readonly` at the top
 * Use lowercase with underscores for function names (following POSIX convention)
