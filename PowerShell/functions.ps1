@@ -469,3 +469,198 @@ function Measure-ProfileLoad {
         ProfileTimes    = $profileTimes  | ForEach-Object { [math]::Round($_, 2) }
     }
 }
+
+function Install-WSLDistribution {
+    <#
+    .SYNOPSIS
+        Installs a WSL distribution to a custom location.
+
+    .DESCRIPTION
+        Installs a WSL distribution using web-download, then exports and re-imports
+        it to a custom location under D:\WSL\<name>. This allows you to store WSL
+        distributions on a non-system drive and use custom names.
+
+    .PARAMETER Distribution
+        The distribution to install (e.g., Ubuntu, Debian, kali-linux).
+        If not provided, you will be prompted to enter it.
+
+    .PARAMETER Name
+        The custom name for the distribution (no spaces allowed).
+        If not provided, you will be prompted to enter it.
+
+    .PARAMETER BasePath
+        The base path where WSL distributions will be stored.
+        Defaults to D:\WSL.
+
+    .EXAMPLE
+        Install-WSLDistribution -Distribution Ubuntu -Name MyUbuntu
+
+    .EXAMPLE
+        Install-WSLDistribution
+        # Prompts for distribution and name
+
+    .NOTES
+        Requires WSL to be enabled and administrative privileges may be required
+        for the initial installation.
+    #>
+    [CmdletBinding()]
+    param(
+        [string]$Distribution,
+        [string]$Name,
+        [string]$BasePath = 'D:\WSL'
+    )
+
+    # Prompt for distribution if not provided
+    if (-not $Distribution) {
+        $Distribution = Read-Host 'Enter the WSL distribution to install (e.g., Ubuntu, Debian, kali-linux)'
+    }
+
+    # Prompt for custom name if not provided
+    if (-not $Name) {
+        $Name = Read-Host 'Enter a custom name for the distribution (no spaces)'
+    }
+
+    # Validate name has no spaces
+    if ($Name -match '\s') {
+        Write-Error 'Distribution name cannot contain spaces. Please use a name without spaces.'
+        return
+    }
+
+    # Validate distribution name is not empty
+    if ([string]::IsNullOrWhiteSpace($Distribution)) {
+        Write-Error 'Distribution name cannot be empty.'
+        return
+    }
+
+    # Validate custom name is not empty
+    if ([string]::IsNullOrWhiteSpace($Name)) {
+        Write-Error 'Custom name cannot be empty.'
+        return
+    }
+
+    # Check if the target distribution name already exists
+    $existingDistros = wsl --list --quiet
+    if ($existingDistros -contains $Name) {
+        Write-Error "A distribution named '$Name' already exists. Please choose a different name."
+        return
+    }
+
+    # Create target directory
+    $targetPath = Join-Path $BasePath $Name
+    if (-not (Test-Path $targetPath)) {
+        Write-Host "Creating directory: $targetPath" -ForegroundColor Cyan
+        New-Item -ItemType Directory -Path $targetPath -Force | Out-Null
+    }
+
+    # Use a unique temporary name to avoid conflicts
+    $tempName = "TEMP_$Distribution_$(Get-Date -Format 'yyyyMMddHHmmss')"
+
+    # Install the distribution with web-download using temporary name
+    Write-Host "`nInstalling $Distribution as temporary distribution '$tempName'..." -ForegroundColor Cyan
+    try {
+        wsl --install -d $Distribution --web-download --name $tempName --no-launch
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to install $Distribution. Exit code: $LASTEXITCODE"
+            return
+        }
+    }
+    catch {
+        Write-Error "Failed to install $Distribution`: $_"
+        return
+    }
+
+    # Wait for installation to complete
+    Write-Host 'Waiting for installation to complete...' -ForegroundColor Yellow
+    Start-Sleep -Seconds 5
+
+    # Export the distribution
+    $tarPath = Join-Path $targetPath "$Name.tar"
+    Write-Host "`nExporting $tempName to $tarPath..." -ForegroundColor Cyan
+    try {
+        wsl --export $tempName $tarPath
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to export $tempName. Exit code: $LASTEXITCODE"
+            return
+        }
+    }
+    catch {
+        Write-Error "Failed to export $tempName`: $_"
+        return
+    }
+
+    # Unregister the temporary distribution
+    Write-Host "`nUnregistering temporary distribution $tempName..." -ForegroundColor Cyan
+    try {
+        wsl --unregister $tempName
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "Failed to unregister $tempName. Exit code: $LASTEXITCODE"
+        }
+    }
+    catch {
+        Write-Warning "Failed to unregister $tempName`: $_"
+    }
+
+    # Import to the custom location with custom name
+    Write-Host "`nImporting $Name to $targetPath..." -ForegroundColor Cyan
+    try {
+        wsl --import $Name $targetPath $tarPath
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to import $Name. Exit code: $LASTEXITCODE"
+            return
+        }
+    }
+    catch {
+        Write-Error "Failed to import $Name`: $_"
+        return
+    }
+
+    # Success message
+    Write-Host "`n✓ Successfully installed $Name to $targetPath" -ForegroundColor Green
+
+    # Run initialization script
+    $initScript = "$PSScriptRoot\..\Linux\init-wsl.sh"
+    if (Test-Path $initScript) {
+        Write-Host "`nRunning initialization script..." -ForegroundColor Cyan
+
+        # Convert Windows path to WSL path
+        $windowsInitPath = (Resolve-Path $initScript).Path
+        $wslInitPath = ($windowsInitPath -replace '\\', '/' -replace '^([A-Z]):', '/mnt/$1').ToLower()
+
+        # Copy script to /tmp and run as root
+        Write-Host "Copying init-wsl.sh to WSL distribution..." -ForegroundColor Cyan
+        wsl -d $Name -- bash -c "cp '$wslInitPath' /tmp/init-wsl.sh && chmod +x /tmp/init-wsl.sh"
+
+        # Run the script as root
+        Write-Host "Running initialization script as root..." -ForegroundColor Cyan
+        wsl -d $Name --user root -- /tmp/init-wsl.sh
+
+        if ($LASTEXITCODE -eq 0) {
+            Write-Host "`n✓ Initialization script completed successfully" -ForegroundColor Green
+
+            # Get the default user from the script output
+            $defaultUser = wsl -d $Name --user root -- cat /tmp/wsl-default-user.txt 2>$null
+            if ($defaultUser) {
+                $defaultUser = $defaultUser.Trim()
+                Write-Host "Setting default user to: $defaultUser" -ForegroundColor Cyan
+
+                # Set default user in /etc/wsl.conf
+                wsl -d $Name --user root -- bash -c "echo '[user]' > /etc/wsl.conf && echo 'default=$defaultUser' >> /etc/wsl.conf"
+
+                # Terminate the distribution to apply settings
+                Write-Host "Restarting WSL distribution to apply settings..." -ForegroundColor Cyan
+                wsl --terminate $Name
+                Start-Sleep -Seconds 2
+
+                Write-Host "`n✓ Default user set to: $defaultUser" -ForegroundColor Green
+            }
+        } else {
+            Write-Warning "Initialization script completed with warnings or errors"
+        }
+    } else {
+        Write-Warning "Initialization script not found at: $initScript"
+        Write-Host "Expected location: $initScript" -ForegroundColor Yellow
+    }
+
+    Write-Host "`nTo start the distribution, run: wsl -d $Name" -ForegroundColor Yellow
+    Write-Host "To set it as default, run: wsl --set-default $Name" -ForegroundColor Yellow
+}
