@@ -5,6 +5,15 @@
 # git integration, and various quality-of-life improvements.
 
 # ==============================================================================
+# TMUX AUTO-START
+# ==============================================================================
+# Automatically start tmux if available and not already in a tmux session
+if command -v tmux &> /dev/null && [ -z "$TMUX" ] && [ -z "$TMUX_AUTOSTART_SKIP" ]; then
+    # Start tmux: attach to existing session or create new one
+    tmux attach-session -t default || tmux new-session -s default
+fi
+
+# ==============================================================================
 # HISTORY SETTINGS
 # ==============================================================================
 setopt histignorealldups sharehistory  # Don't save duplicates, share across sessions
