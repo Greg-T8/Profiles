@@ -6,12 +6,40 @@
 # Author: Greg Tate
 # Date: November 4, 2025
 # -------------------------------------------------------------------------
+#
+# USAGE:
+#   1. Make the script executable:
+#      chmod +x init-wsl.sh
+#
+#   2. Run the script:
+#      ./init-wsl.sh
+#
+#   3. After completion, restart your terminal or run:
+#      exec zsh
+#
+# WHAT THIS SCRIPT DOES:
+#   - Creates symbolic links to your Windows profile dotfiles
+#   - Installs ZSH and sets it as default shell
+#   - Installs zsh-autosuggestions plugin
+#   - Installs FZF for fuzzy finding and history search
+#   - Installs tmux for terminal multiplexing
+#   - Installs additional tools (vim, git, curl, wget)
+#
+# REQUIREMENTS:
+#   - WSL environment (Ubuntu/Debian-based)
+#   - Internet connection for package installation
+#   - Sudo privileges
+#
+# -------------------------------------------------------------------------
 
 # ==============================================================================
 # CONFIGURATION
 # ==============================================================================
 # Path to Windows profile directory (accessible from WSL)
 WINDOWS_PROFILE="/mnt/c/Users/gregt"
+
+# Path to Linux profile directory (contains dotfiles)
+LINUX_PROFILE="${WINDOWS_PROFILE}/OneDrive/Apps/Profiles/Linux"
 
 # Configuration files to symlink
 DOTFILES=(".bashrc" ".inputrc" ".vimrc" ".zshrc" ".tmux.conf")
@@ -22,6 +50,10 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
+
+# User credentials (will be set during execution)
+NEW_USERNAME=""
+NEW_PASSWORD=""
 
 # ==============================================================================
 # HELPER FUNCTIONS
@@ -59,14 +91,55 @@ section() {
 # MAIN FUNCTIONS
 # ==============================================================================
 
+# Create or get user account
+setup_user() {
+    section "User Account Setup"
+
+    # Prompt for username
+    read -p "Enter username for new user account: " NEW_USERNAME
+
+    # Validate username
+    if [[ -z "$NEW_USERNAME" ]]; then
+        error "Username cannot be empty"
+        exit 1
+    fi
+
+    # Check if user already exists
+    if id "$NEW_USERNAME" &>/dev/null; then
+        info "User '$NEW_USERNAME' already exists"
+    else
+        # Create user
+        info "Creating user '$NEW_USERNAME'..."
+        useradd -m -s /bin/bash "$NEW_USERNAME"
+
+        # Prompt for password
+        info "Setting password for '$NEW_USERNAME'..."
+        passwd "$NEW_USERNAME"
+
+        # Add user to sudo group
+        info "Adding '$NEW_USERNAME' to sudo group..."
+        usermod -aG sudo "$NEW_USERNAME"
+
+        success "User '$NEW_USERNAME' created successfully"
+    fi
+
+    # Set as default user for WSL
+    info "Setting '$NEW_USERNAME' as default WSL user..."
+    # This will be handled by the PowerShell script after this completes
+}
+
 # Create symbolic links for configuration files
 create_symlinks() {
     section "Creating Symbolic Links"
 
+    local target_home="$1"
+
+    info "Setting up configuration files for: $target_home"
+
     # Backup and link each configuration file
     for file in "${DOTFILES[@]}"; do
-        local target="${WINDOWS_PROFILE}/${file}"
-        local link="${HOME}/${file}"
+        local target="${LINUX_PROFILE}/${file}"
+        local link="${target_home}/${file}"
 
         # Check if source file exists in Windows profile
         if [ ! -f "$target" ]; then
@@ -101,6 +174,54 @@ create_symlinks() {
     done
 }
 
+# Setup configuration for both root and user
+setup_configurations() {
+    section "Configuring Root and User Profiles"
+
+    # Setup symlinks for root
+    info "Configuring root profile..."
+    create_symlinks "/root"
+
+    # Setup symlinks for new user
+    if [ -n "$NEW_USERNAME" ]; then
+        info "Configuring $NEW_USERNAME profile..."
+        local user_home="/home/$NEW_USERNAME"
+        create_symlinks "$user_home"
+
+        # Ensure proper ownership
+        chown -R "$NEW_USERNAME:$NEW_USERNAME" "$user_home"
+    fi
+}
+
+# Install ZSH plugins for a specific user
+install_zsh_plugins() {
+    local target_home="$1"
+    local plugin_dir="${target_home}/.zsh/zsh-autosuggestions"
+
+    # Create .zsh directory if it doesn't exist
+    if [ ! -d "${target_home}/.zsh" ]; then
+        mkdir -p "${target_home}/.zsh"
+    fi
+
+    # Clone or update zsh-autosuggestions
+    if [ -d "$plugin_dir" ]; then
+        warning "zsh-autosuggestions already exists in $target_home, updating..."
+        cd "$plugin_dir"
+        git pull
+        cd - > /dev/null
+    else
+        info "Installing zsh-autosuggestions to $target_home..."
+        git clone https://github.com/zsh-users/zsh-autosuggestions "$plugin_dir"
+    fi
+
+    # Verify plugin installation
+    if [ -f "${plugin_dir}/zsh-autosuggestions.zsh" ]; then
+        success "zsh-autosuggestions installed successfully in $target_home"
+    else
+        error "Failed to install zsh-autosuggestions in $target_home"
+    fi
+}
+
 # Install and configure ZSH
 install_zsh() {
     section "Installing and Configuring ZSH"
@@ -111,8 +232,8 @@ install_zsh() {
     else
         # Install zsh
         info "Installing ZSH..."
-        sudo apt update
-        sudo apt install zsh -y
+        apt update
+        apt install zsh -y
 
         # Verify installation
         if command -v zsh &> /dev/null; then
@@ -123,35 +244,27 @@ install_zsh() {
         fi
     fi
 
-    # Change default shell to zsh
-    info "Setting ZSH as default shell..."
-    chsh -s "$(which zsh)"
+    # Change default shell to zsh for root
+    info "Setting ZSH as default shell for root..."
+    chsh -s "$(which zsh)" root
+
+    # Change default shell to zsh for new user
+    if [ -n "$NEW_USERNAME" ]; then
+        info "Setting ZSH as default shell for $NEW_USERNAME..."
+        chsh -s "$(which zsh)" "$NEW_USERNAME"
+    fi
+
     success "Default shell changed to ZSH"
 
-    # Install zsh-autosuggestions plugin
-    info "Installing zsh-autosuggestions plugin..."
-    local plugin_dir="${HOME}/.zsh/zsh-autosuggestions"
+    # Install zsh-autosuggestions plugin for root
+    info "Installing zsh-autosuggestions for root..."
+    install_zsh_plugins "/root"
 
-    # Create .zsh directory if it doesn't exist
-    if [ ! -d "${HOME}/.zsh" ]; then
-        mkdir -p "${HOME}/.zsh"
-    fi
-
-    # Clone or update zsh-autosuggestions
-    if [ -d "$plugin_dir" ]; then
-        warning "zsh-autosuggestions already exists, updating..."
-        cd "$plugin_dir"
-        git pull
-        cd - > /dev/null
-    else
-        git clone https://github.com/zsh-users/zsh-autosuggestions "$plugin_dir"
-    fi
-
-    # Verify plugin installation
-    if [ -f "${plugin_dir}/zsh-autosuggestions.zsh" ]; then
-        success "zsh-autosuggestions installed successfully"
-    else
-        error "Failed to install zsh-autosuggestions"
+    # Install zsh-autosuggestions plugin for new user
+    if [ -n "$NEW_USERNAME" ]; then
+        info "Installing zsh-autosuggestions for $NEW_USERNAME..."
+        install_zsh_plugins "/home/$NEW_USERNAME"
+        chown -R "$NEW_USERNAME:$NEW_USERNAME" "/home/$NEW_USERNAME/.zsh"
     fi
 }
 
@@ -168,8 +281,8 @@ install_fzf() {
 
     # Install fzf via apt
     info "Installing FZF..."
-    sudo apt update
-    sudo apt install fzf -y
+    apt update
+    apt install fzf -y
 
     # Verify installation
     if command -v fzf &> /dev/null; then
@@ -199,8 +312,8 @@ install_tmux() {
     else
         # Install tmux
         info "Installing tmux..."
-        sudo apt update
-        sudo apt install tmux -y
+        apt update
+        apt install tmux -y
 
         # Verify installation
         if command -v tmux &> /dev/null; then
@@ -212,11 +325,18 @@ install_tmux() {
         fi
     fi
 
-    # Verify tmux configuration file exists
-    if [ -L "${HOME}/.tmux.conf" ]; then
-        success "tmux configuration file is properly linked"
+    # Verify tmux configuration file exists for root
+    if [ -L "/root/.tmux.conf" ]; then
+        success "tmux configuration file is properly linked for root"
     else
-        warning "tmux configuration file not found or not linked"
+        warning "tmux configuration file not found or not linked for root"
+    fi
+
+    # Verify tmux configuration file exists for new user
+    if [ -n "$NEW_USERNAME" ] && [ -L "/home/$NEW_USERNAME/.tmux.conf" ]; then
+        success "tmux configuration file is properly linked for $NEW_USERNAME"
+    elif [ -n "$NEW_USERNAME" ]; then
+        warning "tmux configuration file not found or not linked for $NEW_USERNAME"
     fi
 }
 
@@ -225,10 +345,10 @@ install_additional_tools() {
     section "Installing Additional Tools"
 
     info "Updating package lists..."
-    sudo apt update
+    apt update
 
     # List of useful tools
-    local tools=("vim" "git" "curl" "wget")
+    local tools=("vim" "git" "curl" "wget" "sudo")
 
     # Install each tool if not present
     for tool in "${tools[@]}"; do
@@ -236,7 +356,7 @@ install_additional_tools() {
             info "$tool is already installed"
         else
             info "Installing $tool..."
-            sudo apt install "$tool" -y
+            apt install "$tool" -y
         fi
     done
 
@@ -289,6 +409,12 @@ main() {
     info "Date: $(date)"
     echo ""
 
+    # Verify running as root
+    if [ "$EUID" -ne 0 ]; then
+        error "This script must be run as root (use sudo or run as root)"
+        exit 1
+    fi
+
     # Check if running in WSL
     if ! grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null; then
         warning "This script is designed for WSL environments"
@@ -300,15 +426,26 @@ main() {
         fi
     fi
 
+    # Setup user account
+    setup_user
+
     # Execute setup functions
-    create_symlinks
     install_additional_tools
+    setup_configurations
     install_zsh
     install_fzf
     install_tmux
 
     # Display completion message
     show_summary
+
+    # Output username for PowerShell script to use
+    echo ""
+    info "Default user: $NEW_USERNAME"
+    echo "$NEW_USERNAME" > /tmp/wsl-default-user.txt
+
+    # Change to home directory
+    cd ~
 }
 
 # Run main function
