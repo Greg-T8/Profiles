@@ -9,7 +9,7 @@
 # ==============================================================================
 # INTERACTIVE SHELL CHECK
 # ==============================================================================
-# If not running interactively, don't do anything
+# If running interactively, proceed with the script; otherwise, exit
 case $- in
     *i*) ;;
       *) return;;
