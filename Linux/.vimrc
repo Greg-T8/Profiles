@@ -151,27 +151,16 @@ set expandtab                       " Insert spaces instead of tabs
 " ==============================================================================
 " CURSOR SHAPE CONFIGURATION
 " ==============================================================================
-" ------------------------------------------------------------------------------
-" xterm and rxvt Terminals
-" ------------------------------------------------------------------------------
-" Change cursor shape based on mode
-if &term =~ 'xterm' || &term =~ 'rxvt'
-  " Block cursor in normal mode
-  autocmd VimEnter,InsertLeave * silent execute "!echo -ne '\e[2 q'"
-  " Vertical bar cursor in insert mode
-  autocmd InsertEnter * silent execute "!echo -ne '\e[6 q'"
-  " Reset cursor to default on exit
-  autocmd VimLeave * silent execute "!echo -ne '\e[ q'"
-endif
+" Set cursor shape for different modes using terminal escape codes
+" Block cursor (2) in normal mode, vertical bar (6) in insert mode
+" Works with tmux-256color terminal type
 
-" ------------------------------------------------------------------------------
-" Windows Terminal
-" ------------------------------------------------------------------------------
-" Use terminal escape codes for cursor shape
-if &term =~ 'win32'
-  let &t_EI = "\e[2 q"              " Block cursor in normal mode
-  let &t_SI = "\e[6 q"              " Vertical bar cursor in insert mode
-endif
+let &t_SI = "\e[6 q"                " Vertical bar cursor in insert mode
+let &t_SR = "\e[4 q"                " Underline cursor in replace mode
+let &t_EI = "\e[2 q"                " Block cursor in normal mode
+
+" Reset cursor to block on exit
+autocmd VimLeave * silent !echo -ne "\e[2 q"
 
 " ==============================================================================
 " BELL CONFIGURATION
