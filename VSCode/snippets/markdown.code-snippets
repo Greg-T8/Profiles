@@ -15,16 +15,26 @@
 	// 	],
 	// 	"description": "Log output to console"
 	// }
-	{
-		"Insert Contents Header": {
-			"prefix": "contentsheader",
-			"scope": "markdown",
-			"body": [
-				"<-- omit in toc -->",
-				"## Contents",
-				""
-			],
-			"description": "Insert a Markdown contents header with omit-in-toc comment"
-		}
+	"Omit in ToC Header": {
+		"prefix": "2-hdr-omitintoc",
+		"scope": "markdown",
+		"body": [
+			"<!-- omit in toc -->",
+			"## Contents",
+			""
+		],
+		"description": "Insert a Markdown contents header with omit-in-toc comment"
+	},
+	"Split Code Block": {
+		"prefix": "1-splitcodeblock",
+		// "scope": "markdown",		Leave scope commented out to make globally available
+		"body": [
+			"```",
+			"",
+			"$0",
+			"",
+			"```${1:bash}"
+		],
+		"description": "Split one code block into two separate code blocks by inserting closing and opening code fences"
 	}
 }

@@ -15,8 +15,8 @@
 	// 	],
 	// 	"description": "Log output to console"
 	// }
-	"File Header (with date)": {
-		"prefix": "hdr",
+	"General Program File Header (with date)": {
+		"prefix": "hdr-program",
 		"body": [
 			"$BLOCK_COMMENT_START",
 			"Program: ${1:Name}",
@@ -29,14 +29,4 @@
 		],
 		"description": "Insert a header with today's date"
 	},
-	"Markdown Contents Header": {
-		"prefix": "contentsheader",
-		"scope": "markdown",
-		"body": [
-			"<!-- omit in toc -->",
-			"## 🧾 Contents",
-			""
-		],
-		"description": "Insert a Markdown contents header with omit-in-toc comment"
-	}
 }
