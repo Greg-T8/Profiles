@@ -45,6 +45,14 @@ vim.api.nvim_set_keymap('n', '<leader>ic',
     { noremap = true, silent = true })
 
 -- ==============================================================================
+-- SNIPPET KEYBINDINGS
+-- ==============================================================================
+-- Insert "Split Code Block" snippet
+vim.api.nvim_set_keymap('n', '<leader>scb',
+    "<Cmd>call VSCodeNotify('editor.action.insertSnippet', {'name': 'Split Code Block'})<CR>",
+    { noremap = true, silent = true })
+
+-- ==============================================================================
 -- COPILOT/CHAT KEYBINDINGS
 -- ==============================================================================
 -- Trigger inline voice chat
