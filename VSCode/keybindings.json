@@ -651,11 +651,25 @@
   },
   {
     "key": "f1",
-    "command": "-workbench.action.showCommands",
+    "command": "-workbench.action.showCommands"
   },
   {
     "key": "f1",
     "command": "workbench.action.showCommands",
     "when": "!terminalFocus"
   },
+  {
+    "key": "ctrl+alt+j",
+    "command": "-editor.action.insertSnippet",
+    "when": "editorTextFocus && !editorReadonly && editorLangId == 'powershell'"
+  },
+  {
+    "key": "ctrl+alt+n",
+    "command": "editor.action.insertSnippet",
+    "args": {
+      "name": "Wrap in Code Block"
+    },
+    "when": "editorTextFocus && !editorReadonly"
+  }
+
 ]
