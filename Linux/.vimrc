@@ -36,8 +36,12 @@ nnoremap <C-a> ggVG                 " Normal mode: select all text
 inoremap <C-a> <Esc>ggVG            " Insert mode: select all text
 
 " ==============================================================================
-" VISUAL MODE KEYBINDINGS
+" PASTE KEYBINDINGS
 " ==============================================================================
+" Paste from system clipboard in normal mode without losing first character
+nnoremap <leader>v "+p              " Normal mode: paste after cursor
+nnoremap <leader>V "+P              " Normal mode: paste before cursor
+
 " Paste without yanking replaced text (matches Neovim behavior)
 xnoremap <leader>p "_dP
 
