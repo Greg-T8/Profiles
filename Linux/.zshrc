@@ -8,9 +8,35 @@
 # TMUX AUTO-START
 # ==============================================================================
 # Automatically start tmux if available and not already in a tmux session
+#
+# SETUP: To use separate sessions in VS Code vs Windows Terminal, add this to
+# VS Code settings.json (Ctrl+Shift+P -> "Preferences: Open User Settings (JSON)"):
+#
+#   "terminal.integrated.env.linux": {
+#       "TMUX_SESSION": "vscode"
+#   }
+#
 if command -v tmux &> /dev/null && [ -z "$TMUX" ] && [ -z "$TMUX_AUTOSTART_SKIP" ]; then
-    # Start tmux: attach to existing session or create new one
-    tmux attach-session -t default || tmux new-session -s default
+    # Detect VS Code terminal and use appropriate session name
+    if [ -n "$VSCODE_SHELL_INTEGRATION" ]; then
+        SESSION_NAME="vscode"
+    else
+        SESSION_NAME="terminal"
+    fi
+
+    # Start or attach to the session
+    tmux attach-session -t "$SESSION_NAME" || tmux new-session -s "$SESSION_NAME"
+fi
+
+# ==============================================================================
+# VSCODE SHELL INTEGRATION
+# ==============================================================================
+# Enable VS Code shell integration if running in VS Code terminal
+# See: https://code.visualstudio.com/docs/terminal/shell-integration
+if [ -n "$VSCODE_SHELL_INTEGRATION" ]; then
+    # Temporarily unset to prevent recursive issues
+    unset VSCODE_SHELL_INTEGRATION
+    . "$(code --locate-shell-integration-path zsh)"
 fi
 
 # ==============================================================================
