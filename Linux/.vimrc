@@ -16,9 +16,10 @@ let mapleader = " "
 " ==============================================================================
 " LEADER KEY MAPPINGS
 " ==============================================================================
-" Save and quit with leader+wq
+" Save and quit with leader+wq or leader+!
 nnoremap <leader>w :w<CR>
 nnoremap <leader>wq :wq<CR>
+nnoremap <leader>! :wq<CR>
 nnoremap <leader>q :q!<CR>
 
 " ==============================================================================
@@ -34,6 +35,13 @@ inoremap <C-h> <Left>               " Ctrl+H: move cursor left
 " Select all text with Ctrl+A
 nnoremap <C-a> ggVG                 " Normal mode: select all text
 inoremap <C-a> <Esc>ggVG            " Insert mode: select all text
+
+" ==============================================================================
+" COPY KEYBINDINGS
+" ==============================================================================
+" Copy to system clipboard with Ctrl+C
+vnoremap <C-c> "+y                  " Visual mode: copy selection to clipboard
+xnoremap <C-c> "+y                  " Visual block mode: copy selection to clipboard
 
 " ==============================================================================
 " PASTE KEYBINDINGS

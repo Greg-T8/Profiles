@@ -17,6 +17,7 @@
 -- Save and quit operations
 vim.keymap.set('n', '<leader>w', ':w<CR>', { desc = 'Save file', noremap = true, silent = true })
 vim.keymap.set('n', '<leader>wq', ':wq<CR>', { desc = 'Save and quit', noremap = true, silent = true })
+vim.keymap.set('n', '<leader>!', ':wq<CR>', { desc = 'Save and quit', noremap = true, silent = true })
 vim.keymap.set('n', '<leader>q', ':q!<CR>', { desc = 'Force quit without saving', noremap = true, silent = true })
 
 -- Make :q always force quit without confirmation

@@ -52,10 +52,18 @@ unset zle_bracketed_paste
 export EDITOR=vim
 export VISUAL=vim
 
+# Set secondary prompt for multiline commands (continuation lines)
+# Adjust the number of spaces to match your prompt indentation
+PS2='    '
+
 # Enable edit-command-line: Press 'v' in normal mode to edit command in vim
 autoload -Uz edit-command-line
 zle -N edit-command-line
 bindkey -M vicmd 'v' edit-command-line
+
+# Enable run-help for built-in help system
+autoload -Uz run-help
+alias help=run-help
 
 # ------------------------------------------------------------------------------
 # Key Bindings
