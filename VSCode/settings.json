@@ -28,6 +28,7 @@
   },
   "[json]": {
     "editor.autoIndent": "advanced",
+    "editor.defaultFormatter": "vscode.json-language-features",
     "editor.insertSpaces": true,
     "editor.rulers": [
       110
@@ -35,6 +36,7 @@
     "editor.tabSize": 2
   },
   "[jsonc]": {
+    "editor.defaultFormatter": "vscode.json-language-features",
     "editor.insertSpaces": true,
     "editor.tabSize": 2,
     "prettier.printWidth": 110,
@@ -762,6 +764,9 @@
   "terminal.integrated.defaultProfile.linux": "zsh",
   "terminal.integrated.defaultProfile.windows": "PowerShell",
   "terminal.integrated.enableMultiLinePasteWarning": "auto",
+  "terminal.integrated.env.linux": {
+    "TMUX_SESSION": "vscode" // Custom environment variable for VSCode-specific tmux sessions
+  },
   "terminal.integrated.fontFamily": "Cascadia Mono",
   "terminal.integrated.fontSize": 14,
   "terminal.integrated.fontWeight": "400",
@@ -796,8 +801,10 @@
       "args": [
         "-d",
         "Ubuntu",
-        "--cd",
-        "~"
+        "-e",
+        "zsh",
+        "-c",
+        "cd ~ && VSCODE_SHELL_INTEGRATION=1 exec zsh"
       ],
       "icon": "terminal-linux",
       "path": "wsl.exe"
@@ -1030,6 +1037,7 @@
     "terminal.integrated.shellIntegration.decorationsEnabled",
     "terminal.integrated.defaultProfile.linux",
     "terminal.integrated.defaultProfile.windows",
+    "terminal.integrated.env.linux",
     "terminal.integrated.profiles.linux",
     "terminal.integrated.profiles.windows",
     "terminal.integrated.shellIntegration.enabled",
