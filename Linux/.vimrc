@@ -29,6 +29,10 @@ nnoremap <leader>q :q!<CR>
 inoremap <C-l> <Right>              " Ctrl+L: move cursor right
 inoremap <C-h> <Left>               " Ctrl+H: move cursor left
 
+" Go to end of file and last character on line
+nnoremap G G$
+
+
 " ==============================================================================
 " SELECT ALL KEYBINDINGS
 " ==============================================================================
@@ -56,8 +60,8 @@ xnoremap <leader>p "_dP
 " ==============================================================================
 " STARTUP BEHAVIOR
 " ==============================================================================
-" Start in insert mode automatically when vim launches
-autocmd VimEnter * startinsert
+" Start in normal mode when vim launches (default behavior)
+" autocmd VimEnter * startinsert
 
 " ==============================================================================
 " COMMAND MODE SHORTCUTS
