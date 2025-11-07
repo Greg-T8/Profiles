@@ -164,6 +164,7 @@ zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
 alias ls='ls --color=auto'            # Colorize ls output
 alias ll='ls -la --color'             # Long listing with hidden files
 alias cls='clear'                     # Windows-style clear command
+alias md='mkdir'                      # Windows-style make directory
 
 # ==============================================================================
 # PLUGINS
