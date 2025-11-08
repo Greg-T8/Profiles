@@ -60,7 +60,7 @@ unsetopt HIST_BEEP                    # Disable beep on history errors
 # TERMINAL SETTINGS
 # ==============================================================================
 # Disable line wrapping for output (allows horizontal scrolling)
-tput rmam
+# tput rmam
 
 # ==============================================================================
 # VI MODE CONFIGURATION
@@ -68,11 +68,15 @@ tput rmam
 # Enable vi keybindings for command-line editing
 bindkey -v
 
-# Reduce ESC key delay for faster mode switching (10ms instead of default 400ms)
-export KEYTIMEOUT=1
+# Reduce ESC key delay for faster mode switching
+# Default is 40 (400ms). Setting to 10 (100ms) is fast but stable for pasting
+export KEYTIMEOUT=10
 
-# Disable bracketed paste to prevent last character capitalization issues
-unset zle_bracketed_paste
+# Note: KEYTIMEOUT=1 causes issues with pasted multi-line text:
+# - Last character may capitalize (escape sequence timing issue)
+# - Multi-line navigation with k/j breaks
+# - Recommended range: 10-20 for good ESC response without paste issues
+# To apply changes to KEYTIMEOUT: use 'exec zsh' instead of 'source ~/.zshrc'
 
 # Set default editors for CLI tools (git, crontab, etc.)
 export EDITOR=vim
@@ -101,6 +105,10 @@ bindkey -M viins '^N' down-line-or-history    # Ctrl+N: next command
 # History search with Ctrl+R (fallback if fzf is not installed)
 bindkey -M viins '^R' history-incremental-search-backward
 bindkey -M vicmd '^R' history-incremental-search-backward
+
+# Vi mode navigation for multi-line commands
+bindkey -M vicmd 'k' vi-up-line-or-history    # k: move up in command or history
+bindkey -M vicmd 'j' vi-down-line-or-history  # j: move down in command or history
 
 # ------------------------------------------------------------------------------
 # Cursor Shape Based on Vi Mode
@@ -166,6 +174,11 @@ alias ll='ls -la --color'             # Long listing with hidden files
 alias cls='clear'                     # Windows-style clear command
 alias md='mkdir'                      # Windows-style make directory
 
+# Tmux session shortcuts
+alias ta='tmux attach -t'             # Attach to tmux session by name
+alias tat='tmux attach -t terminal'   # Attach to terminal session
+alias tav='tmux attach -t vscode'     # Attach to vscode session
+
 # ==============================================================================
 # PLUGINS
 # ==============================================================================
@@ -183,6 +196,7 @@ if [ -f /usr/share/doc/fzf/examples/key-bindings.zsh ]; then
 elif [ -f ~/.fzf/shell/key-bindings.zsh ]; then
     source ~/.fzf/shell/key-bindings.zsh
 fi
+
 
 # ------------------------------------------------------------------------------
 # Zsh Autosuggestions (PowerShell-like inline predictions)
