@@ -484,6 +484,9 @@
     "asvetliakov.vscode-neovim": 1,
     "vscodevim.vim": 1
   },
+  "files.associations": {
+    "*.keymap": "devicetree"
+  },
   "files.autoSave": "off",
   "files.autoSaveDelay": 10000,
   "files.hotExit": "onExitAndWindowClose",
@@ -961,6 +964,7 @@
     "explorer.confirmDragAndDrop",
     "explorer.sortOrder",
     "extensions.experimental.affinity",
+    "files.associations",
     "files.autoSave",
     "files.autoSaveDelay",
     "files.hotExit",
