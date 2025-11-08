@@ -197,7 +197,6 @@ elif [ -f ~/.fzf/shell/key-bindings.zsh ]; then
     source ~/.fzf/shell/key-bindings.zsh
 fi
 
-
 # ------------------------------------------------------------------------------
 # Zsh Autosuggestions (PowerShell-like inline predictions)
 # ------------------------------------------------------------------------------
