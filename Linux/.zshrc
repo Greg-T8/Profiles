@@ -111,9 +111,15 @@ bindkey -M viins '^N' down-line-or-history    # Ctrl+N: next command
 bindkey -M viins '^R' history-incremental-search-backward
 bindkey -M vicmd '^R' history-incremental-search-backward
 
-# Vi mode navigation for multi-line commands
-bindkey -M vicmd 'k' vi-up-line-or-history    # k: move up in command or history
-bindkey -M vicmd 'j' vi-down-line-or-history  # j: move down in command or history
+# Vi mode navigation - buffer-only movement (no history)
+# Note: In standard vi-mode, k/j access history. These bindings change that behavior
+# to only move within the current multi-line command buffer.
+bindkey -M vicmd 'k' up-line-or-search        # k: move up in buffer, search if at top
+bindkey -M vicmd 'j' down-line-or-search      # j: move down in buffer, search if at bottom
+
+# Multi-line command editing
+# Alt+Enter converts continuation lines (PS2 prompts) into a single editable buffer
+bindkey -M viins '\e^M' push-line-or-edit     # Alt+Enter: edit multi-line commands
 
 # ------------------------------------------------------------------------------
 # Cursor Shape Based on Vi Mode
