@@ -121,6 +121,15 @@ bindkey -M vicmd 'j' down-line-or-search      # j: move down in buffer, search i
 # Alt+Enter converts continuation lines (PS2 prompts) into a single editable buffer
 bindkey -M viins '\e^M' push-line-or-edit     # Alt+Enter: edit multi-line commands
 
+# Shift+Enter inserts a literal newline for multi-line command input
+# Creates a custom widget to insert newline without executing the command
+function insert-literal-newline {
+  LBUFFER="${LBUFFER}"$'\n'
+}
+zle -N insert-literal-newline
+bindkey -M viins '^[[13;2u' insert-literal-newline  # Shift+Enter (most terminals)
+bindkey -M vicmd '^[[13;2u' insert-literal-newline  # Shift+Enter in normal mode
+
 # ------------------------------------------------------------------------------
 # Cursor Shape Based on Vi Mode
 # ------------------------------------------------------------------------------
