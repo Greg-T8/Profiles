@@ -114,8 +114,11 @@ bindkey -M vicmd 'k' up-line-or-search        # k: move up in buffer, search if 
 bindkey -M vicmd 'j' down-line-or-search      # j: move down in buffer, search if at bottom
 
 # Multi-line command editing
-# Alt+Enter converts continuation lines (PS2 prompts) into a single editable buffer
-bindkey -M viins '\e^M' push-line-or-edit     # Alt+Enter: edit multi-line commands
+# Alt+Enter inserts a literal newline for multi-line command input
+# Uses self-insert-unmeta which strips the escape/meta bit to insert literal newline
+# Allows cursor navigation between lines (like ESC+Enter described in zsh guide)
+bindkey -M viins '\e^M' self-insert-unmeta  # Alt+Enter
+bindkey -M vicmd '\e^M' self-insert-unmeta  # Alt+Enter in normal mode
 
 # ------------------------------------------------------------------------------
 # Cursor Shape Based on Vi Mode
