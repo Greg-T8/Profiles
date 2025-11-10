@@ -428,7 +428,7 @@
   "editor.autoClosingQuotes": "never",
   "editor.autoIndent": "full",
   "editor.bracketPairColorization.enabled": true,
-  "editor.columnSelection": true,
+  "editor.columnSelection": false,
   "editor.cursorBlinking": "smooth",
   "editor.cursorSmoothCaretAnimation": "on",
   "editor.cursorStyle": "line-thin",
