@@ -83,6 +83,13 @@ else {
     $isWindows = $true
 }
 
+# Check if running as administrator
+$isAdmin = $false
+if ($isWindows) {
+    $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
+    $isAdmin = $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+}
+
 # Display banner
 Write-Host "`n=== PowerShell Profile Installer ===" -ForegroundColor Cyan
 Write-Host "Repository: $GitHubRepo" -ForegroundColor Gray
@@ -90,16 +97,34 @@ Write-Host "Branch: $Branch" -ForegroundColor Gray
 Write-Host "Install Path: $InstallPath" -ForegroundColor Gray
 if ($isWindows) {
     Write-Host "Target: PowerShell Core + Windows PowerShell" -ForegroundColor Gray
+    Write-Host "Running as Administrator: $isAdmin" -ForegroundColor Gray
 }
 Write-Host ""
 
-# Check execution policy and provide guidance if restricted
+# Check and configure execution policy
 $executionPolicy = Get-ExecutionPolicy -Scope CurrentUser
 if ($executionPolicy -eq 'Restricted' -or $executionPolicy -eq 'Undefined') {
     Write-Host "⚠ Execution policy is currently: $executionPolicy" -ForegroundColor Yellow
-    Write-Host "Profile will be installed but may not load automatically in new sessions." -ForegroundColor Yellow
-    Write-Host "To enable profile loading, run:" -ForegroundColor Cyan
-    Write-Host "  Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`n" -ForegroundColor White
+
+    # Attempt to set execution policy
+    try {
+        if ($isAdmin) {
+            Write-Host "Setting execution policy to RemoteSigned (LocalMachine scope)..." -ForegroundColor Yellow
+            Set-ExecutionPolicy RemoteSigned -Scope LocalMachine -Force
+            Write-Host "✓ Execution policy updated for all users`n" -ForegroundColor Green
+        }
+        else {
+            Write-Host "Setting execution policy to RemoteSigned (CurrentUser scope)..." -ForegroundColor Yellow
+            Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+            Write-Host "✓ Execution policy updated for current user`n" -ForegroundColor Green
+        }
+    }
+    catch {
+        Write-Host "⚠ Could not set execution policy: $_" -ForegroundColor Yellow
+        Write-Host "Profile will be installed but may not load automatically in new sessions." -ForegroundColor Yellow
+        Write-Host "To enable profile loading, run:" -ForegroundColor Cyan
+        Write-Host "  Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`n" -ForegroundColor White
+    }
 }
 
 # Create installation directory if it doesn't exist
@@ -212,7 +237,7 @@ $profilePaths += @{
 
 # If on Windows and running PowerShell Core, also configure Windows PowerShell
 if ($isWindows -and $PSVersionTable.PSVersion.Major -ge 6) {
-    $windowsPowerShellProfilePath = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'WindowsPowerShell\profile.ps1'
+    $windowsPowerShellProfilePath = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'Windows PowerShell\profile.ps1'
     $profilePaths += @{
         Path = $windowsPowerShellProfilePath
         Name = "Windows PowerShell"
