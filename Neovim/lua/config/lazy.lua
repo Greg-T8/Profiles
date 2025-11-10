@@ -77,8 +77,8 @@ require("lazy").setup({
 
     -- Plugin update checker
     checker = {
-        enabled = true,         -- Check for plugin updates
-        notify  = true,  		-- Show notification when updates are available
+        enabled = false,        -- Disable automatic update checking (check manually with :Lazy check)
+        notify  = false,        -- Don't show automatic update notifications
     },
 
     -- Environment-specific locations
