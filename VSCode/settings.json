@@ -768,9 +768,6 @@
   "terminal.integrated.defaultProfile.linux": "zsh",
   "terminal.integrated.defaultProfile.windows": "PowerShell",
   "terminal.integrated.enableMultiLinePasteWarning": "auto",
-  "terminal.integrated.env.linux": {
-    "TMUX_SESSION": "vscode" // Custom environment variable for VSCode-specific tmux sessions
-  },
   "terminal.integrated.fontFamily": "Cascadia Mono",
   "terminal.integrated.fontSize": 14,
   "terminal.integrated.fontWeight": "400",
@@ -789,17 +786,12 @@
     "Command Prompt": null,
     "Git Bash": null,
     "JavaScript Debug Terminal": null,
+    "Azure Cloud Shell (Bash)": null,
+    "Azure Cloud Shell (PowerShell)": null,
+    "Windows PowerShell": null,
     "PowerShell": {
       "icon": "terminal-powershell",
       "source": "PowerShell"
-    },
-    "PowerShell (No Profile)": {
-      "args": [
-        "-NoLogo",
-        "-NoProfile"
-      ],
-      "icon": "terminal-powershell",
-      "path": "C:/Program Files/PowerShell/7/pwsh.exe"
     },
     "Ubuntu": {
       "args": [
@@ -813,7 +805,15 @@
       "icon": "terminal-linux",
       "path": "wsl.exe"
     },
-    "Windows PowerShell": {
+    "PowerShell (No Profile)": {
+      "args": [
+        "-NoLogo",
+        "-NoProfile"
+      ],
+      "icon": "terminal-powershell",
+      "path": "C:/Program Files/PowerShell/7/pwsh.exe"
+    },
+    "Windows PowerShell (x64)": {
       "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
     }
   },
