@@ -76,6 +76,15 @@ Write-Host "Repository: $GitHubRepo" -ForegroundColor Gray
 Write-Host "Branch: $Branch" -ForegroundColor Gray
 Write-Host "Install Path: $InstallPath`n" -ForegroundColor Gray
 
+# Check execution policy and provide guidance if restricted
+$executionPolicy = Get-ExecutionPolicy -Scope CurrentUser
+if ($executionPolicy -eq 'Restricted' -or $executionPolicy -eq 'Undefined') {
+    Write-Host "⚠ Execution policy is currently: $executionPolicy" -ForegroundColor Yellow
+    Write-Host "Profile will be installed but may not load automatically in new sessions." -ForegroundColor Yellow
+    Write-Host "To enable profile loading, run:" -ForegroundColor Cyan
+    Write-Host "  Set-ExecutionPolicy RemoteSigned -Scope CurrentUser`n" -ForegroundColor White
+}
+
 # Create installation directory if it doesn't exist
 if (-not (Test-Path $InstallPath)) {
     Write-Host "Creating installation directory..." -ForegroundColor Yellow
@@ -207,17 +216,26 @@ if ($profileContent -notmatch 'Install-RemoteProfile\.ps1') {
 if (-not $SkipActivation) {
     Write-Host "Activating profile in current session..." -ForegroundColor Cyan
 
-    if (Test-Path "$InstallPath\prompt.ps1") {
-        . "$InstallPath\prompt.ps1"
-        Write-Host "✓ Prompt customizations loaded" -ForegroundColor Green
-    }
+    try {
+        if (Test-Path "$InstallPath\prompt.ps1") {
+            . "$InstallPath\prompt.ps1"
+            Write-Host "✓ Prompt customizations loaded" -ForegroundColor Green
+        }
 
-    if (Test-Path "$InstallPath\functions.ps1") {
-        . "$InstallPath\functions.ps1"
-        Write-Host "✓ Functions loaded" -ForegroundColor Green
-    }
+        if (Test-Path "$InstallPath\functions.ps1") {
+            . "$InstallPath\functions.ps1"
+            Write-Host "✓ Functions loaded" -ForegroundColor Green
+        }
 
-    Write-Host "`n✓ Profile activated! Open a new PowerShell session to use it automatically." -ForegroundColor Green
+        Write-Host "`n✓ Profile activated! Open a new PowerShell session to use it automatically." -ForegroundColor Green
+    }
+    catch {
+        Write-Host "`n⚠ Could not activate profile in current session (execution policy restriction)" -ForegroundColor Yellow
+        Write-Host "Your profile has been installed successfully and will load automatically in new sessions." -ForegroundColor Yellow
+        Write-Host "`nTo enable it in this session, run:" -ForegroundColor Cyan
+        Write-Host "  Set-ExecutionPolicy RemoteSigned -Scope CurrentUser" -ForegroundColor White
+        Write-Host "  . `$PROFILE" -ForegroundColor White
+    }
 }
 else {
     Write-Host "`nProfile installed but not activated. Restart PowerShell or run:" -ForegroundColor Yellow
