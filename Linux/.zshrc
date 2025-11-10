@@ -98,6 +98,11 @@ alias help=run-help
 # ------------------------------------------------------------------------------
 # Key Bindings
 # ------------------------------------------------------------------------------
+# Fix backspace and delete in vi insert mode (common issue after mode switching)
+bindkey -M viins '^?' backward-delete-char    # Backspace
+bindkey -M viins '^H' backward-delete-char    # Ctrl+H (alternative backspace)
+bindkey -M viins '^[[3~' delete-char          # Delete key
+
 # History navigation with Ctrl+P/N in insert mode
 bindkey -M viins '^P' up-line-or-history      # Ctrl+P: previous command
 bindkey -M viins '^N' down-line-or-history    # Ctrl+N: next command
