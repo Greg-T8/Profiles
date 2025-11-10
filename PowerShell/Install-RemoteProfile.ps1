@@ -90,14 +90,34 @@ if ($isWindows) {
     $isAdmin = $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 }
 
+# Require administrator mode
+if ($isWindows -and -not $isAdmin) {
+    Write-Host "`n=== PowerShell Profile Installer ===" -ForegroundColor Cyan
+    Write-Host "`n❌ This script must be run as Administrator." -ForegroundColor Red
+    Write-Host "`nPlease restart PowerShell with administrator privileges and try again." -ForegroundColor Yellow
+    Write-Host "Right-click PowerShell and select 'Run as Administrator'`n" -ForegroundColor Yellow
+    exit 1
+}
+
+# Define installation paths
+$windowsPowerShellPath = if ($isWindows) {
+    "$HOME\Documents\Windows PowerShell"
+}
+else {
+    $null
+}
+
 # Display banner
 Write-Host "`n=== PowerShell Profile Installer ===" -ForegroundColor Cyan
 Write-Host "Repository: $GitHubRepo" -ForegroundColor Gray
 Write-Host "Branch: $Branch" -ForegroundColor Gray
-Write-Host "Install Path: $InstallPath" -ForegroundColor Gray
+Write-Host "Install Paths:" -ForegroundColor Gray
+Write-Host "  PowerShell Core: $InstallPath" -ForegroundColor Gray
+if ($windowsPowerShellPath) {
+    Write-Host "  Windows PowerShell: $windowsPowerShellPath" -ForegroundColor Gray
+}
 if ($isWindows) {
-    Write-Host "Target: PowerShell Core + Windows PowerShell" -ForegroundColor Gray
-    Write-Host "Running as Administrator: $isAdmin" -ForegroundColor Gray
+    Write-Host "Running as Administrator: ✓" -ForegroundColor Green
 }
 Write-Host ""
 
@@ -127,12 +147,19 @@ if ($executionPolicy -eq 'Restricted' -or $executionPolicy -eq 'Undefined') {
     }
 }
 
-# Create installation directory if it doesn't exist
+# Create installation directories if they don't exist
 if (-not (Test-Path $InstallPath)) {
-    Write-Host "Creating installation directory..." -ForegroundColor Yellow
+    Write-Host "Creating PowerShell installation directory..." -ForegroundColor Yellow
     New-Item -ItemType Directory -Path $InstallPath -Force | Out-Null
-    Write-Host "✓ Directory created`n" -ForegroundColor Green
+    Write-Host "✓ Directory created" -ForegroundColor Green
 }
+
+if ($windowsPowerShellPath -and -not (Test-Path $windowsPowerShellPath)) {
+    Write-Host "Creating Windows PowerShell installation directory..." -ForegroundColor Yellow
+    New-Item -ItemType Directory -Path $windowsPowerShellPath -Force | Out-Null
+    Write-Host "✓ Directory created" -ForegroundColor Green
+}
+Write-Host ""
 
 # Check if git is available
 $gitAvailable = $null -ne (Get-Command git -ErrorAction SilentlyContinue)
@@ -164,16 +191,17 @@ if ($gitAvailable -and -not $UseRawDownload) {
         Write-Host "✓ Repository cloned`n" -ForegroundColor Green
     }
 
-    # Copy profile files
+    # Copy profile files to PowerShell Core directory
     $sourceFiles = @('functions.ps1', 'prompt.ps1', 'PSScriptAnalyzerSettings.psd1')
 
+    Write-Host "Installing to PowerShell Core directory..." -ForegroundColor Cyan
     foreach ($file in $sourceFiles) {
         $sourcePath = Join-Path $repoPath "PowerShell\$file"
         $destPath = Join-Path $InstallPath $file
 
         if (Test-Path $sourcePath) {
             Copy-Item -Path $sourcePath -Destination $destPath -Force
-            Write-Host "✓ Installed $file" -ForegroundColor Green
+            Write-Host "  ✓ Installed $file" -ForegroundColor Green
         }
     }
 
@@ -182,7 +210,28 @@ if ($gitAvailable -and -not $UseRawDownload) {
     $remoteProfileDest = Join-Path $InstallPath "profile.ps1"
     if (Test-Path $remoteProfileSource) {
         Copy-Item -Path $remoteProfileSource -Destination $remoteProfileDest -Force
-        Write-Host "✓ Installed profile.ps1 (remote version)" -ForegroundColor Green
+        Write-Host "  ✓ Installed profile.ps1 (remote version)" -ForegroundColor Green
+    }
+
+    # Copy profile files to Windows PowerShell directory if on Windows
+    if ($windowsPowerShellPath) {
+        Write-Host "`nInstalling to Windows PowerShell directory..." -ForegroundColor Cyan
+        foreach ($file in $sourceFiles) {
+            $sourcePath = Join-Path $repoPath "PowerShell\$file"
+            $destPath = Join-Path $windowsPowerShellPath $file
+
+            if (Test-Path $sourcePath) {
+                Copy-Item -Path $sourcePath -Destination $destPath -Force
+                Write-Host "  ✓ Installed $file" -ForegroundColor Green
+            }
+        }
+
+        # Copy the remote-specific profile version to Windows PowerShell
+        $destPath = Join-Path $windowsPowerShellPath "profile.ps1"
+        if (Test-Path $remoteProfileSource) {
+            Copy-Item -Path $remoteProfileSource -Destination $destPath -Force
+            Write-Host "  ✓ Installed profile.ps1 (remote version)" -ForegroundColor Green
+        }
     }
 }
 else {
@@ -197,14 +246,16 @@ else {
     $baseUrl = "https://raw.githubusercontent.com/$GitHubRepo/$Branch/PowerShell"
     $files = @('functions.ps1', 'prompt.ps1', 'PSScriptAnalyzerSettings.psd1')
 
+    # Download to PowerShell Core directory
+    Write-Host "Downloading to PowerShell Core directory..." -ForegroundColor Cyan
     foreach ($file in $files) {
         $url = "$baseUrl/$file"
         $destPath = Join-Path $InstallPath $file
 
         try {
-            Write-Host "Downloading $file..." -ForegroundColor Yellow
+            Write-Host "  Downloading $file..." -ForegroundColor Yellow
             Invoke-WebRequest -Uri $url -OutFile $destPath -UseBasicParsing
-            Write-Host "✓ Downloaded $file" -ForegroundColor Green
+            Write-Host "  ✓ Downloaded $file" -ForegroundColor Green
         }
         catch {
             Write-Warning "Failed to download ${file}: $_"
@@ -213,18 +264,79 @@ else {
 
     # Download the remote-specific profile version as profile.ps1
     try {
-        Write-Host "Downloading profile-remote.ps1..." -ForegroundColor Yellow
+        Write-Host "  Downloading profile-remote.ps1..." -ForegroundColor Yellow
         $url = "$baseUrl/profile-remote.ps1"
         $destPath = Join-Path $InstallPath "profile.ps1"
         Invoke-WebRequest -Uri $url -OutFile $destPath -UseBasicParsing
-        Write-Host "✓ Downloaded profile.ps1 (remote version)" -ForegroundColor Green
+        Write-Host "  ✓ Downloaded profile.ps1 (remote version)" -ForegroundColor Green
     }
     catch {
         Write-Warning "Failed to download profile-remote.ps1: $_"
     }
+
+    # Download to Windows PowerShell directory if on Windows
+    if ($windowsPowerShellPath) {
+        Write-Host "`nDownloading to Windows PowerShell directory..." -ForegroundColor Cyan
+        foreach ($file in $files) {
+            $url = "$baseUrl/$file"
+            $destPath = Join-Path $windowsPowerShellPath $file
+
+            try {
+                Write-Host "  Downloading $file..." -ForegroundColor Yellow
+                Invoke-WebRequest -Uri $url -OutFile $destPath -UseBasicParsing
+                Write-Host "  ✓ Downloaded $file" -ForegroundColor Green
+            }
+            catch {
+                Write-Warning "Failed to download ${file}: $_"
+            }
+        }
+
+        # Download the remote-specific profile version as profile.ps1
+        try {
+            Write-Host "  Downloading profile-remote.ps1..." -ForegroundColor Yellow
+            $url = "$baseUrl/profile-remote.ps1"
+            $destPath = Join-Path $windowsPowerShellPath "profile.ps1"
+            Invoke-WebRequest -Uri $url -OutFile $destPath -UseBasicParsing
+            Write-Host "  ✓ Downloaded profile.ps1 (remote version)" -ForegroundColor Green
+        }
+        catch {
+            Write-Warning "Failed to download profile-remote.ps1: $_"
+        }
+    }
 }
 
 Write-Host "`n✓ Profile installation complete!" -ForegroundColor Green
+
+# Install PSReadLine module from PSGallery
+Write-Host "`nInstalling PSReadLine module..." -ForegroundColor Cyan
+
+try {
+    # Check if PSReadLine is already installed
+    $psReadLine = Get-Module -ListAvailable -Name PSReadLine | Sort-Object Version -Descending | Select-Object -First 1
+
+    if ($psReadLine) {
+        Write-Host "PSReadLine version $($psReadLine.Version) is already installed" -ForegroundColor Gray
+        Write-Host "Checking for updates..." -ForegroundColor Yellow
+
+        # Try to update to latest version
+        try {
+            Update-Module -Name PSReadLine -Force -ErrorAction Stop
+            Write-Host "✓ PSReadLine updated to latest version" -ForegroundColor Green
+        }
+        catch {
+            Write-Host "✓ PSReadLine is up to date" -ForegroundColor Green
+        }
+    }
+    else {
+        Write-Host "Installing PSReadLine from PSGallery..." -ForegroundColor Yellow
+        Install-Module -Name PSReadLine -Force -AllowClobber -Scope AllUsers
+        Write-Host "✓ PSReadLine installed successfully" -ForegroundColor Green
+    }
+}
+catch {
+    Write-Warning "Failed to install/update PSReadLine: $_"
+    Write-Host "You can manually install it later with: Install-Module PSReadLine -Force" -ForegroundColor Yellow
+}
 
 # Determine which profile paths to configure
 $profilePaths = @()
