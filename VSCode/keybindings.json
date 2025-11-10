@@ -1,675 +1,674 @@
 // Place your key bindings in this file to override the defaults
 [
-  // Terminal Overrides
-  {
-    //Terminal: Removed in favor of using terminal built-in Emacs command
-    "key": "ctrl+p",
-    "command": "-workbench.action.quickOpen"
-    // don't restrict with when clause
-  },
-  {
-    //Terminal: Removed in favor of using terminal built-in Emacs command
-    "command": "-workbench.action.terminal.focusFind",
-    "key": "ctrl+f",
-    "when": "terminalFocus"
-  },
-  {
-    //Terminal: Remove quickOpen in using terminal built-in Emacs command
-    "command": "-workbench.action.quickOpen",
-    "key": "ctrl+e"
-    // don't restrict with when clause
-  },
-  {
-    //Terminal: Removed in favor of using Emacs command
-    "command": "deleteAllRight",
-    "key": "ctrl+k",
-    "when": "terminalFocus"
-  },
-  {
-    // Terminal command: Delete word to the left
-    "command": "-workbench.action.terminal.killEditor",
-    "key": "ctrl+w",
-    "when": "terminalEditorFocus && terminalFocus && terminalHasBeenCreated && resourceScheme == 'vscode-terminal' || terminalEditorFocus && terminalFocus && terminalProcessSupported && resourceScheme == 'vscode-terminal'"
-  },
-  {
-    // Terminal command:  Enable Windows paste
-    "command": "workbench.action.terminal.paste",
-    "key": "ctrl+v",
-    "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
-  },
-  {
-    // Terminal: Remove default VSCode keymapping in favor of using terminal built-in Emacs command
-    "key": "ctrl+f",
-    "command": "-workbench.action.terminal.focusFind",
-    "when": "terminalFindFocused && terminalHasBeenCreated || terminalFindFocused && terminalProcessSupported || terminalFocusInAny && terminalHasBeenCreated || terminalFocusInAny && terminalProcessSupported"
-  },
-  {
-    // Terminal: Remove default VSCode keymapping in favor of using terminal built-in Emacs command
-    "key": "ctrl+w",
-    "command": "-workbench.action.terminal.killEditor",
-    "when": "terminalEditorFocus && terminalFocus && terminalHasBeenCreated || terminalEditorFocus && terminalFocus && terminalProcessSupported"
-  },
-  {
-    // Terminal movement: remove existing keymapping when in terminal in favor delete word to the left
-    "command": "-workbench.action.closeActiveEditor",
-    "key": "ctrl+w",
-    "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
-  },
-  {
-    // Editor customizations: new file; overwrites new window
-    "command": "workbench.action.files.newUntitledFile",
-    "key": "ctrl+shift+n"
-  },
-  {
-    // Editor: remove close group due to inadverent closing of windows
-    "key": "ctrl+w",
-    "command": "-workbench.action.closeGroup",
-    "when": "activeEditorGroupEmpty && multipleEditorGroups"
-  },
-  {
-    // Editor: remove close active editor due to inadverent closing of windows
-    "key": "ctrl+w",
-    "command": "-workbench.action.closeActiveEditor"
-  },
-  {
-    // PowerShell debugging: add keymapping (overwrites Debug: Start Debugging)
-    "command": "PowerShell.Debug.Start",
-    "key": "f5",
-    "when": "editorTextFocus && editorLangId == 'powershell'"
-  },
-  {
-    // PowerShell debugging: remove default VSCode keymapping in favor of "Play" button
-    "command": "-workbench.action.debug.start",
-    "key": "f5",
-    "when": "debuggersAvailable && debugState == 'inactive' && editorLangId == 'powershell'"
-  },
-  {
-    // Debugging: Use F5 to debug in all other languages
-    "key": "f5",
-    "command": "workbench.action.debug.start",
-    "when": "debuggersAvailable && debugState == 'inactive'"
-  },
-  {
-    // Debugging: Toggle inline breakpoint
-    "key": "ctrl+f9",
-    "command": "editor.debug.action.toggleInlineBreakpoint",
-    "when": "editorTextFocus"
-  },
-  {
-    // Editor Navigation: Next editor
-    "key": "ctrl+l",
-    "command": "workbench.action.nextEditor",
-    "when": "editorTextFocus || activeViewlet"
-  },
-  {
-    // Editor Navigation: Remove default VSCode keybinding
-    "key": "ctrl+pagedown",
-    "command": "-workbench.action.nextEditor"
-  },
-  {
-    // Editor Navigation: Previous editor
-    "key": "ctrl+h",
-    "command": "workbench.action.previousEditor",
-    "when": "editorTextFocus || activeViewlet"
-  },
-  {
-    // Editor Navigation: Remove default VSCode keybinding
-    "key": "ctrl+pageup",
-    "command": "-workbench.action.previousEditor"
-  },
-  {
-    // Editor Navigation: Remove default VSCode keybinding
-    "key": "ctrl+shift+pageup",
-    "command": "-workbench.action.moveEditorLeftInGroup"
-  },
-  {
-    // Editor Navigation: Resize panel to the left
-    "key": "shift+left",
-    "command": "workbench.action.terminal.resizePaneLeft"
-  },
-  {
-    // Editor Navigation: Resize panel to the right
-    "key": "shift+right",
-    "command": "workbench.action.terminal.resizePaneRight"
-  },
-  {
-    // Editor Navigation: Resize panel down
-    "key": "shift+down",
-    "command": "workbench.action.terminal.resizePaneDown"
-  },
-  {
-    // Editor Navigation: Resize panel up
-    "key": "shift+up",
-    "command": "workbench.action.terminal.resizePaneUp"
-  },
-  {
-    // Editor Navigation: Increase editor pane size
-    "key": "alt+i",
-    "command": "workbench.action.increaseViewSize"
-  },
-  {
-    // Editor Navigation: Navigate backwards in document
-    "key": "alt+b",
-    "command": "workbench.action.navigateBack",
-    "when": "canNavigateBack"
-  },
-  {
-    // Editor Navigation: Remove default VSCode keybinding
-    "key": "alt+left",
-    "command": "-workbench.action.navigateBack",
-    "when": "canNavigateBack"
-  },
-  {
-    // Editor Navigation: Navigate forwards in document
-    "key": "alt+f",
-    "command": "workbench.action.navigateForward",
-    "when": "canNavigateForward"
-  },
-  {
-    // Editor Navigation: Remove default VSCode keybinding
-    "key": "alt+right",
-    "command": "-workbench.action.navigateForward",
-    "when": "canNavigateForward"
-  },
-  {
-    // Sidebar Toggle: Remove default VSCode keybinding
-    "key": "ctrl+b",
-    "command": "-workbench.action.toggleSidebarVisibility"
-  },
-  {
-    // Sidebar Toggle: Remove default VSCode keybinding
-    "key": "ctrl+`",
-    "command": "-workbench.action.terminal.toggleTerminal",
-    "when": "terminal.active"
-  },
-  {
-    // Sidebar Toggle: Remove default VSCode keybinding for secondary sidebar toggle
-    "key": "ctrl+alt+b",
-    "command": "-workbench.action.toggleAuxiliaryBar"
-  },
-  {
-    // GitHub Copilot: Accept inline suggestion
-    "key": "ctrl+tab",
-    "command": "editor.action.inlineSuggest.commit",
-    "when": "inlineEditIsVisible && tabShouldAcceptInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineEditIsVisible && inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineEditIsVisible && inlineSuggestionVisible && tabShouldAcceptInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible"
-  },
-  {
-    // GitHub Copilot: Remove default VSCode keybinding in favor for accepting inline suggestion
-    "key": "ctrl+tab",
-    "command": "-workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup",
-    "when": "!activeEditorGroupEmpty"
-  },
-  {
-    // GitHub Copilot: Remove default VSCode keybinding for accepting inline suggestion
-    "key": "tab",
-    "command": "-editor.action.inlineSuggest.commit",
-    "when": "inlineEditIsVisible && tabShouldAcceptInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineEditIsVisible && inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineEditIsVisible && inlineSuggestionVisible && tabShouldAcceptInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible"
-  },
-  {
-    // GitHub Copilot: Hide inline suggestion
-    "key": "escape",
-    "command": "editor.action.inlineSuggest.hide",
-    "when": "(inlineEditIsVisible || inlineSuggestionVisible) && (neovim.init && neovim.mode != 'insert')"
-  },
-  {
-    "key": "ctrl+shift+pagedown",
-    "command": "-workbench.action.moveEditorRightInGroup"
-  },
-  {
-    "key": "ctrl+alt+right",
-    "command": "-workbench.action.moveEditorToNextGroup"
-  },
-  {
-    "key": "ctrl+alt+left",
-    "command": "-workbench.action.moveEditorToPreviousGroup"
-  },
-  {
-    "key": "ctrl+alt+l",
-    "command": "workbench.action.moveEditorToRightGroup",
-    "when": "editorFocus"
-  },
-  {
-    "key": "ctrl+alt+h",
-    "command": "workbench.action.moveEditorToLeftGroup",
-    "when": "editorFocus"
-  },
-  {
-    "key": "ctrl+h",
-    "command": "-editor.action.startFindReplaceAction",
-    "when": "editorFocus || editorIsOpen"
-  },
-  {
-    "key": "ctrl+h",
-    "command": "workbench.action.previousSideBarView",
-    "when": "sideBarFocus"
-  },
-  {
-    "key": "ctrl+l",
-    "command": "workbench.action.nextPanelView",
-    "when": "panelFocus"
-  },
-  {
-    "key": "ctrl+h",
-    "command": "workbench.action.previousPanelView",
-    "when": "panelFocus"
-  },
-  {
-    "key": "alt+g",
-    "command": "github.copilot.git.generateCommitMessage",
-    "when": "sideBarFocus && workbench.scm.active"
-  },
-  {
-    "key": "alt+a",
-    "command": "-editor.action.accessibilityHelpConfigureAssignedKeybindings",
-    "when": "accessibilityHelpIsShown && accessibleViewHasAssignedKeybindings"
-  },
-  {
-    "key": "shift+alt+e",
-    "command": "workbench.action.toggleSidebarVisibility"
-  },
-  {
-    "key": "shift+alt+d",
-    "command": "workbench.action.toggleAuxiliaryBar"
-  },
-  {
-    "key": "ctrl+l",
-    "command": "workbench.action.nextSideBarView",
-    "when": "sideBarFocus"
-  },
-  {
-    "key": "ctrl+l",
-    "command": "workbench.action.nextAuxiliaryBarView",
-    "when": "auxiliaryBarFocus"
-  },
-  {
-    "key": "ctrl+h",
-    "command": "workbench.action.previousAuxiliaryBarView",
-    "when": "auxiliaryBarFocus"
-  },
-  {
-    "key": "alt+c",
-    "command": "workbench.action.focusPanel"
-  },
-  {
-    "key": "alt+e",
-    "command": "workbench.action.focusSideBar"
-  },
-  {
-    "key": "alt+c",
-    "command": "-workbench.action.terminal.toggleFindCaseSensitive",
-    "when": "terminalFindVisible && terminalHasBeenCreated || terminalFindVisible && terminalProcessSupported"
-  },
-  {
-    "key": "alt+c",
-    "command": "-toggleFindCaseSensitive",
-    "when": "editorFocus"
-  },
-  {
-    "key": "alt+c",
-    "command": "-toggleSearchCaseSensitive",
-    "when": "searchViewletFocus"
-  },
-  {
-    "key": "alt+c",
-    "command": "-toggleSearchEditorCaseSensitive",
-    "when": "inSearchEditor && searchInputBoxFocus"
-  },
-  {
-    "key": "alt+c",
-    "command": "-markdown.extension.checkTaskList",
-    "when": "editorTextFocus && editorLangId =~ /^markdown$|^rmd$|^quarto$/"
-  },
-  {
-    "key": "ctrl+0",
-    "command": "-workbench.action.focusSideBar"
-  },
-  {
-    "key": "alt+d",
-    "command": "workbench.action.focusAuxiliaryBar"
-  },
-  {
-    "key": "alt+v",
-    "command": "workbench.action.focusActiveEditorGroup"
-  },
-  {
-    "key": "ctrl+shift+2",
-    "command": "editor.action.inlineSuggest.showNext",
-    "when": "inlineSuggestionVisible && !editorReadonly"
-  },
-  {
-    "key": "shift+alt+i",
-    "command": "-editor.action.insertCursorAtEndOfEachLineSelected",
-    "when": "editorTextFocus"
-  },
-  {
-    "key": "ctrl+shift+5",
-    "command": "editor.action.inlineSuggest.showPrevious",
-    "when": "inlineSuggestionVisible && !editorReadonly"
-  },
-  {
-    "key": "alt+[",
-    "command": "-editor.action.inlineSuggest.showPrevious",
-    "when": "inlineSuggestionVisible && !editorReadonly"
-  },
-  {
-    "key": "alt+\\",
-    "command": "-editor.action.inlineSuggest.trigger",
-    "when": "editorTextFocus && !editorHasSelection && !inlineSuggestionsVisible"
-  },
-  {
-    "key": "tab",
-    "command": "markdown.extension.onTabKey",
-    "when": "editorTextFocus && markdown.extension.editor.cursor.inList && !editorHasMultipleSelections && !editorReadonly && !editorTabMovesFocus && !hasOtherSuggestions && !hasSnippetCompletions && !inSnippetMode && !markdown.extension.editor.cursor.inFencedCodeBlock && !markdown.extension.editor.cursor.inMathEnv && !suggestWidgetVisible && !tabShouldAcceptInlineEdit && !tabShouldJumpToInlineEdit && editorLangId =~ /^markdown$|^rmd$|^quarto$/"
-  },
-  {
-    "key": "tab",
-    "command": "-markdown.extension.onTabKey",
-    "when": "editorTextFocus && markdown.extension.editor.cursor.inList && !editorHasMultipleSelections && !editorReadonly && !editorTabMovesFocus && !hasOtherSuggestions && !hasSnippetCompletions && !inSnippetMode && !inlineSuggestionVisible && !markdown.extension.editor.cursor.inFencedCodeBlock && !markdown.extension.editor.cursor.inMathEnv && !suggestWidgetVisible && !tabShouldAcceptInlineEdit && !tabShouldJumpToInlineEdit && editorLangId =~ /^markdown$|^rmd$|^quarto$/"
-  },
-  {
-    "key": "ctrl+shift+6",
-    "command": "workbench.action.chat.startVoiceChat",
-    "when": "chatIsEnabled && hasSpeechProvider && inChatInput && !chatSessionRequestInProgress && !editorFocus && !notebookEditorFocused && !scopedVoiceChatGettingReady && !speechToTextInProgress || chatIsEnabled && hasSpeechProvider && inlineChatFocused && !chatSessionRequestInProgress && !editorFocus && !notebookEditorFocused && !scopedVoiceChatGettingReady && !speechToTextInProgress"
-  },
-  {
-    "key": "ctrl+shift+h",
-    "command": "terminal.focus",
-    "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported || terminalHasBeenCreated && terminalTabsFocus || terminalProcessSupported && terminalTabsFocus"
-  },
-  {
-    "key": "ctrl+shift+l",
-    "command": "workbench.action.terminal.focusTabs",
-    "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported || terminalHasBeenCreated && terminalTabsFocus || terminalProcessSupported && terminalTabsFocus"
-  },
-  {
-    "key": "ctrl+q",
-    "command": "-workbench.action.quickOpenView"
-  },
-  {
-    "key": "ctrl+f",
-    "command": "editor.action.inlineSuggest.acceptNextWord",
-    "when": "inlineSuggestionVisible && !editorReadonly"
-  },
-  {
-    "key": "ctrl+d",
-    "command": "editor.action.inlineSuggest.acceptNextLine",
-    "when": "inlineSuggestionVisible && !editorReadonly"
-  },
-  {
-    "key": "alt+r",
-    "command": "keybindings.editor.recordSearchKeys",
-    "when": "inKeybindings && inKeybindingsSearch"
-  },
-  {
-    "key": "alt+k",
-    "command": "-keybindings.editor.recordSearchKeys",
-    "when": "inKeybindings && inKeybindingsSearch"
-  },
-  {
-    "key": "ctrl+j",
-    "command": "-workbench.action.togglePanel"
-  },
-  {
-    "key": "ctrl+shift+2",
-    "command": "editor.action.inlineSuggest.trigger",
-    "when": "!editorReadonly && !inlineSuggestionVisible"
-  },
-  {
-    "key": "escape",
-    "command": "-editor.action.inlineSuggest.hide",
-    "when": "inlineEditIsVisible || inlineSuggestionVisible"
-  },
-  {
-    "key": "ctrl+shift+h",
-    "command": "terminal.focus"
-  },
-  {
-    "key": "ctrl+f",
-    "command": "-actions.find",
-    "when": "editorFocus || editorIsOpen"
-  },
-  {
-    "key": "ctrl+j",
-    "command": "list.focusDown",
-    "when": "terminalHasBeenCreated && terminalTabsFocus || terminalProcessSupported && terminalTabsFocus"
-  },
-  {
-    "key": "ctrl+k",
-    "command": "list.focusUp",
-    "when": "terminalHasBeenCreated && terminalTabsFocus || terminalProcessSupported && terminalTabsFocus"
-  },
-  {
-    "key": "ctrl+tab",
-    "command": "editor.action.inlineSuggest.jump",
-    "when": "inlineEditIsVisible && tabShouldJumpToInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible"
-  },
-  {
-    "key": "tab",
-    "command": "-editor.action.inlineSuggest.jump",
-    "when": "inlineEditIsVisible && tabShouldJumpToInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible"
-  },
-  {
-    "key": "ctrl+shift+tab",
-    "command": "-workbench.action.quickOpenNavigatePreviousInEditorPicker",
-    "when": "inEditorsPicker && inQuickOpen"
-  },
-  {
-    "key": "ctrl+shift+tab",
-    "command": "-workbench.action.quickOpenLeastRecentlyUsedEditorInGroup",
-    "when": "!activeEditorGroupEmpty"
-  },
-  {
-    "key": "ctrl+shift+tab",
-    "command": "hideSuggestWidget",
-    "when": "suggestWidgetVisible && textInputFocus"
-  },
-  {
-    "key": "ctrl+shift+d",
-    "command": "-workbench.view.debug",
-    "when": "viewContainer.workbench.view.debug.enabled"
-  },
-  {
-    "key": "shift+alt+c",
-    "command": "openInIntegratedTerminal",
-    "when": "editorFocus"
-  },
-  {
-    "key": "ctrl+shift+i",
-    "command": "workbench.action.chat.toggleAgentMode"
-  },
-  {
-    "key": "ctrl+shift+4",
-    "command": "editor.action.inlineSuggest.triggerInlineEditExplicit"
-  },
-  {
-    "key": "tab",
-    "command": "-editor.action.inlineSuggest.commit",
-    "when": "inlineEditIsVisible && tabShouldAcceptInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineEditIsVisible && inlineSuggestionVisible && tabShouldAcceptInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editor.hasSelection && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineEditIsVisible && inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editor.hasSelection && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible"
-  },
-  {
-    "key": "ctrl+shift+b",
-    "command": "markdown.extension.editing.toggleBold",
-    "when": "editorTextFocus && !editorReadonly && editorLangId =~ /^markdown$|^rmd$|^quarto$/"
-  },
-  {
-    "key": "ctrl+f",
-    "command": "-vscode-neovim.ctrl-f",
-    "when": "editorTextFocus && neovim.ctrlKeysNormal.f && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
-  },
-  {
-    "key": "ctrl+b",
-    "command": "-vscode-neovim.ctrl-b",
-    "when": "editorTextFocus && neovim.ctrlKeysNormal.b && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
-  },
-  {
-    "key": "ctrl+d",
-    "command": "-vscode-neovim.ctrl-d",
-    "when": "editorTextFocus && neovim.ctrlKeysNormal.d && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
-  },
-  {
-    "key": "ctrl+u",
-    "command": "-vscode-neovim.ctrl-u",
-    "when": "editorTextFocus && neovim.ctrlKeysNormal.u && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
-  },
-  {
-    "key": "ctrl+f",
-    "command": "vscode-neovim.send",
-    "args": "<C-f>",
-    "when": "editorTextFocus && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
-  },
-  {
-    "key": "ctrl+b",
-    "command": "vscode-neovim.send",
-    "args": "<C-b>",
-    "when": "editorTextFocus && neovim.init && neovim.mode != 'insert'&& editorLangId not in 'neovim.editorLangIdExclusions'"
-  },
-  {
-    "key": "ctrl+d",
-    "command": "vscode-neovim.send",
-    "args": "<C-d>",
-    "when": "editorTextFocus && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
-  },
-  {
-    "key": "ctrl+u",
-    "command": "vscode-neovim.send",
-    "args": "<C-u>",
-    "when": "editorTextFocus && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
-  },
-  {
-    "args": "<C-S-l>",
-    "command": "vscode-neovim.send",
-    "key": "ctrl+shift+l",
-    "when": "editorFocus && neovim.init"
-  },
-  {
-    "key": "f2",
-    "command": "workbench.action.debug.continue",
-    "when": "debugState == 'stopped'"
-  },
-  {
-    "key": "f5",
-    "command": "-workbench.action.debug.continue",
-    "when": "debugState == 'stopped'"
-  },
-  {
-    "key": "f12",
-    "command": "workbench.action.debug.stepOut",
-    "when": "debugState == 'stopped'"
-  },
-  {
-    "key": "shift+f11",
-    "command": "-workbench.action.debug.stepOut",
-    "when": "debugState == 'stopped'"
-  },
-  {
-    "key": "f8",
-    "command": "workbench.action.debug.stop",
-    "when": "inDebugMode && !focusedSessionIsAttach"
-  },
-  {
-    "key": "shift+f5",
-    "command": "-workbench.action.debug.stop",
-    "when": "inDebugMode && !focusedSessionIsAttach"
-  },
-  {
-    "key": "f6",
-    "command": "workbench.action.debug.restart",
-    "when": "inDebugMode"
-  },
-  {
-    "key": "ctrl+shift+f5",
-    "command": "-workbench.action.debug.restart",
-    "when": "inDebugMode"
-  },
-  {
-    "key": "f9",
-    "command": "workbench.action.debug.pause",
-    "when": "debugState == 'running'"
-  },
-  {
-    "key": "f6",
-    "command": "-workbench.action.debug.pause",
-    "when": "debugState == 'running'"
-  },
-  {
-    "key": "ctrl+shift+o",
-    "command": "workbench.action.chat.switchToNextModel",
-    "when": "chatIsEnabled && inChatInput"
-  },
-  {
-    "key": "ctrl+shift+k",
-    "command": "workbench.action.chat.openModePicker",
-    "when": "chatIsEnabled && inChatInput && chatLocation == 'panel'"
-  },
-  {
-    "key": "ctrl+.",
-    "command": "-workbench.action.chat.openModePicker",
-    "when": "chatIsEnabled && inChatInput && chatLocation == 'panel'"
-  },
-  {
-    "key": "ctrl+shift+l",
-    "command": "workbench.action.chat.openModelPicker",
-    "when": "chatIsEnabled && inChatInput"
-  },
-  {
-    "key": "ctrl+alt+.",
-    "command": "-workbench.action.chat.openModelPicker",
-    "when": "chatIsEnabled && inChatInput"
-  },
-  {
-    "key": "alt+k",
-    "command": "vscode-neovim.send",
-    "args": "<M-k>",
-    "when": "editorTextFocus && neovim.init && neovim.mode == 'visual' && editorLangId not in 'neovim.editorLangIdExclusions'"
-  },
-  {
-    "key": "alt+j",
-    "command": "vscode-neovim.send",
-    "args": "<M-j>",
-    "when": "editorTextFocus && neovim.init && neovim.mode == 'visual' && editorLangId not in 'neovim.editorLangIdExclusions'"
-  },
-  {
-    "key": "alt+h",
-    "command": "vscode-neovim.send",
-    "args": "<M-h>",
-    "when": "editorTextFocus && neovim.init && neovim.mode == 'visual' && editorLangId not in 'neovim.editorLangIdExclusions'"
-  },
-  {
-    "key": "alt+l",
-    "command": "vscode-neovim.send",
-    "args": "<M-l>",
-    "when": "editorTextFocus && neovim.init && neovim.mode == 'visual' && editorLangId not in 'neovim.editorLangIdExclusions'"
-  },
-  {
-    "key": "shift+alt+c",
-    "command": "workbench.action.togglePanel"
-  },
-  {
-    "key": "ctrl+shift+k",
-    "command": "workbench.action.terminal.split",
-    "when": "terminalFocus && terminalProcessSupported || terminalFocus && terminalWebExtensionContributedProfile"
-  },
-  {
-    "key": "f1",
-    "command": "-workbench.action.showCommands"
-  },
-  {
-    "key": "f1",
-    "command": "workbench.action.showCommands",
-    "when": "!terminalFocus"
-  },
-  {
-    "key": "ctrl+alt+j",
-    "command": "-editor.action.insertSnippet",
-    "when": "editorTextFocus && !editorReadonly && editorLangId == 'powershell'"
-  },
-  {
-    "key": "ctrl+alt+n",
-    "command": "editor.action.insertSnippet",
-    "args": {
-      "name": "Wrap in Code Block"
+    // Terminal Overrides
+    {
+        //Terminal: Removed in favor of using terminal built-in Emacs command
+        "key": "ctrl+p",
+        "command": "-workbench.action.quickOpen"
+        // don't restrict with when clause
     },
-    "when": "editorTextFocus && !editorReadonly"
-  }
-
+    {
+        //Terminal: Removed in favor of using terminal built-in Emacs command
+        "command": "-workbench.action.terminal.focusFind",
+        "key": "ctrl+f",
+        "when": "terminalFocus"
+    },
+    {
+        //Terminal: Remove quickOpen in using terminal built-in Emacs command
+        "command": "-workbench.action.quickOpen",
+        "key": "ctrl+e"
+        // don't restrict with when clause
+    },
+    {
+        //Terminal: Removed in favor of using Emacs command
+        "command": "deleteAllRight",
+        "key": "ctrl+k",
+        "when": "terminalFocus"
+    },
+    {
+        // Terminal command: Delete word to the left
+        "command": "-workbench.action.terminal.killEditor",
+        "key": "ctrl+w",
+        "when": "terminalEditorFocus && terminalFocus && terminalHasBeenCreated && resourceScheme == 'vscode-terminal' || terminalEditorFocus && terminalFocus && terminalProcessSupported && resourceScheme == 'vscode-terminal'"
+    },
+    {
+        // Terminal command:  Enable Windows paste
+        "command": "workbench.action.terminal.paste",
+        "key": "ctrl+v",
+        "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+    },
+    {
+        // Terminal: Remove default VSCode keymapping in favor of using terminal built-in Emacs command
+        "key": "ctrl+f",
+        "command": "-workbench.action.terminal.focusFind",
+        "when": "terminalFindFocused && terminalHasBeenCreated || terminalFindFocused && terminalProcessSupported || terminalFocusInAny && terminalHasBeenCreated || terminalFocusInAny && terminalProcessSupported"
+    },
+    {
+        // Terminal: Remove default VSCode keymapping in favor of using terminal built-in Emacs command
+        "key": "ctrl+w",
+        "command": "-workbench.action.terminal.killEditor",
+        "when": "terminalEditorFocus && terminalFocus && terminalHasBeenCreated || terminalEditorFocus && terminalFocus && terminalProcessSupported"
+    },
+    {
+        // Terminal movement: remove existing keymapping when in terminal in favor delete word to the left
+        "command": "-workbench.action.closeActiveEditor",
+        "key": "ctrl+w",
+        "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported"
+    },
+    {
+        // Editor customizations: new file; overwrites new window
+        "command": "workbench.action.files.newUntitledFile",
+        "key": "ctrl+shift+n"
+    },
+    {
+        // Editor: remove close group due to inadverent closing of windows
+        "key": "ctrl+w",
+        "command": "-workbench.action.closeGroup",
+        "when": "activeEditorGroupEmpty && multipleEditorGroups"
+    },
+    {
+        // Editor: remove close active editor due to inadverent closing of windows
+        "key": "ctrl+w",
+        "command": "-workbench.action.closeActiveEditor"
+    },
+    {
+        // PowerShell debugging: add keymapping (overwrites Debug: Start Debugging)
+        "command": "PowerShell.Debug.Start",
+        "key": "f5",
+        "when": "editorTextFocus && editorLangId == 'powershell'"
+    },
+    {
+        // PowerShell debugging: remove default VSCode keymapping in favor of "Play" button
+        "command": "-workbench.action.debug.start",
+        "key": "f5",
+        "when": "debuggersAvailable && debugState == 'inactive' && editorLangId == 'powershell'"
+    },
+    {
+        // Debugging: Use F5 to debug in all other languages
+        "key": "f5",
+        "command": "workbench.action.debug.start",
+        "when": "debuggersAvailable && debugState == 'inactive'"
+    },
+    {
+        // Debugging: Toggle inline breakpoint
+        "key": "ctrl+f9",
+        "command": "editor.debug.action.toggleInlineBreakpoint",
+        "when": "editorTextFocus"
+    },
+    {
+        // Editor Navigation: Next editor
+        "key": "ctrl+l",
+        "command": "workbench.action.nextEditor",
+        "when": "editorTextFocus || activeViewlet"
+    },
+    {
+        // Editor Navigation: Remove default VSCode keybinding
+        "key": "ctrl+pagedown",
+        "command": "-workbench.action.nextEditor"
+    },
+    {
+        // Editor Navigation: Previous editor
+        "key": "ctrl+h",
+        "command": "workbench.action.previousEditor",
+        "when": "editorTextFocus || activeViewlet"
+    },
+    {
+        // Editor Navigation: Remove default VSCode keybinding
+        "key": "ctrl+pageup",
+        "command": "-workbench.action.previousEditor"
+    },
+    {
+        // Editor Navigation: Remove default VSCode keybinding
+        "key": "ctrl+shift+pageup",
+        "command": "-workbench.action.moveEditorLeftInGroup"
+    },
+    {
+        // Editor Navigation: Resize panel to the left
+        "key": "shift+left",
+        "command": "workbench.action.terminal.resizePaneLeft"
+    },
+    {
+        // Editor Navigation: Resize panel to the right
+        "key": "shift+right",
+        "command": "workbench.action.terminal.resizePaneRight"
+    },
+    {
+        // Editor Navigation: Resize panel down
+        "key": "shift+down",
+        "command": "workbench.action.terminal.resizePaneDown"
+    },
+    {
+        // Editor Navigation: Resize panel up
+        "key": "shift+up",
+        "command": "workbench.action.terminal.resizePaneUp"
+    },
+    {
+        // Editor Navigation: Increase editor pane size
+        "key": "alt+i",
+        "command": "workbench.action.increaseViewSize"
+    },
+    {
+        // Editor Navigation: Navigate backwards in document
+        "key": "alt+b",
+        "command": "workbench.action.navigateBack",
+        "when": "canNavigateBack"
+    },
+    {
+        // Editor Navigation: Remove default VSCode keybinding
+        "key": "alt+left",
+        "command": "-workbench.action.navigateBack",
+        "when": "canNavigateBack"
+    },
+    {
+        // Editor Navigation: Navigate forwards in document
+        "key": "alt+f",
+        "command": "workbench.action.navigateForward",
+        "when": "canNavigateForward"
+    },
+    {
+        // Editor Navigation: Remove default VSCode keybinding
+        "key": "alt+right",
+        "command": "-workbench.action.navigateForward",
+        "when": "canNavigateForward"
+    },
+    {
+        // Sidebar Toggle: Remove default VSCode keybinding
+        "key": "ctrl+b",
+        "command": "-workbench.action.toggleSidebarVisibility"
+    },
+    {
+        // Sidebar Toggle: Remove default VSCode keybinding
+        "key": "ctrl+`",
+        "command": "-workbench.action.terminal.toggleTerminal",
+        "when": "terminal.active"
+    },
+    {
+        // Sidebar Toggle: Remove default VSCode keybinding for secondary sidebar toggle
+        "key": "ctrl+alt+b",
+        "command": "-workbench.action.toggleAuxiliaryBar"
+    },
+    {
+        // GitHub Copilot: Accept inline suggestion
+        "key": "ctrl+tab",
+        "command": "editor.action.inlineSuggest.commit",
+        "when": "inlineEditIsVisible && tabShouldAcceptInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineEditIsVisible && inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineEditIsVisible && inlineSuggestionVisible && tabShouldAcceptInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible"
+    },
+    {
+        // GitHub Copilot: Remove default VSCode keybinding in favor for accepting inline suggestion
+        "key": "ctrl+tab",
+        "command": "-workbench.action.quickOpenPreviousRecentlyUsedEditorInGroup",
+        "when": "!activeEditorGroupEmpty"
+    },
+    {
+        // GitHub Copilot: Remove default VSCode keybinding for accepting inline suggestion
+        "key": "tab",
+        "command": "-editor.action.inlineSuggest.commit",
+        "when": "inlineEditIsVisible && tabShouldAcceptInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineEditIsVisible && inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineEditIsVisible && inlineSuggestionVisible && tabShouldAcceptInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible"
+    },
+    {
+        // GitHub Copilot: Hide inline suggestion
+        "key": "escape",
+        "command": "editor.action.inlineSuggest.hide",
+        "when": "(inlineEditIsVisible || inlineSuggestionVisible) && (neovim.init && neovim.mode != 'insert')"
+    },
+    {
+        "key": "ctrl+shift+pagedown",
+        "command": "-workbench.action.moveEditorRightInGroup"
+    },
+    {
+        "key": "ctrl+alt+right",
+        "command": "-workbench.action.moveEditorToNextGroup"
+    },
+    {
+        "key": "ctrl+alt+left",
+        "command": "-workbench.action.moveEditorToPreviousGroup"
+    },
+    {
+        "key": "ctrl+alt+l",
+        "command": "workbench.action.moveEditorToRightGroup",
+        "when": "editorFocus"
+    },
+    {
+        "key": "ctrl+alt+h",
+        "command": "workbench.action.moveEditorToLeftGroup",
+        "when": "editorFocus"
+    },
+    {
+        "key": "ctrl+h",
+        "command": "-editor.action.startFindReplaceAction",
+        "when": "editorFocus || editorIsOpen"
+    },
+    {
+        "key": "ctrl+h",
+        "command": "workbench.action.previousSideBarView",
+        "when": "sideBarFocus"
+    },
+    {
+        "key": "ctrl+l",
+        "command": "workbench.action.nextPanelView",
+        "when": "panelFocus"
+    },
+    {
+        "key": "ctrl+h",
+        "command": "workbench.action.previousPanelView",
+        "when": "panelFocus"
+    },
+    {
+        "key": "alt+g",
+        "command": "github.copilot.git.generateCommitMessage",
+        "when": "sideBarFocus && workbench.scm.active"
+    },
+    {
+        "key": "alt+a",
+        "command": "-editor.action.accessibilityHelpConfigureAssignedKeybindings",
+        "when": "accessibilityHelpIsShown && accessibleViewHasAssignedKeybindings"
+    },
+    {
+        "key": "shift+alt+e",
+        "command": "workbench.action.toggleSidebarVisibility"
+    },
+    {
+        "key": "shift+alt+d",
+        "command": "workbench.action.toggleAuxiliaryBar"
+    },
+    {
+        "key": "ctrl+l",
+        "command": "workbench.action.nextSideBarView",
+        "when": "sideBarFocus"
+    },
+    {
+        "key": "ctrl+l",
+        "command": "workbench.action.nextAuxiliaryBarView",
+        "when": "auxiliaryBarFocus"
+    },
+    {
+        "key": "ctrl+h",
+        "command": "workbench.action.previousAuxiliaryBarView",
+        "when": "auxiliaryBarFocus"
+    },
+    {
+        "key": "alt+c",
+        "command": "workbench.action.focusPanel"
+    },
+    {
+        "key": "alt+e",
+        "command": "workbench.action.focusSideBar"
+    },
+    {
+        "key": "alt+c",
+        "command": "-workbench.action.terminal.toggleFindCaseSensitive",
+        "when": "terminalFindVisible && terminalHasBeenCreated || terminalFindVisible && terminalProcessSupported"
+    },
+    {
+        "key": "alt+c",
+        "command": "-toggleFindCaseSensitive",
+        "when": "editorFocus"
+    },
+    {
+        "key": "alt+c",
+        "command": "-toggleSearchCaseSensitive",
+        "when": "searchViewletFocus"
+    },
+    {
+        "key": "alt+c",
+        "command": "-toggleSearchEditorCaseSensitive",
+        "when": "inSearchEditor && searchInputBoxFocus"
+    },
+    {
+        "key": "alt+c",
+        "command": "-markdown.extension.checkTaskList",
+        "when": "editorTextFocus && editorLangId =~ /^markdown$|^rmd$|^quarto$/"
+    },
+    {
+        "key": "ctrl+0",
+        "command": "-workbench.action.focusSideBar"
+    },
+    {
+        "key": "alt+d",
+        "command": "workbench.action.focusAuxiliaryBar"
+    },
+    {
+        "key": "alt+v",
+        "command": "workbench.action.focusActiveEditorGroup"
+    },
+    {
+        "key": "ctrl+shift+2",
+        "command": "editor.action.inlineSuggest.showNext",
+        "when": "inlineSuggestionVisible && !editorReadonly"
+    },
+    {
+        "key": "shift+alt+i",
+        "command": "-editor.action.insertCursorAtEndOfEachLineSelected",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+shift+5",
+        "command": "editor.action.inlineSuggest.showPrevious",
+        "when": "inlineSuggestionVisible && !editorReadonly"
+    },
+    {
+        "key": "alt+[",
+        "command": "-editor.action.inlineSuggest.showPrevious",
+        "when": "inlineSuggestionVisible && !editorReadonly"
+    },
+    {
+        "key": "alt+\\",
+        "command": "-editor.action.inlineSuggest.trigger",
+        "when": "editorTextFocus && !editorHasSelection && !inlineSuggestionsVisible"
+    },
+    {
+        "key": "tab",
+        "command": "markdown.extension.onTabKey",
+        "when": "editorTextFocus && markdown.extension.editor.cursor.inList && !editorHasMultipleSelections && !editorReadonly && !editorTabMovesFocus && !hasOtherSuggestions && !hasSnippetCompletions && !inSnippetMode && !markdown.extension.editor.cursor.inFencedCodeBlock && !markdown.extension.editor.cursor.inMathEnv && !suggestWidgetVisible && !tabShouldAcceptInlineEdit && !tabShouldJumpToInlineEdit && editorLangId =~ /^markdown$|^rmd$|^quarto$/"
+    },
+    {
+        "key": "tab",
+        "command": "-markdown.extension.onTabKey",
+        "when": "editorTextFocus && markdown.extension.editor.cursor.inList && !editorHasMultipleSelections && !editorReadonly && !editorTabMovesFocus && !hasOtherSuggestions && !hasSnippetCompletions && !inSnippetMode && !inlineSuggestionVisible && !markdown.extension.editor.cursor.inFencedCodeBlock && !markdown.extension.editor.cursor.inMathEnv && !suggestWidgetVisible && !tabShouldAcceptInlineEdit && !tabShouldJumpToInlineEdit && editorLangId =~ /^markdown$|^rmd$|^quarto$/"
+    },
+    {
+        "key": "ctrl+shift+6",
+        "command": "workbench.action.chat.startVoiceChat",
+        "when": "chatIsEnabled && hasSpeechProvider && inChatInput && !chatSessionRequestInProgress && !editorFocus && !notebookEditorFocused && !scopedVoiceChatGettingReady && !speechToTextInProgress || chatIsEnabled && hasSpeechProvider && inlineChatFocused && !chatSessionRequestInProgress && !editorFocus && !notebookEditorFocused && !scopedVoiceChatGettingReady && !speechToTextInProgress"
+    },
+    {
+        "key": "ctrl+shift+h",
+        "command": "terminal.focus",
+        "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported || terminalHasBeenCreated && terminalTabsFocus || terminalProcessSupported && terminalTabsFocus"
+    },
+    {
+        "key": "ctrl+shift+l",
+        "command": "workbench.action.terminal.focusTabs",
+        "when": "terminalFocus && terminalHasBeenCreated || terminalFocus && terminalProcessSupported || terminalHasBeenCreated && terminalTabsFocus || terminalProcessSupported && terminalTabsFocus"
+    },
+    {
+        "key": "ctrl+q",
+        "command": "-workbench.action.quickOpenView"
+    },
+    {
+        "key": "ctrl+f",
+        "command": "editor.action.inlineSuggest.acceptNextWord",
+        "when": "inlineSuggestionVisible && !editorReadonly"
+    },
+    {
+        "key": "ctrl+d",
+        "command": "editor.action.inlineSuggest.acceptNextLine",
+        "when": "inlineSuggestionVisible && !editorReadonly"
+    },
+    {
+        "key": "alt+r",
+        "command": "keybindings.editor.recordSearchKeys",
+        "when": "inKeybindings && inKeybindingsSearch"
+    },
+    {
+        "key": "alt+k",
+        "command": "-keybindings.editor.recordSearchKeys",
+        "when": "inKeybindings && inKeybindingsSearch"
+    },
+    {
+        "key": "ctrl+j",
+        "command": "-workbench.action.togglePanel"
+    },
+    {
+        "key": "ctrl+shift+2",
+        "command": "editor.action.inlineSuggest.trigger",
+        "when": "!editorReadonly && !inlineSuggestionVisible"
+    },
+    {
+        "key": "escape",
+        "command": "-editor.action.inlineSuggest.hide",
+        "when": "inlineEditIsVisible || inlineSuggestionVisible"
+    },
+    {
+        "key": "ctrl+shift+h",
+        "command": "terminal.focus"
+    },
+    {
+        "key": "ctrl+f",
+        "command": "-actions.find",
+        "when": "editorFocus || editorIsOpen"
+    },
+    {
+        "key": "ctrl+j",
+        "command": "list.focusDown",
+        "when": "terminalHasBeenCreated && terminalTabsFocus || terminalProcessSupported && terminalTabsFocus"
+    },
+    {
+        "key": "ctrl+k",
+        "command": "list.focusUp",
+        "when": "terminalHasBeenCreated && terminalTabsFocus || terminalProcessSupported && terminalTabsFocus"
+    },
+    {
+        "key": "ctrl+tab",
+        "command": "editor.action.inlineSuggest.jump",
+        "when": "inlineEditIsVisible && tabShouldJumpToInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible"
+    },
+    {
+        "key": "tab",
+        "command": "-editor.action.inlineSuggest.jump",
+        "when": "inlineEditIsVisible && tabShouldJumpToInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible"
+    },
+    {
+        "key": "ctrl+shift+tab",
+        "command": "-workbench.action.quickOpenNavigatePreviousInEditorPicker",
+        "when": "inEditorsPicker && inQuickOpen"
+    },
+    {
+        "key": "ctrl+shift+tab",
+        "command": "-workbench.action.quickOpenLeastRecentlyUsedEditorInGroup",
+        "when": "!activeEditorGroupEmpty"
+    },
+    {
+        "key": "ctrl+shift+tab",
+        "command": "hideSuggestWidget",
+        "when": "suggestWidgetVisible && textInputFocus"
+    },
+    {
+        "key": "ctrl+shift+d",
+        "command": "-workbench.view.debug",
+        "when": "viewContainer.workbench.view.debug.enabled"
+    },
+    {
+        "key": "shift+alt+c",
+        "command": "openInIntegratedTerminal",
+        "when": "editorFocus"
+    },
+    {
+        "key": "ctrl+shift+i",
+        "command": "workbench.action.chat.toggleAgentMode"
+    },
+    {
+        "key": "ctrl+shift+4",
+        "command": "editor.action.inlineSuggest.triggerInlineEditExplicit"
+    },
+    {
+        "key": "tab",
+        "command": "-editor.action.inlineSuggest.commit",
+        "when": "inlineEditIsVisible && tabShouldAcceptInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineEditIsVisible && inlineSuggestionVisible && tabShouldAcceptInlineEdit && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editor.hasSelection && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible || inlineEditIsVisible && inlineSuggestionHasIndentationLessThanTabSize && inlineSuggestionVisible && !editor.hasSelection && !editorHoverFocused && !editorTabMovesFocus && !suggestWidgetVisible"
+    },
+    {
+        "key": "ctrl+shift+b",
+        "command": "markdown.extension.editing.toggleBold",
+        "when": "editorTextFocus && !editorReadonly && editorLangId =~ /^markdown$|^rmd$|^quarto$/"
+    },
+    {
+        "key": "ctrl+f",
+        "command": "-vscode-neovim.ctrl-f",
+        "when": "editorTextFocus && neovim.ctrlKeysNormal.f && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
+    },
+    {
+        "key": "ctrl+b",
+        "command": "-vscode-neovim.ctrl-b",
+        "when": "editorTextFocus && neovim.ctrlKeysNormal.b && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
+    },
+    {
+        "key": "ctrl+d",
+        "command": "-vscode-neovim.ctrl-d",
+        "when": "editorTextFocus && neovim.ctrlKeysNormal.d && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
+    },
+    {
+        "key": "ctrl+u",
+        "command": "-vscode-neovim.ctrl-u",
+        "when": "editorTextFocus && neovim.ctrlKeysNormal.u && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
+    },
+    {
+        "key": "ctrl+f",
+        "command": "vscode-neovim.send",
+        "args": "<C-f>",
+        "when": "editorTextFocus && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
+    },
+    {
+        "key": "ctrl+b",
+        "command": "vscode-neovim.send",
+        "args": "<C-b>",
+        "when": "editorTextFocus && neovim.init && neovim.mode != 'insert'&& editorLangId not in 'neovim.editorLangIdExclusions'"
+    },
+    {
+        "key": "ctrl+d",
+        "command": "vscode-neovim.send",
+        "args": "<C-d>",
+        "when": "editorTextFocus && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
+    },
+    {
+        "key": "ctrl+u",
+        "command": "vscode-neovim.send",
+        "args": "<C-u>",
+        "when": "editorTextFocus && neovim.init && neovim.mode != 'insert' && editorLangId not in 'neovim.editorLangIdExclusions'"
+    },
+    {
+        "args": "<C-S-l>",
+        "command": "vscode-neovim.send",
+        "key": "ctrl+shift+l",
+        "when": "editorFocus && neovim.init"
+    },
+    {
+        "key": "f2",
+        "command": "workbench.action.debug.continue",
+        "when": "debugState == 'stopped'"
+    },
+    {
+        "key": "f5",
+        "command": "-workbench.action.debug.continue",
+        "when": "debugState == 'stopped'"
+    },
+    {
+        "key": "f12",
+        "command": "workbench.action.debug.stepOut",
+        "when": "debugState == 'stopped'"
+    },
+    {
+        "key": "shift+f11",
+        "command": "-workbench.action.debug.stepOut",
+        "when": "debugState == 'stopped'"
+    },
+    {
+        "key": "f8",
+        "command": "workbench.action.debug.stop",
+        "when": "inDebugMode && !focusedSessionIsAttach"
+    },
+    {
+        "key": "shift+f5",
+        "command": "-workbench.action.debug.stop",
+        "when": "inDebugMode && !focusedSessionIsAttach"
+    },
+    {
+        "key": "f6",
+        "command": "workbench.action.debug.restart",
+        "when": "inDebugMode"
+    },
+    {
+        "key": "ctrl+shift+f5",
+        "command": "-workbench.action.debug.restart",
+        "when": "inDebugMode"
+    },
+    {
+        "key": "f9",
+        "command": "workbench.action.debug.pause",
+        "when": "debugState == 'running'"
+    },
+    {
+        "key": "f6",
+        "command": "-workbench.action.debug.pause",
+        "when": "debugState == 'running'"
+    },
+    {
+        "key": "ctrl+shift+o",
+        "command": "workbench.action.chat.switchToNextModel",
+        "when": "chatIsEnabled && inChatInput"
+    },
+    {
+        "key": "ctrl+shift+k",
+        "command": "workbench.action.chat.openModePicker",
+        "when": "chatIsEnabled && inChatInput && chatLocation == 'panel'"
+    },
+    {
+        "key": "ctrl+.",
+        "command": "-workbench.action.chat.openModePicker",
+        "when": "chatIsEnabled && inChatInput && chatLocation == 'panel'"
+    },
+    {
+        "key": "ctrl+shift+l",
+        "command": "workbench.action.chat.openModelPicker",
+        "when": "chatIsEnabled && inChatInput"
+    },
+    {
+        "key": "ctrl+alt+.",
+        "command": "-workbench.action.chat.openModelPicker",
+        "when": "chatIsEnabled && inChatInput"
+    },
+    {
+        "key": "alt+k",
+        "command": "vscode-neovim.send",
+        "args": "<M-k>",
+        "when": "editorTextFocus && neovim.init && neovim.mode == 'visual' && editorLangId not in 'neovim.editorLangIdExclusions'"
+    },
+    {
+        "key": "alt+j",
+        "command": "vscode-neovim.send",
+        "args": "<M-j>",
+        "when": "editorTextFocus && neovim.init && neovim.mode == 'visual' && editorLangId not in 'neovim.editorLangIdExclusions'"
+    },
+    {
+        "key": "alt+h",
+        "command": "vscode-neovim.send",
+        "args": "<M-h>",
+        "when": "editorTextFocus && neovim.init && neovim.mode == 'visual' && editorLangId not in 'neovim.editorLangIdExclusions'"
+    },
+    {
+        "key": "alt+l",
+        "command": "vscode-neovim.send",
+        "args": "<M-l>",
+        "when": "editorTextFocus && neovim.init && neovim.mode == 'visual' && editorLangId not in 'neovim.editorLangIdExclusions'"
+    },
+    {
+        "key": "shift+alt+c",
+        "command": "workbench.action.togglePanel"
+    },
+    {
+        "key": "ctrl+shift+k",
+        "command": "workbench.action.terminal.split",
+        "when": "terminalFocus && terminalProcessSupported || terminalFocus && terminalWebExtensionContributedProfile"
+    },
+    {
+        "key": "f1",
+        "command": "-workbench.action.showCommands"
+    },
+    {
+        "key": "f1",
+        "command": "workbench.action.showCommands",
+        "when": "!terminalFocus"
+    },
+    {
+        "key": "ctrl+alt+j",
+        "command": "-editor.action.insertSnippet",
+        "when": "editorTextFocus && !editorReadonly && editorLangId == 'powershell'"
+    },
+    {
+        "key": "ctrl+alt+n",
+        "command": "editor.action.insertSnippet",
+        "args": {
+            "name": "Wrap in Code Block"
+        },
+        "when": "editorTextFocus && !editorReadonly"
+    },
 ]
