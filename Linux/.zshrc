@@ -117,8 +117,15 @@ bindkey -M vicmd 'j' down-line-or-search      # j: move down in buffer, search i
 # Alt+Enter inserts a literal newline for multi-line command input
 # Uses self-insert-unmeta which strips the escape/meta bit to insert literal newline
 # Allows cursor navigation between lines (like ESC+Enter described in zsh guide)
+# See https://zsh.sourceforge.io/Guide/zshguide04.html#l100 (4.6.1: Multi-line Editing)
 bindkey -M viins '\e^M' self-insert-unmeta  # Alt+Enter
 bindkey -M vicmd '\e^M' self-insert-unmeta  # Alt+Enter in normal mode
+
+# Ctrl+O converts continuation lines (PS2 prompts) into a single editable buffer
+# Useful for editing commands that span multiple lines with continuations
+bindkey -M viins '^O' push-line-or-edit  # Ctrl+O
+bindkey -M vicmd '^O' push-line-or-edit  # Ctrl+O in normal mode
+
 
 # ------------------------------------------------------------------------------
 # Cursor Shape Based on Vi Mode
