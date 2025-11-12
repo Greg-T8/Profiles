@@ -82,7 +82,7 @@ $Main = {
 
 $Helpers = {
     # Script-level variables
-    $script:isWindows = $null
+    $script:onWindows = $null
     $script:isAdmin = $null
     $script:windowsPowerShellPath = $null
     $script:gitAvailable = $null
@@ -90,24 +90,24 @@ $Helpers = {
     function Initialize-PlatformDetection {
         # Detect if running on Windows
         if ($PSVersionTable.PSVersion.Major -ge 6) {
-            $script:isWindows = Get-Variable -Name 'IsWindows' -ValueOnly -ErrorAction SilentlyContinue
-            if ($null -eq $script:isWindows) {
-                $script:isWindows = $true
+            $script:onWindows = Get-Variable -Name 'IsWindows' -ValueOnly -ErrorAction SilentlyContinue
+            if ($null -eq $script:onWindows) {
+                $script:onWindows = $true
             }
         }
         else {
-            $script:isWindows = $true
+            $script:onWindows = $true
         }
 
         # Check if running as administrator
         $script:isAdmin = $false
-        if ($script:isWindows) {
+        if ($script:onWindows) {
             $currentPrincipal = New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())
             $script:isAdmin = $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
         }
 
         # Define Windows PowerShell path if on Windows
-        $script:windowsPowerShellPath = if ($script:isWindows) {
+        $script:windowsPowerShellPath = if ($script:onWindows) {
             "$HOME\Documents\WindowsPowerShell"
         }
         else {
@@ -130,7 +130,7 @@ $Helpers = {
             Write-Host "  Windows PowerShell: $script:windowsPowerShellPath" -ForegroundColor Gray
         }
 
-        if ($script:isWindows) {
+        if ($script:onWindows) {
             Write-Host "Running as Administrator: $(if ($script:isAdmin) { '[OK]' } else { '[FAIL]' })" -ForegroundColor $(if ($script:isAdmin) { 'Green' } else { 'Red' })
         }
         Write-Host ""
@@ -138,7 +138,7 @@ $Helpers = {
 
     function Confirm-AdministratorRole {
         # Verify administrator privileges on Windows
-        if ($script:isWindows -and -not $script:isAdmin) {
+        if ($script:onWindows -and -not $script:isAdmin) {
             Write-Host "`n=== PowerShell Profile Installer ===" -ForegroundColor Cyan
             Write-Host "`n[ERROR] This script must be run as Administrator." -ForegroundColor Red
             Write-Host "`nPlease restart PowerShell with administrator privileges and try again." -ForegroundColor Yellow
@@ -390,7 +390,7 @@ $Helpers = {
         }
 
         # If on Windows and running PowerShell Core, also configure Windows PowerShell
-        if ($script:isWindows -and $PSVersionTable.PSVersion.Major -ge 6) {
+        if ($script:onWindows -and $PSVersionTable.PSVersion.Major -ge 6) {
             $windowsPowerShellProfilePath = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'WindowsPowerShell\profile.ps1'
             $profilePaths += @{
                 Path = $windowsPowerShellProfilePath
@@ -446,7 +446,7 @@ $Helpers = {
         Write-Host "To activate your new profile, please close this PowerShell session and open a new one." -ForegroundColor Yellow
         Write-Host ""
 
-        if ($script:isWindows) {
+        if ($script:onWindows) {
             Write-Host "Your profile has been installed to:" -ForegroundColor Gray
             Write-Host "  - Windows PowerShell: $script:windowsPowerShellPath\profile.ps1" -ForegroundColor Gray
 
