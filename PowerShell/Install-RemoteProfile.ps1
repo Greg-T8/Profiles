@@ -405,12 +405,19 @@ $Helpers = {
 
             Write-Host "`nConfiguring $profileName profile..." -ForegroundColor Cyan
 
-            # Determine the source path for this profile type
+            # Determine the source path - always use InstallPath for PowerShell Core
+            # For Windows PowerShell, use windowsPowerShellPath if it's different from profile path
             if ($profileName -eq "Windows PowerShell" -and $script:windowsPowerShellPath) {
                 $sourceProfilePath = Join-Path $script:windowsPowerShellPath 'profile.ps1'
             }
             else {
                 $sourceProfilePath = Join-Path $InstallPath 'profile.ps1'
+            }
+
+            # Skip if source and destination are the same
+            if ($sourceProfilePath -eq $profilePath) {
+                Write-Host "[OK] Profile already in place at: $profilePath" -ForegroundColor Green
+                continue
             }
 
             # Copy the installed profile.ps1 to the profile location
