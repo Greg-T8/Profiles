@@ -185,7 +185,7 @@ function prompt {
     else {
         # Windows PowerShell 5.1 - Cannot use ANSI, build prompt string
         "`n" +                                                       # New line
-        "- $(Get-PromptPath)" +                                          # Display shortened path
+        "PWD: $(Get-PromptPath)" +                                          # Display shortened path
         "`n" +                                                       # New line
         $(if (Test-Path variable:/PSDebugContext) { '[DBG]: ' } else { '' }) +  # Debug indicator
         $(if ($NestedPromptLevel -ge 1) { '>>' }) +                  # Nested prompt indicator
