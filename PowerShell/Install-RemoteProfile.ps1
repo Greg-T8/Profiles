@@ -380,16 +380,43 @@ $Helpers = {
                 $windowsPSPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
 
                 if (Test-Path $windowsPSPath) {
-                    # Install PSReadLine in Windows PowerShell context
-                    $installCommand = "Install-Module -Name PSReadLine -Force -AllowClobber -SkipPublisherCheck -Scope AllUsers -Confirm:`$false -Repository PSGallery"
+                    # Build a script block that sets up the environment and installs PSReadLine
+                    $installScript = @'
+# Set execution policy for this process
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process -Force
 
-                    $result = & $windowsPSPath -NoProfile -Command $installCommand 2>&1
+# Install NuGet provider
+Write-Host "Checking NuGet provider..." -ForegroundColor Yellow
+$nuget = Get-PackageProvider -Name NuGet -Force -ForceBootstrap -ErrorAction SilentlyContinue
+if ($nuget) {
+    Write-Host "[OK] NuGet provider installed" -ForegroundColor Green
+}
+
+# Suppress progress and prompts
+$ProgressPreference = 'SilentlyContinue'
+
+# Install PSReadLine
+Write-Host "Installing PSReadLine from PSGallery..." -ForegroundColor Yellow
+Install-Module -Name PSReadLine -Force -AllowClobber -SkipPublisherCheck -Scope AllUsers -Confirm:$false -Repository PSGallery
+
+# Verify installation
+$psReadLine = Get-Module -ListAvailable -Name PSReadLine | Sort-Object Version -Descending | Select-Object -First 1
+if ($psReadLine) {
+    Write-Host "[OK] PSReadLine version $($psReadLine.Version) installed" -ForegroundColor Green
+}
+'@
+
+                    # Execute the installation script in Windows PowerShell
+                    $result = & $windowsPSPath -NoProfile -Command $installScript 2>&1
 
                     if ($LASTEXITCODE -eq 0) {
                         Write-Host "[OK] PSReadLine installed for Windows PowerShell" -ForegroundColor Green
                     }
                     else {
-                        Write-Warning "Could not install PSReadLine for Windows PowerShell. You may need to install it manually."
+                        Write-Warning "Could not install PSReadLine for Windows PowerShell. Exit code: $LASTEXITCODE"
+                        if ($result) {
+                            Write-Host "Output: $result" -ForegroundColor Yellow
+                        }
                     }
                 }
             }
