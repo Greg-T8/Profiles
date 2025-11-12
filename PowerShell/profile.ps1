@@ -263,14 +263,34 @@ if (-not (Get-Module PSReadline)) { Import-Module PSReadLine }
 
 # Basic PSReadLine options
 Set-PSReadLineOption -EditMode Vi
-Set-PSReadLineOption -PredictionViewStyle InlineView
+
+# PredictionViewStyle requires PSReadLine 2.1.0+ (PowerShell Core)
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    try {
+        Set-PSReadLineOption -PredictionViewStyle InlineView
+    }
+    catch {
+        # InlineView not available in this PSReadLine version
+    }
+}
 
 # Configure prediction source (version-specific)
 if ($PSVersionTable.PSVersion.Major -ge 7 -and $PSVersionTable.PSVersion.Minor -ge 2) {
-    Set-PSReadLineOption -PredictionSource HistoryAndPlugin
+    try {
+        Set-PSReadLineOption -PredictionSource HistoryAndPlugin
+    }
+    catch {
+        # Fall back to History if HistoryAndPlugin not available
+        Set-PSReadLineOption -PredictionSource History
+    }
 }
 elseif ($PSVersionTable.PSVersion.Major -ge 7) {
-    Set-PSReadLineOption -PredictionSource History
+    try {
+        Set-PSReadLineOption -PredictionSource History
+    }
+    catch {
+        # Prediction not available in this version
+    }
 }
 
 # Tab completion key handlers
@@ -279,9 +299,16 @@ Set-PSReadLineKeyHandler -Chord Shift+Tab -Function TabCompletePrevious
 Set-PSReadLineKeyHandler -Chord Ctrl+V -Function Paste
 Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 
-# Prediction navigation
+# Prediction navigation (PowerShell Core with newer PSReadLine)
 Set-PSReadLineKeyHandler -Key RightArrow -Function ForwardWord
-Set-PSReadLineKeyHandler -Key Ctrl+RightArrow -Function AcceptSuggestion
+if ($PSVersionTable.PSVersion.Major -ge 7) {
+    try {
+        Set-PSReadLineKeyHandler -Key Ctrl+RightArrow -Function AcceptSuggestion
+    }
+    catch {
+        # AcceptSuggestion not available in this PSReadLine version
+    }
+}
 
 # Vi mode configuration
 if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
