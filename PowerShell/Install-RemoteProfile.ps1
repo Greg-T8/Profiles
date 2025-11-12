@@ -183,12 +183,21 @@ $Helpers = {
         if (-not $nugetProvider) {
             try {
                 Write-Host "Installing NuGet provider..." -ForegroundColor Yellow
-                Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Confirm:$false -Scope AllUsers |
+
+                # Suppress confirmation prompts
+                $originalConfirmPreference = $ConfirmPreference
+                $ConfirmPreference = 'None'
+
+                Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Scope AllUsers |
                     Out-Null
+
+                $ConfirmPreference = $originalConfirmPreference
+
                 Write-Host "[OK] NuGet provider installed`n" -ForegroundColor Green
             }
             catch {
                 Write-Warning "Failed to install NuGet provider: $_"
+                $ConfirmPreference = $originalConfirmPreference
             }
         }
         else {
@@ -335,8 +344,8 @@ $Helpers = {
     }
 
     function Install-PSReadLineModule {
-        # Install or update PSReadLine module
-        Write-Host "`nInstalling PSReadLine module..." -ForegroundColor Cyan
+        # Install latest PSReadLine module (Windows includes an older version by default)
+        Write-Host "`nInstalling latest PSReadLine module..." -ForegroundColor Cyan
 
         try {
             $psReadLine = Get-Module -ListAvailable -Name PSReadLine |
@@ -344,26 +353,21 @@ $Helpers = {
                 Select-Object -First 1
 
             if ($psReadLine) {
-                Write-Host "PSReadLine version $($psReadLine.Version) is already installed" -ForegroundColor Gray
-                Write-Host "Checking for updates..." -ForegroundColor Yellow
+                Write-Host "Current PSReadLine version: $($psReadLine.Version)" -ForegroundColor Gray
+            }
 
-                try {
-                    Update-Module -Name PSReadLine -Force -ErrorAction Stop
-                    Write-Host "[OK] PSReadLine updated to latest version" -ForegroundColor Green
-                }
-                catch {
-                    Write-Host "[OK] PSReadLine is up to date" -ForegroundColor Green
-                }
-            }
-            else {
-                Write-Host "Installing PSReadLine from PSGallery..." -ForegroundColor Yellow
-                Install-Module -Name PSReadLine -Force -AllowClobber -Scope AllUsers
-                Write-Host "[OK] PSReadLine installed successfully" -ForegroundColor Green
-            }
+            Write-Host "Installing latest PSReadLine from PSGallery..." -ForegroundColor Yellow
+            Install-Module -Name PSReadLine -Force -AllowClobber -SkipPublisherCheck -Scope AllUsers
+
+            $newVersion = Get-Module -ListAvailable -Name PSReadLine |
+                Sort-Object Version -Descending |
+                Select-Object -First 1
+
+            Write-Host "[OK] PSReadLine version $($newVersion.Version) installed successfully" -ForegroundColor Green
         }
         catch {
             Write-Warning "Failed to install/update PSReadLine: $_"
-            Write-Host "You can manually install it later with: Install-Module PSReadLine -Force" -ForegroundColor Yellow
+            Write-Host "You can manually install it later with: Install-Module PSReadLine -Force -SkipPublisherCheck" -ForegroundColor Yellow
         }
     }
 
