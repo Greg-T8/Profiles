@@ -60,7 +60,7 @@ unsetopt HIST_BEEP                    # Disable beep on history errors
 # TERMINAL SETTINGS
 # ==============================================================================
 # Disable line wrapping for output (allows horizontal scrolling)
-# tput rmam
+tput rmam
 
 # ==============================================================================
 # VI MODE CONFIGURATION
