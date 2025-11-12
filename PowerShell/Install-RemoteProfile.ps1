@@ -351,7 +351,20 @@ $Helpers = {
             }
 
             Write-Host "Installing latest PSReadLine from PSGallery..." -ForegroundColor Yellow
-            Install-Module -Name PSReadLine -Force -AllowClobber -SkipPublisherCheck -Scope AllUsers
+
+            # Suppress all prompts during installation
+            $originalProgressPreference = $ProgressPreference
+            $ProgressPreference = 'SilentlyContinue'
+
+            Install-Module -Name PSReadLine `
+                -Force `
+                -AllowClobber `
+                -SkipPublisherCheck `
+                -Scope AllUsers `
+                -Confirm:$false `
+                -Repository PSGallery
+
+            $ProgressPreference = $originalProgressPreference
 
             $newVersion = Get-Module -ListAvailable -Name PSReadLine |
                 Sort-Object Version -Descending |
@@ -362,6 +375,7 @@ $Helpers = {
         catch {
             Write-Warning "Failed to install/update PSReadLine: $_"
             Write-Host "You can manually install it later with: Install-Module PSReadLine -Force -SkipPublisherCheck" -ForegroundColor Yellow
+            $ProgressPreference = $originalProgressPreference
         }
     }
 
