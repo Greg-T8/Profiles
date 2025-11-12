@@ -121,10 +121,10 @@
     "C:/Users/gregt/AppData/Roaming/Code/User/prompts": true
   },
   "chat.tools.terminal.autoApprove": {
-    "git checkout": true,
-    "git fetch": true,
-    "git ls-tree": true
-  },
+    "$lines": true,
+    "\"Total": true,
+    "\"Line": true
+},
   "dashboard.displayProjectPath": true,
   "dashboard.openOnStartup": "empty workspace",
   "dashboard.projectData": [
