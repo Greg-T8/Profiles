@@ -433,34 +433,26 @@ $Helpers = {
     }
 
     function Enable-ProfileInSession {
-        # Activate profile in current session
-        if (-not $SkipActivation) {
-            Write-Host "`nActivating profile in current session..." -ForegroundColor Cyan
+        # Inform user to restart session for profile to take effect
+        Write-Host "`n[INFO] Profile installation complete!" -ForegroundColor Cyan
+        Write-Host ""
+        Write-Host "To activate your new profile, please close this PowerShell session and open a new one." -ForegroundColor Yellow
+        Write-Host ""
 
-            try {
-                # Load the installed profile
-                $installedProfile = Join-Path $InstallPath "profile.ps1"
-                if (Test-Path $installedProfile) {
-                    . $installedProfile
-                    Write-Host "[OK] Profile loaded successfully" -ForegroundColor Green
-                }
+        if ($script:isWindows) {
+            Write-Host "Your profile has been installed to:" -ForegroundColor Gray
+            Write-Host "  - Windows PowerShell: $script:windowsPowerShellPath\profile.ps1" -ForegroundColor Gray
 
-                $sessionType = if ($PSVersionTable.PSVersion.Major -ge 6) { "PowerShell Core" } else { "Windows PowerShell" }
-                Write-Host "`n[OK] Profile activated in current $sessionType session!" -ForegroundColor Green
-
-                if ($script:isWindows -and $PSVersionTable.PSVersion.Major -ge 6) {
-                    Write-Host "  (Windows PowerShell profile also configured - will load automatically there)" -ForegroundColor Gray
-                }
-            }
-            catch {
-                Write-Host "`n[WARNING] Could not activate profile in current session" -ForegroundColor Yellow
-                Write-Host "Error: $_" -ForegroundColor Yellow
-                Write-Host "Your profile has been installed successfully and will load automatically in new sessions." -ForegroundColor Yellow
+            if (Test-Path $InstallPath) {
+                Write-Host "  - PowerShell Core: $InstallPath\profile.ps1" -ForegroundColor Gray
             }
         }
         else {
-            Write-Host "`nProfile installed but not activated. To activate, restart PowerShell." -ForegroundColor Yellow
+            Write-Host "Your profile has been installed to: $InstallPath\profile.ps1" -ForegroundColor Gray
         }
+
+        Write-Host ""
+        Write-Host "The profile will load automatically in all new PowerShell sessions." -ForegroundColor Gray
     }
 
     function Show-InstallComplete {
