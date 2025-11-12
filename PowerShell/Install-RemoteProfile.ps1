@@ -338,7 +338,7 @@ $Helpers = {
     }
 
     function Install-PSReadLineModule {
-        # Install latest PSReadLine module (Windows includes an older version by default)
+        # Install latest PSReadLine module for current PowerShell session
         Write-Host "`nInstalling latest PSReadLine module..." -ForegroundColor Cyan
 
         try {
@@ -371,6 +371,28 @@ $Helpers = {
                 Select-Object -First 1
 
             Write-Host "[OK] PSReadLine version $($newVersion.Version) installed successfully" -ForegroundColor Green
+
+            # If on Windows and running PowerShell Core, also install for Windows PowerShell
+            if ($script:onWindows -and $PSVersionTable.PSVersion.Major -ge 6) {
+                Write-Host "`nInstalling PSReadLine for Windows PowerShell..." -ForegroundColor Cyan
+
+                # Find Windows PowerShell executable
+                $windowsPSPath = "$env:SystemRoot\System32\WindowsPowerShell\v1.0\powershell.exe"
+
+                if (Test-Path $windowsPSPath) {
+                    # Install PSReadLine in Windows PowerShell context
+                    $installCommand = "Install-Module -Name PSReadLine -Force -AllowClobber -SkipPublisherCheck -Scope AllUsers -Confirm:`$false -Repository PSGallery"
+
+                    $result = & $windowsPSPath -NoProfile -Command $installCommand 2>&1
+
+                    if ($LASTEXITCODE -eq 0) {
+                        Write-Host "[OK] PSReadLine installed for Windows PowerShell" -ForegroundColor Green
+                    }
+                    else {
+                        Write-Warning "Could not install PSReadLine for Windows PowerShell. You may need to install it manually."
+                    }
+                }
+            }
         }
         catch {
             Write-Warning "Failed to install/update PSReadLine: $_"
