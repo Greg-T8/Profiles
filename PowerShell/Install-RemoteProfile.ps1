@@ -176,28 +176,22 @@ $Helpers = {
     }
 
     function Install-NuGetProvider {
-        # Install NuGet provider for PSGallery access
+        # Install NuGet provider for PSGallery access (required for module installation)
         Write-Host "Checking NuGet provider..." -ForegroundColor Cyan
-        $nugetProvider = Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue
+
+        # Check if NuGet is already available
+        $nugetProvider = Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue -ListAvailable
 
         if (-not $nugetProvider) {
+            Write-Host "Installing NuGet provider automatically..." -ForegroundColor Yellow
+
+            # Use Get-PackageProvider with -Force to bootstrap without prompting
             try {
-                Write-Host "Installing NuGet provider..." -ForegroundColor Yellow
-
-                # Suppress confirmation prompts
-                $originalConfirmPreference = $ConfirmPreference
-                $ConfirmPreference = 'None'
-
-                Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Scope AllUsers |
-                    Out-Null
-
-                $ConfirmPreference = $originalConfirmPreference
-
+                Get-PackageProvider -Name NuGet -Force -ForceBootstrap | Out-Null
                 Write-Host "[OK] NuGet provider installed`n" -ForegroundColor Green
             }
             catch {
                 Write-Warning "Failed to install NuGet provider: $_"
-                $ConfirmPreference = $originalConfirmPreference
             }
         }
         else {
