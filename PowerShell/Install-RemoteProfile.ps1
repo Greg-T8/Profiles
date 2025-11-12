@@ -108,7 +108,7 @@ $Helpers = {
 
         # Define Windows PowerShell path if on Windows
         $script:windowsPowerShellPath = if ($script:isWindows) {
-            "$HOME\Documents\Windows PowerShell"
+            "$HOME\Documents\WindowsPowerShell"
         }
         else {
             $null
@@ -391,7 +391,7 @@ $Helpers = {
 
         # If on Windows and running PowerShell Core, also configure Windows PowerShell
         if ($script:isWindows -and $PSVersionTable.PSVersion.Major -ge 6) {
-            $windowsPowerShellProfilePath = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'Windows PowerShell\profile.ps1'
+            $windowsPowerShellProfilePath = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'WindowsPowerShell\profile.ps1'
             $profilePaths += @{
                 Path = $windowsPowerShellProfilePath
                 Name = "Windows PowerShell"
