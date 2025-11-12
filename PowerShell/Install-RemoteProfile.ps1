@@ -147,6 +147,24 @@ if ($executionPolicy -eq 'Restricted' -or $executionPolicy -eq 'Undefined') {
     }
 }
 
+# Install NuGet provider if needed (for PSGallery access)
+Write-Host "Checking NuGet provider..." -ForegroundColor Cyan
+$nugetProvider = Get-PackageProvider -Name NuGet -ErrorAction SilentlyContinue
+
+if (-not $nugetProvider) {
+    try {
+        Write-Host "Installing NuGet provider..." -ForegroundColor Yellow
+        Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force -Scope AllUsers | Out-Null
+        Write-Host "✓ NuGet provider installed`n" -ForegroundColor Green
+    }
+    catch {
+        Write-Warning "Failed to install NuGet provider: $_"
+    }
+}
+else {
+    Write-Host "✓ NuGet provider already installed`n" -ForegroundColor Green
+}
+
 # Create installation directories if they don't exist
 if (-not (Test-Path $InstallPath)) {
     Write-Host "Creating PowerShell installation directory..." -ForegroundColor Yellow

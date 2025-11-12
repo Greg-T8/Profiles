@@ -38,36 +38,48 @@ function prompt {
         }
     }
 
-    # Hard-code prompt colors and styles using ANSI escape codes
-    # See here for list of ANSI escape references:
-    # - https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
-    # - https://en.wikipedia.org/wiki/ANSI_escape_code
-
-    $ESC = [char]0x1b           # Define the escape character used for specifying colors and styles
-    # Prompt starts here
-    "`n" + # New line
-    "$ESC[38;2;0;179;226m" +    # Set foreground color (38) using rgb mode (2) with rgb colors (0, 179, 226)
-    $([char]0x256d) +           # The '╭' character, i.e. Box Drawings Light Arc Down and Right
-    $([char]0x2500) +           # The '─' character, i.e. Box Drawings Light Horizontal
-    '( ' +
-    "$ESC[3m" +                 # Start italic mode
-    "$ESC[2m" +                 # Start dim/faint mode
-    $(GetPromptPath) +
-    "$ESC[22m" +                # Reset dim/faint mode
-    "$(if ($usingPoshGit) { "$(& $GitPromptScriptBlock)" })" +
-    "$ESC[23m" +                # Reset italic mode
-    "`n" +
-    "$ESC[38;2;0;179;226m" +    # Set foreground color (38) using rgb mode (2) with rgb colors (0, 179, 226)
-    $([char]0x2570) +           # The '╰' character, i.e. Box Drawings Light Arc Up and Right
-    $([char]0x2574) +           # The '─' character, i.e. Box Drawings Light Right
-    "$ESC[0m" +                 # Reset all modes (styles and colors)
-    $(
-        if (Test-Path variable:/PSDebugContext) { '[DBG]: ' } else { '' }
-    ) +
-    $(
-        if ($NestedPromptLevel -ge 1) { '>>' }
-    ) +
-    '> '
+    # Use different prompt styles based on PowerShell version
+    if ($PSVersionTable.PSVersion.Major -ge 7) {
+        # PowerShell 7+ with ANSI escape codes
+        $ESC = [char]0x1b                                            # ESC character for ANSI sequences
+        "`n" +                                                       # New line
+        "$ESC[38;2;0;179;226m" +                                     # Set foreground color to cyan RGB(0,179,226)
+        $([char]0x256d) +                                            # '╭' Box Drawings Light Arc Down and Right
+        $([char]0x2500) +                                            # '─' Box Drawings Light Horizontal
+        '( ' +                                                       # Opening parenthesis and space
+        "$ESC[3m" +                                                  # Start italic mode
+        "$ESC[2m" +                                                  # Start dim/faint mode
+        $(GetPromptPath) +                                           # Display shortened path
+        "$ESC[22m" +                                                 # Reset dim/faint mode
+        "$(if ($usingPoshGit) { "$(& $GitPromptScriptBlock)" })" +  # Git status if in git repo
+        "$ESC[23m" +                                                 # Reset italic mode
+        "`n" +                                                       # New line
+        "$ESC[38;2;0;179;226m" +                                     # Set foreground color to cyan RGB(0,179,226)
+        $([char]0x2570) +                                            # '╰' Box Drawings Light Arc Up and Right
+        $([char]0x2574) +                                            # '╴' Box Drawings Light Left
+        "$ESC[0m" +                                                  # Reset all ANSI formatting
+        $(if (Test-Path variable:/PSDebugContext) { '[DBG]: ' } else { '' }) +  # Debug indicator
+        $(if ($NestedPromptLevel -ge 1) { '>>' }) +                  # Nested prompt indicator
+        '> '                                                         # Prompt character
+    }
+    else {
+        # Windows PowerShell 5.1 - Use Write-Host with colors
+        Write-Host "" # New line
+        Write-Host "+--( " -NoNewline -ForegroundColor Cyan
+        Write-Host "$(GetPromptPath)" -NoNewline -ForegroundColor DarkGray
+        if ($usingPoshGit) {
+            Write-Host "$(& $GitPromptScriptBlock)" -NoNewline
+        }
+        Write-Host ""
+        Write-Host "+-> " -NoNewline -ForegroundColor Cyan
+        if (Test-Path variable:/PSDebugContext) {
+            Write-Host "[DBG]: " -NoNewline
+        }
+        if ($NestedPromptLevel -ge 1) {
+            Write-Host ">>" -NoNewline
+        }
+        return "> "
+    }
 }
 
 # Prompt Helpers

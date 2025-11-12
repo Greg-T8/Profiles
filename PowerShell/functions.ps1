@@ -1,4 +1,4 @@
-# Reverts to the default dir function in cmd.exe
+﻿# Reverts to the default dir function in cmd.exe
 function dir {
     cmd /c dir $args
 }
@@ -32,6 +32,7 @@ function tempcode {
         }
     }
 }
+
 
 # Downloads and outputs the Microsoft license catalog as PowerShell objects.
 function GetMicrosoftLicenseCatalog {
@@ -119,8 +120,11 @@ function Update-AllInstalledModules {
     if (-not $repo.Trusted) {
         Write-Host "Marking '$repoName' as a trusted repository..." -ForegroundColor Yellow
         Set-PSRepository -Name $repoName -InstallationPolicy Trusted -ErrorAction Stop
-        Write-Host "✓ '$repoName' is now trusted." -ForegroundColor Green
+        # Write-Host "✓ `'$repoName`' is now trusted." -ForegroundColor Green
+        Write-Host " `'$repoName`' is now trusted." -ForegroundColor Green
     }
+
+
 
     $modules = Get-InstalledModule
 
@@ -626,9 +630,10 @@ function Install-WSLDistribution {
         $windowsInitPath = (Resolve-Path $initScript).Path
         $wslInitPath = ($windowsInitPath -replace '\\', '/' -replace '^([A-Z]):', '/mnt/$1').ToLower()
 
-        # Copy script to /tmp and run as root
+        # Copy script to /tmp and make it executable
         Write-Host "Copying init-wsl.sh to WSL distribution..." -ForegroundColor Cyan
-        wsl -d $Name -- bash -c "cp '$wslInitPath' /tmp/init-wsl.sh && chmod +x /tmp/init-wsl.sh"
+        $bashCmd = "cp '$wslInitPath' /tmp/init-wsl.sh; chmod +x /tmp/init-wsl.sh"
+        wsl -d $Name -- bash -c $bashCmd
 
         # Run the script as root
         Write-Host "Running initialization script as root..." -ForegroundColor Cyan
@@ -644,7 +649,8 @@ function Install-WSLDistribution {
                 Write-Host "Setting default user to: $defaultUser" -ForegroundColor Cyan
 
                 # Set default user in /etc/wsl.conf
-                wsl -d $Name --user root -- bash -c "echo '[user]' > /etc/wsl.conf && echo 'default=$defaultUser' >> /etc/wsl.conf"
+                $bashCmd = "echo '[user]' > /etc/wsl.conf; echo 'default=$defaultUser' >> /etc/wsl.conf"
+                wsl -d $Name --user root -- bash -c $bashCmd
 
                 # Terminate the distribution to apply settings
                 Write-Host "Restarting WSL distribution to apply settings..." -ForegroundColor Cyan
@@ -662,5 +668,5 @@ function Install-WSLDistribution {
     }
 
     Write-Host "`nTo start the distribution, run: wsl -d $Name" -ForegroundColor Yellow
-    Write-Host "To set it as default, run: wsl --set-default $Name" -ForegroundColor Yellow
+    Write-Host "To set it as default, run: wsl" '--set-default' "$Name" -ForegroundColor Yellow
 }

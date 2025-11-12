@@ -1,4 +1,4 @@
-<#
+﻿<#
     This is my PowerShell profile script I use in the context of $Profile.CurrentUserAllHosts.
 
     The prompt function mimmics the behavior of the Oh-My-Posh prompt for PowerShell, but without requiring the
@@ -62,7 +62,15 @@ Remove-Item Alias:dir -ErrorAction SilentlyContinue
 if (-not (Get-Module PSReadline)) { Import-Module PSReadLine }
 Set-PSReadLineOption -EditMode Vi
 Set-PSReadLineOption -PredictionViewStyle InlineView
-Set-PSReadLineOption -PredictionSource HistoryAndPlugin
+
+# PredictionSource HistoryAndPlugin requires PowerShell 7.2+
+if ($PSVersionTable.PSVersion.Major -ge 7 -and $PSVersionTable.PSVersion.Minor -ge 2) {
+    Set-PSReadLineOption -PredictionSource HistoryAndPlugin
+}
+elseif ($PSVersionTable.PSVersion.Major -ge 7) {
+    Set-PSReadLineOption -PredictionSource History
+}
+
 Set-PSReadLineKeyHandler -Chord Tab -Function TabCompleteNext
 Set-PSReadLineKeyHandler -Chord Shift+Tab -Function TabCompletePrevious
 Set-PSReadLineKeyHandler -Chord Ctrl+V -Function Paste
@@ -87,18 +95,21 @@ if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
         Set-PSReadLineKeyHandler -Chord Ctrl+w -Function BackwardKillWord -ViMode $mode
     }
 
-    function OnViModeChange {
-        if ($args[0] -eq 'Command') {
-            # Set the cursor to a blinking block.
-            Write-Host -NoNewline "`e[1 q"
+    # Custom cursor styles only work in PowerShell Core (VT100 escape sequences)
+    if ($PSVersionTable.PSVersion.Major -ge 7) {
+        function OnViModeChange {
+            if ($args[0] -eq 'Command') {
+                # Set the cursor to a blinking block.
+                Write-Host -NoNewline "`e[1 q"
+            }
+            else {
+                # Set the cursor to a blinking line.
+                Write-Host -NoNewline "`e[5 q"
+            }
         }
-        else {
-            # Set the cursor to a blinking line.
-            Write-Host -NoNewline "`e[5 q"
-        }
-    }
-    Set-PSReadLineOption -ViModeIndicator Script -ViModeChangeHandler $Function:OnViModeChange
+        Set-PSReadLineOption -ViModeIndicator Script -ViModeChangeHandler $Function:OnViModeChange
 
-    # Set initial cursor to blinking line for Insert mode
-    Write-Host -NoNewline "`e[5 q"
+        # Set initial cursor to blinking line for Insert mode
+        Write-Host -NoNewline "`e[5 q"
+    }
 }
