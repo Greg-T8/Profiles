@@ -17,10 +17,7 @@
     2. Download individual files directly from GitHub (fallback method)
 
     Files installed:
-    - profile.ps1  (main profile script)
-    - prompt.ps1   (custom prompt function)
-    - functions.ps1 (optional utility functions)
-    - PSScriptAnalyzerSettings.psd1 (script analyzer settings)
+    - profile.ps1  (main profile script containing all customizations)
 
 .PARAMETER GitHubRepo
     The GitHub repository in the format 'owner/repo'. Defaults to 'Greg-T8/Profiles'.
@@ -208,19 +205,27 @@ $Helpers = {
     }
 
     function New-InstallationDirectory {
-        # Create installation directories if they don't exist
-        if (-not (Test-Path $InstallPath)) {
-            Write-Host "Creating PowerShell installation directory..." -ForegroundColor Yellow
-            New-Item -ItemType Directory -Path $InstallPath -Force |
-                Out-Null
-            Write-Host "[OK] Directory created" -ForegroundColor Green
-        }
-
+        # Create Windows PowerShell directory if it doesn't exist
         if ($script:windowsPowerShellPath -and -not (Test-Path $script:windowsPowerShellPath)) {
             Write-Host "Creating Windows PowerShell installation directory..." -ForegroundColor Yellow
             New-Item -ItemType Directory -Path $script:windowsPowerShellPath -Force |
                 Out-Null
             Write-Host "[OK] Directory created" -ForegroundColor Green
+        }
+
+        # Check if PowerShell Core directory exists (only create if PowerShell Core is installed)
+        if (Test-Path $InstallPath) {
+            Write-Host "PowerShell Core directory exists: $InstallPath" -ForegroundColor Gray
+        }
+        elseif ($PSVersionTable.PSVersion.Major -ge 6) {
+            # We're running in PowerShell Core, so create the directory
+            Write-Host "Creating PowerShell Core installation directory..." -ForegroundColor Yellow
+            New-Item -ItemType Directory -Path $InstallPath -Force |
+                Out-Null
+            Write-Host "[OK] Directory created" -ForegroundColor Green
+        }
+        else {
+            Write-Host "[INFO] PowerShell Core directory not found - will skip PowerShell Core installation" -ForegroundColor Yellow
         }
         Write-Host ""
     }
@@ -239,11 +244,11 @@ $Helpers = {
         # Clone or update repository using git
         Write-Host "Git detected. Using git clone method..." -ForegroundColor Cyan
 
-        $repoPath = Join-Path $InstallPath '.repo'
+        $tempRepoPath = Join-Path $env:TEMP '.profile-repo'
 
-        if (Test-Path $repoPath) {
+        if (Test-Path $tempRepoPath) {
             Write-Host "Repository exists. Pulling latest changes..." -ForegroundColor Yellow
-            Push-Location $repoPath
+            Push-Location $tempRepoPath
             try {
                 git pull origin $Branch 2>&1 | Out-Null
                 Write-Host "[OK] Repository updated`n" -ForegroundColor Green
@@ -257,36 +262,32 @@ $Helpers = {
         }
         else {
             Write-Host "Cloning repository..." -ForegroundColor Yellow
-            git clone "https://github.com/$GitHubRepo.git" $repoPath --branch $Branch --depth 1 2>&1 |
+            git clone "https://github.com/$GitHubRepo.git" $tempRepoPath --branch $Branch --depth 1 2>&1 |
                 Out-Null
             Write-Host "[OK] Repository cloned`n" -ForegroundColor Green
         }
 
-        # Copy files to PowerShell Core directory
-        $sourceFiles = @('profile.ps1', 'prompt.ps1', 'functions.ps1', 'PSScriptAnalyzerSettings.psd1')
+        $sourceFile = Join-Path $tempRepoPath "PowerShell\profile.ps1"
 
-        Write-Host "Installing to PowerShell Core directory..." -ForegroundColor Cyan
-        foreach ($file in $sourceFiles) {
-            $sourcePath = Join-Path $repoPath "PowerShell\$file"
-            $destPath = Join-Path $InstallPath $file
+        # Copy to PowerShell Core directory if it exists
+        if (Test-Path $InstallPath) {
+            Write-Host "Installing to PowerShell Core directory..." -ForegroundColor Cyan
+            $destPath = Join-Path $InstallPath "profile.ps1"
 
-            if (Test-Path $sourcePath) {
-                Copy-Item -Path $sourcePath -Destination $destPath -Force
-                Write-Host "  [OK] Installed $file" -ForegroundColor Green
+            if (Test-Path $sourceFile) {
+                Copy-Item -Path $sourceFile -Destination $destPath -Force
+                Write-Host "  [OK] Installed profile.ps1" -ForegroundColor Green
             }
         }
 
-        # Copy files to Windows PowerShell directory if on Windows
-        if ($script:windowsPowerShellPath) {
+        # Copy to Windows PowerShell directory
+        if ($script:windowsPowerShellPath -and (Test-Path $script:windowsPowerShellPath)) {
             Write-Host "`nInstalling to Windows PowerShell directory..." -ForegroundColor Cyan
-            foreach ($file in $sourceFiles) {
-                $sourcePath = Join-Path $repoPath "PowerShell\$file"
-                $destPath = Join-Path $script:windowsPowerShellPath $file
+            $destPath = Join-Path $script:windowsPowerShellPath "profile.ps1"
 
-                if (Test-Path $sourcePath) {
-                    Copy-Item -Path $sourcePath -Destination $destPath -Force
-                    Write-Host "  [OK] Installed $file" -ForegroundColor Green
-                }
+            if (Test-Path $sourceFile) {
+                Copy-Item -Path $sourceFile -Destination $destPath -Force
+                Write-Host "  [OK] Installed profile.ps1" -ForegroundColor Green
             }
         }
     }
@@ -300,40 +301,35 @@ $Helpers = {
             Write-Host "Using direct download method..." -ForegroundColor Yellow
         }
 
-        $baseUrl = "https://raw.githubusercontent.com/$GitHubRepo/$Branch/PowerShell"
-        $files = @('profile.ps1', 'prompt.ps1', 'functions.ps1', 'PSScriptAnalyzerSettings.psd1')
+        $url = "https://raw.githubusercontent.com/$GitHubRepo/$Branch/PowerShell/profile.ps1"
 
-        # Download to PowerShell Core directory
-        Write-Host "Downloading to PowerShell Core directory..." -ForegroundColor Cyan
-        foreach ($file in $files) {
-            $url = "$baseUrl/$file"
-            $destPath = Join-Path $InstallPath $file
+        # Download to PowerShell Core directory if it exists
+        if (Test-Path $InstallPath) {
+            Write-Host "Downloading to PowerShell Core directory..." -ForegroundColor Cyan
+            $destPath = Join-Path $InstallPath "profile.ps1"
 
             try {
-                Write-Host "  Downloading $file..." -ForegroundColor Yellow
+                Write-Host "  Downloading profile.ps1..." -ForegroundColor Yellow
                 Invoke-WebRequest -Uri $url -OutFile $destPath -UseBasicParsing
-                Write-Host "  [OK] Downloaded $file" -ForegroundColor Green
+                Write-Host "  [OK] Downloaded profile.ps1" -ForegroundColor Green
             }
             catch {
-                Write-Warning "Failed to download ${file}: $_"
+                Write-Warning "Failed to download profile.ps1: $_"
             }
         }
 
-        # Download to Windows PowerShell directory if on Windows
-        if ($script:windowsPowerShellPath) {
+        # Download to Windows PowerShell directory
+        if ($script:windowsPowerShellPath -and (Test-Path $script:windowsPowerShellPath)) {
             Write-Host "`nDownloading to Windows PowerShell directory..." -ForegroundColor Cyan
-            foreach ($file in $files) {
-                $url = "$baseUrl/$file"
-                $destPath = Join-Path $script:windowsPowerShellPath $file
+            $destPath = Join-Path $script:windowsPowerShellPath "profile.ps1"
 
-                try {
-                    Write-Host "  Downloading $file..." -ForegroundColor Yellow
-                    Invoke-WebRequest -Uri $url -OutFile $destPath -UseBasicParsing
-                    Write-Host "  [OK] Downloaded $file" -ForegroundColor Green
-                }
-                catch {
-                    Write-Warning "Failed to download ${file}: $_"
-                }
+            try {
+                Write-Host "  Downloading profile.ps1..." -ForegroundColor Yellow
+                Invoke-WebRequest -Uri $url -OutFile $destPath -UseBasicParsing
+                Write-Host "  [OK] Downloaded profile.ps1" -ForegroundColor Green
+            }
+            catch {
+                Write-Warning "Failed to download profile.ps1: $_"
             }
         }
     }
@@ -458,11 +454,8 @@ $Helpers = {
     function Show-InstallComplete {
         # Display completion message
         Write-Host "`n=== Installation Complete ===" -ForegroundColor Cyan
-        Write-Host "`nInstalled files:" -ForegroundColor Gray
-        Write-Host "  - profile.ps1 (main profile script)" -ForegroundColor Gray
-        Write-Host "  - prompt.ps1 (custom prompt)" -ForegroundColor Gray
-        Write-Host "  - functions.ps1 (utility functions)" -ForegroundColor Gray
-        Write-Host "  - PSScriptAnalyzerSettings.psd1 (analyzer settings)" -ForegroundColor Gray
+        Write-Host "`nInstalled file:" -ForegroundColor Gray
+        Write-Host "  - profile.ps1 (main profile script with all customizations)" -ForegroundColor Gray
         Write-Host ""
     }
 }
