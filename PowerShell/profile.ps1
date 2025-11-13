@@ -158,9 +158,9 @@ function prompt {
         }
     }
 
-    # Use different prompt styles based on PowerShell version
-    if ($PSVersionTable.PSVersion.Major -ge 7) {
-        # PowerShell 7+ with ANSI escape codes
+    # Use different prompt styles based on PowerShell edition
+    if ($PSVersionTable.PSEdition -eq 'Core') {
+        # PowerShell Core with ANSI escape codes
         $ESC = [char]0x1b                                            # ESC character for ANSI sequences
         "`n" +                                                       # New line
         "$ESC[38;2;0;179;226m" +                                     # Set foreground color to cyan RGB(0,179,226)
@@ -276,35 +276,16 @@ if (-not (Get-Module PSReadline)) { Import-Module PSReadLine }
 
 # Basic PSReadLine options
 Set-PSReadLineOption -EditMode Vi
-Set-PSReadLineOption -ContinuationPrompt '   '
+Set-PSReadLineOption -ContinuationPrompt ''
 
 # PredictionViewStyle requires PSReadLine 2.1.0+ (PowerShell Core)
-if ($PSVersionTable.PSVersion.Major -ge 7) {
-    try {
-        Set-PSReadLineOption -PredictionViewStyle InlineView
-    }
-    catch {
-        # InlineView not available in this PSReadLine version
-    }
+if ($PSVersionTable.PSEdition -eq 'Core') {
+    Set-PSReadLineOption -PredictionViewStyle InlineView -ErrorAction SilentlyContinue
 }
 
-# Configure prediction source (version-specific)
-if ($PSVersionTable.PSVersion.Major -ge 7 -and $PSVersionTable.PSVersion.Minor -ge 2) {
-    try {
-        Set-PSReadLineOption -PredictionSource HistoryAndPlugin
-    }
-    catch {
-        # Fall back to History if HistoryAndPlugin not available
-        Set-PSReadLineOption -PredictionSource History
-    }
-}
-elseif ($PSVersionTable.PSVersion.Major -ge 7) {
-    try {
-        Set-PSReadLineOption -PredictionSource History
-    }
-    catch {
-        # Prediction not available in this version
-    }
+# Configure prediction source (edition-specific)
+if ($PSVersionTable.PSEdition -eq 'Core') {
+    Set-PSReadLineOption -PredictionSource HistoryAndPlugin -ErrorAction SilentlyContinue
 }
 
 # Tab completion key handlers
@@ -323,7 +304,7 @@ Set-PSReadLineKeyHandler -Key Tab -ScriptBlock {
     $textBeforeCursor = $line.Substring($lineStart, $cursor - $lineStart)
 
     if ($textBeforeCursor -notmatch '\S') {
-        [Microsoft.PowerShell.PSConsoleReadLine]::Insert("    ")
+        [Microsoft.PowerShell.PSConsoleReadLine]::Insert('    ')
     }
     else {
         [Microsoft.PowerShell.PSConsoleReadLine]::MenuComplete()
@@ -332,20 +313,14 @@ Set-PSReadLineKeyHandler -Key Tab -ScriptBlock {
 
 # Prediction navigation (PowerShell Core with newer PSReadLine)
 Set-PSReadLineKeyHandler -Key RightArrow -Function ForwardWord
-if ($PSVersionTable.PSVersion.Major -ge 7) {
-    try {
-        Set-PSReadLineKeyHandler -Key Ctrl+RightArrow -Function AcceptSuggestion
-    }
-    catch {
-        # AcceptSuggestion not available in this PSReadLine version
-    }
+if ($PSVersionTable.PSEdition -eq 'Core') {
+    Set-PSReadLineKeyHandler -Key Ctrl+RightArrow -Function AcceptSuggestion -ErrorAction SilentlyContinue
 }
 
 # Vi mode configuration
 if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
     Set-PSReadLineOption -ViModeIndicator 'Cursor'
     $env:EDITOR = 'nvim'
-
 
     # Vi mode key handlers for both Command and Insert modes
     foreach ($mode in 'Command', 'Insert') {
@@ -361,7 +336,7 @@ if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
     }
 
     # Custom cursor styles (PowerShell Core only - uses VT100 escape sequences)
-    if ($PSVersionTable.PSVersion.Major -ge 7) {
+    if ($PSVersionTable.PSEdition -eq 'Core') {
         function OnViModeChange {
             if ($args[0] -eq 'Command') {
                 # Set the cursor to a blinking block
