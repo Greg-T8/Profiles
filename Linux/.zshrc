@@ -304,3 +304,11 @@ PROMPT=$'\n'\
 '%F{yellow}${vcs_info_msg_0_}%f'\
 $'\n'\
 '%F{cyan}${box_arc_up_right}${box_horizontal_short}%f%# '
+
+# ==============================================================================
+# STARTUP DIRECTORY
+# ==============================================================================
+# Change to home directory if starting in Windows directory
+if [[ $PWD == /mnt/c/* ]]; then
+    cd ~
+fi

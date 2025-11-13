@@ -200,3 +200,11 @@ if ! shopt -oq posix; then
     . /etc/bash_completion
   fi
 fi
+
+# ==============================================================================
+# STARTUP DIRECTORY
+# ==============================================================================
+# Change to home directory if starting in Windows directory
+if [[ $PWD == /mnt/c/* ]]; then
+    cd ~
+fi
