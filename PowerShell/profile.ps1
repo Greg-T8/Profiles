@@ -90,25 +90,25 @@ function Get-PromptPath {
                 # Extract the relative path from user profile
                 $relativelocation = $location.Substring($userProfilePath.Length)
 
-                if ($relativelocation.Length -le 50) {
-                    $promptPath = '~' + $relativelocation
+                # Count folder depth (number of separators)
+                $matches = [regex]::Matches($relativelocation, [regex]::Escape($sep))
+                $folderDepth = $matches.Count
+
+                # Check if the displayed path would be too long
+                $displayPath = '~' + $relativelocation
+
+                if ($displayPath.Length -le 50) {
+                    $promptPath = $displayPath
+                }
+                elseif ($folderDepth -le 4) {
+                    # Not enough folders to shorten, show full path
+                    $promptPath = $displayPath
                 }
                 else {
-                    # Path is long, so shorten it by keeping first 3 folders and last 2 folders
-                    $matches = [regex]::Matches($relativelocation, [regex]::Escape($sep))
-                    switch ($matches.count) {
-                        # Display full relative path if 4 or fewer folders
-                        { $_ -ge 1 -and $_ -le 4 } {
-                            $promptPath = '~' + $relativelocation
-                            break
-                        }
-                        # Path is long, so add '...' in the middle
-                        default {
-                            $leftPath   = $relativelocation.Substring(0, $matches[2].Index)
-                            $rightPath  = $relativelocation.Substring($matches[$matches.count - 2].Index)
-                            $promptPath = "~$leftPath$sep...$rightPath"
-                        }
-                    }
+                    # Path is long and has enough folders, shorten by keeping first 3 and last 2
+                    $leftPath   = $relativelocation.Substring(0, $matches[2].Index)
+                    $rightPath  = $relativelocation.Substring($matches[$matches.Count - 2].Index)
+                    $promptPath = "~$leftPath$sep...$rightPath"
                 }
             }
         }
