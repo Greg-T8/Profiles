@@ -85,7 +85,6 @@ $Helpers = {
     $script:onWindows = $null
     $script:isAdmin = $null
     $script:windowsPowerShellPath = $null
-    $script:gitAvailable = $null
 
     function Initialize-PlatformDetection {
         # Detect if running on Windows
@@ -113,9 +112,6 @@ $Helpers = {
         else {
             $null
         }
-
-        # Check if git is available
-        $script:gitAvailable = $null -ne (Get-Command git -ErrorAction SilentlyContinue)
     }
 
     function Show-InstallBanner {
@@ -238,13 +234,8 @@ $Helpers = {
     }
 
     function Install-ProfileFile {
-        # Install profile files using git clone or direct download
-        if ($script:gitAvailable -and -not $UseRawDownload) {
-            Install-ProfileWithGit
-        }
-        else {
-            Install-ProfileWithDownload
-        }
+        # Install profile files using direct download
+        Install-ProfileWithDownload
     }
 
     function Install-ProfileWithGit {
