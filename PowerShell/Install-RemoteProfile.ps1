@@ -362,7 +362,7 @@ $Helpers = {
                 -Force `
                 -AllowClobber `
                 -SkipPublisherCheck `
-                -Scope AllUsers `
+                -Scope CurrentUser `
                 -Confirm:$false `
                 -Repository PSGallery
 
@@ -399,7 +399,7 @@ $ProgressPreference = 'SilentlyContinue'
 
 # Install PSReadLine
 Write-Host "Installing PSReadLine from PSGallery..." -ForegroundColor Yellow
-Install-Module -Name PSReadLine -Force -AllowClobber -SkipPublisherCheck -Scope AllUsers -Confirm:$false -Repository PSGallery
+Install-Module -Name PSReadLine -Force -AllowClobber -SkipPublisherCheck -Scope CurrentUser -Confirm:$false -Repository PSGallery
 
 # Verify installation
 $psReadLine = Get-Module -ListAvailable -Name PSReadLine | Sort-Object Version -Descending | Select-Object -First 1

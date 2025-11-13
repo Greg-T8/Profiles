@@ -20,6 +20,9 @@
 
 $ErrorActionPreference = 'Stop'
 
+# Debug flag for troubleshooting prompt issues
+$script:DebugPrompt = $false
+
 # Set PSStyle formatting colors (PowerShell Core only)
 if ($PSVersionTable.PSEdition -eq 'Core') {
     $PSStyle.Formatting.Verbose = $PSStyle.Foreground.Cyan
@@ -48,30 +51,49 @@ function Test-GitDirectory {
 }
 
 function Get-PromptPath {
-    # Get shortened path for prompt display
-    $location = "$(Get-Location)"
+    try {
+        # Get shortened path for prompt display
+        $location = "$(Get-Location)"
 
-    # Remove trailing slash except for root paths like 'C:\'
-    if ($location.EndsWith('\') -and -not $location.EndsWith(':\')) {
-        $location = $location.TrimEnd('\')
-    }
+        # Detect platform - check for IsWindows variable (PowerShell Core) or assume Windows for older versions
+        # Use Get-Variable to avoid assignment conflict with read-only variable
+        $onWindows = if ($PSVersionTable.PSVersion.Major -ge 6) {
+            (Get-Variable -Name IsWindows -ValueOnly -ErrorAction SilentlyContinue)
+        } else {
+            $true
+        }
 
-    $userProfilePath = $env:USERPROFILE
-    if ($location.Contains($userProfilePath)) {
-        if ($location.Equals($userProfilePath)) {
+        # Set path separator based on platform
+        $sep = if ($onWindows) { '\' } else { '/' }
+
+        # Remove trailing slash except for root paths
+        if ($onWindows) {
+            if ($location.EndsWith('\') -and -not $location.EndsWith(':\')) {
+                $location = $location.TrimEnd('\\')
+            }
+        } else {
+            if ($location.EndsWith('/') -and $location.Length -gt 1) {
+                $location = $location.TrimEnd('/')
+            }
+        }
+
+        # Get user home directory
+        $userProfilePath = if ($onWindows) { $env:USERPROFILE } else { $env:HOME }
+
+    if ($userProfilePath -and $location.StartsWith($userProfilePath)) {
+        if ($location -eq $userProfilePath) {
             $promptPath = '~'
         }
         else {
             # Extract the relative path from user profile
-            # The -split operator uses regex, so we must escape backslashes
-            $relativelocation = ($location -split ($userProfilePath -replace ('\\', '\\')))[1]
+            $relativelocation = $location.Substring($userProfilePath.Length)
 
             if ($relativelocation.Length -le 50) {
                 $promptPath = '~' + $relativelocation
             }
             else {
                 # Path is long, so shorten it by keeping first 3 folders and last 2 folders
-                $matches = [regex]::matches($relativelocation, '\\')
+                $matches = [regex]::Matches($relativelocation, [regex]::Escape($sep))
                 switch ($matches.count) {
                     # Display full relative path if 4 or fewer folders
                     { $_ -ge 1 -and $_ -le 4 } {
@@ -80,30 +102,39 @@ function Get-PromptPath {
                     }
                     # Path is long, so add '...' in the middle
                     default {
-                        $leftPath   = $relativelocation.Substring(0, $matches[2].index)
-                        $rightPath  = $relativelocation.Substring($matches[$matches.count - 2].index)
-                        $promptPath = '~' + $leftPath + '\...' + $rightPath
+                        $leftPath   = $relativelocation.Substring(0, $matches[2].Index)
+                        $rightPath  = $relativelocation.Substring($matches[$matches.count - 2].Index)
+                        $promptPath = "~$leftPath$sep...$rightPath"
                     }
                 }
             }
         }
     }
     else {
-        # Build prompt path for locations outside of user profile (e.g., 'C:\Windows\System32')
-        $matches = [regex]::matches($location, '\\')
+        # Build prompt path for locations outside of user profile
+        $matches = [regex]::Matches($location, [regex]::Escape($sep))
         switch ($matches.count) {
             { $_ -ge 1 -and $_ -le 4 } {
                 $promptPath = $location
                 break
             }
             default {
-                $leftPath   = $location.Substring(0, $matches[2].index)
-                $rightPath  = $location.Substring($matches[$_ - 2].index)
-                $promptPath = $leftPath + '\...' + $rightPath
+                $leftPath   = $location.Substring(0, $matches[2].Index)
+                $rightPath  = $location.Substring($matches[$_ - 2].Index)
+                $promptPath = "$leftPath$sep...$rightPath"
             }
         }
     }
-    $promptPath
+        return $promptPath
+    }
+    catch {
+        # On error, fall back to current location
+        if ($script:DebugPrompt) {
+            Write-Host "ERROR in Get-PromptPath: $_" -ForegroundColor Red
+            Write-Host "Stack Trace: $($_.ScriptStackTrace)" -ForegroundColor Yellow
+        }
+        return "$(Get-Location)"
+    }
 }
 
 function Initialize-PoshGit {
