@@ -1,4 +1,7 @@
 ﻿<#
+    Test0747
+
+
     This is my PowerShell profile script I use in the context of $Profile.CurrentUserAllHosts.
 
     The prompt function mimmics the behavior of the Oh-My-Posh prompt for PowerShell, but without requiring the
@@ -276,7 +279,7 @@ if (-not (Get-Module PSReadline)) { Import-Module PSReadLine }
 
 # Basic PSReadLine options
 Set-PSReadLineOption -EditMode Vi
-Set-PSReadLineOption -ContinuationPrompt 'abc'
+Set-PSReadLineOption -ContinuationPrompt ''
 
 # PredictionViewStyle requires PSReadLine 2.1.0+ (PowerShell Core)
 if ($PSVersionTable.PSEdition -eq 'Core') {
