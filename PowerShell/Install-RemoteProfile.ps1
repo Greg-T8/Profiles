@@ -253,7 +253,8 @@ $Helpers = {
             Write-Host "Repository exists. Pulling latest changes..." -ForegroundColor Yellow
             Push-Location $tempRepoPath
             try {
-                git pull origin $Branch 2>&1 | Out-Null
+                git fetch origin $Branch 2>&1 | Out-Null
+                git reset --hard "origin/$Branch" 2>&1 | Out-Null
                 Write-Host "[OK] Repository updated`n" -ForegroundColor Green
             }
             catch {
@@ -272,26 +273,26 @@ $Helpers = {
 
         $sourceFile = Join-Path $tempRepoPath "PowerShell\profile.ps1"
 
+        # Verify source file exists
+        if (-not (Test-Path $sourceFile)) {
+            Write-Warning "Source file not found: $sourceFile"
+            return
+        }
+
         # Copy to PowerShell Core directory if it exists
         if (Test-Path $InstallPath) {
             Write-Host "Installing to PowerShell Core directory..." -ForegroundColor Cyan
             $destPath = Join-Path $InstallPath "profile.ps1"
-
-            if (Test-Path $sourceFile) {
-                Copy-Item -Path $sourceFile -Destination $destPath -Force
-                Write-Host "  [OK] Installed profile.ps1" -ForegroundColor Green
-            }
+            Copy-Item -Path $sourceFile -Destination $destPath -Force
+            Write-Host "  [OK] Installed profile.ps1" -ForegroundColor Green
         }
 
         # Copy to Windows PowerShell directory
         if ($script:windowsPowerShellPath -and (Test-Path $script:windowsPowerShellPath)) {
             Write-Host "`nInstalling to Windows PowerShell directory..." -ForegroundColor Cyan
             $destPath = Join-Path $script:windowsPowerShellPath "profile.ps1"
-
-            if (Test-Path $sourceFile) {
-                Copy-Item -Path $sourceFile -Destination $destPath -Force
-                Write-Host "  [OK] Installed profile.ps1" -ForegroundColor Green
-            }
+            Copy-Item -Path $sourceFile -Destination $destPath -Force
+            Write-Host "  [OK] Installed profile.ps1" -ForegroundColor Green
         }
     }
 
