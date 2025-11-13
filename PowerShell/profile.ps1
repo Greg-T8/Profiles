@@ -1,7 +1,4 @@
 ﻿<#
-    Test0747
-
-
     This is my PowerShell profile script I use in the context of $Profile.CurrentUserAllHosts.
 
     The prompt function mimmics the behavior of the Oh-My-Posh prompt for PowerShell, but without requiring the
