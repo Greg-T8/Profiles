@@ -287,8 +287,11 @@ $Helpers = {
             Write-Host "  [OK] Installed profile.ps1" -ForegroundColor Green
         }
 
-        # Copy to Windows PowerShell directory
-        if ($script:windowsPowerShellPath -and (Test-Path $script:windowsPowerShellPath)) {
+        # Copy to Windows PowerShell directory (Windows only)
+        if ($script:onWindows -and $script:windowsPowerShellPath) {
+            if (-not (Test-Path $script:windowsPowerShellPath)) {
+                New-Item -ItemType Directory -Path $script:windowsPowerShellPath -Force | Out-Null
+            }
             Write-Host "`nInstalling to Windows PowerShell directory..." -ForegroundColor Cyan
             $destPath = Join-Path $script:windowsPowerShellPath "profile.ps1"
             Copy-Item -Path $sourceFile -Destination $destPath -Force
@@ -322,8 +325,11 @@ $Helpers = {
             }
         }
 
-        # Download to Windows PowerShell directory
-        if ($script:windowsPowerShellPath -and (Test-Path $script:windowsPowerShellPath)) {
+        # Download to Windows PowerShell directory (Windows only)
+        if ($script:onWindows -and $script:windowsPowerShellPath) {
+            if (-not (Test-Path $script:windowsPowerShellPath)) {
+                New-Item -ItemType Directory -Path $script:windowsPowerShellPath -Force | Out-Null
+            }
             Write-Host "`nDownloading to Windows PowerShell directory..." -ForegroundColor Cyan
             $destPath = Join-Path $script:windowsPowerShellPath "profile.ps1"
 
@@ -443,7 +449,7 @@ if ($psReadLine) {
         }
 
         # If on Windows and running PowerShell Core, also configure Windows PowerShell
-        if ($script:onWindows -and $PSVersionTable.PSVersion.Major -ge 6) {
+        if ($script:onWindows -and $PSVersionTable.PSVersion.Major -ge 6 -and $script:windowsPowerShellPath) {
             $windowsPowerShellProfilePath = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'WindowsPowerShell\profile.ps1'
             $windowsPSSourcePath = Join-Path $script:windowsPowerShellPath 'profile.ps1'
             $profilePaths += @{
@@ -505,14 +511,15 @@ if ($psReadLine) {
 
         if ($script:onWindows) {
             Write-Host "Your profile has been installed to:" -ForegroundColor Gray
-            Write-Host "  - Windows PowerShell: $script:windowsPowerShellPath\profile.ps1" -ForegroundColor Gray
-
+            if ($script:windowsPowerShellPath) {
+                Write-Host "  - Windows PowerShell: $script:windowsPowerShellPath\profile.ps1" -ForegroundColor Gray
+            }
             if (Test-Path $InstallPath) {
                 Write-Host "  - PowerShell Core: $InstallPath\profile.ps1" -ForegroundColor Gray
             }
         }
         else {
-            Write-Host "Your profile has been installed to: $InstallPath\profile.ps1" -ForegroundColor Gray
+            Write-Host "Your profile has been installed to: $InstallPath/profile.ps1" -ForegroundColor Gray
         }
 
         Write-Host ""
