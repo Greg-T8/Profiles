@@ -536,9 +536,14 @@ if ($psReadLine) {
 }
 
 try {
-    Push-Location -Path $PSScriptRoot
+    # Only change directory if PSScriptRoot is available (not when invoked via iex from URL)
+    if ($PSScriptRoot) {
+        Push-Location -Path $PSScriptRoot
+    }
     & $Main
 }
 finally {
-    Pop-Location
+    if ($PSScriptRoot) {
+        Pop-Location
+    }
 }
