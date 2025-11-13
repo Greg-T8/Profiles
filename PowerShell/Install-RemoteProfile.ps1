@@ -120,14 +120,18 @@ $Helpers = {
 
     function Show-InstallBanner {
         # Display installation banner with configuration details
+        # Normalize path separators for display based on platform
+        $displayInstallPath = if ($script:onWindows) { $InstallPath } else { $InstallPath -replace '\\', '/' }
+
         Write-Host "`n=== PowerShell Profile Installer ===" -ForegroundColor Cyan
         Write-Host "Repository: $GitHubRepo" -ForegroundColor Gray
         Write-Host "Branch: $Branch" -ForegroundColor Gray
         Write-Host "Install Paths:" -ForegroundColor Gray
-        Write-Host "  PowerShell Core: $InstallPath" -ForegroundColor Gray
+        Write-Host "  PowerShell Core: $displayInstallPath" -ForegroundColor Gray
 
         if ($script:windowsPowerShellPath) {
-            Write-Host "  Windows PowerShell: $script:windowsPowerShellPath" -ForegroundColor Gray
+            $displayWindowsPath = $script:windowsPowerShellPath -replace '\\', '/'
+            Write-Host "  Windows PowerShell: $displayWindowsPath" -ForegroundColor Gray
         }
 
         if ($script:onWindows) {
