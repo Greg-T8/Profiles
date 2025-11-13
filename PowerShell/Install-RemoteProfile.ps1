@@ -498,10 +498,8 @@ if ($psReadLine) {
     }
 
     function Enable-ProfileInSession {
-        # Inform user to restart session for profile to take effect
+        # Activate profile in current session or inform user how to activate
         Write-Host "`n[INFO] Profile installation complete!" -ForegroundColor Cyan
-        Write-Host ""
-        Write-Host "To activate your new profile, please close this PowerShell session and open a new one." -ForegroundColor Yellow
         Write-Host ""
 
         if ($script:onWindows) {
@@ -518,7 +516,28 @@ if ($psReadLine) {
         }
 
         Write-Host ""
-        Write-Host "The profile will load automatically in all new PowerShell sessions." -ForegroundColor Gray
+
+        # Determine if running PowerShell Core or Windows PowerShell
+        if ($PSVersionTable.PSEdition -eq 'Core') {
+            # PowerShell Core - reload profile in current session
+            Write-Host "Loading profile in current session..." -ForegroundColor Yellow
+            try {
+                . $PROFILE.CurrentUserAllHosts
+                Write-Host "[OK] Profile loaded successfully!" -ForegroundColor Green
+                Write-Host "The profile will also load automatically in all new PowerShell sessions." -ForegroundColor Gray
+            }
+            catch {
+                Write-Warning "Failed to load profile: $_"
+                Write-Host "Please close this session and open a new one to activate your profile." -ForegroundColor Yellow
+            }
+        }
+        else {
+            # Windows PowerShell - advise to restart
+            Write-Host "To activate your new profile, please close this PowerShell session and open a new one." -ForegroundColor Yellow
+            Write-Host "The profile will load automatically in all new PowerShell sessions." -ForegroundColor Gray
+        }
+
+        Write-Host ""
     }
 
     function Show-InstallComplete {

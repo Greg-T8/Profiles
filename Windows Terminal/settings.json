@@ -16,10 +16,6 @@
             "id": "User.paste"
         },
         {
-            "command": "find",
-            "id": "User.find"
-        },
-        {
             "command": 
             {
                 "action": "splitPane",
@@ -27,6 +23,10 @@
                 "splitMode": "duplicate"
             },
             "id": "User.splitPane.A6751878"
+        },
+        {
+            "command": "find",
+            "id": "User.find"
         }
     ],
     "alwaysShowNotificationIcon": false,
@@ -45,12 +45,12 @@
             "keys": "ctrl+c"
         },
         {
-            "id": "User.paste",
-            "keys": "ctrl+v"
-        },
-        {
             "id": "User.find",
             "keys": "ctrl+shift+f"
+        },
+        {
+            "id": "User.paste",
+            "keys": "ctrl+v"
         },
         {
             "id": "User.splitPane.A6751878",
@@ -200,6 +200,12 @@
             },
             {
                 "guid": "{2f15cde9-f198-583b-b364-8e8299cc511e}",
+                "hidden": false,
+                "name": "UbuntuTest",
+                "source": "Microsoft.WSL"
+            },
+            {
+                "guid": "{9d0d989b-6fdf-5b03-b398-5c27d67fdc62}",
                 "hidden": false,
                 "name": "UbuntuTest",
                 "source": "Microsoft.WSL"
