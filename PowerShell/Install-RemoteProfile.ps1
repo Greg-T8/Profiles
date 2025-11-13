@@ -430,49 +430,56 @@ if ($psReadLine) {
     }
 
     function Update-ProfileScript {
-        # Configure PowerShell profile scripts to load installed files
+        # Copy profile from installation directory to the actual profile location if needed
+        Write-Host "`nConfiguring PowerShell profiles..." -ForegroundColor Cyan
+
         $profilePaths = @()
 
         # Always add current PowerShell profile
         $profilePaths += @{
-            Path = $PROFILE.CurrentUserAllHosts
-            Name = if ($PSVersionTable.PSVersion.Major -ge 6) { "PowerShell Core" } else { "Windows PowerShell" }
+            Path        = $PROFILE.CurrentUserAllHosts
+            Name        = if ($PSVersionTable.PSVersion.Major -ge 6) { "PowerShell Core" } else { "Windows PowerShell" }
+            SourcePath  = Join-Path $InstallPath 'profile.ps1'
         }
 
         # If on Windows and running PowerShell Core, also configure Windows PowerShell
         if ($script:onWindows -and $PSVersionTable.PSVersion.Major -ge 6) {
             $windowsPowerShellProfilePath = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'WindowsPowerShell\profile.ps1'
+            $windowsPSSourcePath = Join-Path $script:windowsPowerShellPath 'profile.ps1'
             $profilePaths += @{
-                Path = $windowsPowerShellProfilePath
-                Name = "Windows PowerShell"
+                Path        = $windowsPowerShellProfilePath
+                Name        = "Windows PowerShell"
+                SourcePath  = $windowsPSSourcePath
             }
         }
 
-        # Create or update profile scripts
+        # Copy profile files to their final locations
         foreach ($profileInfo in $profilePaths) {
             $profilePath = $profileInfo.Path
             $profileName = $profileInfo.Name
+            $sourceProfilePath = $profileInfo.SourcePath
 
-            Write-Host "`nConfiguring $profileName profile..." -ForegroundColor Cyan
-
-            # Determine the source path - always use InstallPath for PowerShell Core
-            # For Windows PowerShell, use windowsPowerShellPath if it's different from profile path
-            if ($profileName -eq "Windows PowerShell" -and $script:windowsPowerShellPath) {
-                $sourceProfilePath = Join-Path $script:windowsPowerShellPath 'profile.ps1'
+            # Resolve to absolute paths for comparison
+            $resolvedSource = if (Test-Path $sourceProfilePath) {
+                (Resolve-Path $sourceProfilePath).Path
+            } else {
+                $sourceProfilePath
             }
-            else {
-                $sourceProfilePath = Join-Path $InstallPath 'profile.ps1'
+            $resolvedDest = if (Test-Path $profilePath) {
+                (Resolve-Path $profilePath).Path
+            } else {
+                $profilePath
             }
 
-            # Skip if source and destination are the same
-            if ($sourceProfilePath -eq $profilePath) {
-                Write-Host "[OK] Profile already in place at: $profilePath" -ForegroundColor Green
+            # Skip if source and destination are the same file
+            if ($resolvedSource -eq $resolvedDest) {
+                Write-Host "  $profileName profile already in place at: $profilePath" -ForegroundColor Green
                 continue
             }
 
-            # Copy the installed profile.ps1 to the profile location
+            # Copy the profile.ps1 to the profile location
             if (Test-Path $sourceProfilePath) {
-                Write-Host "Copying profile.ps1 to: $profilePath" -ForegroundColor Yellow
+                Write-Host "  Updating $profileName profile: $profilePath" -ForegroundColor Yellow
 
                 # Ensure parent directory exists
                 $profileDir = Split-Path -Parent $profilePath
@@ -481,10 +488,10 @@ if ($psReadLine) {
                 }
 
                 Copy-Item -Path $sourceProfilePath -Destination $profilePath -Force
-                Write-Host "[OK] $profileName profile updated" -ForegroundColor Green
+                Write-Host "  [OK] $profileName profile updated" -ForegroundColor Green
             }
             else {
-                Write-Host "[WARNING] Source profile not found at: $sourceProfilePath" -ForegroundColor Yellow
+                Write-Host "  [WARNING] Source profile not found at: $sourceProfilePath" -ForegroundColor Yellow
             }
         }
     }
