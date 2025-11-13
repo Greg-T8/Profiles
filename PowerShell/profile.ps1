@@ -276,7 +276,7 @@ if (-not (Get-Module PSReadline)) { Import-Module PSReadLine }
 
 # Basic PSReadLine options
 Set-PSReadLineOption -EditMode Vi
-Set-PSReadLineOption -ContinuationPrompt ''
+Set-PSReadLineOption -ContinuationPrompt 'this is a tab'
 
 # PredictionViewStyle requires PSReadLine 2.1.0+ (PowerShell Core)
 if ($PSVersionTable.PSEdition -eq 'Core') {
