@@ -179,7 +179,6 @@ function prompt {
         $([char]0x2574) +                                            # '╴' Box Drawings Light Left
         "$ESC[0m" +                                                  # Reset all ANSI formatting
         $(if (Test-Path variable:/PSDebugContext) { '[DBG]: ' } else { '' }) +  # Debug indicator
-        $(if ($NestedPromptLevel -ge 1) { '>>' }) +                  # Nested prompt indicator
         '> '                                                         # Prompt character
     }
     else {
@@ -193,7 +192,6 @@ function prompt {
         "$([char]0x2570)" +                                          # '╰' Box Drawings Light Arc Up and Right
         "$([char]0x2574)" +                                          # '╴' Box Drawings Light Left with space
         $(if (Test-Path variable:/PSDebugContext) { '[DBG]: ' } else { '' }) +  # Debug indicator
-        $(if ($NestedPromptLevel -ge 1) { '>>' }) +                  # Nested prompt indicator
         '> '                                                         # Prompt character
     }
 }
@@ -257,7 +255,17 @@ Set-Alias -Name ll -Value Get-ChildItem -Force
 Set-Alias -Name cfj -Value ConvertFrom-Json
 Set-Alias -Name tf -Value terraform
 Set-Alias -Name gim -Value Get-InstalledModule
+Set-Alias -Name rr -Value Invoke-ReloadProfile
 Remove-Item Alias:dir -ErrorAction SilentlyContinue
+
+# ============================================================================
+# RELOAD PROFILE FUNCTION
+# ============================================================================
+
+function Invoke-ReloadProfile {
+    # Reload the PowerShell profile
+    . $profile.currentUserAllHosts
+}
 
 # ============================================================================
 # PSREADLINE CONFIGURATION
@@ -268,6 +276,7 @@ if (-not (Get-Module PSReadline)) { Import-Module PSReadLine }
 
 # Basic PSReadLine options
 Set-PSReadLineOption -EditMode Vi
+Set-PSReadLineOption -ContinuationPrompt '   '
 
 # PredictionViewStyle requires PSReadLine 2.1.0+ (PowerShell Core)
 if ($PSVersionTable.PSVersion.Major -ge 7) {
@@ -299,10 +308,27 @@ elseif ($PSVersionTable.PSVersion.Major -ge 7) {
 }
 
 # Tab completion key handlers
-Set-PSReadLineKeyHandler -Chord Tab -Function TabCompleteNext
 Set-PSReadLineKeyHandler -Chord Shift+Tab -Function TabCompletePrevious
 Set-PSReadLineKeyHandler -Chord Ctrl+V -Function Paste
-Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
+Set-PSReadLineKeyHandler -Key Tab -ScriptBlock {
+    param($key, $arg)
+    # Insert a tab if only whitespace precedes cursor on current line, otherwise complete
+    $line = $null
+    $cursor = $null
+    [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
+
+    # Find the start of the current line (last newline before cursor, or beginning)
+    $lastNewline = $line.LastIndexOf("`n", $cursor - 1)
+    $lineStart = if ($lastNewline -ge 0) { $lastNewline + 1 } else { 0 }
+    $textBeforeCursor = $line.Substring($lineStart, $cursor - $lineStart)
+
+    if ($textBeforeCursor -notmatch '\S') {
+        [Microsoft.PowerShell.PSConsoleReadLine]::Insert("    ")
+    }
+    else {
+        [Microsoft.PowerShell.PSConsoleReadLine]::MenuComplete()
+    }
+}
 
 # Prediction navigation (PowerShell Core with newer PSReadLine)
 Set-PSReadLineKeyHandler -Key RightArrow -Function ForwardWord
@@ -319,6 +345,7 @@ if ($PSVersionTable.PSVersion.Major -ge 7) {
 if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
     Set-PSReadLineOption -ViModeIndicator 'Cursor'
     $env:EDITOR = 'nvim'
+
 
     # Vi mode key handlers for both Command and Insert modes
     foreach ($mode in 'Command', 'Insert') {

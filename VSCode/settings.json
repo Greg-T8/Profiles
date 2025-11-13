@@ -825,8 +825,8 @@
   "terminal.integrated.suggest.enabled": true,
   "terminal.integrated.suggest.inlineSuggestion": "alwaysOnTopExceptExactMatch",
   "terminal.integrated.suggest.quickSuggestions": {
-    "arguments": "off",
-    "commands": "off",
+    "arguments": "on",
+    "commands": "on",
     "unknown": "off"
   },
   "terminal.integrated.suggest.showStatusBar": true,
