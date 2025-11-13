@@ -293,7 +293,7 @@ Set-PSReadLineKeyHandler -Chord Shift+Tab -Function TabCompletePrevious
 Set-PSReadLineKeyHandler -Chord Ctrl+V -Function Paste
 Set-PSReadLineKeyHandler -Key Tab -ScriptBlock {
     param($key, $arg)
-    # Insert a tab if only whitespace precedes cursor on current line, otherwise complete
+    # Insert spaces if only whitespace precedes cursor on current line, otherwise complete
     $line = $null
     $cursor = $null
     [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
@@ -310,6 +310,9 @@ Set-PSReadLineKeyHandler -Key Tab -ScriptBlock {
         [Microsoft.PowerShell.PSConsoleReadLine]::MenuComplete()
     }
 }
+
+# Accept menu selection with Tab (after menu is open, use arrows to navigate then Tab to accept)
+Set-PSReadLineKeyHandler -Key Enter -Function AcceptLine
 
 # Prediction navigation (PowerShell Core with newer PSReadLine)
 Set-PSReadLineKeyHandler -Key RightArrow -Function ForwardWord
