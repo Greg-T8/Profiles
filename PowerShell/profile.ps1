@@ -59,7 +59,8 @@ function Get-PromptPath {
         # Use Get-Variable to avoid assignment conflict with read-only variable
         $onWindows = if ($PSVersionTable.PSVersion.Major -ge 6) {
             (Get-Variable -Name IsWindows -ValueOnly -ErrorAction SilentlyContinue)
-        } else {
+        }
+        else {
             $true
         }
 
@@ -71,7 +72,8 @@ function Get-PromptPath {
             if ($location.EndsWith('\') -and -not $location.EndsWith(':\')) {
                 $location = $location.TrimEnd('\\')
             }
-        } else {
+        }
+        else {
             if ($location.EndsWith('/') -and $location.Length -gt 1) {
                 $location = $location.TrimEnd('/')
             }
@@ -80,51 +82,51 @@ function Get-PromptPath {
         # Get user home directory
         $userProfilePath = if ($onWindows) { $env:USERPROFILE } else { $env:HOME }
 
-    if ($userProfilePath -and $location.StartsWith($userProfilePath)) {
-        if ($location -eq $userProfilePath) {
-            $promptPath = '~'
-        }
-        else {
-            # Extract the relative path from user profile
-            $relativelocation = $location.Substring($userProfilePath.Length)
-
-            if ($relativelocation.Length -le 50) {
-                $promptPath = '~' + $relativelocation
+        if ($userProfilePath -and $location.StartsWith($userProfilePath)) {
+            if ($location -eq $userProfilePath) {
+                $promptPath = '~'
             }
             else {
-                # Path is long, so shorten it by keeping first 3 folders and last 2 folders
-                $matches = [regex]::Matches($relativelocation, [regex]::Escape($sep))
-                switch ($matches.count) {
-                    # Display full relative path if 4 or fewer folders
-                    { $_ -ge 1 -and $_ -le 4 } {
-                        $promptPath = '~' + $relativelocation
-                        break
-                    }
-                    # Path is long, so add '...' in the middle
-                    default {
-                        $leftPath   = $relativelocation.Substring(0, $matches[2].Index)
-                        $rightPath  = $relativelocation.Substring($matches[$matches.count - 2].Index)
-                        $promptPath = "~$leftPath$sep...$rightPath"
+                # Extract the relative path from user profile
+                $relativelocation = $location.Substring($userProfilePath.Length)
+
+                if ($relativelocation.Length -le 50) {
+                    $promptPath = '~' + $relativelocation
+                }
+                else {
+                    # Path is long, so shorten it by keeping first 3 folders and last 2 folders
+                    $matches = [regex]::Matches($relativelocation, [regex]::Escape($sep))
+                    switch ($matches.count) {
+                        # Display full relative path if 4 or fewer folders
+                        { $_ -ge 1 -and $_ -le 4 } {
+                            $promptPath = '~' + $relativelocation
+                            break
+                        }
+                        # Path is long, so add '...' in the middle
+                        default {
+                            $leftPath   = $relativelocation.Substring(0, $matches[2].Index)
+                            $rightPath  = $relativelocation.Substring($matches[$matches.count - 2].Index)
+                            $promptPath = "~$leftPath$sep...$rightPath"
+                        }
                     }
                 }
             }
         }
-    }
-    else {
-        # Build prompt path for locations outside of user profile
-        $matches = [regex]::Matches($location, [regex]::Escape($sep))
-        switch ($matches.count) {
-            { $_ -ge 1 -and $_ -le 4 } {
-                $promptPath = $location
-                break
-            }
-            default {
-                $leftPath   = $location.Substring(0, $matches[2].Index)
-                $rightPath  = $location.Substring($matches[$_ - 2].Index)
-                $promptPath = "$leftPath$sep...$rightPath"
+        else {
+            # Build prompt path for locations outside of user profile
+            $matches = [regex]::Matches($location, [regex]::Escape($sep))
+            switch ($matches.count) {
+                { $_ -ge 1 -and $_ -le 4 } {
+                    $promptPath = $location
+                    break
+                }
+                default {
+                    $leftPath   = $location.Substring(0, $matches[2].Index)
+                    $rightPath  = $location.Substring($matches[$_ - 2].Index)
+                    $promptPath = "$leftPath$sep...$rightPath"
+                }
             }
         }
-    }
         return $promptPath
     }
     catch {
@@ -217,7 +219,7 @@ function prompt {
         "`n" +                                                       # New line
         "$([char]0x256d)" +                                          # '╭' Box Drawings Light Arc Down and Right
         "$([char]0x2500)" +                                          # '─' Box Drawings Light Horizontal
-        "( " +                                                       # Opening parenthesis and space
+        '( ' +                                                       # Opening parenthesis and space
         "$(Get-PromptPath)" +                                        # Display shortened path
         "`n" +                                                       # New line
         "$([char]0x2570)" +                                          # '╰' Box Drawings Light Arc Up and Right
@@ -236,9 +238,11 @@ function prompt {
 # For remote/direct profiles, use the actual profile directory
 $profileDir = if (Test-Path -Path "$env:OneDriveConsumer/Apps/Profiles/PowerShell/functions.ps1") {
     "$env:OneDriveConsumer/Apps/Profiles/PowerShell"
-} elseif (Test-Path -Path "$env:USERPROFILE/OneDrive/Apps/Profiles/PowerShell/functions.ps1") {
+}
+elseif (Test-Path -Path "$env:USERPROFILE/OneDrive/Apps/Profiles/PowerShell/functions.ps1") {
     "$env:USERPROFILE/OneDrive/Apps/Profiles/PowerShell"
-} else {
+}
+else {
     # Fall back to the directory containing the profile script
     Split-Path -Parent $PROFILE.CurrentUserAllHosts
 }
