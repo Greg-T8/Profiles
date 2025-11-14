@@ -48,6 +48,11 @@ SAVEHIST=1000                          # Number of commands to save to file
 HISTFILE=~/.zsh_history               # History file location
 
 # ==============================================================================
+# INTERACTIVE COMMENTS
+# ==============================================================================
+setopt interactivecomments            # Allow comments in interactive shell
+
+# ==============================================================================
 # BELL CONFIGURATION
 # ==============================================================================
 # Disable all notification bells (audible and visual)
