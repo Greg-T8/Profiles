@@ -20,6 +20,9 @@
 
 $ErrorActionPreference = 'Stop'
 
+# Store the actual profile script path for reloading
+$script:ProfilePath = $PSCommandPath
+
 # Set PSStyle formatting colors (PowerShell Core only)
 if ($PSVersionTable.PSEdition -eq 'Core') {
     $PSStyle.Formatting.Verbose = $PSStyle.Foreground.Cyan
@@ -27,137 +30,10 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 }
 
 # ============================================================================
-# PROMPT HELPER FUNCTIONS
-# ============================================================================
-
-function Test-GitDirectory {
-    # Check if current directory is a git repository
-    $gitCommand = Get-Command -Name git.exe -CommandType Application -ErrorAction SilentlyContinue
-    if ($gitCommand) {
-        try {
-            $gitStatus = git status 2>&1
-            if (-not ($gitStatus -match 'fatal: not a git repository')) {
-                return $true
-            }
-        }
-        catch {
-            # Ignore errors from git command
-        }
-    }
-    return $false
-}
-
-function Get-PromptPath {
-    # Get shortened path for prompt display
-    $location = "$(Get-Location)"
-
-    # Remove trailing slash except for root paths like 'C:\'
-    if ($location.EndsWith('\') -and -not $location.EndsWith(':\')) {
-        $location = $location.TrimEnd('\')
-    }
-
-    $userProfilePath = $env:USERPROFILE
-    if ($location.Contains($userProfilePath)) {
-        if ($location.Equals($userProfilePath)) {
-            $promptPath = '~'
-        }
-        else {
-            # Extract the relative path from user profile
-            # The -split operator uses regex, so we must escape backslashes
-            $relativelocation = ($location -split ($userProfilePath -replace ('\\', '\\')))[1]
-
-            if ($relativelocation.Length -le 50) {
-                $promptPath = '~' + $relativelocation
-            }
-            else {
-                # Path is long, so shorten it by keeping first 3 folders and last 2 folders
-                $matches = [regex]::matches($relativelocation, '\\')
-                switch ($matches.count) {
-                    # Display full relative path if 4 or fewer folders
-                    { $_ -ge 1 -and $_ -le 4 } {
-                        $promptPath = '~' + $relativelocation
-                        break
-                    }
-                    # Path is long, so add '...' in the middle
-                    default {
-                        $leftPath   = $relativelocation.Substring(0, $matches[2].index)
-                        $rightPath  = $relativelocation.Substring($matches[$matches.count - 2].index)
-                        $promptPath = '~' + $leftPath + '\...' + $rightPath
-                    }
-                }
-            }
-        }
-    }
-    else {
-        # Build prompt path for locations outside of user profile (e.g., 'C:\Windows\System32')
-        $matches = [regex]::matches($location, '\\')
-        switch ($matches.count) {
-            { $_ -ge 1 -and $_ -le 4 } {
-                $promptPath = $location
-                break
-            }
-            default {
-                $leftPath   = $location.Substring(0, $matches[2].index)
-                $rightPath  = $location.Substring($matches[$_ - 2].index)
-                $promptPath = $leftPath + '\...' + $rightPath
-            }
-        }
-    }
-    $promptPath
-}
-
-function Initialize-PoshGit {
-    # Initialize Posh-Git module and settings
-    # Only loads in PowerShell Core when in a Git directory
-
-    if ($PSVersionTable.PSEdition -ne 'Core') {
-        return $false
-    }
-
-    if (-not (Test-GitDirectory)) {
-        return $false
-    }
-
-    try {
-        Import-Module Posh-Git -ErrorAction Stop
-
-        # Configure Posh-Git settings
-        $GitPromptSettings.DefaultPromptPath            = ''
-        $GitPromptSettings.DefaultPromptSuffix          = ''
-        $GitPromptSettings.DefaultPromptDebug           = ''
-        $GitPromptSettings.EnableStashStatus            = $true
-        $GitPromptSettings.BeforeStatus.ForegroundColor = 0x00B3E2      # Cyan RGB(0, 179, 226)
-        $GitPromptSettings.AfterStatus.ForegroundColor  = 0x00B3E2
-        $GitPromptSettings.WorkingColor.ForegroundColor = 0x8A0ACC      # Purple RGB(138, 10, 204)
-        $StashColor                                     = 0xAFB178      # Sage RGB(175, 177, 120)
-        $GitPromptSettings.StashColor.ForegroundColor   = $StashColor
-        $GitPromptSettings.BeforeStash.ForegroundColor  = $StashColor
-        $GitPromptSettings.AfterStash.ForegroundColor   = $StashColor
-
-        return $true
-    }
-    catch {
-        # Posh-Git not available, continue without it
-        return $false
-    }
-}
-
-# ============================================================================
 # PROMPT FUNCTION
 # ============================================================================
 
 function prompt {
-    # Initialize Posh-Git if in PowerShell Core and in a Git directory
-    $usingPoshGit = $false
-    if ($PSVersionTable.PSEdition -eq 'Core') {
-        if (-not (Get-Module -Name Posh-Git)) {
-            $usingPoshGit = Initialize-PoshGit
-        }
-        else {
-            $usingPoshGit = $true
-        }
-    }
-
     # Use different prompt styles based on PowerShell edition
     if ($PSVersionTable.PSEdition -eq 'Core') {
         # PowerShell Core with ANSI escape codes
@@ -169,9 +45,9 @@ function prompt {
         '( ' +                                                       # Opening parenthesis and space
         "$ESC[3m" +                                                  # Start italic mode
         "$ESC[2m" +                                                  # Start dim/faint mode
-        $(Get-PromptPath) +                                          # Display shortened path
+        $(Get-MyPromptPath) +                                        # Display shortened path
         "$ESC[22m" +                                                 # Reset dim/faint mode
-        "$(if ($usingPoshGit) { "$(& $GitPromptScriptBlock)" })" +  # Git status if in git repo
+        "$(if ($script:PoshGitLoaded) { "$(& $GitPromptScriptBlock)" })" +  # Git status if in git repo
         "$ESC[23m" +                                                 # Reset italic mode
         "`n" +                                                       # New line
         "$ESC[38;2;0;179;226m" +                                     # Set foreground color to cyan RGB(0,179,226)
@@ -186,14 +62,25 @@ function prompt {
         "`n" +                                                       # New line
         "$([char]0x256d)" +                                          # '╭' Box Drawings Light Arc Down and Right
         "$([char]0x2500)" +                                          # '─' Box Drawings Light Horizontal
-        "( " +                                                       # Opening parenthesis and space
-        "$(Get-PromptPath)" +                                        # Display shortened path
+        '( ' +                                                       # Opening parenthesis and space
+        "$(Get-MyPromptPath)" +                                      # Display shortened path
         "`n" +                                                       # New line
         "$([char]0x2570)" +                                          # '╰' Box Drawings Light Arc Up and Right
         "$([char]0x2574)" +                                          # '╴' Box Drawings Light Left with space
         $(if (Test-Path variable:/PSDebugContext) { '[DBG]: ' } else { '' }) +  # Debug indicator
         '> '                                                         # Prompt character
     }
+}
+
+# ============================================================================
+# INITIALIZE POSH-GIT
+# ============================================================================
+
+# Try to initialize Posh-Git once during profile load if in PowerShell Core and in a git directory
+# Store result in script-scoped variable to avoid Get-Module calls in prompt
+$script:PoshGitLoaded = $false
+if ($PSVersionTable.PSEdition -eq 'Core') {
+    $script:PoshGitLoaded = Initialize-PoshGit
 }
 
 # ============================================================================
@@ -205,9 +92,8 @@ function prompt {
 # For remote/direct profiles, use the actual profile directory
 $profileDir = if (Test-Path -Path "$env:OneDriveConsumer/Apps/Profiles/PowerShell/functions.ps1") {
     "$env:OneDriveConsumer/Apps/Profiles/PowerShell"
-} elseif (Test-Path -Path "$env:USERPROFILE/OneDrive/Apps/Profiles/PowerShell/functions.ps1") {
-    "$env:USERPROFILE/OneDrive/Apps/Profiles/PowerShell"
-} else {
+}
+else {
     # Fall back to the directory containing the profile script
     Split-Path -Parent $PROFILE.CurrentUserAllHosts
 }
@@ -255,17 +141,16 @@ Set-Alias -Name ll -Value Get-ChildItem -Force
 Set-Alias -Name cfj -Value ConvertFrom-Json
 Set-Alias -Name tf -Value terraform
 Set-Alias -Name gim -Value Get-InstalledModule
-Set-Alias -Name rr -Value Invoke-ReloadProfile
 Remove-Item Alias:dir -ErrorAction SilentlyContinue
 
 # ============================================================================
-# RELOAD PROFILE FUNCTION
+# RELOAD PROFILE
 # ============================================================================
-
-function Invoke-ReloadProfile {
-    # Reload the PowerShell profile
-    . $profile.currentUserAllHosts
-}
+# Note: Due to PowerShell scoping rules, profile reload cannot be wrapped in a
+# function and have changes persist. You must dot-source the profile directly:
+#   . $script:ProfilePath
+# Or define an alias/function as a reminder, but you'll still need to manually
+# dot-source for function definition changes to take effect.#
 
 # ============================================================================
 # PSREADLINE CONFIGURATION
@@ -354,5 +239,220 @@ if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
 
         # Set initial cursor to blinking line for Insert mode
         Write-Host -NoNewline "`e[5 q"
+    }
+}
+
+# ============================================================================
+# PROMPT HELPER FUNCTIONS
+# ============================================================================
+
+function Test-GitDirectory {
+    # Check if current directory is a git repository
+    $gitCommand = Get-Command -Name git.exe -CommandType Application -ErrorAction SilentlyContinue
+    if ($gitCommand) {
+        try {
+            $gitStatus = git status 2>&1
+            if (-not ($gitStatus -match 'fatal: not a git repository')) {
+                return $true
+            }
+        }
+        catch {
+            # Ignore errors from git command
+        }
+    }
+    return $false
+}
+
+function Get-MyPromptPath {
+    <#
+    .SYNOPSIS
+        Get shortened path for prompt display
+
+    .DESCRIPTION
+        Returns a shortened version of the current path for display in the prompt.
+        Paths under the user profile are displayed with ~ prefix.
+        Long paths are shortened by keeping the first 3 folders and last 2 folders.
+        Works on both Windows and Linux systems.
+
+    .NOTES
+        Debug mode: Set $DebugPrompt = $true at the start of the function to see detailed path processing
+    #>
+
+    $DebugPrompt = $false
+
+    # Detect OS and set path separator
+    $onWindows = if ($PSVersionTable.PSEdition -eq 'Core') {
+        (Get-Variable -Name 'IsWindows' -ValueOnly -ErrorAction SilentlyContinue) -ne $false
+    }
+    else {
+        $true  # Windows PowerShell 5.1 is always Windows
+    }
+    $pathSep = if ($onWindows) { '\' } else { '/' }
+    $pathSepRegex = if ($onWindows) { '\\' } else { '/' }
+
+    # Get shortened path for prompt display
+    $location = "$(Get-Location)"
+
+    if ($DebugPrompt) {
+        Write-Host "[DEBUG] location: $location" -ForegroundColor Magenta
+        Write-Host "[DEBUG] onWindows: $onWindows" -ForegroundColor Magenta
+        Write-Host "[DEBUG] pathSep: $pathSep" -ForegroundColor Magenta
+    }
+
+    # Remove trailing slash except for root paths (e.g., 'C:\' or '/')
+    $isRootPath = if ($onWindows) {
+        $location.EndsWith(':\')
+    }
+    else {
+        $location -eq '/'
+    }
+
+    if ($location.EndsWith($pathSep) -and -not $isRootPath) {
+        $location = $location.TrimEnd($pathSep)
+        if ($DebugPrompt) {
+            Write-Host "[DEBUG] location (trimmed): $location" -ForegroundColor Magenta
+        }
+    }
+
+    # Get user profile path (cross-platform)
+    $userProfilePath = if ($onWindows) { $env:USERPROFILE } else { $env:HOME }
+
+    if ($DebugPrompt) {
+        Write-Host "[DEBUG] userProfilePath: $userProfilePath" -ForegroundColor Magenta
+        Write-Host "[DEBUG] location.Contains(userProfilePath): $($location.Contains($userProfilePath))" -ForegroundColor Magenta
+    }
+
+    if ($location.Contains($userProfilePath)) {
+        if ($location.Equals($userProfilePath)) {
+            $promptPath = '~'
+            if ($DebugPrompt) {
+                Write-Host "[DEBUG] At home directory, promptPath: $promptPath" -ForegroundColor Magenta
+            }
+        }
+        else {
+            # Extract the relative path from user profile
+            # The -split operator uses regex, so escape the path separator for regex
+            $escapedProfilePath = $userProfilePath -replace ([regex]::Escape($pathSep)), ([regex]::Escape($pathSep))
+            $relativelocation = ($location -split $escapedProfilePath)[1]
+
+            if ($DebugPrompt) {
+                Write-Host "[DEBUG] relativelocation: $relativelocation" -ForegroundColor Magenta
+                Write-Host "[DEBUG] relativelocation.Length: $($relativelocation.Length)" -ForegroundColor Magenta
+            }
+
+            if ($relativelocation.Length -le 50) {
+                $promptPath = '~' + $relativelocation
+                if ($DebugPrompt) {
+                    Write-Host "[DEBUG] Short path, promptPath: $promptPath" -ForegroundColor Magenta
+                }
+            }
+            else {
+                # Path is long, so shorten it by keeping first 3 folders and last 2 folders
+                $matches = [regex]::matches($relativelocation, $pathSepRegex)
+
+                if ($DebugPrompt) {
+                    Write-Host "[DEBUG] Long path detected, matches.count: $($matches.count)" -ForegroundColor Magenta
+                }
+
+                switch ($matches.count) {
+                    # Display full relative path if 4 or fewer folders
+                    { $_ -ge 1 -and $_ -le 4 } {
+                        $promptPath = '~' + $relativelocation
+                        if ($DebugPrompt) {
+                            Write-Host "[DEBUG] 4 or fewer folders, promptPath: $promptPath" -ForegroundColor Magenta
+                        }
+                        break
+                    }
+                    # Path is long, so add '...' in the middle
+                    default {
+                        $leftPath   = $relativelocation.Substring(0, $matches[2].index)
+                        $rightPath  = $relativelocation.Substring($matches[$matches.count - 2].index)
+                        $promptPath = '~' + $leftPath + $pathSep + '...' + $rightPath
+                        if ($DebugPrompt) {
+                            Write-Host '[DEBUG] Shortened path:' -ForegroundColor Magenta
+                            Write-Host "[DEBUG]   leftPath: $leftPath" -ForegroundColor Magenta
+                            Write-Host "[DEBUG]   rightPath: $rightPath" -ForegroundColor Magenta
+                            Write-Host "[DEBUG]   promptPath: $promptPath" -ForegroundColor Magenta
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else {
+        # Build prompt path for locations outside of user profile (e.g., 'C:\Windows\System32' or '/etc/nginx')
+        if ($DebugPrompt) {
+            Write-Host '[DEBUG] Outside user profile' -ForegroundColor Magenta
+        }
+
+        $matches = [regex]::matches($location, $pathSepRegex)
+
+        if ($DebugPrompt) {
+            Write-Host "[DEBUG] matches.count: $($matches.count)" -ForegroundColor Magenta
+        }
+
+        switch ($matches.count) {
+            { $_ -ge 1 -and $_ -le 4 } {
+                $promptPath = $location
+                if ($DebugPrompt) {
+                    Write-Host "[DEBUG] Short outside path, promptPath: $promptPath" -ForegroundColor Magenta
+                }
+                break
+            }
+            default {
+                $leftPath   = $location.Substring(0, $matches[2].index)
+                $rightPath  = $location.Substring($matches[$_ - 2].index)
+                $promptPath = $leftPath + $pathSep + '...' + $rightPath
+                if ($DebugPrompt) {
+                    Write-Host '[DEBUG] Long outside path:' -ForegroundColor Magenta
+                    Write-Host "[DEBUG]   leftPath: $leftPath" -ForegroundColor Magenta
+                    Write-Host "[DEBUG]   rightPath: $rightPath" -ForegroundColor Magenta
+                    Write-Host "[DEBUG]   promptPath: $promptPath" -ForegroundColor Magenta
+                }
+            }
+        }
+    }
+
+    if ($DebugPrompt) {
+        Write-Host "[DEBUG] Final promptPath: $promptPath" -ForegroundColor Magenta
+    }
+
+    $promptPath
+}
+
+function Initialize-PoshGit {
+    # Initialize Posh-Git module and settings
+    # Only loads in PowerShell Core when in a Git directory
+    # Should be called once during profile load, not in the prompt function
+
+    if ($PSVersionTable.PSEdition -ne 'Core') {
+        return $false
+    }
+
+    if (-not (Test-GitDirectory)) {
+        return $false
+    }
+
+    try {
+        Import-Module Posh-Git -ErrorAction Stop
+
+        # Configure Posh-Git settings
+        $GitPromptSettings.DefaultPromptPath            = ''
+        $GitPromptSettings.DefaultPromptSuffix          = ''
+        $GitPromptSettings.DefaultPromptDebug           = ''
+        $GitPromptSettings.EnableStashStatus            = $true
+        $GitPromptSettings.BeforeStatus.ForegroundColor = 0x00B3E2      # Cyan RGB(0, 179, 226)
+        $GitPromptSettings.AfterStatus.ForegroundColor  = 0x00B3E2
+        $GitPromptSettings.WorkingColor.ForegroundColor = 0x8A0ACC      # Purple RGB(138, 10, 204)
+        $StashColor                                     = 0xAFB178      # Sage RGB(175, 177, 120)
+        $GitPromptSettings.StashColor.ForegroundColor   = $StashColor
+        $GitPromptSettings.BeforeStash.ForegroundColor  = $StashColor
+        $GitPromptSettings.AfterStash.ForegroundColor   = $StashColor
+
+        return $true
+    }
+    catch {
+        # Posh-Git not available, continue without it
+        return $false
     }
 }
