@@ -72,16 +72,6 @@ function prompt {
     }
 }
 
-# ============================================================================
-# INITIALIZE POSH-GIT
-# ============================================================================
-
-# Try to initialize Posh-Git once during profile load if in PowerShell Core and in a git directory
-# Store result in script-scoped variable to avoid Get-Module calls in prompt
-$script:PoshGitLoaded = $false
-if ($PSVersionTable.PSEdition -eq 'Core') {
-    $script:PoshGitLoaded = Initialize-PoshGit
-}
 
 # ============================================================================
 # LOAD EXTERNAL SCRIPTS
@@ -455,4 +445,15 @@ function Initialize-PoshGit {
         # Posh-Git not available, continue without it
         return $false
     }
+}
+
+# ============================================================================
+# INITIALIZE POSH-GIT
+# ============================================================================
+
+# Try to initialize Posh-Git once during profile load if in PowerShell Core and in a git directory
+# Store result in script-scoped variable to avoid Get-Module calls in prompt
+$script:PoshGitLoaded = $false
+if ($PSVersionTable.PSEdition -eq 'Core') {
+    $script:PoshGitLoaded = Initialize-PoshGit
 }
