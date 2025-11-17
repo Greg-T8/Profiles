@@ -17,7 +17,7 @@
 #      exec bash
 #
 # WHAT THIS SCRIPT DOES:
-#   - Creates symbolic links to profile dotfiles (.bashrc, .vimrc, .inputrc)
+#   - Downloads profile dotfiles from GitHub (.bashrc, .vimrc, .inputrc)
 #   - Installs basic tools (vim, git, curl, wget)
 #   - Configures bash with vi mode and custom prompt
 #
@@ -30,10 +30,10 @@
 # ==============================================================================
 # CONFIGURATION
 # ==============================================================================
-# Path to profile directory (adjust this to match your setup)
-PROFILE_DIR="${HOME}/profiles"
+# GitHub repository information
+GITHUB_REPO="https://raw.githubusercontent.com/Greg-T8/Profiles/main/Linux"
 
-# Configuration files to symlink
+# Configuration files to download
 DOTFILES=(".bashrc" ".inputrc" ".vimrc")
 
 # Color codes for output
@@ -79,55 +79,64 @@ section() {
 # MAIN FUNCTIONS
 # ==============================================================================
 
-# Create symbolic links for configuration files
-create_symlinks() {
-    section "Creating Symbolic Links"
+# Download configuration files from GitHub
+download_configs() {
+    section "Downloading Configuration Files"
 
     local target_home="$HOME"
 
-    info "Setting up configuration files in: $target_home"
+    info "Downloading configuration files to: $target_home"
 
-    # Check if profile directory exists
-    if [ ! -d "$PROFILE_DIR" ]; then
-        error "Profile directory not found: $PROFILE_DIR"
-        error "Please adjust PROFILE_DIR variable in the script"
+    # Check if curl or wget is available
+    local downloader=""
+    if command -v curl &> /dev/null; then
+        downloader="curl"
+        info "Using curl for downloads"
+    elif command -v wget &> /dev/null; then
+        downloader="wget"
+        info "Using wget for downloads"
+    else
+        error "Neither curl nor wget is available"
+        error "Please install curl or wget first"
         exit 1
     fi
 
-    # Backup and link each configuration file
+    # Download each configuration file
     for file in "${DOTFILES[@]}"; do
-        local target="${PROFILE_DIR}/${file}"
-        local link="${target_home}/${file}"
+        local url="${GITHUB_REPO}/${file}"
+        local destination="${target_home}/${file}"
 
-        # Check if source file exists in profile directory
-        if [ ! -f "$target" ]; then
-            warning "Source file not found: $target"
-            continue
-        fi
-
-        # Backup existing file if it exists and is not a symlink
-        if [ -e "$link" ] && [ ! -L "$link" ]; then
-            local backup="${link}.backup"
+        # Backup existing file if it exists
+        if [ -e "$destination" ]; then
+            local backup="${destination}.backup"
             info "Backing up existing $file to ${file}.backup"
-            mv "$link" "$backup"
+            mv "$destination" "$backup"
             success "Backup created: $backup"
         fi
 
-        # Remove existing symlink if present
-        if [ -L "$link" ]; then
-            info "Removing existing symlink: $link"
-            rm "$link"
+        # Download file
+        info "Downloading $file from GitHub..."
+        if [ "$downloader" = "curl" ]; then
+            if curl -fsSL "$url" -o "$destination"; then
+                success "Downloaded $file successfully"
+            else
+                error "Failed to download $file"
+                warning "URL: $url"
+            fi
+        else
+            if wget -q "$url" -O "$destination"; then
+                success "Downloaded $file successfully"
+            else
+                error "Failed to download $file"
+                warning "URL: $url"
+            fi
         fi
 
-        # Create symbolic link
-        info "Creating symlink: $link -> $target"
-        ln -s "$target" "$link"
-
-        # Verify symlink creation
-        if [ -L "$link" ]; then
-            success "Symlink created successfully for $file"
+        # Verify file was created
+        if [ -f "$destination" ]; then
+            success "File created: $destination"
         else
-            error "Failed to create symlink for $file"
+            error "File not found after download: $destination"
         fi
     done
 }
@@ -208,7 +217,7 @@ show_summary() {
     echo "  - Vi mode enabled in bash and vim"
     echo "  - Custom two-line prompt with box-drawing characters"
     echo "  - Enhanced readline configuration (.inputrc)"
-    echo "  - All configuration files linked to profile directory"
+    echo "  - All configuration files downloaded from GitHub"
     echo ""
     info "Quick reference:"
     echo "  Vi mode: Press ESC for command mode, 'i' for insert mode"
@@ -244,7 +253,7 @@ main() {
 
     # Execute setup functions
     install_tools
-    create_symlinks
+    download_configs
 
     # Display completion message
     show_summary
