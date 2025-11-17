@@ -137,10 +137,12 @@ Remove-Item Alias:dir -ErrorAction SilentlyContinue
 function DockerExec { docker exec -it @args }
 function DockerImageList { docker image ls -a --no-trunc @args }
 function DockerContainerList { docker container ls -a --no-trunc @args }
+function RegCtl { docker run --rm regclient/regctl @args }
 
 Set-Alias -Name dex -Value DockerExec
 Set-Alias -Name dil -Value DockerImageList
 Set-Alias -Name dcl -Value DockerContainerList
+Set-Alias -Name regctl -Value RegCtl
 
 # ============================================================================
 # RELOAD PROFILE
