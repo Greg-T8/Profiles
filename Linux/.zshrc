@@ -196,6 +196,11 @@ alias ll='ls -la --color'             # Long listing with hidden files
 alias cls='clear'                     # Windows-style clear command
 alias md='mkdir'                      # Windows-style make directory
 
+# Docker shortcuts
+alias dex='docker exec -it'           # Docker exec interactive
+alias dil='docker image ls -a --no-trunc'  # Docker image list all with full IDs
+alias dcl='docker container ls -a --no-trunc'  # Docker container list all with full IDs
+
 # Tmux session shortcuts
 alias ta='tmux attach -t'             # Attach to tmux session by name
 alias tat='tmux attach -t terminal'   # Attach to terminal session
