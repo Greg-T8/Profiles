@@ -133,6 +133,15 @@ Set-Alias -Name tf -Value terraform
 Set-Alias -Name gim -Value Get-InstalledModule
 Remove-Item Alias:dir -ErrorAction SilentlyContinue
 
+# Docker aliases
+function DockerExec { docker exec -it @args }
+function DockerImageList { docker image ls -a --no-trunc @args }
+function DockerContainerList { docker container ls -a --no-trunc @args }
+
+Set-Alias -Name dex -Value DockerExec
+Set-Alias -Name dil -Value DockerImageList
+Set-Alias -Name dcl -Value DockerContainerList
+
 # ============================================================================
 # RELOAD PROFILE
 # ============================================================================
