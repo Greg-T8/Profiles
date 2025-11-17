@@ -1,0 +1,257 @@
+#!/bin/bash
+# -------------------------------------------------------------------------
+# Program: init-docker.sh
+# Description: Quick setup script for Docker container CLI environments
+# Context: Installs bash, vim, and inputrc configurations only
+# Author: Greg Tate
+# -------------------------------------------------------------------------
+#
+# USAGE:
+#   1. Make the script executable:
+#      chmod +x init-docker.sh
+#
+#   2. Run the script:
+#      ./init-docker.sh
+#
+#   3. After completion, restart your terminal or run:
+#      exec bash
+#
+# WHAT THIS SCRIPT DOES:
+#   - Creates symbolic links to profile dotfiles (.bashrc, .vimrc, .inputrc)
+#   - Installs basic tools (vim, git, curl, wget)
+#   - Configures bash with vi mode and custom prompt
+#
+# REQUIREMENTS:
+#   - Linux environment (Docker container, VM, etc.)
+#   - Sudo privileges or run as root
+#
+# -------------------------------------------------------------------------
+
+# ==============================================================================
+# CONFIGURATION
+# ==============================================================================
+# Path to profile directory (adjust this to match your setup)
+PROFILE_DIR="${HOME}/profiles"
+
+# Configuration files to symlink
+DOTFILES=(".bashrc" ".inputrc" ".vimrc")
+
+# Color codes for output
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# ==============================================================================
+# HELPER FUNCTIONS
+# ==============================================================================
+
+# Print informational message
+info() {
+    echo -e "${BLUE}[INFO]${NC} $1"
+}
+
+# Print success message
+success() {
+    echo -e "${GREEN}[SUCCESS]${NC} $1"
+}
+
+# Print warning message
+warning() {
+    echo -e "${YELLOW}[WARNING]${NC} $1"
+}
+
+# Print error message
+error() {
+    echo -e "${RED}[ERROR]${NC} $1"
+}
+
+# Print section header
+section() {
+    echo ""
+    echo -e "${BLUE}========================================${NC}"
+    echo -e "${BLUE}$1${NC}"
+    echo -e "${BLUE}========================================${NC}"
+}
+
+# ==============================================================================
+# MAIN FUNCTIONS
+# ==============================================================================
+
+# Create symbolic links for configuration files
+create_symlinks() {
+    section "Creating Symbolic Links"
+
+    local target_home="$HOME"
+
+    info "Setting up configuration files in: $target_home"
+
+    # Check if profile directory exists
+    if [ ! -d "$PROFILE_DIR" ]; then
+        error "Profile directory not found: $PROFILE_DIR"
+        error "Please adjust PROFILE_DIR variable in the script"
+        exit 1
+    fi
+
+    # Backup and link each configuration file
+    for file in "${DOTFILES[@]}"; do
+        local target="${PROFILE_DIR}/${file}"
+        local link="${target_home}/${file}"
+
+        # Check if source file exists in profile directory
+        if [ ! -f "$target" ]; then
+            warning "Source file not found: $target"
+            continue
+        fi
+
+        # Backup existing file if it exists and is not a symlink
+        if [ -e "$link" ] && [ ! -L "$link" ]; then
+            local backup="${link}.backup"
+            info "Backing up existing $file to ${file}.backup"
+            mv "$link" "$backup"
+            success "Backup created: $backup"
+        fi
+
+        # Remove existing symlink if present
+        if [ -L "$link" ]; then
+            info "Removing existing symlink: $link"
+            rm "$link"
+        fi
+
+        # Create symbolic link
+        info "Creating symlink: $link -> $target"
+        ln -s "$target" "$link"
+
+        # Verify symlink creation
+        if [ -L "$link" ]; then
+            success "Symlink created successfully for $file"
+        else
+            error "Failed to create symlink for $file"
+        fi
+    done
+}
+
+# Install basic tools
+install_tools() {
+    section "Installing Basic Tools"
+
+    # Detect package manager
+    local pkg_manager=""
+    if command -v apt-get &> /dev/null; then
+        pkg_manager="apt-get"
+        info "Detected package manager: apt-get"
+    elif command -v yum &> /dev/null; then
+        pkg_manager="yum"
+        info "Detected package manager: yum"
+    elif command -v apk &> /dev/null; then
+        pkg_manager="apk"
+        info "Detected package manager: apk (Alpine)"
+    else
+        warning "No supported package manager found (apt-get, yum, apk)"
+        warning "Skipping package installation"
+        return 0
+    fi
+
+    # Update package lists
+    info "Updating package lists..."
+    case $pkg_manager in
+        apt-get)
+            apt-get update -qq
+            ;;
+        yum)
+            yum check-update -q || true
+            ;;
+        apk)
+            apk update -q
+            ;;
+    esac
+
+    # List of tools to install
+    local tools=("vim" "git" "curl" "wget")
+
+    # Install each tool if not present
+    for tool in "${tools[@]}"; do
+        if command -v "$tool" &> /dev/null; then
+            info "$tool is already installed"
+        else
+            info "Installing $tool..."
+            case $pkg_manager in
+                apt-get)
+                    apt-get install -y -qq "$tool"
+                    ;;
+                yum)
+                    yum install -y -q "$tool"
+                    ;;
+                apk)
+                    apk add -q "$tool"
+                    ;;
+            esac
+        fi
+    done
+
+    success "Tool installation completed"
+}
+
+# Display summary and next steps
+show_summary() {
+    section "Installation Summary"
+
+    echo ""
+    success "Docker container initialization completed successfully!"
+    echo ""
+    info "Next steps:"
+    echo "  1. Close this terminal and reopen to use configured bash"
+    echo "  2. Or run: exec bash"
+    echo ""
+    info "Key features configured:"
+    echo "  - Vi mode enabled in bash and vim"
+    echo "  - Custom two-line prompt with box-drawing characters"
+    echo "  - Enhanced readline configuration (.inputrc)"
+    echo "  - All configuration files linked to profile directory"
+    echo ""
+    info "Quick reference:"
+    echo "  Vi mode: Press ESC for command mode, 'i' for insert mode"
+    echo "  Ctrl+P/N: Navigate command history"
+    echo "  Ctrl+A/E: Move to beginning/end of line"
+    echo "  Ctrl+K: Delete from cursor to end of line"
+    echo "  Ctrl+U: Delete from cursor to beginning of line"
+    echo ""
+}
+
+# ==============================================================================
+# MAIN EXECUTION
+# ==============================================================================
+
+main() {
+    echo ""
+    info "Docker Container Initialization Script"
+    info "Author: Greg Tate"
+    info "Date: $(date)"
+    echo ""
+
+    # Check if running as root or with sudo
+    if [ "$EUID" -ne 0 ] && ! command -v sudo &> /dev/null; then
+        warning "Not running as root and sudo is not available"
+        warning "Some operations may fail"
+        read -p "Continue anyway? (y/n) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            info "Installation cancelled"
+            exit 0
+        fi
+    fi
+
+    # Execute setup functions
+    install_tools
+    create_symlinks
+
+    # Display completion message
+    show_summary
+
+    # Change to home directory
+    cd ~
+}
+
+# Run main function
+main "$@"
