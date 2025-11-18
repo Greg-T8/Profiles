@@ -198,8 +198,8 @@ alias md='mkdir'                      # Windows-style make directory
 
 # Docker shortcuts
 alias dex='docker exec -it'           # Docker exec interactive
-alias dil='docker image ls -a --no-trunc'  # Docker image list all with full IDs
-alias dcl='docker container ls -a --no-trunc'  # Docker container list all with full IDs
+alias dil='docker image ls -a'        # Docker image list all with full IDs
+alias dcl='docker container ls -a'    # Docker container list all with full IDs
 
 # Tmux session shortcuts
 alias ta='tmux attach -t'             # Attach to tmux session by name
@@ -295,13 +295,7 @@ function git-hook() {
 # Two-line prompt with box-drawing characters and git integration
 # Format:
 #   ╭─( ~/path/to/directory [git-branch●…]
-#   ╰─╴%
-
-# Define box-drawing characters (Unicode)
-box_arc_down_right=$'\u256D'    # ╭
-box_horizontal=$'\u2500'        # ─
-box_arc_up_right=$'\u2570'      # ╰
-box_horizontal_short=$'\u2574'  # ╴
+#   ╰─%
 
 # Prompt configuration
 # See: https://zsh.sourceforge.io/Doc/Release/Prompt-Expansion.html
@@ -310,10 +304,10 @@ box_horizontal_short=$'\u2574'  # ╴
 # %f  = reset foreground color
 # %#  = % for normal user, # for root
 PROMPT=$'\n'\
-"%F{cyan}${box_arc_down_right}${box_horizontal}( %~"\
+$'%F{cyan}╭─( %~'\
 '%F{yellow}${vcs_info_msg_0_}%f'\
 $'\n'\
-'%F{cyan}${box_arc_up_right}${box_horizontal_short}%f%# '
+$'%F{cyan}╰─%f%# '
 
 # ==============================================================================
 # STARTUP DIRECTORY
