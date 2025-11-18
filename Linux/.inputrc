@@ -11,6 +11,11 @@
 # Enable vi editing mode (instead of default emacs mode)
 set editing-mode vi
 
+# Set keyseq timeout to reduce ESC key delay (in milliseconds)
+# Default is 500ms. Lower values make ESC more responsive but may cause
+# issues with pasted text or slow terminal connections
+set keyseq-timeout 100
+
 # ------------------------------------------------------------------------------
 # Mode String Configuration
 # ------------------------------------------------------------------------------
@@ -21,19 +26,17 @@ set show-mode-in-prompt on
 # Customize mode indicators with colors
 # Format: \1 = start non-printing, \2 = end non-printing
 # \e[1;32m = bold green, \e[0m = reset
-set vi-ins-mode-string \1\e[1;32m\2\1\e[0m\2
-set vi-cmd-mode-string \1\e[1;34m\2\1\e[0m\2
+# set vi-ins-mode-string \1\e[1;32m\2\1\e[0m\2
+# set vi-cmd-mode-string \1\e[1;34m\2\1\e[0m\2
 
 # ------------------------------------------------------------------------------
 # Cursor Shape Configuration
 # ------------------------------------------------------------------------------
 # Change cursor shape based on vi mode
-# Block cursor (ESC [ 2 SP q) for command mode
-# Line cursor (ESC [ 6 SP q) for insert mode
-set keymap vi-command
-"\e[2 q": ""
-set keymap vi-insert
-"\e[6 q": ""
+# Block cursor for command mode, line cursor for insert mode
+# This uses the vi-cmd-mode-string and vi-ins-mode-string with embedded escape codes
+set vi-cmd-mode-string "\1\e[2 q\2"
+set vi-ins-mode-string "\1\e[6 q\2"
 
 # ==============================================================================
 # COMPLETION SETTINGS
