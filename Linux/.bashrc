@@ -78,15 +78,22 @@ fi
 #   ╭─( ~/path/to/directory
 #   ╰─╴$
 setup_custom_prompt() {
+    local use_color="${1:-yes}"  # Default to yes if no parameter provided
+
     # Define box-drawing characters (Unicode)
     box_arc_down_right=$'\u256D'    # ╭
     box_horizontal=$'\u2500'        # ─
     box_arc_up_right=$'\u2570'      # ╰
     box_horizontal_short=$'\u2574'  # ╴
 
-    # Define colors using ANSI escape sequences
-    cyan='\[\e[36m\]'               # Cyan color
-    reset='\[\e[0m\]'               # Reset color
+    # Define colors based on parameter
+    if [ "$use_color" = "yes" ]; then
+        cyan='\[\e[36m\]'               # Cyan color
+        reset='\[\e[0m\]'               # Reset color
+    else
+        cyan=''                          # No color
+        reset=''
+    fi
 
     # Build custom PS1 prompt
     PS1=$'\n'\
@@ -117,10 +124,10 @@ fi
 
 # Apply appropriate prompt based on color support
 if [ "$color_prompt" = yes ]; then
-    setup_custom_prompt
+    setup_custom_prompt yes
 else
-    # Fallback to simple prompt without colors
-    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+    # Use custom prompt without colors
+    setup_custom_prompt no
 fi
 unset color_prompt force_color_prompt
 
