@@ -40,9 +40,7 @@ function prompt {
         $ESC = [char]0x1b                                            # ESC character for ANSI sequences
         "`n" +                                                       # New line
         "$ESC[38;2;0;179;226m" +                                     # Set foreground color to cyan RGB(0,179,226)
-        $([char]0x256d) +                                            # '╭' Box Drawings Light Arc Down and Right
-        $([char]0x2500) +                                            # '─' Box Drawings Light Horizontal
-        '( ' +                                                       # Opening parenthesis and space
+        '╭─( ' +                                                     # Box drawing characters and opening parenthesis
         "$ESC[3m" +                                                  # Start italic mode
         "$ESC[2m" +                                                  # Start dim/faint mode
         $(Get-MyPromptPath) +                                        # Display shortened path
@@ -51,8 +49,7 @@ function prompt {
         "$ESC[23m" +                                                 # Reset italic mode
         "`n" +                                                       # New line
         "$ESC[38;2;0;179;226m" +                                     # Set foreground color to cyan RGB(0,179,226)
-        $([char]0x2570) +                                            # '╰' Box Drawings Light Arc Up and Right
-        $([char]0x2574) +                                            # '╴' Box Drawings Light Left
+        '╰╴' +                                                       # Box drawing characters
         "$ESC[0m" +                                                  # Reset all ANSI formatting
         $(if (Test-Path variable:/PSDebugContext) { '[DBG]: ' } else { '' }) +  # Debug indicator
         '> '                                                         # Prompt character
@@ -60,13 +57,10 @@ function prompt {
     else {
         # Windows PowerShell 5.1 - Cannot use ANSI, build prompt string
         "`n" +                                                       # New line
-        "$([char]0x256d)" +                                          # '╭' Box Drawings Light Arc Down and Right
-        "$([char]0x2500)" +                                          # '─' Box Drawings Light Horizontal
-        '( ' +                                                       # Opening parenthesis and space
+        '╭─( ' +                                                     # Box drawing characters and opening parenthesis
         "$(Get-MyPromptPath)" +                                      # Display shortened path
         "`n" +                                                       # New line
-        "$([char]0x2570)" +                                          # '╰' Box Drawings Light Arc Up and Right
-        "$([char]0x2574)" +                                          # '╴' Box Drawings Light Left with space
+        '╰╴' +                                                       # Box drawing characters
         $(if (Test-Path variable:/PSDebugContext) { '[DBG]: ' } else { '' }) +  # Debug indicator
         '> '                                                         # Prompt character
     }
