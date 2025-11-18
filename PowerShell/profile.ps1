@@ -32,6 +32,10 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 # ============================================================================
 # PROMPT FUNCTION
 # ============================================================================
+# Two-line prompt with box-drawing characters
+# Format:
+#   ╭─( ~/path/to/directory [git-status]
+#   ╰╴>
 
 function prompt {
     # Use different prompt styles based on PowerShell edition
