@@ -76,30 +76,20 @@ fi
 # Two-line prompt with box-drawing characters
 # Format:
 #   ╭─( ~/path/to/directory
-#   ╰─╴$
+#   ╰─$
 setup_custom_prompt() {
     local use_color="${1:-yes}"  # Default to yes if no parameter provided
 
-    # Define box-drawing characters (Unicode)
-    box_arc_down_right=$'\u256D'    # ╭
-    box_horizontal=$'\u2500'        # ─
-    box_arc_up_right=$'\u2570'      # ╰
-    box_horizontal_short=$'\u2574'  # ╴
-
     # Define colors based on parameter
     if [ "$use_color" = "yes" ]; then
-        cyan='\[\e[36m\]'               # Cyan color
-        reset='\[\e[0m\]'               # Reset color
+        local cyan=$'\[\e[36m\]'      # Cyan color
+        local reset=$'\[\e[0m\]'      # Reset color
+        # Build custom PS1 prompt with color
+        PS1=$'\n'"${cyan}"$'╭─( \w\n'"${cyan}"$'╰─'"${reset}"$'\$ '
     else
-        cyan=''                          # No color
-        reset=''
+        # Build custom PS1 prompt without color
+        PS1=$'\n╭─( \w\n╰─\$ '
     fi
-
-    # Build custom PS1 prompt
-    PS1=$'\n'\
-"${cyan}${box_arc_down_right}${box_horizontal}( \w"\
-$'\n'\
-"${cyan}${box_arc_up_right}${box_horizontal_short}${reset}\\$ "
 }
 
 # ------------------------------------------------------------------------------
@@ -135,13 +125,14 @@ unset color_prompt force_color_prompt
 # Terminal Title Configuration
 # ------------------------------------------------------------------------------
 # Set xterm/rxvt title to user@host:dir
-case "$TERM" in
-xterm*|rxvt*)
-    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
-    ;;
-*)
-    ;;
-esac
+# Disabled for custom prompt to avoid username/hostname display
+#case "$TERM" in
+#xterm*|rxvt*)
+#    PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+#    ;;
+#*)
+#    ;;
+#esac
 
 # ==============================================================================
 # COLOR SUPPORT
