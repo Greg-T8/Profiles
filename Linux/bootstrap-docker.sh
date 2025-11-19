@@ -9,6 +9,11 @@
 # USAGE:
 #   curl -fsSL https://raw.githubusercontent.com/Greg-T8/Profiles/main/Linux/bootstrap-docker.sh | bash
 #
+# NOTE:
+#   This script requires curl to be pre-installed. For fresh Docker containers
+#   without curl, use this command instead:
+#   apt-get update && apt-get install -y curl && curl -fsSL https://raw.githubusercontent.com/Greg-T8/Profiles/main/Linux/init-docker.sh | bash
+#
 # -------------------------------------------------------------------------
 
 # Download and execute the full installer
