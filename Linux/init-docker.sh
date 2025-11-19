@@ -87,13 +87,13 @@ main() {
 
     # Apply configuration files
     info "Applying configuration..."
-    if [ -f ~/.bashrc ]; then
-        source ~/.bashrc
-        success "Loaded .bashrc (includes .inputrc)"
-    fi
 
     # Change to home directory
     cd ~
+
+    # Start a new interactive bash shell with the configurations loaded
+    info "Starting new bash shell with configurations..."
+    exec bash
 }
 
 # ==============================================================================
