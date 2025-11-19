@@ -44,20 +44,70 @@ LINUX_PROFILE="${WINDOWS_PROFILE}/OneDrive/Apps/Profiles/Linux"
 # Configuration files to symlink
 DOTFILES=(".bashrc" ".inputrc" ".vimrc" ".zshrc" ".tmux.conf")
 
+# User credentials (will be set during execution)
+NEW_USERNAME=""
+NEW_PASSWORD=""
+
+# ==============================================================================
+# MAIN EXECUTION
+# ==============================================================================
+
+main() {
+    echo ""
+    info "WSL Initialization Script"
+    info "Author: Greg Tate"
+    info "Date: $(date)"
+    echo ""
+
+    # Verify running as root
+    if [ "$EUID" -ne 0 ]; then
+        error "This script must be run as root (use sudo or run as root)"
+        exit 1
+    fi
+
+    # Check if running in WSL
+    if ! grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null; then
+        warning "This script is designed for WSL environments"
+        read -p "Continue anyway? (y/n) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            info "Installation cancelled"
+            exit 0
+        fi
+    fi
+
+    # Setup user account
+    setup_user
+
+    # Execute setup functions
+    install_additional_tools
+    setup_configurations
+    install_zsh
+    install_fzf
+    install_tmux
+
+    # Display completion message
+    show_summary
+
+    # Output username for PowerShell script to use
+    echo ""
+    info "Default user: $NEW_USERNAME"
+    echo "$NEW_USERNAME" > /tmp/wsl-default-user.txt
+
+    # Change to home directory
+    cd ~
+}
+
+# ==============================================================================
+# HELPER FUNCTIONS
+# ==============================================================================
+
 # Color codes for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
-
-# User credentials (will be set during execution)
-NEW_USERNAME=""
-NEW_PASSWORD=""
-
-# ==============================================================================
-# HELPER FUNCTIONS
-# ==============================================================================
 
 # Print informational message
 info() {
@@ -398,55 +448,6 @@ show_summary() {
     echo ""
 }
 
-# ==============================================================================
-# MAIN EXECUTION
-# ==============================================================================
-
-main() {
-    echo ""
-    info "WSL Initialization Script"
-    info "Author: Greg Tate"
-    info "Date: $(date)"
-    echo ""
-
-    # Verify running as root
-    if [ "$EUID" -ne 0 ]; then
-        error "This script must be run as root (use sudo or run as root)"
-        exit 1
-    fi
-
-    # Check if running in WSL
-    if ! grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null; then
-        warning "This script is designed for WSL environments"
-        read -p "Continue anyway? (y/n) " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            info "Installation cancelled"
-            exit 0
-        fi
-    fi
-
-    # Setup user account
-    setup_user
-
-    # Execute setup functions
-    install_additional_tools
-    setup_configurations
-    install_zsh
-    install_fzf
-    install_tmux
-
-    # Display completion message
-    show_summary
-
-    # Output username for PowerShell script to use
-    echo ""
-    info "Default user: $NEW_USERNAME"
-    echo "$NEW_USERNAME" > /tmp/wsl-default-user.txt
-
-    # Change to home directory
-    cd ~
-}
 
 # Run main function
 main "$@"
