@@ -210,11 +210,14 @@ install_tools() {
     elif command -v yum &> /dev/null; then
         pkg_manager="yum"
         info "Detected package manager: yum"
+    elif command -v zypper &> /dev/null; then
+        pkg_manager="zypper"
+        info "Detected package manager: zypper (SUSE)"
     elif command -v apk &> /dev/null; then
         pkg_manager="apk"
         info "Detected package manager: apk (Alpine)"
     else
-        warning "No supported package manager found (apt-get, yum, apk)"
+        warning "No supported package manager found (apt-get, yum, zypper, apk)"
         warning "Skipping package installation"
         return 0
     fi
@@ -227,6 +230,9 @@ install_tools() {
             ;;
         yum)
             yum check-update -q || true
+            ;;
+        zypper)
+            zypper refresh
             ;;
         apk)
             apk update -q
@@ -245,6 +251,9 @@ install_tools() {
                     ;;
                 yum)
                     yum install -y -q "$tool"
+                    ;;
+                zypper)
+                    zypper install -y "$tool"
                     ;;
                 apk)
                     apk add -q "$tool"
