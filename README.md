@@ -2,37 +2,96 @@
 
 A collection of configuration files and profiles for various development tools and environments.
 
+## ⚡ Quick Bootstrap
+
+### PowerShell Profile
+
+```powershell
+# One-liner to install PowerShell profile from GitHub
+irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/bootstrap.ps1 | iex
+```
+
+### Linux/Docker Container Setup
+
+```bash
+# One-liner to setup Linux/Docker environment from GitHub
+curl -fsSL https://raw.githubusercontent.com/Greg-T8/Profiles/main/Linux/bootstrap-docker.sh | bash
+```
+
 ## 📁 Repository Structure
 
-```
+```text
 Profiles/
-├── draw.io/              # Draw.io configuration
-├── Linux/                # Linux environment configurations
-│   ├── .vimrc           # Vim editor configuration
-│   └── .zshrc           # ZSH shell configuration
-├── Neovim/              # Neovim configurations
-│   ├── init.lua         # Main Neovim configuration
-│   ├── lua/             # Lua configuration modules
-│   │   ├── _common/     # Shared configurations
-│   │   ├── _nvim/       # Neovim-specific configs
-│   │   └── _vscode/     # VSCode Neovim configs
-├── PowerShell/          # PowerShell profile and scripts
-│   ├── profile.ps1      # PowerShell profile
-│   ├── prompt.ps1       # Custom prompt configuration
-│   └── functions.ps1    # Custom PowerShell functions
-├── VSCode/              # Visual Studio Code settings
-│   ├── settings.json    # Editor settings
-│   ├── keybindings.json # Custom keybindings
-│   ├── snippets/        # Code snippets
-│   ├── chatmodes/       # GitHub Copilot chat modes
-│   └── instructions/    # Copilot instructions
-└── Windows Terminal/    # Windows Terminal configuration
+├── draw.io/                # Draw.io configuration
+│   └── draw.io.desktop.config.json
+├── Linux/                  # Linux environment configurations
+│   ├── .bashrc            # Bash shell configuration
+│   ├── .inputrc           # Readline configuration
+│   ├── .tmux.conf         # Tmux configuration
+│   ├── .vimrc             # Vim editor configuration
+│   ├── .zshrc             # ZSH shell configuration
+│   ├── bootstrap-docker.sh # Quick bootstrap for Docker containers
+│   ├── init-docker.sh     # Docker container setup script
+│   └── init-wsl.sh        # WSL environment setup script
+├── Neovim/                # Neovim configurations
+│   ├── init.lua           # Main Neovim configuration
+│   ├── lazy-lock.nvim.json    # Neovim plugin lockfile
+│   ├── lazy-lock.vscode.json  # VSCode Neovim plugin lockfile
+│   └── lua/               # Lua configuration modules
+│       ├── _common/       # Shared configurations (keymaps, plugins)
+│       ├── _nvim/         # Neovim-specific configs
+│       ├── _vscode/       # VSCode Neovim configs
+│       └── config/        # Lazy.nvim configuration
+├── PowerShell/            # PowerShell profile and scripts
+│   ├── bootstrap.ps1      # Quick bootstrap script
+│   ├── functions.ps1      # Custom PowerShell functions
+│   ├── Install-RemoteProfile.ps1  # Automated installer
+│   ├── profile.ps1        # PowerShell profile
+│   ├── PSScriptAnalyzerSettings.psd1  # Linter settings
+│   └── README.md          # PowerShell-specific documentation
+├── VSCode/                # Visual Studio Code settings
+│   ├── settings.json      # Editor settings
+│   ├── keybindings.json   # Custom keybindings
+│   ├── snippets/          # Code snippets
+│   │   ├── DefaultProfile.code-snippets
+│   │   └── markdown.code-snippets
+│   ├── chatmodes/         # GitHub Copilot chat modes
+│   │   ├── Plan.chatmode.md
+│   │   └── Refactor.chatmode.md
+│   └── instructions/      # Copilot instructions
+│       ├── General Coding Guidelines.instructions.md
+│       ├── PowerShell Style Guidelines.instructions.md
+│       └── Shell Style Guidelines.instructions.md
+└── Windows Terminal/      # Windows Terminal configuration
     └── settings.json
 ```
 
-## 🚀 Quick Start
+## 🚀 Manual Setup
+
+For manual configuration or customization, use the following setup instructions.
 
 ### Linux Configurations
+
+#### Docker Container Quick Setup
+
+The `init-docker.sh` script provides automated setup for Docker containers:
+
+```bash
+# Clone repository first
+git clone https://github.com/Greg-T8/Profiles.git ~/profiles
+cd ~/profiles/Linux
+
+# Make executable and run
+chmod +x init-docker.sh
+./init-docker.sh
+```
+
+**What it does:**
+
+- Automatically installs vim, git, curl, wget
+- Creates symlinks for .bashrc, .vimrc, .inputrc
+- Configures vi mode and custom prompt
+- Works with apt-get, yum, and apk package managers
 
 #### Vim
 
@@ -91,16 +150,42 @@ ln -s ~/path/to/Profiles/Neovim ~/.config/nvim
 
 ### PowerShell
 
+#### Automated Installation
+
+The `Install-RemoteProfile.ps1` script provides automated setup:
+
+```powershell
+# Clone repository first
+git clone https://github.com/Greg-T8/Profiles.git "$env:OneDrive\Apps\Profiles"
+cd "$env:OneDrive\Apps\Profiles\PowerShell"
+
+# Run installer
+.\Install-RemoteProfile.ps1
+```
+
+Or use the bootstrap one-liner (see Quick Bootstrap section above).
+
+**What it does:**
+
+- Creates symlinks to PowerShell profile files
+- Sets up profile directory structure
+- Configures PSReadLine with Vi mode
+- Installs custom prompt with Git integration
+
+#### Manual Setup
+
 ```powershell
 # Create symlink to PowerShell profile
-New-Item -ItemType SymbolicLink -Path $PROFILE -Target "C:\path\to\Profiles\PowerShell\profile.ps1"
+New-Item -ItemType SymbolicLink -Path $PROFILE.CurrentUserAllHosts -Target "C:\path\to\Profiles\PowerShell\profile.ps1"
 ```
 
 **Features:**
 
-- Custom prompt with Git integration
-- Helper functions for common tasks
+- Custom two-line prompt with Git integration (Posh-Git)
+- Vi mode with cursor shape changes
+- Helper functions and aliases for Docker, Terraform, etc.
 - PSScriptAnalyzer settings included
+- Work configuration support
 
 ### Visual Studio Code
 
@@ -197,4 +282,4 @@ MIT License - Feel free to use and modify these configurations for your own use.
 ---
 
 **Author:** Greg-T8  
-**Last Updated:** October 2025
+**Last Updated:** November 2025
