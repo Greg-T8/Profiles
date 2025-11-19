@@ -26,9 +26,9 @@
 #   - Installs additional tools (vim, git, curl, wget)
 #
 # REQUIREMENTS:
-#   - WSL environment (Ubuntu/Debian-based)
+#   - WSL environment (Ubuntu, Fedora, Alpine, or other Linux distributions)
 #   - Internet connection for package installation
-#   - Sudo privileges
+#   - Sudo privileges or root access
 #
 # -------------------------------------------------------------------------
 
@@ -135,6 +135,67 @@ section() {
     echo -e "${BLUE}========================================${NC}"
     echo -e "${BLUE}$1${NC}"
     echo -e "${BLUE}========================================${NC}"
+}
+
+# Detect package manager
+detect_package_manager() {
+    if command -v apt-get &> /dev/null; then
+        echo "apt"
+    elif command -v dnf &> /dev/null; then
+        echo "dnf"
+    elif command -v yum &> /dev/null; then
+        echo "yum"
+    elif command -v apk &> /dev/null; then
+        echo "apk"
+    else
+        echo "unknown"
+    fi
+}
+
+# Update package lists
+update_packages() {
+    local pkg_manager=$(detect_package_manager)
+
+    info "Detected package manager: $pkg_manager"
+    info "Updating package lists..."
+
+    case $pkg_manager in
+        apt)
+            apt-get update -qq
+            ;;
+        dnf|yum)
+            $pkg_manager check-update -q || true
+            ;;
+        apk)
+            apk update -q
+            ;;
+        *)
+            warning "Unknown package manager, skipping update"
+            return 1
+            ;;
+    esac
+}
+
+# Install a package
+install_package() {
+    local package=$1
+    local pkg_manager=$(detect_package_manager)
+
+    case $pkg_manager in
+        apt)
+            apt-get install -y -qq "$package"
+            ;;
+        dnf|yum)
+            $pkg_manager install -y -q "$package"
+            ;;
+        apk)
+            apk add -q "$package"
+            ;;
+        *)
+            error "Unknown package manager, cannot install $package"
+            return 1
+            ;;
+    esac
 }
 
 # ==============================================================================
@@ -282,8 +343,8 @@ install_zsh() {
     else
         # Install zsh
         info "Installing ZSH..."
-        apt update
-        apt install zsh -y
+        update_packages
+        install_package zsh
 
         # Verify installation
         if command -v zsh &> /dev/null; then
@@ -329,10 +390,10 @@ install_fzf() {
         return 0
     fi
 
-    # Install fzf via apt
+    # Install fzf
     info "Installing FZF..."
-    apt update
-    apt install fzf -y
+    update_packages
+    install_package fzf
 
     # Verify installation
     if command -v fzf &> /dev/null; then
@@ -362,8 +423,8 @@ install_tmux() {
     else
         # Install tmux
         info "Installing tmux..."
-        apt update
-        apt install tmux -y
+        update_packages
+        install_package tmux
 
         # Verify installation
         if command -v tmux &> /dev/null; then
@@ -394,8 +455,7 @@ install_tmux() {
 install_additional_tools() {
     section "Installing Additional Tools"
 
-    info "Updating package lists..."
-    apt update
+    update_packages
 
     # List of useful tools
     local tools=("vim" "git" "curl" "wget" "sudo")
@@ -406,7 +466,7 @@ install_additional_tools() {
             info "$tool is already installed"
         else
             info "Installing $tool..."
-            apt install "$tool" -y
+            install_package "$tool"
         fi
     done
 
