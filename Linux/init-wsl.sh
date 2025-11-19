@@ -145,6 +145,8 @@ detect_package_manager() {
         echo "dnf"
     elif command -v yum &> /dev/null; then
         echo "yum"
+    elif command -v zypper &> /dev/null; then
+        echo "zypper"
     elif command -v apk &> /dev/null; then
         echo "apk"
     else
@@ -165,6 +167,9 @@ update_packages() {
             ;;
         dnf|yum)
             $pkg_manager check-update -q || true
+            ;;
+        zypper)
+            zypper refresh
             ;;
         apk)
             apk update -q
@@ -187,6 +192,9 @@ install_package() {
             ;;
         dnf|yum)
             $pkg_manager install -y -q "$package"
+            ;;
+        zypper)
+            zypper install -y "$package"
             ;;
         apk)
             apk add -q "$package"
