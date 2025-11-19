@@ -30,11 +30,23 @@
 # ==============================================================================
 # CONFIGURATION
 # ==============================================================================
+
 # GitHub repository information
 GITHUB_REPO="https://raw.githubusercontent.com/Greg-T8/Profiles/main/Linux"
 
 # Configuration files to download
 DOTFILES=(".bashrc" ".inputrc" ".vimrc")
+
+# List of essential tools to install
+# Add or remove tools as needed for your container environment
+TOOLS=(
+    "curl"          # URL transfer tool
+    "wget"          # File downloader
+    "vim"           # Text editor
+    "less"          # Pager for viewing files
+    "procps"        # Process utilities (ps, top, etc.)
+    # "git"         # Version control
+)
 
 # Color codes for output
 RED='\033[0;31m'
@@ -42,6 +54,57 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
+
+# ==============================================================================
+# MAIN EXECUTION
+# ==============================================================================
+
+main() {
+    echo ""
+    info "Docker Container Initialization Script"
+    info "Author: Greg Tate"
+    info "Date: $(date)"
+    echo ""
+
+    # Check if running as root or with sudo
+    if [ "$EUID" -ne 0 ] && ! command -v sudo &> /dev/null; then
+        warning "Not running as root and sudo is not available"
+        warning "Some operations may fail"
+        read -p "Continue anyway? (y/n) " -n 1 -r
+        echo
+        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+            info "Installation cancelled"
+            exit 0
+        fi
+    fi
+
+    # Execute setup functions
+    install_tools
+    download_configs
+
+    # Display completion message
+    show_summary
+
+    # Apply configuration files
+    info "Applying configuration..."
+    if [ -f ~/.bashrc ]; then
+        source ~/.bashrc
+        success "Loaded .bashrc"
+    fi
+
+    # Only attempt to load inputrc in interactive shells
+    if [ -f ~/.inputrc ]; then
+        if [[ $- == *i* ]]; then
+            bind -f ~/.inputrc
+            success "Loaded .inputrc"
+        else
+            info ".inputrc ready (will load in interactive shell)"
+        fi
+    fi
+
+    # Change to home directory
+    cd ~
+}
 
 # ==============================================================================
 # HELPER FUNCTIONS
@@ -145,6 +208,10 @@ download_configs() {
 install_tools() {
     section "Installing Basic Tools"
 
+    # Set environment variables to avoid interactive prompts during installation
+    export DEBIAN_FRONTEND=noninteractive
+    export TZ=America/Chicago
+
     # Detect package manager
     local pkg_manager=""
     if command -v apt-get &> /dev/null; then
@@ -176,11 +243,8 @@ install_tools() {
             ;;
     esac
 
-    # List of tools to install
-    local tools=("vim" "git" "curl" "wget")
-
     # Install each tool if not present
-    for tool in "${tools[@]}"; do
+    for tool in "${TOOLS[@]}"; do
         if command -v "$tool" &> /dev/null; then
             info "$tool is already installed"
         else
@@ -226,40 +290,6 @@ show_summary() {
     echo "  Ctrl+K: Delete from cursor to end of line"
     echo "  Ctrl+U: Delete from cursor to beginning of line"
     echo ""
-}
-
-# ==============================================================================
-# MAIN EXECUTION
-# ==============================================================================
-
-main() {
-    echo ""
-    info "Docker Container Initialization Script"
-    info "Author: Greg Tate"
-    info "Date: $(date)"
-    echo ""
-
-    # Check if running as root or with sudo
-    if [ "$EUID" -ne 0 ] && ! command -v sudo &> /dev/null; then
-        warning "Not running as root and sudo is not available"
-        warning "Some operations may fail"
-        read -p "Continue anyway? (y/n) " -n 1 -r
-        echo
-        if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-            info "Installation cancelled"
-            exit 0
-        fi
-    fi
-
-    # Execute setup functions
-    install_tools
-    download_configs
-
-    # Display completion message
-    show_summary
-
-    # Change to home directory
-    cd ~
 }
 
 # Run main function
