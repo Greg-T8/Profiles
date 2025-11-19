@@ -22,47 +22,47 @@ curl -fsSL https://raw.githubusercontent.com/Greg-T8/Profiles/main/Linux/bootstr
 
 ```text
 Profiles/
-├── draw.io/                # Draw.io configuration
+├── draw.io/                              # Draw.io configuration
 │   └── draw.io.desktop.config.json
-├── Linux/                  # Linux environment configurations
-│   ├── .bashrc            # Bash shell configuration
-│   ├── .inputrc           # Readline configuration
-│   ├── .tmux.conf         # Tmux configuration
-│   ├── .vimrc             # Vim editor configuration
-│   ├── .zshrc             # ZSH shell configuration
-│   ├── bootstrap-docker.sh # Quick bootstrap for Docker containers
-│   ├── init-docker.sh     # Docker container setup script
-│   └── init-wsl.sh        # WSL environment setup script
-├── Neovim/                # Neovim configurations
-│   ├── init.lua           # Main Neovim configuration
-│   ├── lazy-lock.nvim.json    # Neovim plugin lockfile
-│   ├── lazy-lock.vscode.json  # VSCode Neovim plugin lockfile
-│   └── lua/               # Lua configuration modules
-│       ├── _common/       # Shared configurations (keymaps, plugins)
-│       ├── _nvim/         # Neovim-specific configs
-│       ├── _vscode/       # VSCode Neovim configs
-│       └── config/        # Lazy.nvim configuration
-├── PowerShell/            # PowerShell profile and scripts
-│   ├── bootstrap.ps1      # Quick bootstrap script
-│   ├── functions.ps1      # Custom PowerShell functions
-│   ├── Install-RemoteProfile.ps1  # Automated installer
-│   ├── profile.ps1        # PowerShell profile
-│   ├── PSScriptAnalyzerSettings.psd1  # Linter settings
-│   └── README.md          # PowerShell-specific documentation
-├── VSCode/                # Visual Studio Code settings
-│   ├── settings.json      # Editor settings
-│   ├── keybindings.json   # Custom keybindings
-│   ├── snippets/          # Code snippets
+├── Linux/                                # Linux environment configurations
+│   ├── .bashrc                          # Bash shell configuration
+│   ├── .inputrc                         # Readline configuration
+│   ├── .tmux.conf                       # Tmux configuration
+│   ├── .vimrc                           # Vim editor configuration
+│   ├── .zshrc                           # ZSH shell configuration
+│   ├── bootstrap-docker.sh              # Quick bootstrap for Docker containers
+│   ├── init-docker.sh                   # Docker container setup script
+│   └── init-wsl.sh                      # WSL environment setup script
+├── Neovim/                               # Neovim configurations
+│   ├── init.lua                         # Main Neovim configuration
+│   ├── lazy-lock.nvim.json              # Neovim plugin lockfile
+│   ├── lazy-lock.vscode.json            # VSCode Neovim plugin lockfile
+│   └── lua/                             # Lua configuration modules
+│       ├── _common/                     # Shared configurations (keymaps, plugins)
+│       ├── _nvim/                       # Neovim-specific configs
+│       ├── _vscode/                     # VSCode Neovim configs
+│       └── config/                      # Lazy.nvim configuration
+├── PowerShell/                           # PowerShell profile and scripts
+│   ├── bootstrap.ps1                    # Quick bootstrap script
+│   ├── functions.ps1                    # Custom PowerShell functions
+│   ├── Install-RemoteProfile.ps1        # Automated installer
+│   ├── profile.ps1                      # PowerShell profile
+│   ├── PSScriptAnalyzerSettings.psd1    # Linter settings
+│   └── README.md                        # PowerShell-specific documentation
+├── VSCode/                               # Visual Studio Code settings
+│   ├── settings.json                    # Editor settings
+│   ├── keybindings.json                 # Custom keybindings
+│   ├── snippets/                        # Code snippets
 │   │   ├── DefaultProfile.code-snippets
 │   │   └── markdown.code-snippets
-│   ├── chatmodes/         # GitHub Copilot chat modes
+│   ├── chatmodes/                       # GitHub Copilot chat modes
 │   │   ├── Plan.chatmode.md
 │   │   └── Refactor.chatmode.md
-│   └── instructions/      # Copilot instructions
+│   └── instructions/                    # Copilot instructions
 │       ├── General Coding Guidelines.instructions.md
 │       ├── PowerShell Style Guidelines.instructions.md
 │       └── Shell Style Guidelines.instructions.md
-└── Windows Terminal/      # Windows Terminal configuration
+└── Windows Terminal/                     # Windows Terminal configuration
     └── settings.json
 ```
 
