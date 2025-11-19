@@ -89,17 +89,7 @@ main() {
     info "Applying configuration..."
     if [ -f ~/.bashrc ]; then
         source ~/.bashrc
-        success "Loaded .bashrc"
-    fi
-
-    # Only attempt to load inputrc in interactive shells
-    if [ -f ~/.inputrc ]; then
-        if [[ $- == *i* ]]; then
-            bind -f ~/.inputrc
-            success "Loaded .inputrc"
-        else
-            info ".inputrc ready (will load in interactive shell)"
-        fi
+        success "Loaded .bashrc (includes .inputrc)"
     fi
 
     # Change to home directory

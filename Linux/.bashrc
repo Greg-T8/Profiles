@@ -27,6 +27,11 @@ tput rmam
 # Enable vi command line editing mode (uses ~/.inputrc vi settings)
 set -o vi
 
+# Load inputrc configuration if it exists
+if [ -f ~/.inputrc ]; then
+    bind -f ~/.inputrc
+fi
+
 # Set default editors for CLI tools (git, crontab, etc.)
 export EDITOR=vim
 export VISUAL=vim
