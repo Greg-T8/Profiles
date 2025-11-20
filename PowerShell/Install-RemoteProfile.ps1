@@ -538,6 +538,9 @@ if ($psReadLine) {
         }
 
         Write-Host ""
+        Write-Host "To reload the profile in your current session, run:" -ForegroundColor Cyan
+        Write-Host "  . `$PROFILE.CurrentUserAllHosts" -ForegroundColor White
+        Write-Host ""
     }
 
     function Show-InstallComplete {
