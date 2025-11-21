@@ -124,7 +124,7 @@
     "$lines": true,
     "\"Total": true,
     "\"Line": true
-},
+  },
   "dashboard.displayProjectPath": true,
   "dashboard.openOnStartup": "empty workspace",
   "dashboard.projectData": [
