@@ -27,6 +27,82 @@
         {
             "command": "find",
             "id": "User.find"
+        },
+        {
+            "command":
+            {
+                "action": "splitPane",
+                "split": "right",
+                "splitMode": "duplicate"
+            },
+            "id": "User.splitPane.right"
+        },
+        {
+            "command":
+            {
+                "action": "splitPane",
+                "split": "down",
+                "splitMode": "duplicate"
+            },
+            "id": "User.splitPane.down"
+        },
+        {
+            "command":
+            {
+                "action": "moveFocus",
+                "direction": "left"
+            },
+            "id": "User.moveFocus.left"
+        },
+        {
+            "command":
+            {
+                "action": "moveFocus",
+                "direction": "down"
+            },
+            "id": "User.moveFocus.down"
+        },
+        {
+            "command":
+            {
+                "action": "moveFocus",
+                "direction": "up"
+            },
+            "id": "User.moveFocus.up"
+        },
+        {
+            "command":
+            {
+                "action": "moveFocus",
+                "direction": "right"
+            },
+            "id": "User.moveFocus.right"
+        },
+        {
+            "command": "closePane",
+            "id": "User.closePane"
+        },
+        {
+            "command": "newTab",
+            "id": "User.newTab"
+        },
+        {
+            "command": "closeTab",
+            "id": "User.closeTab"
+        },
+        {
+            "command":
+            {
+                "action": "nextTab"
+            },
+            "id": "User.nextTab"
+        },
+        {
+            "command":
+            {
+                "action": "prevTab"
+            },
+            "id": "User.prevTab"
         }
     ],
     "alwaysShowNotificationIcon": false,
@@ -51,6 +127,50 @@
         {
             "id": "User.paste",
             "keys": "ctrl+v"
+        },
+        {
+            "id": "User.splitPane.right",
+            "keys": "alt+shift+\\"
+        },
+        {
+            "id": "User.splitPane.down",
+            "keys": "alt+minus"
+        },
+        {
+            "id": "User.moveFocus.left",
+            "keys": "alt+h"
+        },
+        {
+            "id": "User.moveFocus.down",
+            "keys": "alt+j"
+        },
+        {
+            "id": "User.moveFocus.up",
+            "keys": "alt+k"
+        },
+        {
+            "id": "User.moveFocus.right",
+            "keys": "alt+l"
+        },
+        {
+            "id": "User.closePane",
+            "keys": "alt+x"
+        },
+        {
+            "id": "User.newTab",
+            "keys": "alt+c"
+        },
+        {
+            "id": "User.closeTab",
+            "keys": "alt+shift+7"
+        },
+        {
+            "id": "User.nextTab",
+            "keys": "shift+right"
+        },
+        {
+            "id": "User.prevTab",
+            "keys": "shift+left"
         }
     ],
     "minimizeToNotificationArea": true,
