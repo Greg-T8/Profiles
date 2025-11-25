@@ -318,18 +318,46 @@ function Measure-ProfileLoad {
         Measures baseline PowerShell startup vs. profile load time and uses
         Measure-Script to identify the slowest operations in the profile.
 
+        With -ShowTiming, displays section-by-section timing checkpoints to help
+        identify which parts of your profile are slow (module imports, PSReadLine
+        configuration, etc.).
+
     .PARAMETER Iterations
         Number of iterations to run for averaging. Default is 3.
+
+    .PARAMETER ShowTiming
+        Shows detailed timing checkpoints for each profile section. Requires adding
+        timing instrumentation to your profile.ps1 (see NOTES).
 
     .EXAMPLE
         Measure-ProfileLoad
 
     .EXAMPLE
         Measure-ProfileLoad -Iterations 5
+
+    .EXAMPLE
+        Measure-ProfileLoad -ShowTiming -Iterations 1
+
+    .NOTES
+        To enable -ShowTiming, add this to the top of your profile.ps1:
+
+        $script:ProfileTimer = [System.Diagnostics.Stopwatch]::StartNew()
+        function script:Write-ProfileTime($label) {
+            if ($env:PROFILE_TIMING) {
+                $elapsed = $script:ProfileTimer.Elapsed.TotalMilliseconds
+                Write-Host ("  [{0,6:N1}ms] {1}" -f $elapsed, $label) -ForegroundColor DarkGray
+            }
+        }
+
+        Then add checkpoints throughout:
+        Write-ProfileTime "After PSReadLine import"
+        Write-ProfileTime "After PSReadLine config"
+        etc.
     #>
     [CmdletBinding()]
     param(
-        [int]$Iterations = 3
+        [int]$Iterations = 3,
+        [switch]$ShowTiming
     )
 
     # Ensure PSProfiler module is available
@@ -339,7 +367,15 @@ function Measure-ProfileLoad {
     }
 
     Write-Host "`nMeasuring PowerShell profile load times..." -ForegroundColor Cyan
+    if ($ShowTiming) {
+        Write-Host "Timing mode: Detailed section breakdown enabled" -ForegroundColor Yellow
+    }
     Write-Host "Running $Iterations iterations...`n" -ForegroundColor Gray
+
+    # Enable timing flag if requested
+    if ($ShowTiming) {
+        $env:PROFILE_TIMING = "1"
+    }
 
     # Measure baseline (no profile)
     $baselineTimes = 1..$Iterations | ForEach-Object {
@@ -351,10 +387,21 @@ function Measure-ProfileLoad {
 
     # Measure with profile
     $profileTimes = 1..$Iterations | ForEach-Object {
-        Write-Host "  Profile $_/$Iterations..." -NoNewline
-        $ms = (Measure-Command { pwsh -Command "exit" }).TotalMilliseconds
-        Write-Host " $([math]::Round($ms, 2))ms" -ForegroundColor Gray
+        if ($ShowTiming) {
+            Write-Host "`n  Profile $_/$Iterations with section timing:" -ForegroundColor Yellow
+            $ms = (Measure-Command { pwsh -Command "exit" }).TotalMilliseconds
+            Write-Host ("  Total: {0}ms`n" -f [math]::Round($ms, 2)) -ForegroundColor Gray
+        } else {
+            Write-Host "  Profile $_/$Iterations..." -NoNewline
+            $ms = (Measure-Command { pwsh -Command "exit" }).TotalMilliseconds
+            Write-Host " $([math]::Round($ms, 2))ms" -ForegroundColor Gray
+        }
         $ms
+    }
+
+    # Clean up timing flag
+    if ($ShowTiming) {
+        Remove-Item Env:\PROFILE_TIMING -ErrorAction SilentlyContinue
     }
 
     $avgBaseline = ($baselineTimes | Measure-Object -Average).Average
@@ -455,6 +502,13 @@ function Measure-ProfileLoad {
 
     $color = if ($avgOverhead -lt 500) { 'Green' } elseif ($avgOverhead -lt 1000) { 'Yellow' } else { 'Red' }
     Write-Host ("Profile overhead:       {0}ms" -f [math]::Round($avgOverhead, 2)) -ForegroundColor $color
+
+    Write-Host "`nNote: Measure-Script only captures executable lines. Missing from timing:" -ForegroundColor Gray
+    Write-Host "  • Script parsing/compilation overhead" -ForegroundColor DarkGray
+    Write-Host "  • Function definition overhead" -ForegroundColor DarkGray
+    Write-Host "  • Module import internal operations" -ForegroundColor DarkGray
+    Write-Host "  • PSReadLine configuration (~100-200ms typical)" -ForegroundColor DarkGray
+    Write-Host "  • Subexpression evaluation overhead" -ForegroundColor DarkGray
 
     if ($topOpsTable) {
         Write-Host "`n=== Top 5 Slowest Operations ===" -ForegroundColor Cyan
