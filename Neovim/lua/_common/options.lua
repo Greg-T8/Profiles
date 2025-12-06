@@ -17,7 +17,11 @@ vim.opt.selection = "inclusive"
 vim.api.nvim_set_keymap('n', '<leader>vb', "<C-v>", { noremap = true, silent = true })
 
 -- ==============================================================================
--- SEARCH HIGHLIGHTING
+-- SEARCH SETTINGS
 -- ==============================================================================
--- Clear search highlighting with leader+n
+-- Case-insensitive search unless uppercase letters are used
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+
+-- Clear search highlighting with leader+space
 vim.api.nvim_set_keymap('n', '<leader><space>', ':nohlsearch<CR>', { noremap = true, silent = true })
