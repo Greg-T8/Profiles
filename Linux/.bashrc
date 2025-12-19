@@ -78,12 +78,13 @@ fi
 # ------------------------------------------------------------------------------
 # SSH Host Detection
 # ------------------------------------------------------------------------------
-# Returns hostname prefix (green) only when connected via SSH
-get_ssh_host() {
-    if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" ]]; then
-        echo "\[\e[32m\]$HOSTNAME\[\e[36m\] "
-    fi
-}
+# Set hostname prefix (green) only when connected via SSH
+# Evaluated once at shell startup since SSH status doesn't change mid-session
+if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" ]]; then
+    _ssh_host=$'\[\e[32m\]'"$HOSTNAME"$'\[\e[36m\] '
+else
+    _ssh_host=""
+fi
 
 # ------------------------------------------------------------------------------
 # Custom Prompt Function
@@ -93,7 +94,7 @@ get_ssh_host() {
 #   ╭─( ~/path/to/directory
 #   ╰─$
 # When connected via SSH:
-#   ╭─( hostname - ~/path/to/directory
+#   ╭─( hostname ~/path/to/directory
 #   ╰─$
 setup_custom_prompt() {
     local use_color="${1:-yes}"  # Default to yes if no parameter provided
@@ -103,10 +104,10 @@ setup_custom_prompt() {
         local cyan=$'\[\e[36m\]'      # Cyan color
         local reset=$'\[\e[0m\]'      # Reset color
         # Build custom PS1 prompt with color
-        PS1=$'\n'"${cyan}"$'╭─( $(get_ssh_host)\w\n'"${cyan}"$'╰─'"${reset}"$'\$ '
+        PS1=$'\n'"${cyan}"$'╭─( '"${_ssh_host}"$'\w\n'"${cyan}"$'╰─'"${reset}"$'\$ '
     else
         # Build custom PS1 prompt without color
-        PS1=$'\n╭─( $(get_ssh_host)\w\n╰─\$ '
+        PS1=$'\n╭─( '"${_ssh_host}"$'\w\n╰─\$ '
     fi
 }
 
