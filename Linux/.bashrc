@@ -78,10 +78,10 @@ fi
 # ------------------------------------------------------------------------------
 # SSH Host Detection
 # ------------------------------------------------------------------------------
-# Returns hostname prefix only when connected via SSH
+# Returns hostname prefix (green) only when connected via SSH
 get_ssh_host() {
     if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" ]]; then
-        echo "$HOSTNAME "
+        echo "\[\e[32m\]$HOSTNAME\[\e[36m\] "
     fi
 }
 

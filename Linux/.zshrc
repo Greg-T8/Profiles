@@ -394,8 +394,16 @@ function get_prompt_path() {
 # %F  = start foreground color
 # %f  = reset foreground color
 # %#  = % for normal user, # for root
+
+# Returns hostname prefix (green) only when connected via SSH
+get_ssh_host() {
+    if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" ]]; then
+        echo "%F{green}$HOST%F{cyan} "
+    fi
+}
+
 PROMPT=$'\n'\
-$'%F{cyan}╭─( $(get_prompt_path)'\
+$'%F{cyan}╭─( $(get_ssh_host)$(get_prompt_path)'\
 '%F{yellow}${vcs_info_msg_0_}%f'\
 $'\n'\
 $'%F{cyan}╰─%f%# '
