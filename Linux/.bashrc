@@ -81,7 +81,7 @@ fi
 # Returns hostname prefix only when connected via SSH
 get_ssh_host() {
     if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" ]]; then
-        echo "$HOSTNAME: "
+        echo "$HOSTNAME "
     fi
 }
 
@@ -206,12 +206,4 @@ if ! shopt -oq posix; then
   elif [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
   fi
-fi
-
-# ==============================================================================
-# STARTUP DIRECTORY
-# ==============================================================================
-# Change to home directory if starting in Windows directory
-if [[ $PWD == /mnt/c/* ]]; then
-    cd ~
 fi
