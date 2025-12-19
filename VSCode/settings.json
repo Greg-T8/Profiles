@@ -801,7 +801,7 @@
         "-e",
         "zsh",
         "-c",
-        "cd ~ && VSCODE_SHELL_INTEGRATION=1 exec zsh"
+        "VSCODE_SHELL_INTEGRATION=1 exec zsh"
       ],
       "icon": "terminal-linux",
       "path": "wsl.exe"
