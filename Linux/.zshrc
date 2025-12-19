@@ -297,14 +297,98 @@ function git-hook() {
 #   ╭─( ~/path/to/directory [git-branch●…]
 #   ╰─%
 
+# ------------------------------------------------------------------------------
+# Get-PromptPath: Returns shortened path for prompt display
+# ------------------------------------------------------------------------------
+# Replicates PowerShell Get-MyPromptPath behavior:
+#   - Paths under Linux $HOME use ~ prefix
+#   - Paths under Windows home (/mnt/c/Users/gregt) use ~win prefix
+#   - Long paths (>50 chars or >4 folders) are shortened:
+#     First 3 folders + ... + last 2 folders
+function get_prompt_path() {
+    local location="$PWD"
+    local prompt_path=""
+    local relative_path=""
+    local prefix=""
+
+    # Define home directories
+    local linux_home="$HOME"
+    local win_home="/mnt/c/Users/gregt"
+
+    # Remove trailing slash except for root
+    if [[ "$location" != "/" && "$location" == */ ]]; then
+        location="${location%/}"
+    fi
+
+    # Check if path is under Windows home (check first, more specific)
+    if [[ "$location" == "$win_home"* ]]; then
+        if [[ "$location" == "$win_home" ]]; then
+            prompt_path="~win"
+        else
+            prefix="~win"
+            relative_path="${location#$win_home}"
+        fi
+    # Check if path is under Linux home
+    elif [[ "$location" == "$linux_home"* ]]; then
+        if [[ "$location" == "$linux_home" ]]; then
+            prompt_path="~"
+        else
+            prefix="~"
+            relative_path="${location#$linux_home}"
+        fi
+    else
+        # Outside both home directories
+        relative_path="$location"
+        prefix=""
+    fi
+
+    # If prompt_path is already set (at home directory), return it
+    if [[ -n "$prompt_path" ]]; then
+        echo "$prompt_path"
+        return
+    fi
+
+    # Count path separators in relative path
+    local sep_count="${relative_path//[^\/]/}"
+    sep_count="${#sep_count}"
+
+    # Short path (<=50 chars) or few folders (<=4 separators): show full path
+    if [[ ${#relative_path} -le 50 ]] || [[ $sep_count -le 4 ]]; then
+        prompt_path="${prefix}${relative_path}"
+    else
+        # Long path: keep first 3 folders + ... + last 2 folders
+        # Split path into array
+        local -a parts
+        parts=("${(@s:/:)relative_path}")
+
+        # Remove empty first element if path started with /
+        if [[ -z "${parts[1]}" ]]; then
+            parts=("${parts[@]:1}")
+        fi
+
+        local total_parts=${#parts[@]}
+
+        if [[ $total_parts -le 4 ]]; then
+            # Not enough parts to shorten meaningfully
+            prompt_path="${prefix}${relative_path}"
+        else
+            # Build shortened path: first 2 folders + ... + last 2 folders
+            local left_path="/${parts[1]}/${parts[2]}"
+            local right_path="/${parts[-2]}/${parts[-1]}"
+            prompt_path="${prefix}${left_path}/...${right_path}"
+        fi
+    fi
+
+    echo "$prompt_path"
+}
+
 # Prompt configuration
 # See: https://zsh.sourceforge.io/Doc/Release/Prompt-Expansion.html
-# %~  = current directory (~ replaces $HOME)
 # %F  = start foreground color
 # %f  = reset foreground color
 # %#  = % for normal user, # for root
 PROMPT=$'\n'\
-$'%F{cyan}╭─( %~'\
+$'%F{cyan}╭─( $(get_prompt_path)'\
 '%F{yellow}${vcs_info_msg_0_}%f'\
 $'\n'\
 $'%F{cyan}╰─%f%# '
