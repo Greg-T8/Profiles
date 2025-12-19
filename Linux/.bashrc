@@ -80,8 +80,9 @@ fi
 # ------------------------------------------------------------------------------
 # Set hostname prefix (green) only when connected via SSH
 # Evaluated once at shell startup since SSH status doesn't change mid-session
+# Uses \001 and \002 (readline markers) with actual escape sequences
 if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" ]]; then
-    _ssh_host='\[\e[32m\]'"$HOSTNAME"'\[\e[36m\] '
+    _ssh_host=$'\001\e[32m\002'"$HOSTNAME"$'\001\e[36m\002 '
 else
     _ssh_host=""
 fi
@@ -101,8 +102,8 @@ setup_custom_prompt() {
 
     # Define colors based on parameter
     if [ "$use_color" = "yes" ]; then
-        local cyan=$'\[\e[36m\]'      # Cyan color
-        local reset=$'\[\e[0m\]'      # Reset color
+        local cyan=$'\001\e[36m\002'   # Cyan color
+        local reset=$'\001\e[0m\002'   # Reset color
         # Build custom PS1 prompt with color
         PS1=$'\n'"${cyan}"$'╭─( '"${_ssh_host}"$'\w\n'"${cyan}"$'╰─'"${reset}"$'\$ '
     else
