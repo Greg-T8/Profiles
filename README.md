@@ -18,6 +18,12 @@ irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/bootstrap
 curl -fsSL https://raw.githubusercontent.com/Greg-T8/Profiles/main/Linux/bootstrap-docker.sh | bash
 ```
 
+For minimal Docker images without curl or wget pre-installed:
+
+```bash
+apt-get update && apt-get install -y curl && curl -fsSL https://raw.githubusercontent.com/Greg-T8/Profiles/main/Linux/init-docker.sh | bash
+```
+
 ## 📁 Repository Structure
 
 ```text
