@@ -76,11 +76,24 @@ fi
 # PROMPT CONFIGURATION
 # ==============================================================================
 # ------------------------------------------------------------------------------
+# SSH Host Detection
+# ------------------------------------------------------------------------------
+# Returns hostname prefix only when connected via SSH
+get_ssh_host() {
+    if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" ]]; then
+        echo "$HOSTNAME - "
+    fi
+}
+
+# ------------------------------------------------------------------------------
 # Custom Prompt Function
 # ------------------------------------------------------------------------------
 # Two-line prompt with box-drawing characters
 # Format:
 #   ╭─( ~/path/to/directory
+#   ╰─$
+# When connected via SSH:
+#   ╭─( hostname - ~/path/to/directory
 #   ╰─$
 setup_custom_prompt() {
     local use_color="${1:-yes}"  # Default to yes if no parameter provided
@@ -90,10 +103,10 @@ setup_custom_prompt() {
         local cyan=$'\[\e[36m\]'      # Cyan color
         local reset=$'\[\e[0m\]'      # Reset color
         # Build custom PS1 prompt with color
-        PS1=$'\n'"${cyan}"$'╭─( \w\n'"${cyan}"$'╰─'"${reset}"$'\$ '
+        PS1=$'\n'"${cyan}"$'╭─( $(get_ssh_host)\w\n'"${cyan}"$'╰─'"${reset}"$'\$ '
     else
         # Build custom PS1 prompt without color
-        PS1=$'\n╭─( \w\n╰─\$ '
+        PS1=$'\n╭─( $(get_ssh_host)\w\n╰─\$ '
     fi
 }
 
