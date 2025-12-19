@@ -313,6 +313,6 @@ $'%F{cyan}╰─%f%# '
 # STARTUP DIRECTORY
 # ==============================================================================
 # Change to home directory if starting in Windows directory
-if [[ $PWD == /mnt/c/* ]]; then
-    cd ~
-fi
+# if [[ $PWD == /mnt/c/* ]]; then
+#     cd ~
+# fi
