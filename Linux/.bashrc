@@ -81,7 +81,7 @@ fi
 # Set hostname prefix (green) only when connected via SSH
 # Evaluated once at shell startup since SSH status doesn't change mid-session
 if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" ]]; then
-    _ssh_host=$'\[\e[32m\]'"$HOSTNAME"$'\[\e[36m\] '
+    _ssh_host='\[\e[32m\]'"$HOSTNAME"'\[\e[36m\] '
 else
     _ssh_host=""
 fi
