@@ -200,6 +200,9 @@ alias ll='ls -la --color'             # Long listing with hidden files
 alias cls='clear'                     # Windows-style clear command
 alias md='mkdir'                      # Windows-style make directory
 
+# Windows home directory shortcut (use: cd ~win)
+hash -d win=/mnt/c/Users/gregt
+
 # Docker shortcuts
 alias dex='docker exec -it'           # Docker exec interactive
 alias dil='docker image ls -a'        # Docker image list all with full IDs
@@ -396,11 +399,3 @@ $'%F{cyan}╭─( $(get_prompt_path)'\
 '%F{yellow}${vcs_info_msg_0_}%f'\
 $'\n'\
 $'%F{cyan}╰─%f%# '
-
-# ==============================================================================
-# STARTUP DIRECTORY
-# ==============================================================================
-# Change to home directory if starting in Windows directory
-# if [[ $PWD == /mnt/c/* ]]; then
-#     cd ~
-# fi
