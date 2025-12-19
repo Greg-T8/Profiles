@@ -169,8 +169,7 @@ zstyle ':completion:*' auto-description 'specify: %d'
 zstyle ':completion:*' completer _expand _complete _correct _approximate
 zstyle ':completion:*' format 'Completing %d'
 zstyle ':completion:*' group-name ''
-zstyle ':completion:*' menu select=2
-zstyle ':completion:*' menu select=long
+zstyle ':completion:*' menu select                     # Always enter interactive menu mode
 zstyle ':completion:*' select-prompt 'Scrolling active: current selection at %p'
 zstyle ':completion:*' list-prompt 'At %p: Hit TAB for more, or the character to insert'
 zstyle ':completion:*' use-compctl false
