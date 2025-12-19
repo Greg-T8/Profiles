@@ -125,6 +125,7 @@
     "\"Total": true,
     "\"Line": true
   },
+  "chat.viewSessions.orientation": "stacked",
   "dashboard.displayProjectPath": true,
   "dashboard.openOnStartup": "empty workspace",
   "dashboard.projectData": [
@@ -911,6 +912,7 @@
     "chat.notifyWindowOnResponseReceived",
     "chat.promptFilesLocations",
     "chat.tools.terminal.autoApprove",
+    "chat.viewSessions.orientation",
     "cSpell.enabled",
     "cSpell.allowCompoundWords",
     "cSpell.showAutocompleteSuggestions",
