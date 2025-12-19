@@ -81,7 +81,7 @@ fi
 # Returns hostname prefix only when connected via SSH
 get_ssh_host() {
     if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" ]]; then
-        echo "$HOSTNAME - "
+        echo "$HOSTNAME: "
     fi
 }
 
