@@ -171,15 +171,13 @@ zstyle ':completion:*' format 'Completing %d'
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*' menu select=2
 zstyle ':completion:*' menu select=long
-zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
-zstyle ':completion:*' list-prompt %SAt %p: Hit TAB for more, or the character to insert%s
+zstyle ':completion:*' select-prompt 'Scrolling active: current selection at %p'
+zstyle ':completion:*' list-prompt 'At %p: Hit TAB for more, or the character to insert'
 zstyle ':completion:*' use-compctl false
 zstyle ':completion:*' verbose true
 
 # Enable colored completion listings
 eval "$(dircolors -b)"
-zstyle ':completion:*:default' list-colors ${(s.:.)LS_COLORS}
-zstyle ':completion:*' list-colors ''
 
 # Case-insensitive completion matching
 zstyle ':completion:*' matcher-list '' 'm:{a-z}={A-Z}' 'm:{a-zA-Z}={A-Za-z}' 'r:|[._-]=* r:|=* l:|=*'
@@ -187,6 +185,13 @@ zstyle ':completion:*' matcher-list '' 'm:{a-z}={A-Z}' 'm:{a-zA-Z}={A-Za-z}' 'r:
 # Colorize process list for kill command
 zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
 zstyle ':completion:*:kill:*' command 'ps -u $USER -o pid,%cpu,tty,cputime,cmd'
+
+# Arrow key navigation in completion menu
+zmodload zsh/complist
+bindkey -M menuselect '^[[A' up-line-or-history        # Up arrow
+bindkey -M menuselect '^[[B' down-line-or-history      # Down arrow
+bindkey -M menuselect '^[[D' backward-char             # Left arrow
+bindkey -M menuselect '^[[C' forward-char              # Right arrow
 
 # ==============================================================================
 # ALIASES
