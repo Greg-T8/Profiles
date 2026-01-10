@@ -1,10 +1,10 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions":
+    "actions": 
     [
         {
-            "command":
+            "command": 
             {
                 "action": "copy",
                 "singleLine": false
@@ -12,11 +12,26 @@
             "id": "User.copy.644BA8F2"
         },
         {
+            "command": 
+            {
+                "action": "newTab"
+            },
+            "id": "User.newTab"
+        },
+        {
+            "command": 
+            {
+                "action": "moveFocus",
+                "direction": "right"
+            },
+            "id": "User.moveFocus.right"
+        },
+        {
             "command": "paste",
             "id": "User.paste"
         },
         {
-            "command":
+            "command": 
             {
                 "action": "splitPane",
                 "split": "auto",
@@ -29,7 +44,15 @@
             "id": "User.find"
         },
         {
-            "command":
+            "command": 
+            {
+                "action": "moveFocus",
+                "direction": "up"
+            },
+            "id": "User.moveFocus.up"
+        },
+        {
+            "command": 
             {
                 "action": "splitPane",
                 "split": "right",
@@ -38,7 +61,7 @@
             "id": "User.splitPane.right"
         },
         {
-            "command":
+            "command": 
             {
                 "action": "splitPane",
                 "split": "down",
@@ -47,7 +70,11 @@
             "id": "User.splitPane.down"
         },
         {
-            "command":
+            "command": "closePane",
+            "id": "User.closePane"
+        },
+        {
+            "command": 
             {
                 "action": "moveFocus",
                 "direction": "left"
@@ -55,7 +82,14 @@
             "id": "User.moveFocus.left"
         },
         {
-            "command":
+            "command": 
+            {
+                "action": "nextTab"
+            },
+            "id": "User.nextTab"
+        },
+        {
+            "command": 
             {
                 "action": "moveFocus",
                 "direction": "down"
@@ -63,42 +97,14 @@
             "id": "User.moveFocus.down"
         },
         {
-            "command":
+            "command": 
             {
-                "action": "moveFocus",
-                "direction": "up"
+                "action": "closeTab"
             },
-            "id": "User.moveFocus.up"
-        },
-        {
-            "command":
-            {
-                "action": "moveFocus",
-                "direction": "right"
-            },
-            "id": "User.moveFocus.right"
-        },
-        {
-            "command": "closePane",
-            "id": "User.closePane"
-        },
-        {
-            "command": "newTab",
-            "id": "User.newTab"
-        },
-        {
-            "command": "closeTab",
             "id": "User.closeTab"
         },
         {
-            "command":
-            {
-                "action": "nextTab"
-            },
-            "id": "User.nextTab"
-        },
-        {
-            "command":
+            "command": 
             {
                 "action": "prevTab"
             },
@@ -114,8 +120,12 @@
     "focusFollowMouse": true,
     "initialCols": 180,
     "initialRows": 50,
-    "keybindings":
+    "keybindings": 
     [
+        {
+            "id": "User.nextTab",
+            "keys": "shift+right"
+        },
         {
             "id": "User.copy.644BA8F2",
             "keys": "ctrl+c"
@@ -165,16 +175,12 @@
             "keys": "alt+shift+7"
         },
         {
-            "id": "User.nextTab",
-            "keys": "shift+right"
-        },
-        {
             "id": "User.prevTab",
             "keys": "shift+left"
         }
     ],
     "minimizeToNotificationArea": true,
-    "newTabMenu":
+    "newTabMenu": 
     [
         {
             "icon": null,
@@ -188,14 +194,14 @@
             "type": "remainingProfiles"
         }
     ],
-    "profiles":
+    "profiles": 
     {
-        "defaults":
+        "defaults": 
         {
             "adjustIndistinguishableColors": "always",
             "colorScheme": "CGA",
             "experimental.repositionCursorWithMouse": false,
-            "font":
+            "font": 
             {
                 "face": "Cascadia Mono"
             },
@@ -204,7 +210,7 @@
             "snapOnInput": true,
             "useAcrylic": true
         },
-        "list":
+        "list": 
         [
             {
                 "colorScheme": "CGA",
