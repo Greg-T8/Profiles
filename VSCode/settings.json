@@ -693,8 +693,8 @@
     "MD045": false // Omit alternate text from image links
   },
   "markdownlint.run": "onSave",
-  "pasteimg.path": "${currentFileDir}/images",
-  "pasteimg.renderPattern": "<img src='${imagePath}' width=500>",
+  "pasteimg.path": "${currentFileDir}/.img",
+  "pasteimg.renderPattern": "<img src='${imagePath}' width=700>",
   "prettyxml.settings.indentSpaceLength": 2,
   "rewrap.autoWrap.enabled": false,
   "rewrap.autoWrap.notification": "icon",
