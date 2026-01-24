@@ -59,7 +59,7 @@
     "editor.tabSize": 2,
     "editor.wordWrap": "wordWrapColumn",
     "editor.wordWrapColumn": 80,
-    "files.autoSave": "off",
+    "files.autoSave": "onWindowChange",
     "files.trimTrailingWhitespace": false,
     "rewrap.wrappingColumn": 80
   },
@@ -489,7 +489,7 @@
   "files.associations": {
     "*.keymap": "devicetree"
   },
-  "files.autoSave": "off",
+  "files.autoSave": "onWindowChange",
   "files.autoSaveDelay": 10000,
   "files.hotExit": "onExitAndWindowClose",
   "files.trimFinalNewlines": true,
