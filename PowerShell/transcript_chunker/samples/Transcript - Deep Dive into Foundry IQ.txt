@@ -1,0 +1,2497 @@
+00:00 Hi everyone. In this video, I want to
+00:03 
+
+00:03 dive into Foundry IQ. This along with
+00:06 
+
+00:06 fabric IQ and work IQ form that
+00:08 
+
+00:08 knowledge foundation for our AI apps and
+00:11 
+
+00:11 agents that enables us to unlock a lot
+00:13 
+
+00:13 of powerful capabilities.
+00:16 
+
+00:16 Now, our need for any of these
+00:18 
+
+00:18 additional sets of knowledge comes from
+00:21 
+
+00:21 the fact that our generative models are
+00:23 
+
+00:23 trained on a very large but very finite
+00:27 
+
+00:27 corpus of information. We think that we
+00:31 
+
+00:31 have this body of knowledge. So this is
+00:34 
+
+00:34 our corpus of training data and this
+00:37 
+
+00:37 comes from books and websites and
+00:41 
+
+00:41 transcripts
+00:43 
+
+00:43 but it is a finite size and it has a
+00:46 
+
+00:46 certain cutoff date and it won't include
+00:48 
+
+00:48 anything non-public.
+00:50 
+
+00:50 So then this is used
+00:53 
+
+00:53 to train
+00:56 
+
+00:56 our generative model. So all of those
+01:00 
+
+01:00 neurons that make up the model get its
+01:04 
+
+01:04 different weights and biases biases
+01:07 
+
+01:07 modified based on the strength of those
+01:09 
+
+01:09 various connections which then once it's
+01:11 
+
+01:11 done all that training I can pass new
+01:14 
+
+01:14 prompts and then it can predict the next
+01:17 
+
+01:17 most probable token and the next and the
+01:19 
+
+01:19 next and it generates us these fantastic
+01:22 
+
+01:22 responses.
+01:24 
+
+01:24 But if I need it to be able to utilize
+01:28 
+
+01:28 and information that it was not trained
+01:30 
+
+01:30 on, it's not part of that pre-trained
+01:33 
+
+01:33 knowledge that makes up the model.
+01:36 
+
+01:36 Well, I have to be able to give it that
+01:39 
+
+01:39 information. I have to provide it as
+01:41 
+
+01:41 part of the request. So the way that
+01:43 
+
+01:43 works is whatever our little AI
+01:45 
+
+01:45 application is
+01:48 
+
+01:48 if there is some prompt that I want to
+01:52 
+
+01:52 give the model but I need that
+01:54 
+
+01:54 additional data what we actually do is
+01:57 
+
+01:57 we have some knowledge of information
+01:60 
+
+01:60 maybe it's our internal company set of
+02:02 
+
+02:02 database whatever that may be so this is
+02:04 
+
+02:04 all of our information the application
+02:08 
+
+02:08 makes a request to it first and then it
+02:11 
+
+02:11 sends back the relevant info.
+02:14 
+
+02:14 Then that info gets added to
+02:17 
+
+02:17 the prompt and now the model can take
+02:20 
+
+02:20 the request and the applicable
+02:22 
+
+02:22 information and generate that response.
+02:25 
+
+02:25 So this is known as retrieving
+02:28 
+
+02:28 additional information to augment
+02:32 
+
+02:32 the ability for it to generate
+02:34 
+
+02:34 information or rag. So it's a super
+02:36 
+
+02:36 common term. We're used to that. And the
+02:39 
+
+02:39 quality of this additional information
+02:41 
+
+02:41 we send it is going to massively impact
+02:44 
+
+02:44 the quality of the response we get back.
+02:46 
+
+02:46 Garbage in would be garbage out. So we
+02:48 
+
+02:48 want to make sure we get the very
+02:49 
+
+02:49 highest quality and applicability of
+02:52 
+
+02:52 data that we send to the model. So we
+02:54 
+
+02:54 get fantastic outputs. So that's the
+02:57 
+
+02:57 fundamental issue. The model is trained
+02:58 
+
+02:58 on a certain body of data. Doesn't know
+03:01 
+
+03:01 about our company's data. It has cutoff
+03:03 
+
+03:03 dates. So for it to be really useful, we
+03:05 
+
+03:05 have to give it more info. Now I drew
+03:09 
+
+03:09 this idea of sending a question and
+03:10 
+
+03:10 getting information back. This is where
+03:13 
+
+03:13 Azure AI search comes in for many of our
+03:16 
+
+03:16 different types of data. So the whole
+03:19 
+
+03:19 point here is what we get is with Azure
+03:21 
+
+03:21 AI search
+03:30 
+
+03:30 it provides that ability to expose an
+03:34 
+
+03:34 endpoint. So remember we're used to
+03:36 
+
+03:36 talking to these things. It's going to
+03:37 
+
+03:37 expose an API. In this case, it's going
+03:40 
+
+03:40 to create a number of indexes. We're
+03:42 
+
+03:42 going to talk to an index. So, the app
+03:44 
+
+03:44 would now for this question would
+03:46 
+
+03:46 actually send it this way to the API for
+03:48 
+
+03:48 Azure AI search.
+03:50 
+
+03:50 And it sends it, hey, the the query it's
+03:53 
+
+03:53 trying to find. And Azure AI search will
+03:58 
+
+03:58 do that search for it. It will find the
+04:01 
+
+04:01 best highest quality data, send it back,
+04:04 
+
+04:04 which you can then add to the prompt. So
+04:06 
+
+04:06 that that's the benefit we get from
+04:08 
+
+04:08 Azure AI search.
+04:10 
+
+04:10 But it's how it finds that information
+04:14 
+
+04:14 that is so powerful because obviously we
+04:18 
+
+04:18 underneath everything we have some
+04:19 
+
+04:19 amount of knowledge.
+04:22 
+
+04:22 Well, it's not even knowledge. That's
+04:23 
+
+04:23 actually a poor word. I'm going to
+04:24 
+
+04:24 change that. We have some information.
+04:28 
+
+04:28 And there's a distinction between
+04:30 
+
+04:30 information and knowledge. So we have a
+04:32 
+
+04:32 set of different information. This could
+04:34 
+
+04:34 be in blobs, could be in databases,
+04:38 
+
+04:38 whatever that may be.
+04:42 
+
+04:42 What Azure AI search is going to do is a
+04:45 
+
+04:45 number of different ways. So firstly,
+04:48 
+
+04:48 it's going to create an index. So the
+04:50 
+
+04:50 whole point here is it creates a certain
+04:52 
+
+04:52 index for a particular set of
+04:55 
+
+04:55 information, a particular blob, um,
+04:58 
+
+04:58 container, a particular database. So in
+05:01 
+
+05:01 this case, maybe we create index one.
+05:04 
+
+05:04 So I create index one
+05:08 
+
+05:08 which corresponds to a single source of
+05:11 
+
+05:11 information. Now sometimes when we
+05:13 
+
+05:13 search we are searching on maybe uh a
+05:17 
+
+05:17 skew a name of a product that has a very
+05:21 
+
+05:21 high discrimination ability against
+05:22 
+
+05:22 other types of data. I'm just basically
+05:25 
+
+05:25 searching a lexical search. I'm doing a
+05:27 
+
+05:27 keyword search to match on that. So when
+05:30 
+
+05:30 we have these indexes in Azure AI
+05:32 
+
+05:32 search, it has that great. It has that
+05:35 
+
+05:35 basic keyword lexical index and it does
+05:38 
+
+05:38 a lexical search. However,
+05:42 
+
+05:42 when we start looking at these
+05:43 
+
+05:43 generative models
+05:45 
+
+05:45 and how we interact with them, we
+05:48 
+
+05:48 normally use natural language. And the
+05:50 
+
+05:50 problem of natural language is many
+05:53 
+
+05:53 words can mean the same thing
+05:56 
+
+05:56 and one word can mean many different
+05:59 
+
+05:59 things. Our language is full of idioms
+06:02 
+
+06:02 where what we say should not be taken
+06:04 
+
+06:04 literally. It's raining cats and dogs.
+06:06 
+
+06:06 If a computer took that literally, it
+06:09 
+
+06:09 would be taking automated actions to
+06:10 
+
+06:10 call a lot of vets to your location
+06:12 
+
+06:12 because it's assuming there's a lot of
+06:13 
+
+06:13 injured animals on the ground. We know
+06:16 
+
+06:16 it just means it's raining a lot. So
+06:18 
+
+06:18 what we have to do when we think about
+06:19 
+
+06:19 natural language is we have to
+06:21 
+
+06:21 understand the semantic meaning of
+06:23 
+
+06:23 information and then find the closest
+06:27 
+
+06:27 set of information based on what we're
+06:29 
+
+06:29 looking for. Now the way we do this is
+06:32 
+
+06:32 we create vectors. So in addition to
+06:35 
+
+06:35 this lexical we have an idea of a vector
+06:38 
+
+06:38 index
+06:40 
+
+06:40 and what we have to enable this is
+06:42 
+
+06:42 whatever that source is
+06:46 
+
+06:46 we actually chunk it up into particular
+06:48 
+
+06:48 blocks and then we use an embedding
+06:51 
+
+06:51 model to create this very
+06:53 
+
+06:53 highdimensional vector that represents
+06:55 
+
+06:55 the semantic meaning of the data. And
+06:59 
+
+06:59 then when we're searching, we create
+07:01 
+
+07:01 another embedding, a high dimensional
+07:02 
+
+07:02 vector of what we're looking for and we
+07:04 
+
+07:04 find the ones that are closest because
+07:05 
+
+07:05 that means they have similar semantic
+07:07 
+
+07:07 meaning.
+07:10 
+
+07:10 So then what Azure AI search will do is
+07:12 
+
+07:12 it will run the search against both of
+07:14 
+
+07:14 those
+07:18 
+
+07:18 and then it does something called
+07:19 
+
+07:19 reciprocal rank fusion.
+07:23 
+
+07:23 basically a fancy term for mush them
+07:25 
+
+07:25 together. Um, things that rank highly on
+07:28 
+
+07:28 both of them put overall near the top.
+07:31 
+
+07:31 But then it does another
+07:34 
+
+07:34 semantical
+07:36 
+
+07:36 reank.
+07:38 
+
+07:38 So that list of results, it then
+07:40 
+
+07:40 compares again compared to what the
+07:43 
+
+07:43 search request was, reorders them,
+07:45 
+
+07:45 scores them, and returns the ones that
+07:48 
+
+07:48 give us an answer above a certain
+07:50 
+
+07:50 confidence level. So this is fantastic
+07:54 
+
+07:54 capability. The net result is I get
+07:57 
+
+07:57 fantastic results.
+07:59 
+
+07:59 But all of the searches we make are
+08:02 
+
+08:02 always against a single index which is
+08:06 
+
+08:06 against a single
+08:10 
+
+08:10 information source. We really can think
+08:12 
+
+08:12 about this as our
+08:15 
+
+08:15 um rag 1.0 stack. So that that's how
+08:18 
+
+08:18 often we'll think about this.
+08:22 
+
+08:22 Okay. So now we're going to think about
+08:24 
+
+08:24 Foundry IQ.
+08:26 
+
+08:26 So if we now take it's still Azure AI
+08:29 
+
+08:29 search. This is built on Azure AI search
+08:32 
+
+08:32 too. But what we're now going to have
+08:35 
+
+08:35 use orange. I always use orange for the
+08:37 
+
+08:37 new thing. So now we're going to have
+08:39 
+
+08:39 Foundry IQ.
+08:46 
+
+08:46 Now the big deal here is it's going to
+08:48 
+
+08:48 provide a true knowledge layer not just
+08:50 
+
+08:50 information. It moves from singleshot
+08:54 
+
+08:54 rag remember
+08:56 
+
+08:56 we make a request it can look at an
+08:58 
+
+08:58 index which represents an information
+09:01 
+
+09:01 source with foundry IQ we move to a
+09:06 
+
+09:06 genic rack. So now it's
+09:10 
+
+09:10 not just this single
+09:13 
+
+09:13 shot. We can also think of it as a
+09:16 
+
+09:16 multi- heap.
+09:21 
+
+09:21 I can now think about searching across
+09:23 
+
+09:23 more than one knowledge source. So for
+09:26 
+
+09:26 example in a single request at a very
+09:28 
+
+09:28 basic basic level what I could now do is
+09:32 
+
+09:32 yes it could still go and look at index
+09:34 
+
+09:34 one
+09:35 
+
+09:35 but also we had index two.
+09:40 
+
+09:40 it had some other type of data
+09:43 
+
+09:43 that when I think about a certain
+09:46 
+
+09:46 real world entity or relationship or
+09:49 
+
+09:49 constraint,
+09:51 
+
+09:51 this has applicable information as well
+09:53 
+
+09:53 that needs to be considered. So I can
+09:56 
+
+09:56 now group particular sets of knowledge
+09:59 
+
+09:59 source together and search across all of
+10:02 
+
+10:02 them. And so maybe that that's a key
+10:05 
+
+10:05 term of what we're going to do here is
+10:07 
+
+10:07 as I start thinking about this, what
+10:08 
+
+10:08 we're adding
+10:10 
+
+10:10 are knowledge
+10:13 
+
+10:13 sources,
+10:17 
+
+10:17 but it's also adding additional types of
+10:20 
+
+10:20 knowledge source. So for example,
+10:23 
+
+10:23 these indexes it creates, it can also
+10:27 
+
+10:27 now index data in fabrics one lake uh
+10:30 
+
+10:30 fabric IQ. So remember fabric IQ is
+10:33 
+
+10:33 fabric's own ontology of the enterprise
+10:36 
+
+10:36 entities relationships properties that
+10:38 
+
+10:38 gives semantic meaning of the
+10:40 
+
+10:40 information. So rather than it just
+10:42 
+
+10:42 being information in one lake it now
+10:45 
+
+10:45 actually represents what does it mean to
+10:47 
+
+10:47 the true enterprise so it becomes a lot
+10:50 
+
+10:50 more useful. So these knowledge sources
+10:52 
+
+10:52 can now include
+10:55 
+
+10:55 fabric
+10:57 
+
+10:57 and fabric IQ i.e a data in one lake and
+11:01 
+
+11:01 that ontology those models
+11:04 
+
+11:04 it can also
+11:07 
+
+11:07 include a specific sharepoint site so I
+11:10 
+
+11:10 can point it to a particular shareepoint
+11:12 
+
+11:12 site
+11:14 
+
+11:14 now with these it is still going to go
+11:18 
+
+11:18 ahead and it's going to index it
+11:23 
+
+11:23 so it's going to go ahead and again take
+11:26 
+
+11:26 the data bring it into an index, create
+11:30 
+
+11:30 the vectors, create the embeddings. So,
+11:32 
+
+11:32 it's now another index that is local to
+11:36 
+
+11:36 Azure AI search,
+11:39 
+
+11:39 but additionally,
+11:41 
+
+11:41 it supports the idea of remote knowledge
+11:44 
+
+11:44 sources. So here I can think about
+11:49 
+
+11:49 this was a specific SharePoint site,
+11:53 
+
+11:53 but I can also have the idea of actually
+11:56 
+
+11:56 just
+11:58 
+
+11:58 work IQ
+12:00 
+
+12:00 slash sort of M365
+12:04 
+
+12:04 SharePoint.
+12:07 
+
+12:07 And what this is now going to do is use
+12:09 
+
+12:09 M365's own semantic index
+12:14 
+
+12:14 to find the most relevant information
+12:17 
+
+12:17 based on the token, the user who is
+12:20 
+
+12:20 making the request. Now I would need a
+12:23 
+
+12:23 co-pilot license to be able to utilize
+12:25 
+
+12:25 that to get that semantic index access.
+12:29 
+
+12:29 I can also
+12:31 
+
+12:31 make a request to the web which is
+12:33 
+
+12:33 powered by Bing and also I think in
+12:37 
+
+12:37 preview I can point to MCP. So remember
+12:40 
+
+12:40 MCP is about a standard way to provide
+12:44 
+
+12:44 additional knowledge and tools maybe
+12:46 
+
+12:46 even prompts to my AI application and it
+12:49 
+
+12:49 reflects its capabilities to me so I
+12:53 
+
+12:53 don't have to try and explain it to the
+12:54 
+
+12:54 app itself on how to use it. It's a
+12:56 
+
+12:56 standard protocol. So what I would
+12:58 
+
+12:58 probably expect here is if I was going
+12:59 
+
+12:59 to use MCP, it probably has some kind of
+13:02 
+
+13:02 search tool that it exposes as part of
+13:07 
+
+13:07 that reflection of its capabilities. So
+13:11 
+
+13:11 Foundry IQ, Azure AI search behind the
+13:14 
+
+13:14 scenes would be able to call that to get
+13:16 
+
+13:16 the response. So these
+13:20 
+
+13:20 are remote knowledge sources. This makes
+13:24 
+
+13:24 zero difference to the AI app. It makes
+13:26 
+
+13:26 zero difference to the user. It's just
+13:29 
+
+13:29 for your information. When you think
+13:30 
+
+13:30 about this,
+13:32 
+
+13:32 if it's regular blob and information or
+13:36 
+
+13:36 data from one lake or sharepoint site,
+13:38 
+
+13:38 it's creating an index
+13:41 
+
+13:41 within Azure AI search. And again, even
+13:44 
+
+13:44 when it does this stuff on a sharepoint
+13:45 
+
+13:45 site, it will still try and retain as
+13:47 
+
+13:47 much information and permissions as it
+13:49 
+
+13:49 can. If I add these like just SharePoint
+13:52 
+
+13:52 in general, not a particular site, then
+13:54 
+
+13:54 it's just going to use M365 Work IQ's
+13:57 
+
+13:57 semantic index. If it's going to search
+13:59 
+
+13:59 the web, it goes and searches the web.
+14:01 
+
+14:01 It's not going to index the web itself.
+14:03 
+
+14:03 Uh MCP will call that search tool. So,
+14:06 
+
+14:06 we have those capabilities
+14:09 
+
+14:09 as part of what we're going to use. And
+14:12 
+
+14:12 if we jump over for a second, so here
+14:16 
+
+14:16 I'm in
+14:18 
+
+14:18 Microsoft Foundry. I'm looking at the
+14:20 
+
+14:20 new
+14:21 
+
+14:21 experience right here.
+14:25 
+
+14:25 And the first thing to pay attention to
+14:27 
+
+14:27 is you select a particular Azure AI
+14:31 
+
+14:31 search resource first. So this has to
+14:33 
+
+14:33 exist. I have to have created an Azure
+14:35 
+
+14:35 AI search resource and then I create one
+14:39 
+
+14:39 or more knowledge bases.
+14:42 
+
+14:42 You can see I have two different
+14:44 
+
+14:44 knowledge bases here. If I select one of
+14:47 
+
+14:47 them,
+14:49 
+
+14:49 what you'll see is it comprises of a
+14:53 
+
+14:53 certain number of knowledge sources. I
+14:56 
+
+14:56 have two. One is the Azure AI search
+14:58 
+
+14:58 index and one of them is web. So I guess
+15:02 
+
+15:02 that's an important point
+15:04 
+
+15:04 when I think about okay knowledge
+15:06 
+
+15:06 sources
+15:08 
+
+15:08 realize what sits above that is a
+15:12 
+
+15:12 knowledge base. So I have a knowledge
+15:15 
+
+15:15 base which is actually what I really
+15:17 
+
+15:17 interact with.
+15:21 
+
+15:21 So a knowledge base
+15:23 
+
+15:23 is just a collection
+15:28 
+
+15:28 of knowledge sources. And today
+15:32 
+
+15:32 you have a number of knowledge sources
+15:34 
+
+15:34 in a knowledge base. It's 10. That could
+15:37 
+
+15:37 absolutely change in the future.
+15:40 
+
+15:40 If we jump back again,
+15:43 
+
+15:43 but what I can see here is I can add
+15:46 
+
+15:46 existing knowledge sources I may have
+15:48 
+
+15:48 already created that maybe I'm using in
+15:50 
+
+15:50 another knowledge base or I can go and
+15:52 
+
+15:52 create a new
+15:54 
+
+15:54 type of knowledge source and this is
+15:55 
+
+15:55 where you can see it. So I could use an
+15:59 
+
+15:59 existing search index I have. I could
+16:01 
+
+16:01 just point it at a blob container. It
+16:03 
+
+16:03 will go and grab them, chunk them, index
+16:05 
+
+16:05 them. I can point it to the web. I could
+16:09 
+
+16:09 point it. So here the point is a
+16:12 
+
+16:12 particular shareepoint site index. So it
+16:15 
+
+16:15 will actually create an index in Azure
+16:17 
+
+16:17 AI search or I can just point it at
+16:20 
+
+16:20 SharePoint in general. This is just
+16:22 
+
+16:22 saying use SharePoint and then it's
+16:24 
+
+16:24 going to use the remote semantic index
+16:27 
+
+16:27 of M365.
+16:29 
+
+16:29 I can also point it to fabrics one lake
+16:33 
+
+16:33 where it can go and retrieve and then
+16:34 
+
+16:34 again it will go and create the index.
+16:36 
+
+16:36 The ability to use MCP is in private
+16:38 
+
+16:38 preview today. I've not got that signed
+16:40 
+
+16:40 up in this particular one, which is why
+16:42 
+
+16:42 I can't see it.
+16:45 
+
+16:45 But there all the different types of
+16:47 
+
+16:47 knowledge source you can actually add.
+16:52 
+
+16:52 You saw already they live in a
+16:54 
+
+16:54 particular instance of Azure AI search.
+16:55 
+
+16:55 So I can add multiple Azure AI search
+16:58 
+
+16:58 resources with different sets of
+16:59 
+
+16:59 knowledge bases in it. Different SKUs of
+17:03 
+
+17:03 Azure AI search support different total
+17:06 
+
+17:06 numbers of knowledge bases and different
+17:08 
+
+17:08 numbers of knowledge sources. If I jump
+17:11 
+
+17:11 over and look at the limits page, and
+17:12 
+
+17:12 again, you'd want to check this, but
+17:15 
+
+17:15 today you can see the free version
+17:18 
+
+17:18 sports only three
+17:21 
+
+17:21 sources and three knowledge bases. Basic
+17:25 
+
+17:25 is 15 unless you created it earlier on.
+17:27 
+
+17:27 It talks about the date which goes to be
+17:31 
+
+17:31 five. Then the S1, S2, S3, etc., etc. So
+17:35 
+
+17:35 the different SKUs support a different
+17:37 
+
+17:37 number of them.
+17:43 
+
+17:43 Once I've created the knowledge source,
+17:46 
+
+17:46 again, I could use it in other knowledge
+17:49 
+
+17:49 bases. it it's literally a knowledge
+17:52 
+
+17:52 base is just a collection of knowledge
+17:53 
+
+17:53 sources
+17:55 
+
+17:55 that I'm collecting together because
+17:58 
+
+17:58 together they represent some useful
+18:01 
+
+18:01 knowledge about entities of the
+18:04 
+
+18:04 enterprise or or some other type of
+18:06 
+
+18:06 thing and then my AI app or agent
+18:08 
+
+18:08 doesn't need to care. It can just point
+18:11 
+
+18:11 to the knowledge bases I've created and
+18:13 
+
+18:13 do useful things. Previously it was very
+18:15 
+
+18:15 complicated for agents. If maybe I
+18:18 
+
+18:18 needed information from three different
+18:21 
+
+18:21 blobs for maybe different types of
+18:22 
+
+18:22 policies and information um then there
+18:25 
+
+18:25 was maybe something in a sharepoint I as
+18:28 
+
+18:28 writing the agent or the app would have
+18:29 
+
+18:29 to go and manage and do separate queries
+18:32 
+
+18:32 and then try and bring them together. It
+18:34 
+
+18:34 would get very messy. So the whole point
+18:36 
+
+18:36 of this is we're we're separating that
+18:39 
+
+18:39 away. So now the AI app or the agent can
+18:41 
+
+18:41 just focus on hey this is the knowledge
+18:44 
+
+18:44 base and it's going to just give me all
+18:46 
+
+18:46 of the information I actually need.
+18:50 
+
+18:50 Now what's really powerful here is how
+18:54 
+
+18:54 it uses these different knowledge
+18:56 
+
+18:56 sources. It's not just saying okay
+18:59 
+
+18:59 before we had a request and we searched
+19:04 
+
+19:04 and we got a set of results. This is not
+19:07 
+
+19:07 simply well now it searches whatever
+19:09 
+
+19:09 that search is across all of the
+19:12 
+
+19:12 different knowledge sources in the
+19:13 
+
+19:13 knowledge base. It's a lot richer than
+19:16 
+
+19:16 that. If we go and look at our knowledge
+19:19 
+
+19:19 base,
+19:22 
+
+19:22 we actually see a few different things
+19:23 
+
+19:23 straight away.
+19:25 
+
+19:25 So one of the things we have here is
+19:29 
+
+19:29 well we give it a chat completions
+19:30 
+
+19:30 model. So this is a generative model it
+19:33 
+
+19:33 can use as part of its reasoning, its
+19:36 
+
+19:36 planning. There's different options that
+19:39 
+
+19:39 I can leverage.
+19:41 
+
+19:41 Then it has this idea of a reasoning
+19:44 
+
+19:44 effort,
+19:46 
+
+19:46 minimal, low, or medium.
+19:49 
+
+19:49 Now you'll notice minimum is grayed out
+19:52 
+
+19:52 because I have it in a certain output
+19:55 
+
+19:55 mode. Actually, if I go and look at a
+19:56 
+
+19:56 different model for a second, someone's
+19:58 
+
+19:58 using web. web forces you to use a
+20:01 
+
+20:01 certain mode. So here I can see all
+20:04 
+
+20:04 three of them minimal, low and medium.
+20:08 
+
+20:08 So let's talk a little bit about exactly
+20:11 
+
+20:11 what is happening here because it is a
+20:13 
+
+20:13 lot richer.
+20:15 
+
+20:15 So remember we talked about this idea of
+20:17 
+
+20:17 this agentic rag,
+20:20 
+
+20:20 this multihop capability. So it's doing
+20:24 
+
+20:24 intelligent thinking to actually work
+20:27 
+
+20:27 out what it needs to do. So as part of
+20:29 
+
+20:29 this agentic rag,
+20:32 
+
+20:32 it's not going to just use everything
+20:35 
+
+20:35 that exists in that knowledge base. Now
+20:38 
+
+20:38 that's actually not true. If I set it to
+20:40 
+
+20:40 minimum, that minimum level of reasoning
+20:42 
+
+20:42 effort, then it does. It just takes the
+20:46 
+
+20:46 request you send it and it sends exactly
+20:48 
+
+20:48 that request to all of the knowledge
+20:50 
+
+20:50 sources. So the effort you select does
+20:53 
+
+20:53 impact its behavior. But if I select an
+20:58 
+
+20:58 effort
+21:02 
+
+21:02 of low
+21:04 
+
+21:04 or medium
+21:08 
+
+21:08 now it's going to do a few different
+21:09 
+
+21:09 things. It's going to work out a plan
+21:17 
+
+21:17 and it's only going to use the knowledge
+21:20 
+
+21:20 sources
+21:24 
+
+21:24 what is needed.
+21:30 
+
+21:30 So that's with low and medium.
+21:33 
+
+21:33 So minimal sure whatever I ask it it's
+21:36 
+
+21:36 just going to ask all of them. low and
+21:38 
+
+21:38 medium is going to look at the knowledge
+21:40 
+
+21:40 source descriptions.
+21:42 
+
+21:42 It's going to look at the knowledge base
+21:44 
+
+21:44 retrieval instructions
+21:46 
+
+21:46 to assess well based on what I'm being
+21:48 
+
+21:48 asked, what is the best way, the most
+21:52 
+
+21:52 efficient way to work this out. And it's
+21:55 
+
+21:55 not just going to pass the query you
+21:56 
+
+21:56 asked it. It's going to go and maybe
+21:58 
+
+21:58 break that into sub queries and send it
+22:01 
+
+22:01 to different knowledge sources to get
+22:04 
+
+22:04 the answer. That's where the agentic
+22:05 
+
+22:05 part comes in. So, it's going to be
+22:07 
+
+22:07 selective about which knowledge sources
+22:10 
+
+22:10 it's going to use. If it's a really
+22:11 
+
+22:11 simple question, it may just pick a
+22:13 
+
+22:13 single knowledge source. If it's a more
+22:15 
+
+22:15 complex question, then sure, maybe it
+22:16 
+
+22:16 has to ask multiple knowledge sources.
+22:19 
+
+22:19 And it's why it's so important to have
+22:22 
+
+22:22 quality descriptions. So when I look at
+22:24 
+
+22:24 this,
+22:26 
+
+22:26 if I was jump out, I have multiple ones.
+22:29 
+
+22:29 Again,
+22:31 
+
+22:31 if I look at my knowledge source, so say
+22:34 
+
+22:34 YouTube,
+22:35 
+
+22:35 I give it a description
+22:38 
+
+22:38 transcripts from John S's technical
+22:40 
+
+22:40 training YouTube channel content
+22:43 
+
+22:43 because that's the understanding
+22:47 
+
+22:47 that the model used to say which
+22:49 
+
+22:49 knowledge sources it should use. That's
+22:52 
+
+22:52 how it's going to make that decision.
+22:54 
+
+22:54 This one is just search of web
+22:56 
+
+22:56 information. So I'm giving it a
+22:58 
+
+22:58 description to the knowledge sources
+23:00 
+
+23:00 because it's going to help the model
+23:02 
+
+23:02 when it's trying to do its train of
+23:03 
+
+23:03 thought when it's going to work out its
+23:04 
+
+23:04 plan. Well, which of the knowledge
+23:06 
+
+23:06 sources should I actually use? And then
+23:09 
+
+23:09 I can add in instructions to my
+23:11 
+
+23:11 knowledge base. So I'm guiding it. Look,
+23:14 
+
+23:14 if it's about technical items,
+23:16 
+
+23:16 prioritize using
+23:19 
+
+23:19 my YouTube knowledge source first all
+23:21 
+
+23:21 the time. If you can't find an answer,
+23:24 
+
+23:24 then you're allowed to use KS web. So,
+23:26 
+
+23:26 I'm giving it very specific guidance of
+23:30 
+
+23:30 how I want it to go about
+23:33 
+
+23:33 actually answering and solving that
+23:36 
+
+23:36 problem. So, the whole point of this
+23:38 
+
+23:38 agentic, this multihop is it's going to
+23:41 
+
+23:41 create a query plan. that train of
+23:42 
+
+23:42 thought it's going to work out different
+23:44 
+
+23:44 queries that are most applicable to the
+23:47 
+
+23:47 knowledge sources it's going to select
+23:48 
+
+23:48 and then it executes it. Now what's nice
+23:51 
+
+23:51 here is if I do medium
+23:57 
+
+23:57 it also then does a self reflection.
+24:03 
+
+24:03 So what that means is it's done this
+24:05 
+
+24:05 plan. queried the particular knowledge
+24:08 
+
+24:08 sources it selected gets the results
+24:10 
+
+24:10 back with medium effort it looks at
+24:13 
+
+24:13 those art results looks at what it was
+24:16 
+
+24:16 trying to do and says have I solved it
+24:19 
+
+24:19 if it doesn't think it has it can do a
+24:22 
+
+24:22 second follow-up pass to try and get a
+24:26 
+
+24:26 better output now obviously it's going
+24:28 
+
+24:28 to use more tokens it's going to have a
+24:30 
+
+24:30 longer lag it's therefore going to cost
+24:32 
+
+24:32 more money but I'm going to get a much
+24:34 
+
+24:34 higher quality of response want. So, you
+24:37 
+
+24:37 get to pick what is that effort I want
+24:40 
+
+24:40 to do.
+24:42 
+
+24:42 And Microsoft has a really nice sort of
+24:44 
+
+24:44 deep techy article and I'll put it in
+24:47 
+
+24:47 the link of the video, but it talks
+24:49 
+
+24:49 about that medium,
+24:52 
+
+24:52 low, and minimal.
+24:54 
+
+24:54 So, if I do that minimal,
+24:57 
+
+24:57 it's not doing any source selection.
+24:60 
+
+24:60 It's not doing any planning. Just
+25:01 
+
+25:01 doesn't do it. It just searches them
+25:03 
+
+25:03 all. Super super basic.
+25:07 
+
+25:07 it doesn't use the web uh as a knowledge
+25:09 
+
+25:09 source grounding. But as soon as I go to
+25:12 
+
+25:12 that low and medium,
+25:14 
+
+25:14 well, now it does do source selection.
+25:16 
+
+25:16 It does do query planning. And then
+25:19 
+
+25:19 really the big difference is we get this
+25:22 
+
+25:22 reflective additional retrieval step
+25:27 
+
+25:27 and additional um classifying as part of
+25:31 
+
+25:31 those responses. So we get additional
+25:34 
+
+25:34 rich capabilities on top of that.
+25:39 
+
+25:39 Now another thing we get
+25:42 
+
+25:42 is you may have noticed as part of the
+25:46 
+
+25:46 knowledge base configuration.
+25:51 
+
+25:51 Well this time it's grayed out. It's
+25:54 
+
+25:54 just answer symphysis.
+25:56 
+
+25:56 The reason it's grayed out and it's
+25:58 
+
+25:58 answer symphysis is because one of my
+26:01 
+
+26:01 knowledge sources is web. If it's web,
+26:05 
+
+26:05 it has to be answer symphysis and it
+26:09 
+
+26:09 won't let me do minimal reasoning.
+26:13 
+
+26:13 But if I don't have web,
+26:19 
+
+26:19 I have a choice.
+26:21 
+
+26:21 I have extractive data and I have answer
+26:26 
+
+26:26 symphysis.
+26:29 
+
+26:29 Answer synthesis is only available with
+26:33 
+
+26:33 low and medium. So if I change this to
+26:36 
+
+26:36 answer symphysis, you'll notice I can't
+26:38 
+
+26:38 select minimal anymore.
+26:40 
+
+26:40 Go back to extractive data for now. So
+26:42 
+
+26:42 what is this all about? What what is
+26:44 
+
+26:44 this point?
+26:49 
+
+26:49 We talked about
+26:52 
+
+26:52 before we have a particular API request
+26:54 
+
+26:54 and that particular API request was just
+26:56 
+
+26:56 asking indexes and that's why it would
+26:59 
+
+26:59 ask
+27:01 
+
+27:01 with boundary IQ
+27:04 
+
+27:04 my API
+27:07 
+
+27:07 it's still the Azure AI search resource
+27:09 
+
+27:09 but instead of it being indexes what
+27:12 
+
+27:12 we're going to change it to most of the
+27:13 
+
+27:13 time
+27:17 
+
+27:17 is knowledge bases. is there's also
+27:19 
+
+27:19 knowledge sources. I think there's
+27:21 
+
+27:21 knowledge retrievalss
+27:23 
+
+27:23 but as part of that I have two choices
+27:27 
+
+27:27 into how it returns.
+27:30 
+
+27:30 So option one
+27:37 
+
+27:37 is extractive
+27:41 
+
+27:41 data
+27:43 
+
+27:43 and that's kind of what we're used to in
+27:46 
+
+27:46 the old Azure AI search.
+27:50 
+
+27:50 I'm going to make some requests. So very
+27:52 
+
+27:52 common this would be for example
+27:56 
+
+27:56 um if this was foundry for
+28:01 
+
+28:01 and it was the agent service.
+28:05 
+
+28:05 So I have a generative model. It just is
+28:08 
+
+28:08 asking for
+28:10 
+
+28:10 give me some data. I'm then going to
+28:12 
+
+28:12 reason over it. I'm then going to come
+28:14 
+
+28:14 up with the answers cuz I'm using it a
+28:16 
+
+28:16 certain way. I just want you to give me
+28:18 
+
+28:18 a set of data back that's most
+28:20 
+
+28:20 applicable.
+28:21 
+
+28:21 So this option one is just extractive
+28:24 
+
+28:24 data. And we'll let's see this in
+28:26 
+
+28:26 action. So if we jump back over. So
+28:29 
+
+28:29 right now I have it in that mode
+28:32 
+
+28:32 extractive data. So if I go and look at
+28:35 
+
+28:35 my agent
+28:38 
+
+28:38 and I'm using that knowledge base right
+28:41 
+
+28:41 now you can see I've added knowledge.
+28:43 
+
+28:43 It's that just basic one. If I go and
+28:46 
+
+28:46 ask it a question uh what is express
+28:49 
+
+28:49 route?
+28:54 
+
+28:54 So, it's going to go and use that
+28:55 
+
+28:55 knowledge base.
+28:58 
+
+28:58 It's asking my approval. Now, you can
+29:02 
+
+29:02 change it. So, you don't have to keep
+29:03 
+
+29:03 doing this, but I wanted you to see it.
+29:05 
+
+29:05 So, I'm going to keep approving only
+29:07 
+
+29:07 once.
+29:09 
+
+29:09 So, it's going to go and call that
+29:11 
+
+29:11 knowledge base with these requests
+29:17 
+
+29:17 and we'll get the answer back.
+29:20 
+
+29:20 But what I want to do is go and look at
+29:22 
+
+29:22 the debug to see exactly what gets sent
+29:25 
+
+29:25 back from that Azure AI search request.
+29:30 
+
+29:30 So if I look at debug
+29:33 
+
+29:33 and I actually look at the usage of the
+29:35 
+
+29:35 knowledge base. So we can see it made
+29:37 
+
+29:37 the request.
+29:39 
+
+29:39 But look at what we get back. What we
+29:41 
+
+29:41 get back
+29:43 
+
+29:43 is just a set of chunks.
+29:46 
+
+29:46 We got 11 documents retrieved. It's just
+29:50 
+
+29:50 sending us
+29:52 
+
+29:52 a bunch of data back. That that's all we
+29:55 
+
+29:55 get. And then my model can do what it
+29:59 
+
+29:59 normally does is use that as part of its
+30:03 
+
+30:03 decision. Great.
+30:06 
+
+30:06 The other option I can do
+30:09 
+
+30:09 is I can think about answer synthesis.
+30:12 
+
+30:12 So if answer symphysis imagine now
+30:17 
+
+30:17 it is something else it's just maybe a
+30:20 
+
+30:20 chat app. So I've written my own little
+30:22 
+
+30:22 chat. Actually I don't want to use that
+30:23 
+
+30:23 color different color.
+30:26 
+
+30:26 So I just write some kind of chat
+30:28 
+
+30:28 application
+30:30 
+
+30:30 and my chat app wants to make a response
+30:33 
+
+30:33 and really I just want the answer back.
+30:36 
+
+30:36 So here my second option
+30:39 
+
+30:39 is that answer
+30:44 
+
+30:44 synthesis.
+30:46 
+
+30:46 It's going to give me a generated answer
+30:49 
+
+30:49 based on the various knowledge things it
+30:52 
+
+30:52 finds. So then it can just return it as
+30:54 
+
+30:54 is. It doesn't have to then go and do
+30:56 
+
+30:56 anything else. It just wants me to give
+30:58 
+
+30:58 it the answer. So if now if we go and
+31:00 
+
+31:00 look and this time I'll change it. So
+31:05 
+
+31:05 remember we our other knowledge sources
+31:06 
+
+31:06 e I could just change my existing one.
+31:09 
+
+31:09 But if I look at my second one that uses
+31:11 
+
+31:11 both my index and the web. This one cuz
+31:14 
+
+31:14 it's using the web is always doing
+31:15 
+
+31:15 answer synthesis. So I would change my
+31:18 
+
+31:18 agent
+31:20 
+
+31:20 to not use that and instead
+31:25 
+
+31:25 we'll add that one.
+31:29 
+
+31:29 We'll ask it the same question.
+31:37 
+
+31:37 And what we should see this time, yep,
+31:40 
+
+31:40 prove
+31:42 
+
+31:42 is we'll actually get a generated answer
+31:46 
+
+31:46 and then it will tell us the information
+31:47 
+
+31:47 it used as references, but it's actually
+31:50 
+
+31:50 going to give the answer as part of its
+31:54 
+
+31:54 response in that natural language. It's
+31:56 
+
+31:56 going to work it out for us. So, it's
+31:57 
+
+31:57 doing that full answer synthesis. So I
+31:60 
+
+31:60 as a more basic AI app wouldn't have to
+32:03 
+
+32:03 then do anything else. It's just giving
+32:05 
+
+32:05 me the complete answer. You can see it's
+32:07 
+
+32:07 taking a little bit longer
+32:11 
+
+32:11 and it's throwing out some output. But
+32:13 
+
+32:13 now if we look at the debug
+32:16 
+
+32:16 and I look at what it actually did this
+32:19 
+
+32:19 time,
+32:22 
+
+32:22 if I look at the information,
+32:26 
+
+32:26 it's giving me the description. It's
+32:28 
+
+32:28 this is the answer. It's just throwing
+32:30 
+
+32:30 out a complete answer and then
+32:34 
+
+32:34 it's telling me the various sources it
+32:37 
+
+32:37 used.
+32:39 
+
+32:39 So it behaves in a very different way.
+32:43 
+
+32:43 So you pick, you decide what is it you
+32:45 
+
+32:45 want it to do based on how is it going
+32:49 
+
+32:49 to be in used. So the key point here
+32:51 
+
+32:51 again, if I'm writing a rich agent, I
+32:54 
+
+32:54 probably just want the data back. I
+32:56 
+
+32:56 don't want it to then extrapolate out
+32:58 
+
+32:58 answers. So, I would want to just use
+33:01 
+
+33:01 the extractive data option for it. Just
+33:03 
+
+33:03 give me the information that's most
+33:05 
+
+33:05 relevant. Hey, a more basic chat thing.
+33:08 
+
+33:08 Sure. Maybe I actually want it to go
+33:09 
+
+33:09 ahead and create the full answer for me.
+33:12 
+
+33:12 There's actually a nicer demonstration
+33:14 
+
+33:14 someone in the product group wrote. So,
+33:16 
+
+33:16 we'll look at this. So, this is doing
+33:18 
+
+33:18 the same thing. It's using a knowledge
+33:19 
+
+33:19 base. If I look at the settings,
+33:22 
+
+33:22 you can see they've got three different
+33:24 
+
+33:24 knowledge sources, blob, one lake, and
+33:26 
+
+33:26 the web.
+33:28 
+
+33:28 Um, because it's using the web, it's
+33:30 
+
+33:30 going to have to be answer synthesis.
+33:33 
+
+33:33 It's using a medium reasoning effort,
+33:35 
+
+33:35 and you can just ask it a certain
+33:36 
+
+33:36 question.
+33:39 
+
+33:39 But what this actually does is they've
+33:40 
+
+33:40 added some additional information about
+33:43 
+
+33:43 what
+33:44 
+
+33:44 Azure AI search I foundry IQ is actually
+33:47 
+
+33:47 doing behind the scenes to get the
+33:49 
+
+33:49 answer and it can show you the number of
+33:51 
+
+33:51 passes it's doing the iterations.
+33:55 
+
+33:55 It's a really cool just way of seeing
+33:57 
+
+33:57 everything that is going on. So here I
+33:60 
+
+33:60 can see okay
+34:03 
+
+34:03 it did two iterations so two distinct
+34:05 
+
+34:05 planning cycles 11 different activities
+34:09 
+
+34:09 60 different retrieval calls I can see
+34:11 
+
+34:11 the lapse time the planning tokens
+34:15 
+
+34:15 I can see the query planning steps what
+34:17 
+
+34:17 it actually did as part of the requests
+34:20 
+
+34:20 what it did on the second iteration some
+34:23 
+
+34:23 additional queries it made and then
+34:26 
+
+34:26 spell out the answer and all of the
+34:28 
+
+34:28 various ious references to it. So it's
+34:31 
+
+34:31 just a an example. You can kind of see
+34:34 
+
+34:34 some of the power that is really going
+34:36 
+
+34:36 into it.
+34:38 
+
+34:38 So in summary, the whole point here is
+34:42 
+
+34:42 that Foundry IQ
+34:45 
+
+34:45 brings the ability to just query the
+34:47 
+
+34:47 knowledge base and that knowledge base
+34:49 
+
+34:49 gives me that single queryable entity
+34:53 
+
+34:53 that will then intelligently utilize all
+34:55 
+
+34:55 the available knowledge sources that can
+34:57 
+
+34:57 be hey local.
+35:00 
+
+35:00 I can use remote and I just gives me a
+35:04 
+
+35:04 list of the most relevant data. So I get
+35:07 
+
+35:07 a high quality inferencing from my agent
+35:11 
+
+35:11 or app or it can just synthesize the
+35:14 
+
+35:14 full answer and that's the whole goal of
+35:18 
+
+35:18 all of this.
+35:20 
+
+35:20 Um you see these interesting things
+35:22 
+
+35:22 about data and information and knowledge
+35:24 
+
+35:24 and wisdom and the goal of all of this
+35:28 
+
+35:28 is to build on top of that. So we're
+35:29 
+
+35:29 used to the idea of just like raw data
+35:33 
+
+35:33 and then we do certain amount of
+35:35 
+
+35:35 processing
+35:37 
+
+35:37 to actually get useful information that
+35:40 
+
+35:40 we can then use. It's why we bring data
+35:43 
+
+35:43 into one lake for example in fabric.
+35:46 
+
+35:46 But then we add additional context. We
+35:50 
+
+35:50 consolidate. We um group it. we
+35:53 
+
+35:53 interpret it which then gives us the
+35:56 
+
+35:56 idea of knowledge
+35:58 
+
+35:58 and it's only once we have knowledge we
+36:02 
+
+36:02 can actually
+36:03 
+
+36:03 reason over it. It's only once we have
+36:06 
+
+36:06 knowledge that I can make judgments
+36:08 
+
+36:08 based on it. So that's that idea of
+36:11 
+
+36:11 wisdom
+36:13 
+
+36:13 which we can apply once we have that
+36:15 
+
+36:15 knowledge and that's what foundry IQ is
+36:17 
+
+36:17 doing. Foundry IQ is giving us
+36:19 
+
+36:19 knowledge. It's why they call it
+36:20 
+
+36:20 knowledge bases. It's knowledge we can
+36:22 
+
+36:22 now leverage in the same way that I can
+36:26 
+
+36:26 think about well fabric IQ
+36:32 
+
+36:32 does the same thing for the data in one
+36:35 
+
+36:35 lake or shortcut to one lake via its
+36:37 
+
+36:37 ontology to make it actually map to real
+36:40 
+
+36:40 enterprise entities. It's the same thing
+36:43 
+
+36:43 work IQ
+36:45 
+
+36:45 is doing for all of the data. Yes, in
+36:48 
+
+36:48 M365, but it adds memory customization,
+36:52 
+
+36:52 richer inferencing. It's all about
+36:54 
+
+36:54 giving you knowledge. And then once I
+36:57 
+
+36:57 have these different now knowledge
+36:58 
+
+36:58 sources, then the AI apps,
+37:05 
+
+37:05 the AI agents I write
+37:12 
+
+37:12 then can provide the wisdom on it and
+37:16 
+
+37:16 that that's the goal. So your AI app and
+37:18 
+
+37:18 agent now gets quality knowledge across
+37:21 
+
+37:21 these so it can now do the right things
+37:24 
+
+37:24 and the whole point is you use them
+37:25 
+
+37:25 together like the work IQ would give you
+37:27 
+
+37:27 an understanding of the full user
+37:29 
+
+37:29 context. Fabric IQ would give you full
+37:32 
+
+37:32 system operational knowledge. Foundry IQ
+37:34 
+
+37:34 would give you the full knowledge around
+37:35 
+
+37:35 any organizational information. So
+37:37 
+
+37:37 together it can really answer any
+37:40 
+
+37:40 question for your AI apps and agents.
+37:43 
+
+37:43 And that was it. Um I hope that was
+37:45 
+
+37:45 useful. As always, till next video, take
+37:47 
+
+37:47 care.
