@@ -90,7 +90,6 @@ else {
 if (Test-Path -Path "$profileDir/functions.ps1") {
     try {
         . "$profileDir/functions.ps1"
-		. "$profileDir/transcript_chunker/transcript_chunker.ps1"
     }
     catch {
         Write-Host "ERROR loading functions.ps1: $_" -ForegroundColor Red
