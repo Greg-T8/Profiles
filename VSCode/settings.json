@@ -693,6 +693,8 @@
     "MD045": false // Omit alternate text from image links
   },
   "markdownlint.run": "onSave",
+  "markdowntable.alignData": false,
+  "markdowntable.alignColumnHeader": false,
   "pasteimg.path": "${currentFileDir}/.img",
   "pasteimg.renderPattern": "<img src='${imagePath}' width=700>",
   "prettyxml.settings.indentSpaceLength": 2,
@@ -1027,6 +1029,8 @@
     "markdown.updateLinksOnFileMove.enabled",
     "markdownlint.run",
     "markdownlint.config",
+    "markdowntable.alignData",
+    "markdowntable.alignColumnHeader",
     "pasteimg.path",
     "pasteimg.renderPattern",
     "prettyxml.settings.indentSpaceLength",
@@ -1082,5 +1086,20 @@
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-  "workbench.tips.enabled": true
+  "workbench.tips.enabled": true,
+  "chat.tools.urls.autoApprove": {
+    "https://github.com": {
+      "approveRequest": false,
+      "approveResponse": true
+    },
+    "https://docs.github.com": {
+      "approveRequest": false,
+      "approveResponse": true
+    },
+    "https://learn.microsoft.com": {
+      "approveRequest": false,
+      "approveResponse": true
+    }
+  },
+  "chat.agent.maxRequests": 200
 }
