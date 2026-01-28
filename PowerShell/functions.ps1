@@ -724,3 +724,483 @@ function Install-WSLDistribution {
     Write-Host "`nTo start the distribution, run: wsl -d $Name" -ForegroundColor Yellow
     Write-Host "To set it as default, run: wsl" '--set-default' "$Name" -ForegroundColor Yellow
 }
+
+# ============================================================================
+# AZURE CLI PROFILE MANAGEMENT
+# ============================================================================
+# Functions for managing multiple Azure CLI contexts across accounts/tenants.
+# Uses separate AZURE_CONFIG_DIR per profile to isolate token caches and
+# prevent context bleeding between tenants.
+# ============================================================================
+
+function Get-AzProfiles {
+    <#
+    .SYNOPSIS
+        Lists all configured Azure CLI profiles from WorkConfig.
+    .DESCRIPTION
+        Displays available Azure profiles with their description, account, and
+        current login status. Profiles are defined in WorkConfig.psd1.
+    .EXAMPLE
+        Get-AzProfiles
+        Lists all available profiles with their status.
+    #>
+    [CmdletBinding()]
+    [OutputType([PSCustomObject[]])]
+    param()
+
+    # Validate that Work configuration is loaded
+    if (-not $Work -or -not $Work.AzureProfiles) {
+        Write-Warning "No Azure profiles configured. Add AzureProfiles section to WorkConfig.psd1"
+        return
+    }
+
+    # Build output for each profile
+    $profiles = foreach ($name in $Work.AzureProfiles.Keys | Sort-Object) {
+        $profile = $Work.AzureProfiles[$name]
+        $configDir = Join-Path $HOME ".azure\$name"
+        $isLoggedIn = $false
+        $currentUser = $null
+
+        # Check if profile has existing session
+        if (Test-Path -Path "$configDir\azureProfile.json") {
+            $isLoggedIn = $true
+            try {
+                $azProfile = Get-Content "$configDir\azureProfile.json" | ConvertFrom-Json
+                $currentUser = $azProfile.subscriptions[0].user.name
+            }
+            catch {
+                $currentUser = "(cached)"
+            }
+        }
+
+        # Return profile info
+        [PSCustomObject]@{
+            Name        = $name
+            Description = $profile.Description
+            Account     = $profile.Account
+            LoggedIn    = $isLoggedIn
+            CurrentUser = $currentUser
+        }
+    }
+
+    return $profiles
+}
+
+function Get-CurrentAzProfile {
+    <#
+    .SYNOPSIS
+        Shows the current Azure CLI context and profile.
+    .DESCRIPTION
+        Displays which Azure profile is currently active based on AZURE_CONFIG_DIR,
+        and shows the current account/subscription information.
+    .EXAMPLE
+        Get-CurrentAzProfile
+        Shows the current Azure context.
+    #>
+    [CmdletBinding()]
+    [OutputType([PSCustomObject])]
+    param()
+
+    # Get current config directory
+    $currentConfigDir = $env:AZURE_CONFIG_DIR
+    if (-not $currentConfigDir) {
+        $currentConfigDir = Join-Path $HOME ".azure"
+    }
+
+    # Determine profile name from config dir
+    $profileName = Split-Path -Leaf $currentConfigDir
+    if ($profileName -eq ".azure") {
+        $profileName = "(default)"
+    }
+
+    # Try to get current account info
+    $accountInfo = $null
+    try {
+        $accountJson = az account show 2>$null
+        if ($accountJson) {
+            $accountInfo = $accountJson | ConvertFrom-Json
+        }
+    }
+    catch {
+        # Not logged in or az CLI not available
+    }
+
+    # Return current context
+    [PSCustomObject]@{
+        ProfileName    = $profileName
+        ConfigDir      = $currentConfigDir
+        LoggedIn       = ($null -ne $accountInfo)
+        User           = $accountInfo.user.name
+        TenantId       = $accountInfo.tenantId
+        Subscription   = $accountInfo.name
+        SubscriptionId = $accountInfo.id
+    }
+}
+
+function Use-AzProfile {
+    <#
+    .SYNOPSIS
+        Switches to a specified Azure CLI profile.
+    .DESCRIPTION
+        Sets AZURE_CONFIG_DIR to isolate the Azure CLI context for a specific
+        account/tenant combination. Logs in if not already authenticated for
+        that profile.
+    .PARAMETER Name
+        The profile name as defined in WorkConfig.psd1 AzureProfiles section.
+    .PARAMETER Force
+        Forces re-authentication even if already logged in.
+    .PARAMETER SelectAccount
+        Prompts for account selection during login (useful for MFA/CA).
+    .EXAMPLE
+        Use-AzProfile lab
+        Switches to the lab profile.
+    .EXAMPLE
+        Use-AzProfile qu -Force
+        Forces re-authentication to the Quisitive profile.
+    .EXAMPLE
+        azp lab
+        Uses the alias to quickly switch profiles.
+    #>
+    [CmdletBinding()]
+    [OutputType([PSCustomObject])]
+    param(
+        [Parameter(Mandatory, Position = 0)]
+        [string]$Name,
+
+        [Parameter()]
+        [switch]$Force,
+
+        [Parameter()]
+        [switch]$SelectAccount
+    )
+
+    # Validate that Work configuration is loaded
+    if (-not $Work -or -not $Work.AzureProfiles) {
+        Write-Error "No Azure profiles configured. Add AzureProfiles section to WorkConfig.psd1"
+        return
+    }
+
+    # Get the profile configuration
+    $profile = $Work.AzureProfiles[$Name]
+    if (-not $profile) {
+        $availableProfiles = $Work.AzureProfiles.Keys -join ', '
+        Write-Error "Profile '$Name' not found. Available profiles: $availableProfiles"
+        return
+    }
+
+    # Set the config directory for this profile
+    $configDir = Join-Path $HOME ".azure\$Name"
+    $env:AZURE_CONFIG_DIR = $configDir
+
+    Write-Host "Switching to profile: " -NoNewline
+    Write-Host $Name -ForegroundColor Cyan -NoNewline
+    Write-Host " ($($profile.Description))"
+
+    # Check if we need to login
+    $needsLogin = $Force.IsPresent
+
+    if (-not $needsLogin) {
+        try {
+            $null = az account show 2>$null
+            if ($LASTEXITCODE -ne 0) {
+                $needsLogin = $true
+            }
+        }
+        catch {
+            $needsLogin = $true
+        }
+    }
+
+    # Perform login if needed
+    if ($needsLogin) {
+        Write-Host "Logging in to tenant: $($profile.TenantId)" -ForegroundColor Yellow
+
+        $loginArgs = @('login', '--tenant', $profile.TenantId)
+
+        # Add account selection prompt if requested
+        if ($SelectAccount.IsPresent) {
+            $loginArgs += '--prompt'
+            $loginArgs += 'select_account'
+        }
+
+        az @loginArgs
+
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "Login failed for profile '$Name'"
+            return
+        }
+    }
+
+    # Set subscription if configured
+    if ($profile.SubscriptionId) {
+        az account set --subscription $profile.SubscriptionId 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "Could not set subscription: $($profile.SubscriptionId)"
+        }
+    }
+
+    # Show current context
+    $accountInfo = az account show -o json 2>$null | ConvertFrom-Json
+
+    # Validate we're in the expected tenant
+    if ($accountInfo.tenantId -ne $profile.TenantId) {
+        Write-Warning "Tenant mismatch! Expected: $($profile.TenantId), Got: $($accountInfo.tenantId)"
+    }
+
+    # Return context info
+    [PSCustomObject]@{
+        Profile        = $Name
+        User           = $accountInfo.user.name
+        TenantId       = $accountInfo.tenantId
+        Subscription   = $accountInfo.name
+        SubscriptionId = $accountInfo.id
+    }
+}
+
+# Create alias for quick access
+Set-Alias -Name azp -Value Use-AzProfile -Scope Global
+
+# Register argument completer for Use-AzProfile profile names
+Register-ArgumentCompleter -CommandName Use-AzProfile -ParameterName Name -ScriptBlock {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+
+    if ($Work -and $Work.AzureProfiles) {
+        $Work.AzureProfiles.Keys | Where-Object { $_ -like "$wordToComplete*" } | ForEach-Object {
+            $description = $Work.AzureProfiles[$_].Description
+            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $description)
+        }
+    }
+}
+
+function New-AzProfile {
+    <#
+    .SYNOPSIS
+        Creates a new Azure CLI profile by logging in and capturing context.
+    .DESCRIPTION
+        Logs into Azure with a specified tenant, captures the account details,
+        and adds the profile to the in-memory configuration. Optionally saves
+        the profile to WorkConfig.psd1.
+    .PARAMETER Name
+        Short name for the profile (e.g., 'contoso', 'lab2').
+    .PARAMETER TenantId
+        The Azure AD tenant ID to log into.
+    .PARAMETER Description
+        A description for this profile.
+    .PARAMETER SubscriptionId
+        Optional subscription ID to set as default for this profile.
+    .PARAMETER Save
+        Saves the profile to WorkConfig.psd1 for persistence across sessions.
+    .EXAMPLE
+        New-AzProfile -Name 'contoso' -TenantId 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx' -Description 'Contoso Corp'
+        Creates a new profile and logs in.
+    .EXAMPLE
+        New-AzProfile -Name 'newclient' -TenantId 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx' -Description 'New Client' -Save
+        Creates a profile and saves it to WorkConfig.psd1.
+    #>
+    [CmdletBinding()]
+    [OutputType([PSCustomObject])]
+    param(
+        [Parameter(Mandatory, Position = 0)]
+        [string]$Name,
+
+        [Parameter(Mandatory)]
+        [string]$TenantId,
+
+        [Parameter(Mandatory)]
+        [string]$Description,
+
+        [Parameter()]
+        [string]$SubscriptionId,
+
+        [Parameter()]
+        [switch]$Save
+    )
+
+    # Validate Work configuration exists
+    if (-not $Work) {
+        Write-Error "Work configuration not loaded. Cannot create profile."
+        return
+    }
+
+    # Initialize AzureProfiles if it doesn't exist
+    if (-not $Work.AzureProfiles) {
+        $Work.AzureProfiles = @{}
+    }
+
+    # Check if profile already exists
+    if ($Work.AzureProfiles.ContainsKey($Name)) {
+        Write-Error "Profile '$Name' already exists. Use a different name or remove the existing profile first."
+        return
+    }
+
+    # Set the config directory for this profile
+    $configDir = Join-Path $HOME ".azure\$Name"
+    $env:AZURE_CONFIG_DIR = $configDir
+
+    Write-Host "Creating new profile: " -NoNewline
+    Write-Host $Name -ForegroundColor Cyan
+    Write-Host "Logging in to tenant: $TenantId" -ForegroundColor Yellow
+
+    # Perform login with account selection
+    az login --tenant $TenantId --prompt select_account
+
+    if ($LASTEXITCODE -ne 0) {
+        Write-Error "Login failed. Profile not created."
+        return
+    }
+
+    # Get account info after login
+    $accountInfo = az account show -o json 2>$null | ConvertFrom-Json
+
+    if (-not $accountInfo) {
+        Write-Error "Could not retrieve account information. Profile not created."
+        return
+    }
+
+    # If subscription ID provided, set it
+    if ($SubscriptionId) {
+        az account set --subscription $SubscriptionId 2>$null
+        if ($LASTEXITCODE -ne 0) {
+            Write-Warning "Could not set subscription: $SubscriptionId. Using default."
+            $SubscriptionId = $accountInfo.id
+        }
+        else {
+            # Refresh account info after setting subscription
+            $accountInfo = az account show -o json 2>$null | ConvertFrom-Json
+        }
+    }
+    else {
+        $SubscriptionId = $accountInfo.id
+    }
+
+    # Create the profile entry
+    $newProfile = @{
+        Account        = $accountInfo.user.name
+        TenantId       = $accountInfo.tenantId
+        SubscriptionId = $SubscriptionId
+        Description    = $Description
+    }
+
+    # Add to in-memory configuration
+    $Work.AzureProfiles[$Name] = $newProfile
+
+    Write-Host "`nProfile created successfully!" -ForegroundColor Green
+    Write-Host "  Name:         $Name"
+    Write-Host "  Account:      $($newProfile.Account)"
+    Write-Host "  Tenant:       $($newProfile.TenantId)"
+    Write-Host "  Subscription: $($accountInfo.name) ($SubscriptionId)"
+
+    # Save to WorkConfig.psd1 if requested
+    if ($Save.IsPresent) {
+        $configPath = "$env:OneDriveCommercial/Code/PowerShell/WorkConfig.psd1"
+
+        if (Test-Path $configPath) {
+            Write-Host "`nTo persist this profile, add the following to WorkConfig.psd1:" -ForegroundColor Yellow
+            Write-Host @"
+
+        '$Name' = @{
+            Account        = '$($newProfile.Account)'
+            TenantId       = '$($newProfile.TenantId)'
+            SubscriptionId = '$SubscriptionId'
+            Description    = '$Description'
+        }
+"@ -ForegroundColor Cyan
+
+            $addToFile = Read-Host "`nAdd to WorkConfig.psd1 now? (y/N)"
+            if ($addToFile -eq 'y') {
+                # Read the current file content
+                $content = Get-Content $configPath -Raw
+
+                # Find the AzureProfiles section and add the new profile
+                $profileEntry = @"
+
+        '$Name' = @{
+            Account        = '$($newProfile.Account)'
+            TenantId       = '$($newProfile.TenantId)'
+            SubscriptionId = '$SubscriptionId'
+            Description    = '$Description'
+        }
+"@
+                # Insert before the closing of AzureProfiles (look for the template comment or closing brace)
+                $insertPattern = "        # Template for adding new profiles:"
+                if ($content -match [regex]::Escape($insertPattern)) {
+                    $content = $content -replace [regex]::Escape($insertPattern), "$profileEntry`n`n        # Template for adding new profiles:"
+                    Set-Content -Path $configPath -Value $content -NoNewline
+                    Write-Host "Profile saved to WorkConfig.psd1" -ForegroundColor Green
+                }
+                else {
+                    Write-Warning "Could not auto-insert. Please add manually."
+                }
+            }
+        }
+    }
+
+    # Return the profile info
+    [PSCustomObject]@{
+        Profile        = $Name
+        Account        = $newProfile.Account
+        TenantId       = $newProfile.TenantId
+        Subscription   = $accountInfo.name
+        SubscriptionId = $SubscriptionId
+        Description    = $Description
+    }
+}
+
+function Remove-AzProfile {
+    <#
+    .SYNOPSIS
+        Removes an Azure CLI profile configuration directory.
+    .DESCRIPTION
+        Removes the Azure CLI config directory for the specified profile and
+        optionally removes it from the in-memory configuration.
+    .PARAMETER Name
+        The profile name to remove.
+    .PARAMETER KeepConfig
+        Keeps the profile in WorkConfig (only removes the local config dir).
+    .EXAMPLE
+        Remove-AzProfile -Name 'oldclient'
+        Removes the profile's config directory.
+    #>
+    [CmdletBinding(SupportsShouldProcess)]
+    param(
+        [Parameter(Mandatory, Position = 0)]
+        [string]$Name,
+
+        [Parameter()]
+        [switch]$KeepConfig
+    )
+
+    $configDir = Join-Path $HOME ".azure\$Name"
+
+    # Remove config directory if it exists
+    if (Test-Path $configDir) {
+        if ($PSCmdlet.ShouldProcess($configDir, "Remove Azure config directory")) {
+            Remove-Item -Path $configDir -Recurse -Force
+            Write-Host "Removed config directory: $configDir" -ForegroundColor Green
+        }
+    }
+    else {
+        Write-Host "Config directory not found: $configDir" -ForegroundColor Yellow
+    }
+
+    # Remove from in-memory config unless KeepConfig is specified
+    if (-not $KeepConfig.IsPresent -and $Work -and $Work.AzureProfiles) {
+        if ($Work.AzureProfiles.ContainsKey($Name)) {
+            $Work.AzureProfiles.Remove($Name)
+            Write-Host "Removed profile from in-memory configuration" -ForegroundColor Green
+            Write-Host "Note: To remove from WorkConfig.psd1, edit the file manually." -ForegroundColor Yellow
+        }
+    }
+}
+
+# Register argument completer for New-AzProfile and Remove-AzProfile
+Register-ArgumentCompleter -CommandName Remove-AzProfile -ParameterName Name -ScriptBlock {
+    param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
+
+    if ($Work -and $Work.AzureProfiles) {
+        $Work.AzureProfiles.Keys | Where-Object { $_ -like "$wordToComplete*" } | ForEach-Object {
+            $description = $Work.AzureProfiles[$_].Description
+            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $description)
+        }
+    }
+}
