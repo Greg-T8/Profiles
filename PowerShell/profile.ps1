@@ -129,6 +129,7 @@ Set-Alias -Name ll -Value Get-ChildItem -Force
 Set-Alias -Name cfj -Value ConvertFrom-Json
 Set-Alias -Name tf -Value terraform
 Set-Alias -Name gim -Value Get-InstalledModule
+Set-Alias -Name tnc -Value Test-NetConnection
 Remove-Item Alias:dir -ErrorAction SilentlyContinue
 
 # Docker aliases
