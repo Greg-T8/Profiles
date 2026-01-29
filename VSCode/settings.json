@@ -686,6 +686,7 @@
   "markdown.preview.scrollPreviewWithEditor": true,
   "markdown.updateLinksOnFileMove.enabled": "always",
   "markdownlint.config": {
+    "MD004": false, // Disable unordered list style rule
     "MD013": false, // Disable line length rule
     "MD024": false, // Allow multiple headers with the same name
     "MD033": false, // Allow inline HTML
