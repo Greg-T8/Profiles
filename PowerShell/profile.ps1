@@ -97,28 +97,16 @@ if (Test-Path -Path "$profileDir/functions.ps1") {
     }
 }
 
+# Load personal configuration
+$personalConfigPath = "$env:OneDriveConsumer/Documents/PowerShell/Config/PersonalConfig.psd1"
+if (Test-Path -Path $personalConfigPath) {
+    $Personal = Import-PowerShellDataFile -Path $personalConfigPath
+}
+
 # Load work configuration
-if (Test-Path -Path $env:OneDriveCommercial/Code/PowerShell/WorkConfig.psd1) {
-    $Work = Import-PowerShellDataFile -Path $env:OneDriveCommercial/Code/PowerShell/WorkConfig.psd1
-
-    # Sort work configuration keys
-    $orderedAccounts = [ordered]@{}
-    foreach ($key in $Work.Accounts.Keys | Sort-Object) {
-        $orderedAccounts[$key] = $Work.Accounts[$key]
-    }
-    $Work.Accounts = $orderedAccounts
-
-    $orderedTenantIds = [ordered]@{}
-    foreach ($key in $Work.TenantIds.Keys | Sort-Object) {
-        $orderedTenantIds[$key] = $Work.TenantIds[$key]
-    }
-    $Work.TenantIds = $orderedTenantIds
-
-    $orderedSubscriptionIds = [ordered]@{}
-    foreach ($key in $Work.SubscritpionIds.Keys | Sort-Object) {
-        $orderedSubscriptionIds[$key] = $Work.SubscritpionIds[$key]
-    }
-    $Work.SubscritpionIds = $orderedSubscriptionIds
+$workConfigPath = "$env:OneDriveCommercial/Code/PowerShell/Config/WorkConfig.psd1"
+if (Test-Path -Path $workConfigPath) {
+    $Work = Import-PowerShellDataFile -Path $workConfigPath
 }
 
 # ============================================================================

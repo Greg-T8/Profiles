@@ -123,7 +123,8 @@
   "chat.tools.terminal.autoApprove": {
     "$lines": true,
     "\"Total": true,
-    "\"Line": true
+    "\"Line": true,
+    ".\\New-VideoNotes.ps1": true
   },
   "chat.viewSessions.orientation": "stacked",
   "dashboard.displayProjectPath": true,
