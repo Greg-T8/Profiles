@@ -768,21 +768,27 @@ function Get-AllAzureProfileConfigs {
 function Get-AzProfiles {
     <#
     .SYNOPSIS
-        Lists Azure CLI profiles from both WorkConfig and the profiles directory.
+        Lists Azure CLI profiles from both PersonalConfig and WorkConfig and the profiles directory.
     .DESCRIPTION
         Scans ~/.azure/profiles directory for existing profile directories and
-        combines with profiles defined in WorkConfig.psd1. Shows login status
-        and configuration details for each profile.
+        combines with profiles defined in PersonalConfig.psd1 and/or WorkConfig.psd1.
+        Shows login status and configuration details for each profile.
+
+        ConfigSource values:
+        - PersonalConfig: Defined in PersonalConfig.psd1 only
+        - WorkConfig: Defined in WorkConfig.psd1 only
+        - Both: Defined in both config files (Personal takes precedence)
+        - DiskOnly: Config directory exists but not in any config file
     .PARAMETER ConfiguredOnly
-        Shows only profiles defined in WorkConfig.psd1.
+        Shows only profiles defined in PersonalConfig or WorkConfig.psd1.
     .PARAMETER DiscoveredOnly
-        Shows only profiles found in ~/.azure/profiles directory.
+        Shows only profiles found in ~/.azure/profiles directory without config.
     .EXAMPLE
         Get-AzProfiles
         Lists all profiles from both sources.
     .EXAMPLE
         Get-AzProfiles -ConfiguredOnly
-        Shows only profiles defined in WorkConfig.psd1.
+        Shows only profiles defined in config files.
     #>
     [CmdletBinding()]
     [OutputType([PSCustomObject[]])]
@@ -796,6 +802,7 @@ function Get-AzProfiles {
 
     $profilesDir = Join-Path $HOME ".azure\profiles"
     $allProfiles = @{}
+    $configSources = @{}  # Track which configs define each profile
 
     # Discover profiles from disk
     if (-not $ConfiguredOnly.IsPresent -and (Test-Path $profilesDir)) {
@@ -825,58 +832,133 @@ function Get-AzProfiles {
                 Name        = $name
                 Description = $null
                 Account     = $null
+                AzConfigDir = $dir.FullName
                 LoggedIn    = $isLoggedIn
                 CurrentUser = $currentUser
                 TenantId    = $tenantId
-                Source      = 'Discovered'
-                Configured  = $false
+                ConfigSource = $null  # Will be set based on config files
             }
+            # Initialize tracking - this is discovered but not yet in any config
+            $configSources[$name] = @()
         }
     }
 
     # Merge with configured profiles from Personal and Work configs
-    $configuredProfiles = Get-AllAzureProfileConfigs
-    if (-not $DiscoveredOnly.IsPresent -and $configuredProfiles.Count -gt 0) {
-        foreach ($name in $configuredProfiles.Keys) {
-            $profile = $configuredProfiles[$name]
-            $configDir = Join-Path $HOME ".azure\profiles\$name"
-            $configFile = Join-Path $configDir "azureProfile.json"
-            $isLoggedIn = Test-Path $configFile
-            $currentUser = $null
+    if (-not $DiscoveredOnly.IsPresent) {
+        # Check Personal config
+        if ($Personal -and $Personal.AzureProfiles) {
+            foreach ($name in $Personal.AzureProfiles.Keys) {
+                $profile = $Personal.AzureProfiles[$name]
+                $configDir = Join-Path $HOME ".azure\profiles\$name"
+                $configFile = Join-Path $configDir "azureProfile.json"
+                $isLoggedIn = Test-Path $configFile
+                $currentUser = $null
 
-            if ($isLoggedIn) {
-                try {
-                    $azProfile = Get-Content $configFile | ConvertFrom-Json
-                    if ($azProfile.subscriptions -and $azProfile.subscriptions.Count -gt 0) {
-                        $currentUser = $azProfile.subscriptions[0].user.name
+                if ($isLoggedIn) {
+                    try {
+                        $azProfile = Get-Content $configFile | ConvertFrom-Json
+                        if ($azProfile.subscriptions -and $azProfile.subscriptions.Count -gt 0) {
+                            $currentUser = $azProfile.subscriptions[0].user.name
+                        }
+                    }
+                    catch {
+                        $currentUser = "(cached)"
                     }
                 }
-                catch {
-                    $currentUser = "(cached)"
+
+                # Track that this profile is in Personal config
+                if (-not $configSources.ContainsKey($name)) {
+                    $configSources[$name] = @()
+                }
+                $configSources[$name] += 'PersonalConfig'
+
+                if ($allProfiles.ContainsKey($name)) {
+                    # Profile already exists (was on disk), update it
+                    $allProfiles[$name].Description = $profile.Description
+                    $allProfiles[$name].Account = $profile.Account
+                    $allProfiles[$name].TenantId = $profile.TenantId
+                }
+                else {
+                    # Add Personal config profile
+                    $allProfiles[$name] = [PSCustomObject]@{
+                        Name        = $name
+                        Description = $profile.Description
+                        Account     = $profile.Account
+                        AzConfigDir = if (Test-Path $configDir) { $configDir } else { $null }
+                        LoggedIn    = $isLoggedIn
+                        CurrentUser = $currentUser
+                        TenantId    = $profile.TenantId
+                        ConfigSource = $null  # Will be set below
+                    }
                 }
             }
+        }
 
-            # Update or add profile
-            if ($allProfiles.ContainsKey($name)) {
-                # Enhance discovered profile with config info
-                $allProfiles[$name].Description = $profile.Description
-                $allProfiles[$name].Account = $profile.Account
-                $allProfiles[$name].Source = 'Both'
-                $allProfiles[$name].Configured = $true
+        # Check Work config
+        if ($Work -and $Work.AzureProfiles) {
+            foreach ($name in $Work.AzureProfiles.Keys) {
+                $profile = $Work.AzureProfiles[$name]
+                $configDir = Join-Path $HOME ".azure\profiles\$name"
+                $configFile = Join-Path $configDir "azureProfile.json"
+                $isLoggedIn = Test-Path $configFile
+                $currentUser = $null
+
+                if ($isLoggedIn) {
+                    try {
+                        $azProfile = Get-Content $configFile | ConvertFrom-Json
+                        if ($azProfile.subscriptions -and $azProfile.subscriptions.Count -gt 0) {
+                            $currentUser = $azProfile.subscriptions[0].user.name
+                        }
+                    }
+                    catch {
+                        $currentUser = "(cached)"
+                    }
+                }
+
+                # Track that this profile is in Work config
+                if (-not $configSources.ContainsKey($name)) {
+                    $configSources[$name] = @()
+                }
+                $configSources[$name] += 'WorkConfig'
+
+                if ($allProfiles.ContainsKey($name)) {
+                    # Profile already exists, update it
+                    $allProfiles[$name].Description = $profile.Description
+                    $allProfiles[$name].Account = $profile.Account
+                    $allProfiles[$name].TenantId = $profile.TenantId
+                }
+                else {
+                    # Add Work config profile
+                    $allProfiles[$name] = [PSCustomObject]@{
+                        Name        = $name
+                        Description = $profile.Description
+                        Account     = $profile.Account
+                        AzConfigDir = if (Test-Path $configDir) { $configDir } else { $null }
+                        LoggedIn    = $isLoggedIn
+                        CurrentUser = $currentUser
+                        TenantId    = $profile.TenantId
+                        ConfigSource = $null  # Will be set below
+                    }
+                }
+            }
+        }
+    }
+
+    # Set ConfigSource based on which config files define each profile
+    foreach ($name in $allProfiles.Keys) {
+        if ($configSources.ContainsKey($name) -and $configSources[$name].Count -gt 0) {
+            if ($configSources[$name].Count -eq 2) {
+                $allProfiles[$name].ConfigSource = 'Both'
+            }
+            elseif ($configSources[$name] -contains 'PersonalConfig') {
+                $allProfiles[$name].ConfigSource = 'PersonalConfig'
             }
             else {
-                # Add configured profile
-                $allProfiles[$name] = [PSCustomObject]@{
-                    Name        = $name
-                    Description = $profile.Description
-                    Account     = $profile.Account
-                    LoggedIn    = $isLoggedIn
-                    CurrentUser = $currentUser
-                    TenantId    = $profile.TenantId
-                    Source      = 'Configured'
-                    Configured  = $true
-                }
+                $allProfiles[$name].ConfigSource = 'WorkConfig'
             }
+        }
+        elseif ($null -ne $allProfiles[$name].AzConfigDir -and -not $configSources.ContainsKey($name)) {
+            $allProfiles[$name].ConfigSource = 'DiskOnly'
         }
     }
 
@@ -1082,6 +1164,8 @@ function New-AzProfile {
         Logs into Azure with a specified tenant, captures the account details,
         and adds the profile to the in-memory configuration. Optionally saves
         the profile to WorkConfig.psd1.
+
+        Can also initialize the config directory for an existing profile defined in config.
     .PARAMETER Name
         Short name for the profile (e.g., 'contoso', 'lab2').
     .PARAMETER TenantId
@@ -1092,52 +1176,87 @@ function New-AzProfile {
         Optional subscription ID to set as default for this profile.
     .PARAMETER Save
         Saves the profile to WorkConfig.psd1 for persistence across sessions.
+    .PARAMETER FromConfig
+        Initializes the config directory for a profile that already exists in PersonalConfig or WorkConfig.
+        When using this, only -Name parameter is required (TenantId and Description are read from config).
     .EXAMPLE
         New-AzProfile -Name 'contoso' -TenantId 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx' -Description 'Contoso Corp'
         Creates a new profile and logs in.
     .EXAMPLE
         New-AzProfile -Name 'newclient' -TenantId 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx' -Description 'New Client' -Save
         Creates a profile and saves it to WorkConfig.psd1.
+    .EXAMPLE
+        New-AzProfile -Name 'lab' -FromConfig
+        Initializes the config directory for the 'lab' profile already defined in PersonalConfig.
     #>
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'NewProfile')]
     [OutputType([PSCustomObject])]
     param(
         [Parameter(Mandatory, Position = 0)]
         [string]$Name,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory, ParameterSetName = 'NewProfile')]
         [string]$TenantId,
 
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory, ParameterSetName = 'NewProfile')]
         [string]$Description,
 
-        [Parameter()]
+        [Parameter(ParameterSetName = 'NewProfile')]
         [string]$SubscriptionId,
 
-        [Parameter()]
-        [switch]$Save
+        [Parameter(ParameterSetName = 'NewProfile')]
+        [switch]$Save,
+
+        [Parameter(ParameterSetName = 'FromConfig')]
+        [switch]$FromConfig
     )
 
-    # Check if profile already exists in either config
-    $allConfiguredProfiles = Get-AllAzureProfileConfigs
-    if ($allConfiguredProfiles.ContainsKey($Name)) {
-        Write-Error "Profile '$Name' already exists. Use a different name or remove the existing profile first."
-        return
+
+    # Handle FromConfig parameter set
+    if ($FromConfig.IsPresent) {
+        # Get all configured profiles
+        $allConfiguredProfiles = Get-AllAzureProfileConfigs
+        if (-not $allConfiguredProfiles.ContainsKey($Name)) {
+            $availableProfiles = $allConfiguredProfiles.Keys -join ', '
+            Write-Error "Profile '$Name' not found in config. Available profiles: $availableProfiles"
+            return
+        }
+
+        $profile = $allConfiguredProfiles[$Name]
+        $TenantId = $profile.TenantId
+        $Description = $profile.Description
+        $SubscriptionId = $profile.SubscriptionId
+
+        Write-Host "Initializing config directory for existing profile: " -NoNewline
+        Write-Host $Name -ForegroundColor Cyan
+        Write-Host "Description: $Description"
+        Write-Host "Tenant:      $TenantId"
+    }
+    else {
+        # New profile parameter set - check if profile already exists
+        $allConfiguredProfiles = Get-AllAzureProfileConfigs
+        if ($allConfiguredProfiles.ContainsKey($Name)) {
+            Write-Error "Profile '$Name' already exists. Use a different name or remove the existing profile first."
+            return
+        }
     }
 
     # Set the config directory for this profile
     $configDir = Join-Path $HOME ".azure\profiles\$Name"
     $env:AZURE_CONFIG_DIR = $configDir
 
-    Write-Host "Creating new profile: " -NoNewline
-    Write-Host $Name -ForegroundColor Cyan
+    if (-not $FromConfig.IsPresent) {
+        Write-Host "Creating new profile: " -NoNewline
+        Write-Host $Name -ForegroundColor Cyan
+    }
+
     Write-Host "Logging in to tenant: $TenantId" -ForegroundColor Yellow
 
     # Perform login with account selection
-    az login --tenant $TenantId --prompt select_account
+    az login --tenant $TenantId
 
     if ($LASTEXITCODE -ne 0) {
-        Write-Error "Login failed. Profile not created."
+        Write-Error "Login failed. Profile initialization failed."
         return
     }
 
@@ -1145,7 +1264,7 @@ function New-AzProfile {
     $accountInfo = az account show -o json 2>$null | ConvertFrom-Json
 
     if (-not $accountInfo) {
-        Write-Error "Could not retrieve account information. Profile not created."
+        Write-Error "Could not retrieve account information. Profile initialization failed."
         return
     }
 
@@ -1156,36 +1275,35 @@ function New-AzProfile {
             Write-Warning "Could not set subscription: $SubscriptionId. Using default."
             $SubscriptionId = $accountInfo.id
         }
-        else {
-            # Refresh account info after setting subscription
-            $accountInfo = az account show -o json 2>$null | ConvertFrom-Json
-        }
     }
     else {
-        $SubscriptionId = $accountInfo.id
+        # Refresh account info after setting subscription
+        $accountInfo = az account show -o json 2>$null | ConvertFrom-Json
     }
 
-    # Create the profile entry
-    $newProfile = @{
-        Account        = $accountInfo.user.name
-        TenantId       = $accountInfo.tenantId
-        SubscriptionId = $SubscriptionId
-        Description    = $Description
-    }
+    # If not using FromConfig, create the profile entry and offer to save
+    if (-not $FromConfig.IsPresent) {
+        # Create the profile entry
+        $newProfile = @{
+            Account        = $accountInfo.user.name
+            TenantId       = $accountInfo.tenantId
+            SubscriptionId = $SubscriptionId
+            Description    = $Description
+        }
 
-    Write-Host "`nProfile created successfully!" -ForegroundColor Green
-    Write-Host "  Name:         $Name"
-    Write-Host "  Account:      $($newProfile.Account)"
-    Write-Host "  Tenant:       $($newProfile.TenantId)"
-    Write-Host "  Subscription: $($accountInfo.name) ($SubscriptionId)"
+        Write-Host "`nProfile created successfully!" -ForegroundColor Green
+        Write-Host "  Name:         $Name"
+        Write-Host "  Account:      $($newProfile.Account)"
+        Write-Host "  Tenant:       $($newProfile.TenantId)"
+        Write-Host "  Subscription: $($accountInfo.name) ($SubscriptionId)"
 
-    # Save to config file if requested
-    if ($Save.IsPresent) {
-        $personalConfigPath = "$env:USERPROFILE/Documents/PowerShell/Config/PersonalConfig.psd1"
-        $workConfigPath = "$env:OneDriveCommercial/Code/PowerShell/Config/WorkConfig.psd1"
+        # Save to config file if requested
+        if ($Save.IsPresent) {
+            $personalConfigPath = "$env:USERPROFILE/Documents/PowerShell/Config/PersonalConfig.psd1"
+            $workConfigPath = "$env:OneDriveCommercial/Code/PowerShell/Config/WorkConfig.psd1"
 
-        Write-Host "`nTo persist this profile, add the following to your config file:" -ForegroundColor Yellow
-        Write-Host @"
+            Write-Host "`nTo persist this profile, add the following to your config file:" -ForegroundColor Yellow
+            Write-Host @"
 
         '$Name' = @{
             Account        = '$($newProfile.Account)'
@@ -1195,24 +1313,24 @@ function New-AzProfile {
         }
 "@ -ForegroundColor Cyan
 
-        Write-Host "`nSave to:" -ForegroundColor Yellow
-        Write-Host "  [1] PersonalConfig.psd1 (personal/lab profiles)"
-        Write-Host "  [2] WorkConfig.psd1 (work/customer profiles)"
-        Write-Host "  [N] Don't save"
-        $choice = Read-Host "Choice"
+            Write-Host "`nSave to:" -ForegroundColor Yellow
+            Write-Host "  [1] PersonalConfig.psd1 (personal/lab profiles)"
+            Write-Host "  [2] WorkConfig.psd1 (work/customer profiles)"
+            Write-Host "  [N] Don't save"
+            $choice = Read-Host "Choice"
 
-        $configPath = switch ($choice) {
-            '1' { $personalConfigPath }
-            '2' { $workConfigPath }
-            default { $null }
-        }
+            $configPath = switch ($choice) {
+                '1' { $personalConfigPath }
+                '2' { $workConfigPath }
+                default { $null }
+            }
 
-        if ($configPath -and (Test-Path $configPath)) {
-            # Read the current file content
-            $content = Get-Content $configPath -Raw
+            if ($configPath -and (Test-Path $configPath)) {
+                # Read the current file content
+                $content = Get-Content $configPath -Raw
 
-            # Find the AzureProfiles section and add the new profile
-            $profileEntry = @"
+                # Find the AzureProfiles section and add the new profile
+                $profileEntry = @"
 
         '$Name' = @{
             Account        = '$($newProfile.Account)'
@@ -1235,15 +1353,33 @@ function New-AzProfile {
     }
 
     # Return the profile info
-    [PSCustomObject]@{
-        Profile        = $Name
-        Account        = $newProfile.Account
-        TenantId       = $newProfile.TenantId
-        Subscription   = $accountInfo.name
-        SubscriptionId = $SubscriptionId
-        Description    = $Description
+    if ($FromConfig.IsPresent) {
+        Write-Host "`nProfile initialized successfully!" -ForegroundColor Green
+        Write-Host "  Name:         $Name"
+        Write-Host "  Account:      $($accountInfo.user.name)"
+        Write-Host "  Tenant:       $($accountInfo.tenantId)"
+        Write-Host "  Subscription: $($accountInfo.name) ($($accountInfo.id))"
+
+        [PSCustomObject]@{
+            Profile        = $Name
+            Account        = $accountInfo.user.name
+            TenantId       = $accountInfo.tenantId
+            Subscription   = $accountInfo.name
+            SubscriptionId = $accountInfo.id
+            Description    = $Description
+        }
     }
-}
+    else {
+        [PSCustomObject]@{
+            Profile        = $Name
+            Account        = $newProfile.Account
+            TenantId       = $newProfile.TenantId
+            Subscription   = $accountInfo.name
+            SubscriptionId = $SubscriptionId
+            Description    = $Description
+        }
+    }
+}}
 
 function Remove-AzProfile {
     <#
