@@ -154,7 +154,7 @@ Set-PSReadLineOption -ContinuationPrompt ''
 
 # PredictionViewStyle requires PSReadLine 2.1.0+ (PowerShell Core)
 if ($PSVersionTable.PSEdition -eq 'Core') {
-    Set-PSReadLineOption -PredictionViewStyle InlineView -ErrorAction SilentlyContinue
+    Set-PSReadLineOption -PredictionViewStyle ListView -ErrorAction SilentlyContinue
 }
 
 # Configure prediction source (edition-specific)
