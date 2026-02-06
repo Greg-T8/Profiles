@@ -502,12 +502,6 @@
   // "github.copilot.chat.codeGeneration.instructions": [],
   // "github.copilot.chat.codeGeneration.useInstructionFiles": true, //Enables use of instruction file in .github/.md
   "github.copilot.chat.commitMessageGeneration.instructions": [
-    {
-      "text": "If any staged files reside under a /Books/<book name>/chapter folder, e.g. ch01, prefix the commit message with the relavent chapter number,e.g Ch01, corresponding to the folder; otherwise, do not include the prefix."
-    },
-    {
-      "text": "Include the prefix 'Notes' in the commit message when modifying markdown files."
-    }
   ],
   "github.copilot.editor.enableCodeActions": true,
   "github.copilot.enable": {
