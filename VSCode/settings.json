@@ -79,6 +79,7 @@
       115
     ],
     "editor.tabSize": 4,
+    "github.copilot.chat.codeGeneration.useInstructionFiles": false,
     "rewrap.wrappingColumn": 115
   },
   "[snippets]": {
@@ -517,6 +518,7 @@
   // "github.copilot.chat.codeGeneration.instructions": [],
   "github.copilot.chat.codeGeneration.useInstructionFiles": false, //Disables auto-insertion of instruction files
   "github.copilot.chat.commitMessageGeneration.instructions": [],
+  "github.copilot.chat.experimental.fileCreation.openInEditor": false,
   "github.copilot.editor.enableCodeActions": true,
   "github.copilot.enable": {
     "*": true,
@@ -994,6 +996,7 @@
     "github.copilot.chat.codeGeneration.instructions",
     "github.copilot.chat.codeGeneration.useInstructionFiles",
     "github.copilot.chat.commitMessageGeneration.instructions",
+    "github.copilot.chat.experimental.fileCreation.openInEditor",
     "github.copilot.chat.search.semanticTextResults",
     "github.copilot.editor.enableAutoCompletions",
     "github.copilot.enable",
