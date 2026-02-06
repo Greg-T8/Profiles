@@ -105,6 +105,7 @@
   "betterAlign.alignAfterTypeEnter": false,
   "betterAlign.indentBase": "firstline",
   "chat.agent.enabled": true,
+  "chat.agent.maxRequests": 200,
   "chat.agent.thinkingStyle": "collapsedPreview",
   "chat.editing.confirmEditRequestRemoval": false,
   "chat.emptyState.history.enabled": true,
@@ -121,10 +122,24 @@
     "C:/Users/gregt/AppData/Roaming/Code/User/prompts": true
   },
   "chat.tools.terminal.autoApprove": {
-    "$lines": true,
-    "\"Total": true,
+    ".\\New-VideoNotes.ps1": true,
     "\"Line": true,
-    ".\\New-VideoNotes.ps1": true
+    "\"Total": true,
+    "$lines": true
+  },
+  "chat.tools.urls.autoApprove": {
+    "https://docs.github.com": {
+      "approveRequest": false,
+      "approveResponse": true
+    },
+    "https://github.com": {
+      "approveRequest": false,
+      "approveResponse": true
+    },
+    "https://learn.microsoft.com": {
+      "approveRequest": false,
+      "approveResponse": true
+    }
   },
   "chat.viewSessions.orientation": "stacked",
   "dashboard.displayProjectPath": true,
@@ -688,10 +703,11 @@
     "MD045": false // Omit alternate text from image links
   },
   "markdownlint.run": "onSave",
-  "markdowntable.alignData": false,
   "markdowntable.alignColumnHeader": false,
+  "markdowntable.alignData": false,
   "pasteimg.path": "${currentFileDir}/.img",
   "pasteimg.renderPattern": "<img src='${imagePath}' width=700>",
+  "powershell.integratedConsole.showOnStartup": false,
   "prettyxml.settings.indentSpaceLength": 2,
   "rewrap.autoWrap.enabled": false,
   "rewrap.autoWrap.notification": "icon",
@@ -781,15 +797,22 @@
     }
   },
   "terminal.integrated.profiles.windows": {
+    "Azure Cloud Shell (Bash)": null,
+    "Azure Cloud Shell (PowerShell)": null,
     "Command Prompt": null,
     "Git Bash": null,
     "JavaScript Debug Terminal": null,
-    "Azure Cloud Shell (Bash)": null,
-    "Azure Cloud Shell (PowerShell)": null,
-    "Windows PowerShell": null,
     "PowerShell": {
       "icon": "terminal-powershell",
       "source": "PowerShell"
+    },
+    "PowerShell (No Profile)": {
+      "args": [
+        "-NoLogo",
+        "-NoProfile"
+      ],
+      "icon": "terminal-powershell",
+      "path": "C:/Program Files/PowerShell/7/pwsh.exe"
     },
     "Ubuntu": {
       "args": [
@@ -803,14 +826,7 @@
       "icon": "terminal-linux",
       "path": "wsl.exe"
     },
-    "PowerShell (No Profile)": {
-      "args": [
-        "-NoLogo",
-        "-NoProfile"
-      ],
-      "icon": "terminal-powershell",
-      "path": "C:/Program Files/PowerShell/7/pwsh.exe"
-    },
+    "Windows PowerShell": null,
     "Windows PowerShell (x64)": {
       "path": "C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
     }
@@ -1026,6 +1042,7 @@
     "markdownlint.config",
     "markdowntable.alignData",
     "markdowntable.alignColumnHeader",
+    "powershell.integratedConsole.showOnStartup",
     "pasteimg.path",
     "pasteimg.renderPattern",
     "prettyxml.settings.indentSpaceLength",
@@ -1081,20 +1098,5 @@
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-  "workbench.tips.enabled": true,
-  "chat.tools.urls.autoApprove": {
-    "https://github.com": {
-      "approveRequest": false,
-      "approveResponse": true
-    },
-    "https://docs.github.com": {
-      "approveRequest": false,
-      "approveResponse": true
-    },
-    "https://learn.microsoft.com": {
-      "approveRequest": false,
-      "approveResponse": true
-    }
-  },
-  "chat.agent.maxRequests": 200
+  "workbench.tips.enabled": true
 }
