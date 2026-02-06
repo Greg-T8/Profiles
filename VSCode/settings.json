@@ -1148,5 +1148,9 @@
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-  "workbench.tips.enabled": true
+  "workbench.tips.enabled": true,
+  "azureTerraform.survey": {
+    "surveyPromptDate": "2026-02-16T13:55:54.371Z",
+    "surveyPromptIgnoredCount": 0
+  }
 }
