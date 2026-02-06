@@ -500,9 +500,8 @@
   "git.enableSmartCommit": true,
   "github.copilot.chat.agent.thinkingTool": true, // Updated on 2025-04-17
   // "github.copilot.chat.codeGeneration.instructions": [],
-  // "github.copilot.chat.codeGeneration.useInstructionFiles": true, //Enables use of instruction file in .github/.md
-  "github.copilot.chat.commitMessageGeneration.instructions": [
-  ],
+  "github.copilot.chat.codeGeneration.useInstructionFiles": false, //Disables auto-insertion of instruction files
+  "github.copilot.chat.commitMessageGeneration.instructions": [],
   "github.copilot.editor.enableCodeActions": true,
   "github.copilot.enable": {
     "*": true,
