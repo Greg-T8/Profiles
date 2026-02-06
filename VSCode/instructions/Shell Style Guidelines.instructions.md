@@ -1,3 +1,8 @@
+---
+applyTo: "**/*.sh"
+description: "This file contains the shell scripting standards and guidelines for Copilot."
+---
+
 # Generating Shell Scripts with Proper Style (Linux/POSIX)
 
 Refactor the shell script so that it adheres to the following style guidelines:

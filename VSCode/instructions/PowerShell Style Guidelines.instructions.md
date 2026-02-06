@@ -1,3 +1,8 @@
+---
+applyTo: "**/*.ps1"
+description: "This file contains the PowerShell scripting standards and guidelines for Copilot."
+---
+
 # Generating a PowerShell Script with Proper Style
 
 Refactor the PowerShell script so that it adheres to the following style guidelines:
