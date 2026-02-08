@@ -34,9 +34,14 @@ vim.api.nvim_set_keymap('n', '<leader>at',
 -- ==============================================================================
 -- MARKDOWN KEYBINDINGS
 -- ==============================================================================
--- Open markdown preview to the side
-vim.api.nvim_set_keymap('n', '<leader>de',
+-- Open Markdown Preview Enhanced preview to the side
+vim.api.nvim_set_keymap('n', '<leader>fe',
     "<cmd>call VSCodeNotify('markdown-preview-enhanced.openPreviewToTheSide')<CR>",
+    { noremap = true, silent = true })
+
+-- Show built-in markdown preview to the side
+vim.api.nvim_set_keymap('n', '<leader>fr',
+    "<cmd>call VSCodeNotify('markdown.showPreviewToSide')<CR>",
     { noremap = true, silent = true })
 
 -- Toggle code block in markdown

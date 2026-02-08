@@ -125,7 +125,8 @@
     ".\\New-VideoNotes.ps1": true,
     "\"Line": true,
     "\"Total": true,
-    "$lines": true
+    "$lines": true,
+    "spx": true
   },
   "chat.tools.urls.autoApprove": {
     "https://docs.github.com": {
