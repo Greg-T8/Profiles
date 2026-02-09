@@ -692,7 +692,7 @@
   "markdown.preview.doubleClickToSwitchToEditor": true,
   "markdown.preview.fontSize": 14,
   "markdown.preview.lineHeight": 1.4,
-  "markdown.preview.scrollEditorWithPreview": false,
+  "markdown.preview.scrollEditorWithPreview": true,
   "markdown.preview.scrollPreviewWithEditor": true,
   "markdown.updateLinksOnFileMove.enabled": "always",
   "markdownlint.config": {
@@ -807,7 +807,7 @@
   "terminal.integrated.copyOnSelection": true,
   "terminal.integrated.defaultProfile.linux": "zsh",
   "terminal.integrated.defaultProfile.windows": "PowerShell",
-  "terminal.integrated.enableMultiLinePasteWarning": "auto",
+  "terminal.integrated.enableMultiLinePasteWarning": "never",
   "terminal.integrated.fontFamily": "Cascadia Mono",
   "terminal.integrated.fontSize": 14,
   "terminal.integrated.fontWeight": "400",

@@ -804,6 +804,42 @@ function Get-AzProfiles {
     $allProfiles = @{}
     $configSources = @{}  # Track which configs define each profile
 
+    # Check for default Azure profile (used when AZURE_CONFIG_DIR is not set)
+    if (-not $ConfiguredOnly.IsPresent) {
+        $defaultConfigDir = Join-Path $HOME ".azure"
+        $defaultConfigFile = Join-Path $defaultConfigDir "azureProfile.json"
+        $isLoggedIn = Test-Path $defaultConfigFile
+        $currentUser = $null
+        $tenantId = $null
+
+        if ($isLoggedIn) {
+            try {
+                $azProfile = Get-Content $defaultConfigFile | ConvertFrom-Json
+                if ($azProfile.subscriptions -and $azProfile.subscriptions.Count -gt 0) {
+                    $currentUser = $azProfile.subscriptions[0].user.name
+                    $tenantId = $azProfile.subscriptions[0].tenantId
+                }
+            }
+            catch {
+                $currentUser = "(cached)"
+            }
+        }
+
+        # Always show default profile if .azure directory exists
+        if (Test-Path $defaultConfigDir) {
+            $allProfiles['(default)'] = [PSCustomObject]@{
+                Name        = '(default)'
+                Description = 'Default Azure CLI profile'
+                Account     = $null
+                AzConfigDir = $defaultConfigDir
+                LoggedIn    = $isLoggedIn
+                CurrentUser = $currentUser
+                TenantId    = $tenantId
+                ConfigSource = 'Default'
+            }
+        }
+    }
+
     # Discover profiles from disk
     if (-not $ConfiguredOnly.IsPresent -and (Test-Path $profilesDir)) {
         $discoveredDirs = Get-ChildItem -Path $profilesDir -Directory
@@ -1026,11 +1062,15 @@ function Use-AzProfile {
         account/tenant combination. Logs in if not already authenticated for
         that profile.
     .PARAMETER Name
-        The profile name as defined in WorkConfig.psd1 AzureProfiles section.
+        The profile name as defined in WorkConfig.psd1 AzureProfiles section,
+        or '(default)' for the default Azure CLI profile.
     .PARAMETER Force
         Forces re-authentication even if already logged in.
     .PARAMETER SelectAccount
         Prompts for account selection during login (useful for MFA/CA).
+    .EXAMPLE
+        Use-AzProfile '(default)'
+        Switches to the default Azure profile.
     .EXAMPLE
         Use-AzProfile lab
         Switches to the lab profile.
@@ -1053,6 +1093,64 @@ function Use-AzProfile {
         [Parameter()]
         [switch]$SelectAccount
     )
+
+    # Handle default profile specially
+    if ($Name -eq '(default)' -or $Name -eq 'default') {
+        # Set to default Azure config directory
+        $configDir = Join-Path $HOME ".azure"
+        $env:AZURE_CONFIG_DIR = $configDir
+
+        Write-Host "Switching to profile: " -NoNewline
+        Write-Host "(default)" -ForegroundColor Cyan -NoNewline
+        Write-Host " (Default Azure CLI profile)"
+
+        # Check if we need to login
+        $needsLogin = $Force.IsPresent
+
+        if (-not $needsLogin) {
+            try {
+                $null = az account show 2>$null
+                if ($LASTEXITCODE -ne 0) {
+                    $needsLogin = $true
+                }
+            }
+            catch {
+                $needsLogin = $true
+            }
+        }
+
+        # Perform login if needed
+        if ($needsLogin) {
+            Write-Host "Logging in..." -ForegroundColor Yellow
+
+            $loginArgs = @('login')
+
+            # Add account selection prompt if requested
+            if ($SelectAccount.IsPresent) {
+                $loginArgs += '--prompt'
+                $loginArgs += 'select_account'
+            }
+
+            az @loginArgs
+
+            if ($LASTEXITCODE -ne 0) {
+                Write-Error "Login failed for default profile"
+                return
+            }
+        }
+
+        # Show current context
+        $accountInfo = az account show -o json 2>$null | ConvertFrom-Json
+
+        # Return context info
+        return [PSCustomObject]@{
+            Profile        = '(default)'
+            User           = $accountInfo.user.name
+            TenantId       = $accountInfo.tenantId
+            Subscription   = $accountInfo.name
+            SubscriptionId = $accountInfo.id
+        }
+    }
 
     # Get all configured profiles from Personal and Work configs
     $allConfiguredProfiles = Get-AllAzureProfileConfigs
@@ -1145,13 +1243,25 @@ Set-Alias -Name azp -Value Use-AzProfile -Scope Global
 $azProfileCompleter = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
 
+    # Add default profile first
+    $results = @([System.Management.Automation.CompletionResult]::new(
+        '(default)',
+        '(default)',
+        'ParameterValue',
+        'Default Azure CLI profile'
+    ))
+
+    # Add configured profiles
     $allProfiles = Get-AllAzureProfileConfigs
     if ($allProfiles.Count -gt 0) {
-        $allProfiles.Keys | Where-Object { $_ -like "$wordToComplete*" } | ForEach-Object {
+        $results += $allProfiles.Keys | Where-Object { $_ -like "$wordToComplete*" } | ForEach-Object {
             $description = $allProfiles[$_].Description
             [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $description)
         }
     }
+
+    # Filter by word to complete and return
+    $results | Where-Object { $_.CompletionText -like "$wordToComplete*" }
 }
 
 Register-ArgumentCompleter -CommandName Use-AzProfile, azp -ParameterName Name -ScriptBlock $azProfileCompleter
