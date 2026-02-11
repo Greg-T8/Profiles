@@ -477,6 +477,8 @@
   },
   "editor.quickSuggestionsDelay": 250,
   "editor.snippetSuggestions": "bottom",
+  "editor.suggest.showFolders": true,
+  "editor.suggest.preview": true,
   "editor.suggest.showInlineDetails": true,
   "editor.suggest.showStatusBar": true,
   "editor.suggestOnTriggerCharacters": true, // Controls Intellisense; CTRL+SPACE to manually trigger
@@ -991,6 +993,8 @@
     "editor.quickSuggestionsDelay",
     "editor.rulers",
     "editor.suggestOnTriggerCharacters",
+    "editor.suggest.showFolders",
+    "editor.suggest.preview",
     "editor.suggest.showInlineDetails",
     "editor.suggest.showSnippets",
     "editor.suggest.showStatusBar",
