@@ -506,6 +506,7 @@
     "vscodevim.vim": 1
   },
   "files.associations": {
+    "*.prompt.md": "markdown",
     "*.keymap": "devicetree"
   },
   "files.autoSave": "onWindowChange",
