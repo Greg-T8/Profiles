@@ -35,12 +35,12 @@ vim.api.nvim_set_keymap('n', '<leader>at',
 -- MARKDOWN KEYBINDINGS
 -- ==============================================================================
 -- Open Markdown Preview Enhanced preview to the side
-vim.api.nvim_set_keymap('n', '<leader>sw',
+vim.api.nvim_set_keymap('n', '<leader>se',
     "<cmd>call VSCodeNotify('markdown-preview-enhanced.openPreviewToTheSide')<CR>",
     { noremap = true, silent = true })
 
 -- Show built-in markdown preview to the side
-vim.api.nvim_set_keymap('n', '<leader>se',
+vim.api.nvim_set_keymap('n', '<leader>sw',
     "<cmd>call VSCodeNotify('markdown.showPreviewToSide')<CR>",
     { noremap = true, silent = true })
 
