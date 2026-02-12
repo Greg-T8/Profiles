@@ -701,6 +701,7 @@
     "MD004": false, // Disable unordered list style rule
     "MD013": false, // Disable line length rule
     "MD024": false, // Allow multiple headers with the same name
+    "MD029": false, // Disable ordered list item prefix rule
     "MD033": false, // Allow inline HTML
     "MD036": false, // Emphasis used instead of a header
     "MD045": false // Omit alternate text from image links
