@@ -693,6 +693,7 @@
   "markdown.extension.toc.updateOnSave": true,
   "markdown.preview.doubleClickToSwitchToEditor": true,
   "markdown.preview.fontSize": 14,
+  "markdown-preview-github-styles.colorTheme": "light",
   "markdown.preview.lineHeight": 1.4,
   "markdown.preview.scrollEditorWithPreview": true,
   "markdown.preview.scrollPreviewWithEditor": true,
@@ -1070,6 +1071,7 @@
     "markdown-preview-enhanced.hideDefaultVSCodeMarkdownPreviewButtons",
     "markdown-preview-enhanced.previewMode",
     "markdown-preview-enhanced.previewTheme",
+    "markdown-preview-github-styles.colorTheme",
     "markdown.updateLinksOnFileMove.enabled",
     "markdownlint.run",
     "markdownlint.config",
@@ -1160,5 +1162,7 @@
   "azureTerraform.survey": {
     "surveyPromptDate": "2026-02-16T13:55:54.371Z",
     "surveyPromptIgnoredCount": 0
-  }
+  },
+  "terminal.integrated.tabs.enabled": false,
+  "terminal.integrated.initialHint": false
 }
