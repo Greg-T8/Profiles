@@ -704,7 +704,9 @@
     "MD029": false, // Disable ordered list item prefix rule
     "MD033": false, // Allow inline HTML
     "MD036": false, // Emphasis used instead of a header
-    "MD045": false // Omit alternate text from image links
+    "MD040": false, //Fenced code blocks should have a language specified
+    "MD045": false, // Omit alternate text from image links
+    "MD060": false  // Table column style - table pipe is missing space
   },
   "markdownlint.run": "onSave",
   "markdowntable.alignColumnHeader": false,
