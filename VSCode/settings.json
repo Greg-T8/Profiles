@@ -671,6 +671,7 @@
   "markdown-preview-enhanced.hideDefaultVSCodeMarkdownPreviewButtons": false,
   "markdown-preview-enhanced.previewMode": "Multiple Previews",
   "markdown-preview-enhanced.previewTheme": "github-light.css",
+  "markdown-preview-enhanced.scrollSync": false,
   "markdown.copyFiles.destination": {
     "*": "images/${unixTime}.png"
   },
@@ -1072,6 +1073,7 @@
     "markdown-preview-enhanced.previewMode",
     "markdown-preview-enhanced.previewTheme",
     "markdown-preview-github-styles.colorTheme",
+    "markdown-preview-enhanced.scrollSync",
     "markdown.updateLinksOnFileMove.enabled",
     "markdownlint.run",
     "markdownlint.config",
