@@ -142,7 +142,6 @@
       "approveResponse": true
     }
   },
-  "chat.viewSessions.orientation": "stacked",
   "dashboard.displayProjectPath": true,
   "dashboard.openOnStartup": "empty workspace",
   "dashboard.projectData": [
@@ -517,8 +516,7 @@
   "git.autofetch": true,
   "git.confirmSync": false,
   "git.enableSmartCommit": true,
-  "github.copilot.chat.agent.thinkingTool": true, // Updated on 2025-04-17
-  // "github.copilot.chat.codeGeneration.instructions": [],
+  "github.copilot.chat.claudeAgent.enabled": true,
   "github.copilot.chat.codeGeneration.useInstructionFiles": false, //Disables auto-insertion of instruction files
   "github.copilot.chat.commitMessageGeneration.instructions": [],
   "github.copilot.editor.enableCodeActions": true,
@@ -697,7 +695,7 @@
   "markdown-preview-github-styles.colorTheme": "light",
   "markdown.preview.lineHeight": 1.4,
   "markdown.preview.scrollEditorWithPreview": true,
-  "markdown.preview.scrollPreviewWithEditor": true,
+  "markdown.preview.scrollPreviewWithEditor": false,
   "markdown.updateLinksOnFileMove.enabled": "always",
   "markdownlint.config": {
     "MD004": false, // Disable unordered list style rule
@@ -1026,6 +1024,7 @@
     "git.confirmSync",
     "git.enableSmartCommit",
     "github.copilot.chat.agent.thinkingTool",
+    "github.copilot.chat.claudeAgent.enabled",
     "github.copilot.chat.codeGeneration.instructions",
     "github.copilot.chat.codeGeneration.useInstructionFiles",
     "github.copilot.chat.commitMessageGeneration.instructions",
@@ -1165,5 +1164,6 @@
     "surveyPromptIgnoredCount": 0
   },
   "terminal.integrated.tabs.enabled": false,
-  "terminal.integrated.initialHint": false
+  "terminal.integrated.initialHint": false,
+  "chat.viewSessions.orientation": "stacked"
 }
