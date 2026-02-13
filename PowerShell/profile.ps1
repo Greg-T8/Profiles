@@ -181,7 +181,7 @@ Set-PSReadLineKeyHandler -Key Tab -ScriptBlock {
         [Microsoft.PowerShell.PSConsoleReadLine]::Insert('    ')
     }
     else {
-        [Microsoft.PowerShell.PSConsoleReadLine]::MenuComplete()
+        [Microsoft.PowerShell.PSConsoleReadLine]::TabCompleteNext()
     }
 }
 
