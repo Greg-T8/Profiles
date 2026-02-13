@@ -130,10 +130,6 @@
   "chat.requestQueuing.enabled": true,
   "chat.tools.autoExpandFailures": true,
   "chat.tools.terminal.autoApprove": {
-    ".\\New-VideoNotes.ps1": true,
-    "\"Line": true,
-    "\"Total": true,
-    "$lines": true,
     "spx": true
   },
   "chat.tools.urls.autoApprove": {
