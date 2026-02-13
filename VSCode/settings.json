@@ -109,6 +109,9 @@
   "chat.agent.enabled": true,
   "chat.agent.maxRequests": 200,
   "chat.agent.thinkingStyle": "collapsedPreview",
+  "chat.agent.thinking.collapsedTools": "withThinking",
+  "chat.agent.thinking.terminalTools": true,
+  "chat.tools.autoExpandFailures": true,
   "chat.editing.confirmEditRequestRemoval": false,
   "chat.instructionsFilesLocations": {
     "C:/Users/gregt/OneDrive/Apps/Profiles/VSCode/instructions": true
@@ -121,6 +124,8 @@
   "chat.promptFilesLocations": {
     "C:/Users/gregt/AppData/Roaming/Code/User/prompts": false
   },
+  "chat.requestQueuing.enabled": true,
+  "chat.requestQueuing.defaultAction": "steer",
   "chat.tools.terminal.autoApprove": {
     ".\\New-VideoNotes.ps1": true,
     "\"Line": true,
@@ -138,6 +143,10 @@
       "approveResponse": true
     },
     "https://learn.microsoft.com": {
+      "approveRequest": false,
+      "approveResponse": true
+    },
+    "https://raw.githubusercontent.com": {
       "approveRequest": false,
       "approveResponse": true
     }
@@ -707,7 +716,7 @@
     "MD036": false, // Emphasis used instead of a header
     "MD040": false, //Fenced code blocks should have a language specified
     "MD045": false, // Omit alternate text from image links
-    "MD060": false  // Table column style - table pipe is missing space
+    "MD060": false // Table column style - table pipe is missing space
   },
   "markdownlint.run": "onSave",
   "markdowntable.alignColumnHeader": false,
@@ -951,14 +960,19 @@
     "betterAlign.indentBase",
     "chat.agent.enable",
     "chat.agent.thinkingStyle",
+    "chat.agent.thinking.collapsedTools",
+    "chat.agent.thinking.terminalTools",
     "chat.emptyState.history.enabled",
     "chat.instructionsFilesLocations",
     "chat.mcp.gallery.enabled",
     "chat.modeFilesLocations",
     "chat.notifyWindowOnResponseReceived",
     "chat.promptFilesLocations",
+    "chat.requestQueuing.enabled",
+    "chat.requestQueuing.defaultAction",
     "chat.tools.terminal.autoApprove",
     "chat.viewSessions.orientation",
+    "chat.tools.autoExpandFailures",
     "cSpell.enabled",
     "cSpell.allowCompoundWords",
     "cSpell.showAutocompleteSuggestions",
