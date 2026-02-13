@@ -1,4 +1,6 @@
-﻿# Reverts to the default dir function in cmd.exe
+﻿#region UTILITY FUNCTIONS
+
+# Reverts to the default dir function in cmd.exe
 function dir {
     cmd /c dir $args
 }
@@ -725,14 +727,13 @@ function Install-WSLDistribution {
     Write-Host "To set it as default, run: wsl" '--set-default' "$Name" -ForegroundColor Yellow
 }
 
-# ============================================================================
-# AZURE CLI PROFILE MANAGEMENT
-# ============================================================================
+#endregion
+
+#region AZURE CLI PROFILE MANAGEMENT
 # Functions for managing multiple Azure CLI contexts across accounts/tenants.
 # Uses separate AZURE_CONFIG_DIR per profile to isolate token caches and
 # prevent context bleeding between tenants.
 # Profiles can be defined in either $Personal.AzureProfiles or $Work.AzureProfiles
-# ============================================================================
 
 function Get-AllAzureProfileConfigs {
     <#
@@ -1554,3 +1555,5 @@ function Remove-AzProfile {
 
 # Register argument completer for Remove-AzProfile
 Register-ArgumentCompleter -CommandName Remove-AzProfile -ParameterName Name -ScriptBlock $azProfileCompleter
+
+#endregion

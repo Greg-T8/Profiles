@@ -14,9 +14,7 @@
     - https://devblogs.microsoft.com/powershell/optimizing-your-profile/
 #>
 
-# ============================================================================
-# INITIAL CONFIGURATION
-# ============================================================================
+#region INITIAL CONFIGURATION
 
 $ErrorActionPreference = 'Stop'
 
@@ -29,9 +27,9 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
     $PSStyle.Formatting.Warning = $PSStyle.Foreground.Yellow
 }
 
-# ============================================================================
-# PROMPT FUNCTION
-# ============================================================================
+#endregion
+
+#region PROMPT FUNCTION
 # Two-line prompt with box-drawing characters
 # Format:
 #   ╭─( ~/path/to/directory [git-status]
@@ -70,10 +68,9 @@ function prompt {
     }
 }
 
+#endregion
 
-# ============================================================================
-# LOAD EXTERNAL SCRIPTS
-# ============================================================================
+#region LOAD EXTERNAL SCRIPTS
 
 # Determine the profile directory path
 # For symlinked profiles, use the OneDrive path
@@ -109,9 +106,9 @@ if (Test-Path -Path $workConfigPath) {
     $Work = Import-PowerShellDataFile -Path $workConfigPath
 }
 
-# ============================================================================
-# ALIASES
-# ============================================================================
+#endregion
+
+#region ALIASES
 
 Set-Alias -Name ll -Value Get-ChildItem -Force
 Set-Alias -Name cfj -Value ConvertFrom-Json
@@ -132,18 +129,18 @@ Set-Alias -Name dil -Value DockerImageList
 Set-Alias -Name dcl -Value DockerContainerList
 Set-Alias -Name regctl -Value RegCtlCmd
 
-# ============================================================================
-# RELOAD PROFILE
-# ============================================================================
+#endregion
+
+#region RELOAD PROFILE
 # Note: Due to PowerShell scoping rules, profile reload cannot be wrapped in a
 # function and have changes persist. You must dot-source the profile directly:
 #   . $script:ProfilePath
 # Or define an alias/function as a reminder, but you'll still need to manually
 # dot-source for function definition changes to take effect.#
 
-# ============================================================================
-# PSREADLINE CONFIGURATION
-# ============================================================================
+#endregion
+
+#region PSREADLINE CONFIGURATION
 
 # Import PSReadLine module
 if (-not (Get-Module PSReadline)) { Import-Module PSReadLine }
@@ -232,9 +229,9 @@ if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
     }
 }
 
-# ============================================================================
-# PROMPT HELPER FUNCTIONS
-# ============================================================================
+#endregion
+
+#region PROMPT HELPER FUNCTIONS
 
 function Test-GitDirectory {
     # Check if current directory is a git repository
@@ -447,9 +444,9 @@ function Initialize-PoshGit {
     }
 }
 
-# ============================================================================
-# INITIALIZE POSH-GIT
-# ============================================================================
+#endregion
+
+#region INITIALIZE POSH-GIT
 
 # Try to initialize Posh-Git once during profile load if in PowerShell Core and in a git directory
 # Store result in script-scoped variable to avoid Get-Module calls in prompt
@@ -457,3 +454,5 @@ $script:PoshGitLoaded = $false
 if ($PSVersionTable.PSEdition -eq 'Core') {
     $script:PoshGitLoaded = Initialize-PoshGit
 }
+
+#endregion
