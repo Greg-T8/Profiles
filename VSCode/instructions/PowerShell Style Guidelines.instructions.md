@@ -108,6 +108,32 @@ finally {
   * `ft` → `Format-Table`
   * `fl` → `Format-List`
 
+### 3.4 Collapsible regions
+
+* Use `#region` and `#endregion` directives to organize major sections of code.
+* All major sections SHOULD be wrapped in collapsible regions for better navigation.
+* Region names SHOULD be in UPPERCASE for consistency.
+* Include a brief comment after the region declaration describing the section's purpose.
+
+Example:
+
+```powershell
+#region AZURE CLI PROFILE MANAGEMENT
+# Functions for managing multiple Azure CLI contexts across accounts/tenants.
+# Uses separate AZURE_CONFIG_DIR per profile to isolate token caches and
+# prevent context bleeding between tenants.
+# Profiles can be defined in either $Personal.AzureProfiles or $Work.AzureProfiles
+
+function Switch-AzProfile {
+    # Implementation
+}
+
+function Get-CurrentAzProfile {
+    # Implementation
+}
+#endregion
+```
+
 ---
 
 ## 4) Function Naming
