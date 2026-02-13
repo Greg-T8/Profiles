@@ -104,14 +104,17 @@
     ],
     "editor.tabSize": 2
   },
+  "azureTerraform.survey": {
+    "surveyPromptDate": "2026-02-16T13:55:54.371Z",
+    "surveyPromptIgnoredCount": 0
+  },
   "betterAlign.alignAfterTypeEnter": false,
   "betterAlign.indentBase": "firstline",
   "chat.agent.enabled": true,
   "chat.agent.maxRequests": 200,
-  "chat.agent.thinkingStyle": "collapsedPreview",
   "chat.agent.thinking.collapsedTools": "withThinking",
   "chat.agent.thinking.terminalTools": true,
-  "chat.tools.autoExpandFailures": true,
+  "chat.agent.thinkingStyle": "collapsedPreview",
   "chat.editing.confirmEditRequestRemoval": false,
   "chat.instructionsFilesLocations": {
     "C:/Users/gregt/OneDrive/Apps/Profiles/VSCode/instructions": true
@@ -124,8 +127,9 @@
   "chat.promptFilesLocations": {
     "C:/Users/gregt/AppData/Roaming/Code/User/prompts": false
   },
-  "chat.requestQueuing.enabled": true,
   "chat.requestQueuing.defaultAction": "steer",
+  "chat.requestQueuing.enabled": true,
+  "chat.tools.autoExpandFailures": true,
   "chat.tools.terminal.autoApprove": {
     ".\\New-VideoNotes.ps1": true,
     "\"Line": true,
@@ -151,6 +155,7 @@
       "approveResponse": true
     }
   },
+  "chat.viewSessions.orientation": "stacked",
   "dashboard.displayProjectPath": true,
   "dashboard.openOnStartup": "empty workspace",
   "dashboard.projectData": [
@@ -485,8 +490,8 @@
   },
   "editor.quickSuggestionsDelay": 250,
   "editor.snippetSuggestions": "bottom",
-  "editor.suggest.showFolders": true,
   "editor.suggest.preview": true,
+  "editor.suggest.showFolders": true,
   "editor.suggest.showInlineDetails": true,
   "editor.suggest.showStatusBar": true,
   "editor.suggestOnTriggerCharacters": true, // Controls Intellisense; CTRL+SPACE to manually trigger
@@ -514,8 +519,8 @@
     "vscodevim.vim": 1
   },
   "files.associations": {
-    "*.prompt.md": "markdown",
-    "*.keymap": "devicetree"
+    "*.keymap": "devicetree",
+    "*.prompt.md": "markdown"
   },
   "files.autoSave": "onWindowChange",
   "files.autoSaveDelay": 10000,
@@ -525,6 +530,7 @@
   "git.autofetch": true,
   "git.confirmSync": false,
   "git.enableSmartCommit": true,
+  "github.copilot.chat.askQuestions.enabled": true,
   "github.copilot.chat.claudeAgent.enabled": true,
   "github.copilot.chat.codeGeneration.useInstructionFiles": false, //Disables auto-insertion of instruction files
   "github.copilot.chat.commitMessageGeneration.instructions": [],
@@ -672,8 +678,10 @@
   "hediet.vscode-drawio.theme": "min",
   "html.autoClosingTags": true,
   "html.autoCreateQuotes": false,
+  "inlineChat.affordance": "editor",
   "inlineChat.finishOnType": true,
   "inlineChat.holdToSpeech": true,
+  "inlineChat.renderMode": "zone",
   "javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
   "markdown-preview-enhanced.alwaysShowBacklinksInPreview": false,
   "markdown-preview-enhanced.automaticallyShowPreviewOfMarkdownBeingEdited": false,
@@ -681,6 +689,7 @@
   "markdown-preview-enhanced.previewMode": "Multiple Previews",
   "markdown-preview-enhanced.previewTheme": "github-light.css",
   "markdown-preview-enhanced.scrollSync": false,
+  "markdown-preview-github-styles.colorTheme": "light",
   "markdown.copyFiles.destination": {
     "*": "images/${unixTime}.png"
   },
@@ -702,7 +711,6 @@
   "markdown.extension.toc.updateOnSave": true,
   "markdown.preview.doubleClickToSwitchToEditor": true,
   "markdown.preview.fontSize": 14,
-  "markdown-preview-github-styles.colorTheme": "light",
   "markdown.preview.lineHeight": 1.4,
   "markdown.preview.scrollEditorWithPreview": true,
   "markdown.preview.scrollPreviewWithEditor": false,
@@ -822,11 +830,12 @@
   "terminal.integrated.copyOnSelection": true,
   "terminal.integrated.defaultProfile.linux": "zsh",
   "terminal.integrated.defaultProfile.windows": "PowerShell",
-  "terminal.integrated.enableWin32InputMode": true,
   "terminal.integrated.enableMultiLinePasteWarning": "never",
+  "terminal.integrated.enableWin32InputMode": true,
   "terminal.integrated.fontFamily": "Cascadia Mono",
   "terminal.integrated.fontSize": 14,
   "terminal.integrated.fontWeight": "400",
+  "terminal.integrated.initialHint": false,
   "terminal.integrated.profiles.linux": {
     "bash": {
       "icon": "terminal-bash",
@@ -887,6 +896,7 @@
   },
   "terminal.integrated.suggest.showStatusBar": true,
   "terminal.integrated.suggest.suggestOnTriggerCharacters": false,
+  "terminal.integrated.tabs.enabled": false,
   "terminal.integrated.useWslProfiles": false,
   "vscode-neovim.compositeKeys": {
     "jj": {
@@ -1040,6 +1050,7 @@
     "git.confirmSync",
     "git.enableSmartCommit",
     "github.copilot.chat.agent.thinkingTool",
+    "github.copilot.chat.askQuestions.enabled",
     "github.copilot.chat.claudeAgent.enabled",
     "github.copilot.chat.codeGeneration.instructions",
     "github.copilot.chat.codeGeneration.useInstructionFiles",
@@ -1061,6 +1072,8 @@
     "hediet.vscode-drawio.theme",
     "inlineChat.finishOnType",
     "inlineChat.holdToSpeech",
+    "inlineChat.affordance",
+    "inlineChat.renderMode",
     "html.autoCreateQuotes",
     "html.autoClosingTags",
     "javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces",
@@ -1176,12 +1189,5 @@
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-  "workbench.tips.enabled": true,
-  "azureTerraform.survey": {
-    "surveyPromptDate": "2026-02-16T13:55:54.371Z",
-    "surveyPromptIgnoredCount": 0
-  },
-  "terminal.integrated.tabs.enabled": false,
-  "terminal.integrated.initialHint": false,
-  "chat.viewSessions.orientation": "stacked"
+  "workbench.tips.enabled": true
 }
