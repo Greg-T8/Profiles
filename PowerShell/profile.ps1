@@ -210,6 +210,7 @@ if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
         Set-PSReadLineKeyHandler -Chord Ctrl+k -Function KillLine -ViMode $mode
         Set-PSReadLineKeyHandler -Chord Ctrl+u -Function BackwardKillInput -ViMode $mode
         Set-PSReadLineKeyHandler -Chord Ctrl+w -Function BackwardKillWord -ViMode $mode
+        Set-PSReadLineKeyHandler -Chord Shift+Enter -Function AddLine -ViMode $mode
     }
 
     # Custom cursor styles (PowerShell Core only - uses VT100 escape sequences)
