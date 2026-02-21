@@ -105,8 +105,8 @@
     "editor.tabSize": 2
   },
   "azureTerraform.survey": {
-    "surveyPromptDate": "2026-02-16T13:55:54.371Z",
-    "surveyPromptIgnoredCount": 0
+    "surveyPromptDate": "2026-02-23T16:09:55.891Z",
+    "surveyPromptIgnoredCount": 1
   },
   "betterAlign.alignAfterTypeEnter": false,
   "betterAlign.indentBase": "firstline",
@@ -115,11 +115,12 @@
   "chat.agent.thinking.collapsedTools": "off",
   "chat.agent.thinking.generateTitles": true,
   "chat.checkpoints.enabled": true,
+  "chat.customAgentInSubagent.enabled": true,
   "chat.agent.thinking.terminalTools": false,
   "chat.agent.thinkingStyle": "fixedScrolling",
   "chat.editing.confirmEditRequestRemoval": false,
   "chat.instructionsFilesLocations": {
-    "C:/Users/gregt/OneDrive/Apps/Profiles/VSCode/instructions": true
+    "~/OneDrive/Apps/Profiles/VSCode/instructions": true
   },
   "chat.mcp.gallery.enabled": true,
   "chat.notifyWindowOnResponseReceived": false,
@@ -146,6 +147,10 @@
       "approveResponse": true
     },
     "https://raw.githubusercontent.com": {
+      "approveRequest": false,
+      "approveResponse": true
+    },
+    "https://code.visualstudio.com": {
       "approveRequest": false,
       "approveResponse": true
     }
@@ -444,7 +449,7 @@
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
-  "debug.inlineValues": "auto",
+	"debug.inlineValues": "auto",
   "diffEditor.ignoreTrimWhitespace": false,
   "editor.acceptSuggestionOnCommitCharacter": false,
   "editor.acceptSuggestionOnEnter": "off",
@@ -514,7 +519,9 @@
   },
   "files.associations": {
     "*.keymap": "devicetree",
-    "*.prompt.md": "markdown"
+    // "*.prompt.md": "markdown",
+    // "*.agent.md": "markdown",
+    "*.md": "markdown"
   },
   "files.autoSave": "onWindowChange",
   "files.autoSaveDelay": 10000,
@@ -528,6 +535,7 @@
   "github.copilot.chat.claudeAgent.enabled": true,
   "github.copilot.chat.codeGeneration.useInstructionFiles": false, //Disables auto-insertion of instruction files
   "github.copilot.chat.commitMessageGeneration.instructions": [],
+  "github.copilot.chat.copilotMemory.enabled": true,
   "github.copilot.editor.enableCodeActions": true,
   "github.copilot.chat.anthropic.thinking.budgetTokens": 16000,
   "github.copilot.chat.agent.temperature": 0,
@@ -969,6 +977,7 @@
     "chat.agent.thinking.terminalTools",
     "chat.agent.thinkingStyle",
     "chat.checkpoints.enabled",
+    "chat.customAgentInSubagent.enabled",
     "chat.emptyState.history.enabled",
     "chat.instructionsFilesLocations",
     "chat.mcp.gallery.enabled",
@@ -1042,7 +1051,7 @@
     "files.autoSaveDelay",
     "files.hotExit",
     "files.trimFinalNewlines",
-    "files.trimTrailingWhitespace", // Would like to override only in markdown files
+    "files.trimTrailingWhitespace",
     "git.autofetch",
     "git.confirmSync",
     "git.enableSmartCommit",
@@ -1052,6 +1061,7 @@
     "github.copilot.chat.codeGeneration.instructions",
     "github.copilot.chat.codeGeneration.useInstructionFiles",
     "github.copilot.chat.commitMessageGeneration.instructions",
+    "github.copilot.chat.copilotMemory.enabled",
     "github.copilot.chat.search.semanticTextResults",
     "github.copilot.editor.enableAutoCompletions",
     "github.copilot.enable",
@@ -1180,11 +1190,16 @@
     "workbench.panel.defaultLocation",
     "workbench.productIconTheme",
     "workbench.startupEditor",
-    "workbench.settings.editor"
+    "workbench.settings.editor",
+    "inlineChat.defaultModel",
+    "inlineChat.enableV2"
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
   "workbench.tips.enabled": true,
-  "chat.viewSessions.orientation": "stacked"
+  "chat.viewSessions.orientation": "stacked",
+  "inlineChat.defaultModel": "GPT-5.1-Codex-Mini (Preview) (copilot)",
+  "inlineChat.enableV2": true,
+  "@azure.argTenant": "547b168b-bd3f-4cfc-ae2b-665f52672fae"
 }
