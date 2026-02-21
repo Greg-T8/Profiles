@@ -127,9 +127,7 @@
   "chat.requestQueuing.defaultAction": "steer",
   "chat.requestQueuing.enabled": true,
   "chat.tools.autoExpandFailures": true,
-  "chat.tools.terminal.autoApprove": {
-    "spx": true
-  },
+  "chat.tools.terminal.autoApprove": { },
   "chat.tools.urls.autoApprove": {
     "https://code.visualstudio.com": {
       "approveRequest": false,
