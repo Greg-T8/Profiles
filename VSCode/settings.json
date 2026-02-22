@@ -149,9 +149,7 @@
       "approveResponse": true
     }
   },
-  "chat.useAgentSkills": false,
   "chat.viewProgressBadge.enabled": true,
-  "chat.viewSessions.orientation": "stacked",
   "dashboard.displayProjectPath": true,
   "dashboard.openOnStartup": "empty workspace",
   "dashboard.projectData": [
@@ -1198,5 +1196,6 @@
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-  "workbench.tips.enabled": true
+  "workbench.tips.enabled": true,
+  "chat.viewSessions.orientation": "stacked"
 }
