@@ -104,6 +104,10 @@
     ],
     "editor.tabSize": 2
   },
+  "azureTerraform.survey": {
+    "surveyPromptDate": "2026-03-03T18:38:25.544Z",
+    "surveyPromptIgnoredCount": 0
+  },
   "betterAlign.alignAfterTypeEnter": false,
   "betterAlign.indentBase": "firstline",
   "chat.agent.enabled": true,
@@ -145,6 +149,7 @@
       "approveResponse": true
     }
   },
+  "chat.useAgentSkills": false,
   "chat.viewProgressBadge.enabled": true,
   "chat.viewSessions.orientation": "stacked",
   "dashboard.displayProjectPath": true,
@@ -982,6 +987,7 @@
     "chat.requestQueuing.enabled",
     "chat.tools.autoExpandFailures",
     "chat.tools.terminal.autoApprove",
+    "chat.useAgentSkills",
     "chat.viewProgressBadge.enabled",
     "chat.viewSessions.orientation",
     "cSpell.allowCompoundWords",
@@ -1076,7 +1082,8 @@
     "html.autoCreateQuotes",
     "inlineChat.affordance",
     "inlineChat.defaultModel",
-    "inlineChat.enableV2""inlineChat.finishOnType",
+    "inlineChat.enableV2",
+    "inlineChat.finishOnType",
     "inlineChat.holdToSpeech",
     "inlineChat.renderMode",
     "javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces",
@@ -1186,7 +1193,7 @@
     "workbench.panel.defaultLocation",
     "workbench.productIconTheme",
     "workbench.settings.editor",
-    "workbench.startupEditor"
+    "workbench.startupEditor",
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
