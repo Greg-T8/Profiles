@@ -119,10 +119,14 @@
   "chat.checkpoints.enabled": true,
   "chat.customAgentInSubagent.enabled": false,
   "chat.editing.confirmEditRequestRemoval": false,
-  "chat.instructionsFilesLocations": {},
+  "chat.instructionsFilesLocations": {
+    "~/LocalCode/Agent-Toolkit/instructions": true
+  },
   "chat.mcp.gallery.enabled": true,
   "chat.notifyWindowOnResponseReceived": false,
-  "chat.promptFilesLocations": {},
+  "chat.promptFilesLocations": {
+    "~/LocalCode/Agent-Toolkit/prompts": true
+  },
   "chat.requestQueuing.defaultAction": "steer",
   "chat.requestQueuing.enabled": true,
   "chat.tools.autoExpandFailures": true,
@@ -948,7 +952,15 @@
   "workbench.colorCustomizations": {
     "titleBar.activeBackground": "#105447",
     "titleBar.activeForeground": "#ffffff",
-    "titleBar.inactiveBackground": "#033029"
+    "titleBar.inactiveBackground": "#033029",
+    "diffEditor.insertedTextBackground": "#003a66",
+    "diffEditor.removedTextBackground": "#663300",
+    "diffEditor.insertedLineBackground": "#002b4d",
+    "diffEditor.removedLineBackground": "#4d2600",
+    "editorGutter.addedBackground": "#2f81f7",
+    "editorGutter.deletedBackground": "#ff9e3d",
+    "editorOverviewRuler.addedForeground": "#58a6ff",
+    "editorOverviewRuler.deletedForeground": "#ffb86b"
   },
   "workbench.colorTheme": "Default Dark Modern",
   "workbench.editor.enablePreview": true,
@@ -1200,5 +1212,8 @@
   "chat.viewSessions.orientation": "stacked",
   "@azure.argTenant": "547b168b-bd3f-4cfc-ae2b-665f52672fae",
   "azureResourceGroups.enableChatStandIn": false,
-  "@azure.enableCustomModeRecommendations": false
+  "@azure.enableCustomModeRecommendations": false,
+  "chat.agentSkillsLocations": {
+    "~/LocalCode/Agent-Toolkit/skills": true
+  }
 }
