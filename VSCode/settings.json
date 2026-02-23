@@ -1191,10 +1191,14 @@
     "workbench.productIconTheme",
     "workbench.settings.editor",
     "workbench.startupEditor",
+    "@azure.enableCustomModeRecommendations"
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
   "workbench.tips.enabled": true,
-  "chat.viewSessions.orientation": "stacked"
+  "chat.viewSessions.orientation": "stacked",
+  "@azure.argTenant": "547b168b-bd3f-4cfc-ae2b-665f52672fae",
+  "azureResourceGroups.enableChatStandIn": false,
+  "@azure.enableCustomModeRecommendations": false
 }
