@@ -532,7 +532,6 @@
   "github.copilot.chat.claudeAgent.enabled": true,
   "github.copilot.chat.codeGeneration.useInstructionFiles": false, //Disables auto-insertion of instruction files
   "github.copilot.chat.commitMessageGeneration.instructions": [],
-  "github.copilot.chat.copilotMemory.enabled": true,
   "github.copilot.editor.enableCodeActions": true,
   "github.copilot.enable": {
     "*": true,
@@ -678,8 +677,8 @@
   "html.autoClosingTags": true,
   "html.autoCreateQuotes": false,
   "inlineChat.affordance": "editor",
-  "inlineChat.defaultModel": "GPT-5.1-Codex-Mini (Preview) (copilot)",
-  "inlineChat.enableV2": true,
+  "inlineChat.defaultModel": "GPT-5 mini (copilot)",
+  "inlineChat.enableV2": false,
   "inlineChat.finishOnType": true,
   "inlineChat.holdToSpeech": true,
   "inlineChat.renderMode": "zone",
@@ -731,7 +730,7 @@
   "markdowntable.alignColumnHeader": false,
   "markdowntable.alignData": false,
   "pasteimg.path": "${currentFileDir}/.img",
-  "pasteimg.renderPattern": "<img src='${imagePath}' width=700>",
+  "pasteimg.renderPattern": "<img src='${imagePath}' width=600>",
   "powershell.codeFormatting.addWhitespaceAroundPipe": true,
   "powershell.codeFormatting.alignPropertyValuePairs": false,
   "powershell.codeFormatting.autoCorrectAliases": true,
