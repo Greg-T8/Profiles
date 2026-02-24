@@ -104,6 +104,9 @@
     ],
     "editor.tabSize": 2
   },
+  "@azure.argTenant": "547b168b-bd3f-4cfc-ae2b-665f52672fae",
+  "@azure.enableCustomModeRecommendations": false,
+  "azureResourceGroups.enableChatStandIn": false,
   "azureTerraform.survey": {
     "surveyPromptDate": "2026-03-03T18:38:25.544Z",
     "surveyPromptIgnoredCount": 0
@@ -116,6 +119,9 @@
   "chat.agent.thinking.generateTitles": true,
   "chat.agent.thinking.terminalTools": true,
   "chat.agent.thinkingStyle": "fixedScrolling",
+  "chat.agentSkillsLocations": {
+    "~/LocalCode/Agent-Toolkit/skills": true
+  },
   "chat.checkpoints.enabled": true,
   "chat.customAgentInSubagent.enabled": false,
   "chat.editing.confirmEditRequestRemoval": false,
@@ -154,6 +160,7 @@
     }
   },
   "chat.viewProgressBadge.enabled": true,
+  "chat.viewSessions.orientation": "stacked",
   "dashboard.displayProjectPath": true,
   "dashboard.openOnStartup": "empty workspace",
   "dashboard.projectData": [
@@ -950,17 +957,17 @@
   "window.zoomLevel": 2,
   "workbench.activityBar.location": "top",
   "workbench.colorCustomizations": {
-    "titleBar.activeBackground": "#105447",
-    "titleBar.activeForeground": "#ffffff",
-    "titleBar.inactiveBackground": "#033029",
-    "diffEditor.insertedTextBackground": "#003a66",
-    "diffEditor.removedTextBackground": "#663300",
     "diffEditor.insertedLineBackground": "#002b4d",
+    "diffEditor.insertedTextBackground": "#003a66",
     "diffEditor.removedLineBackground": "#4d2600",
+    "diffEditor.removedTextBackground": "#663300",
     "editorGutter.addedBackground": "#2f81f7",
     "editorGutter.deletedBackground": "#ff9e3d",
     "editorOverviewRuler.addedForeground": "#58a6ff",
-    "editorOverviewRuler.deletedForeground": "#ffb86b"
+    "editorOverviewRuler.deletedForeground": "#ffb86b",
+    "titleBar.activeBackground": "#105447",
+    "titleBar.activeForeground": "#ffffff",
+    "titleBar.inactiveBackground": "#033029"
   },
   "workbench.colorTheme": "Default Dark Modern",
   "workbench.editor.enablePreview": true,
@@ -974,7 +981,7 @@
     "*.svg": "hediet.vscode-drawio-text"
   },
   "workbench.iconTheme": "vs-seti",
-  "workbench.panel.defaultLocation": "bottom",
+  "workbench.panel.defaultLocation": "right",
   "workbench.productIconTheme": "Default",
   "workbench.settings.applyToAllProfiles": [
     "betterAlign.alignAfterTypeEnter",
@@ -1208,12 +1215,5 @@
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "welcomePageInEmptyWorkbench",
-  "workbench.tips.enabled": true,
-  "chat.viewSessions.orientation": "stacked",
-  "@azure.argTenant": "547b168b-bd3f-4cfc-ae2b-665f52672fae",
-  "azureResourceGroups.enableChatStandIn": false,
-  "@azure.enableCustomModeRecommendations": false,
-  "chat.agentSkillsLocations": {
-    "~/LocalCode/Agent-Toolkit/skills": true
-  }
+  "workbench.tips.enabled": true
 }

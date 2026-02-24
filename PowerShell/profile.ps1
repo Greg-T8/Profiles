@@ -36,6 +36,10 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 #   ╰╴>
 
 function prompt {
+    if (-not $script:PoshGitLoaded -and $PSVersionTable.PSEdition -eq 'Core' -and (Test-GitDirectory)) {
+        $script:PoshGitLoaded = Initialize-PoshGit
+    }
+
     # Use different prompt styles based on PowerShell edition
     if ($PSVersionTable.PSEdition -eq 'Core') {
         # PowerShell Core with ANSI escape codes
@@ -437,8 +441,8 @@ function Initialize-PoshGit {
         $GitPromptSettings.WorkingColor.ForegroundColor = 0x8A0ACC      # Purple RGB(138, 10, 204)
         $StashColor                                     = 0xAFB178      # Sage RGB(175, 177, 120)
         $GitPromptSettings.StashColor.ForegroundColor   = $StashColor
-        $GitPromptSettings.BeforeStashForegroundColor  = $StashColor
-        $GitPromptSettings.AfterStashForegroundColor   = $StashColor
+        $GitPromptSettings.BeforeStash.ForegroundColor  = $StashColor
+        $GitPromptSettings.AfterStash.ForegroundColor   = $StashColor
 
         return $true
     }
