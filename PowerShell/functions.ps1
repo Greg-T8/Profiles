@@ -997,10 +997,15 @@ function Get-AzProfiles {
                 Name        = '(default)'
                 Description = 'Default Azure CLI profile'
                 Account     = $null
+                AzCliAccount = $null
                 SubscriptionId = $null
+                AzCliSubscriptionId = $null
                 AzConfigDir = $defaultConfigDir
+                AzCliConfigDir = $defaultConfigDir
                 LoggedIn    = $isLoggedIn
+                AzCliIsLoggedIn = $isLoggedIn
                 CurrentUser = $currentUser
+                AzCliUser = $currentUser
                 TenantId    = $tenantId
                 AzCliLoggedIn = $isLoggedIn
                 AzCliCurrentUser = $currentUser
@@ -1046,10 +1051,15 @@ function Get-AzProfiles {
                 Name        = $name
                 Description = $null
                 Account     = $null
+                AzCliAccount = $null
                 SubscriptionId = $null
+                AzCliSubscriptionId = $null
                 AzConfigDir = $dir.FullName
+                AzCliConfigDir = $dir.FullName
                 LoggedIn    = $isLoggedIn
+                AzCliIsLoggedIn = $isLoggedIn
                 CurrentUser = $currentUser
+                AzCliUser = $currentUser
                 TenantId    = $tenantId
                 AzCliLoggedIn = $isLoggedIn
                 AzCliCurrentUser = $currentUser
@@ -1102,8 +1112,10 @@ function Get-AzProfiles {
                     # Profile already exists (was on disk), update it
                     $allProfiles[$name].Description = $profileConfig.Description
                     $allProfiles[$name].Account = $profileConfig.Account
+                    $allProfiles[$name].AzCliAccount = $profileConfig.Account
                     $allProfiles[$name].TenantId = $profileConfig.TenantId
                     $allProfiles[$name].SubscriptionId = $profileConfig.SubscriptionId
+                    $allProfiles[$name].AzCliSubscriptionId = $profileConfig.SubscriptionId
                 }
                 else {
                     # Add Personal config profile
@@ -1111,10 +1123,15 @@ function Get-AzProfiles {
                         Name        = $name
                         Description = $profileConfig.Description
                         Account     = $profileConfig.Account
+                        AzCliAccount = $profileConfig.Account
                         SubscriptionId = $profileConfig.SubscriptionId
+                        AzCliSubscriptionId = $profileConfig.SubscriptionId
                         AzConfigDir = if (Test-Path $configDir) { $configDir } else { $null }
+                        AzCliConfigDir = if (Test-Path $configDir) { $configDir } else { $null }
                         LoggedIn    = $isLoggedIn
+                        AzCliIsLoggedIn = $isLoggedIn
                         CurrentUser = $currentUser
+                        AzCliUser = $currentUser
                         TenantId    = $profileConfig.TenantId
                         AzCliLoggedIn = $isLoggedIn
                         AzCliCurrentUser = $currentUser
@@ -1164,8 +1181,10 @@ function Get-AzProfiles {
                     # Profile already exists, update it
                     $allProfiles[$name].Description = $profileConfig.Description
                     $allProfiles[$name].Account = $profileConfig.Account
+                    $allProfiles[$name].AzCliAccount = $profileConfig.Account
                     $allProfiles[$name].TenantId = $profileConfig.TenantId
                     $allProfiles[$name].SubscriptionId = $profileConfig.SubscriptionId
+                    $allProfiles[$name].AzCliSubscriptionId = $profileConfig.SubscriptionId
                 }
                 else {
                     # Add Work config profile
@@ -1173,10 +1192,15 @@ function Get-AzProfiles {
                         Name        = $name
                         Description = $profileConfig.Description
                         Account     = $profileConfig.Account
+                        AzCliAccount = $profileConfig.Account
                         SubscriptionId = $profileConfig.SubscriptionId
+                        AzCliSubscriptionId = $profileConfig.SubscriptionId
                         AzConfigDir = if (Test-Path $configDir) { $configDir } else { $null }
+                        AzCliConfigDir = if (Test-Path $configDir) { $configDir } else { $null }
                         LoggedIn    = $isLoggedIn
+                        AzCliIsLoggedIn = $isLoggedIn
                         CurrentUser = $currentUser
+                        AzCliUser = $currentUser
                         TenantId    = $profileConfig.TenantId
                         AzCliLoggedIn = $isLoggedIn
                         AzCliCurrentUser = $currentUser
@@ -1307,16 +1331,19 @@ function Get-CurrentAzProfile {
     [PSCustomObject]@{
         ProfileName    = $profileName
         ConfigDir      = $currentConfigDir
+        AzCliConfigDir = $currentConfigDir
         LoggedIn       = ($null -ne $cliAccountInfo)
+        AzCliIsLoggedIn = ($null -ne $cliAccountInfo)
         User           = $cliAccountInfo.user.name
-        TenantId       = $cliAccountInfo.tenantId
-        Subscription   = $cliAccountInfo.name
-        SubscriptionId = $cliAccountInfo.id
-        AzCliLoggedIn  = ($null -ne $cliAccountInfo)
         AzCliUser      = $cliAccountInfo.user.name
+        TenantId       = $cliAccountInfo.tenantId
         AzCliTenantId  = $cliAccountInfo.tenantId
+        Subscription   = $cliAccountInfo.name
         AzCliSubscription = $cliAccountInfo.name
+        SubscriptionId = $cliAccountInfo.id
         AzCliSubscriptionId = $cliAccountInfo.id
+        AzCliLoggedIn  = ($null -ne $cliAccountInfo)
+        AzCliCurrentUser = $cliAccountInfo.user.name
         HasAzModule    = $moduleContext.HasAzModule
         AzModuleLoggedIn = $moduleContext.LoggedIn
         AzModuleContextName = $moduleContext.ContextName
@@ -1427,9 +1454,14 @@ function Use-AzProfile {
         return [PSCustomObject]@{
             Profile        = '(default)'
             User           = $accountInfo.user.name
+            AzCliUser      = $accountInfo.user.name
             TenantId       = $accountInfo.tenantId
+            AzCliTenantId  = $accountInfo.tenantId
             Subscription   = $accountInfo.name
+            AzCliSubscription = $accountInfo.name
             SubscriptionId = $accountInfo.id
+            AzCliSubscriptionId = $accountInfo.id
+            AzCliIsLoggedIn = ($null -ne $accountInfo)
             HasAzModule    = $azModuleContext.HasAzModule
             AzModuleContextName = $azModuleContext.ContextName
             AzModuleUser   = $azModuleContext.Account
@@ -1520,9 +1552,14 @@ function Use-AzProfile {
     [PSCustomObject]@{
         Profile        = $Name
         User           = $accountInfo.user.name
+        AzCliUser      = $accountInfo.user.name
         TenantId       = $accountInfo.tenantId
+        AzCliTenantId  = $accountInfo.tenantId
         Subscription   = $accountInfo.name
+        AzCliSubscription = $accountInfo.name
         SubscriptionId = $accountInfo.id
+        AzCliSubscriptionId = $accountInfo.id
+        AzCliIsLoggedIn = ($null -ne $accountInfo)
         HasAzModule    = $azModuleContext.HasAzModule
         AzModuleContextName = $azModuleContext.ContextName
         AzModuleUser   = $azModuleContext.Account
@@ -1775,9 +1812,14 @@ function New-AzProfile {
         [PSCustomObject]@{
             Profile        = $Name
             Account        = $accountInfo.user.name
+            AzCliAccount   = $accountInfo.user.name
             TenantId       = $accountInfo.tenantId
+            AzCliTenantId  = $accountInfo.tenantId
             Subscription   = $accountInfo.name
+            AzCliSubscription = $accountInfo.name
             SubscriptionId = $accountInfo.id
+            AzCliSubscriptionId = $accountInfo.id
+            AzCliIsLoggedIn = ($null -ne $accountInfo)
             Description    = $Description
             HasAzModule    = $azModuleContext.HasAzModule
             AzModuleContextName = $azModuleContext.ContextName
@@ -1791,9 +1833,14 @@ function New-AzProfile {
         [PSCustomObject]@{
             Profile        = $Name
             Account        = $newProfile.Account
+            AzCliAccount   = $newProfile.Account
             TenantId       = $newProfile.TenantId
+            AzCliTenantId  = $newProfile.TenantId
             Subscription   = $accountInfo.name
+            AzCliSubscription = $accountInfo.name
             SubscriptionId = $SubscriptionId
+            AzCliSubscriptionId = $SubscriptionId
+            AzCliIsLoggedIn = ($null -ne $accountInfo)
             Description    = $Description
             HasAzModule    = $azModuleContext.HasAzModule
             AzModuleContextName = $azModuleContext.ContextName

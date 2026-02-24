@@ -123,7 +123,7 @@
     "~/LocalCode/Agent-Toolkit/instructions": true
   },
   "chat.mcp.gallery.enabled": true,
-  "chat.notifyWindowOnResponseReceived": false,
+  "chat.notifyWindowOnResponseReceived": "off",
   "chat.promptFilesLocations": {
     "~/LocalCode/Agent-Toolkit/prompts": true
   },

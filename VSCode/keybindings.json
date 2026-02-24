@@ -469,9 +469,9 @@
     "when": "viewContainer.workbench.view.debug.enabled"
   },
   {
-    "key": "shift+alt+c",
+    "key": "alt+c",
     "command": "openInIntegratedTerminal",
-    "when": "editorFocus"
+    "when": "!editorFocus"
   },
   {
     "key": "ctrl+shift+i",
