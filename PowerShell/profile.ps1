@@ -117,6 +117,10 @@ Set-Alias -Name gim -Value Get-InstalledModule
 Set-Alias -Name tnc -Value Test-NetConnection
 Set-Alias -Name rdn -Value Resolve-DNSName
 Remove-Item Alias:dir -ErrorAction SilentlyContinue
+Set-Alias -Name gcap -Value Get-CurrentAzProfile
+Set-Alias -Name uap -Value Use-AzProfile
+function Set-GitRepoRoot { Set-Location (git rev-parse --show-toplevel) }
+Set-Alias -Name sgr -Value Set-GitRepoRoot
 
 # Docker aliases
 function DockerExec { docker exec -it @args }
@@ -433,8 +437,8 @@ function Initialize-PoshGit {
         $GitPromptSettings.WorkingColor.ForegroundColor = 0x8A0ACC      # Purple RGB(138, 10, 204)
         $StashColor                                     = 0xAFB178      # Sage RGB(175, 177, 120)
         $GitPromptSettings.StashColor.ForegroundColor   = $StashColor
-        $GitPromptSettings.BeforeStash.ForegroundColor  = $StashColor
-        $GitPromptSettings.AfterStash.ForegroundColor   = $StashColor
+        $GitPromptSettings.BeforeStashForegroundColor  = $StashColor
+        $GitPromptSettings.AfterStashForegroundColor   = $StashColor
 
         return $true
     }
@@ -456,3 +460,5 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 }
 
 #endregion
+
+# Add new aliases for Azure and Git commands
