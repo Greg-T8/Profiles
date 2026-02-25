@@ -232,163 +232,6 @@
           "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\Linux"
         }
       ]
-    },
-    {
-      "groupName": "Systems",
-      "id": "systemst4o1r3thtmaipjfoi",
-      "projects": [
-        {
-          "color": "#4683ca",
-          "id": "azuregna1o2c8nmbj6rjha",
-          "isGitRepo": true,
-          "name": "Azure",
-          "path": "c:/Users/gregt/LocalCode/LearningAzure/LearningAzure.code-workspace"
-        },
-        {
-          "color": "#FF9900",
-          "id": "aws3f0o3qyn1mciy2e2m",
-          "isGitRepo": false,
-          "name": "AWS",
-          "path": "c:/Users/gregt/LocalCode/LearningAWS/LearningAWS.code-workspace"
-        },
-        {
-          "color": "#2e5c42",
-          "id": "terraformtj10gu54zmaiq95o3",
-          "isGitRepo": true,
-          "name": "Terraform",
-          "path": "c:/Users/gregt/LocalCode/LearningTerraform/LearningTerraform.code-workspace"
-        },
-        {
-          "color": "#e1e34c",
-          "id": "blogpv73e3qmemaiq8lv8",
-          "isGitRepo": true,
-          "name": "Blog",
-          "path": "c:/Users/gregt/LocalCode/Blog"
-        },
-        {
-          "color": "#4869d7",
-          "id": "kubernetesy1abqtua2maiqapak",
-          "isGitRepo": true,
-          "name": "Kubernetes",
-          "path": "vscode-remote://wsl+Kubernetes/home/gtate/LearningKubernetes/LearningKubernetes.code-workspace"
-        },
-        {
-          "color": "linear-gradient(43deg, #581dd3 0%, #d23ed8 100%)",
-          "id": "kalilinuxaad79g6zwmaiqc4sh",
-          "isGitRepo": true,
-          "name": "Kali Linux",
-          "path": "vscode-remote://wsl+Kali/home/gtate/LearningOffsec/LearningOffsec.code-workspace"
-        },
-        {
-          "color": "#10685f",
-          "id": "learningfabricvka7w9h34mcom57pi",
-          "isGitRepo": false,
-          "name": "Fabric",
-          "path": "c:/Users/gregt/LocalCode/LearningFabric/LearningFabric.code-workspace"
-        },
-        {
-          "color": "#796989",
-          "id": "identityxmkh8ee7hmd4bsb04",
-          "isGitRepo": true,
-          "name": "Identity",
-          "path": "c:/Users/gregt/LocalCode/Identity/Identity.code-workspace"
-        }
-      ]
-    },
-    {
-      "groupName": "Languages",
-      "id": "languagesr8vqt8qtfmaionob2",
-      "projects": [
-        {
-          "color": "#549be2",
-          "id": "dotnet1yfn5aeo3maipbmkz",
-          "isGitRepo": true,
-          "name": "DotNet",
-          "path": "c:/Users/gregt/LocalCode/LearningDotNet/LearningDotNet.code-workspace"
-        },
-        {
-          "color": "#63b76c",
-          "id": "pythondjfx2c4xpmaipc5yr",
-          "isGitRepo": true,
-          "name": "Python",
-          "path": "c:/Users/gregt/LocalCode/LearningPython/LearningPython.code-workspace"
-        },
-        {
-          "color": "#8338EC",
-          "id": "javascript0hsy4zmv8maip9liw",
-          "isGitRepo": true,
-          "name": "JavaScript",
-          "path": "c:/Users/gregt/LocalCode/LearningJavaScript/LearningJavaScript.code-workspace"
-        },
-        {
-          "color": "#8acbda",
-          "id": "gozf35umda8maipd20o",
-          "isGitRepo": true,
-          "name": "Go",
-          "path": "c:/Users/gregt/LocalCode/LearningGo/LearningGo.code-workspace"
-        },
-        {
-          "color": "#dbf24f",
-          "id": "sql3x3abfahimaipebde",
-          "isGitRepo": true,
-          "name": "SQL",
-          "path": "vscode-remote://wsl+MySQL/home/gtate/learningSQL/LearningSQL.code-workspace"
-        },
-        {
-          "color": "#FF0000",
-          "id": "ccuafy3ubfkmaiopv9m",
-          "isGitRepo": true,
-          "name": "C & C++",
-          "path": "vscode-remote://wsl+CCode/home/gtate/learningC-CPP/LearningC-CPP.code-workspace"
-        },
-        {
-          "color": "linear-gradient(43deg, #4158D0 0%, #C850C0 46%, #FFCC70 100%)",
-          "id": "cssn994kkqa1maipb2cr",
-          "isGitRepo": true,
-          "name": "CSS",
-          "path": "c:/Users/gregt/LocalCode/LearningCSS/LearningCSS.code-workspace"
-        }
-      ]
-    },
-    {
-      "groupName": "Work",
-      "id": "workysmri3ipqmaipjirc",
-      "projects": [
-        {
-          "color": "#00b3e2",
-          "id": "infscriptszd34qajbimaiqcp06",
-          "isGitRepo": true,
-          "name": "INF - Scripts",
-          "path": "c:/Users/gregt/OneDrive - Quisitive/Code/Azure DevOps/INF - Scripts"
-        },
-        {
-          "color": "#384555",
-          "id": "qitrunbooksz58bj9gaqmcqptwpa",
-          "isGitRepo": false,
-          "name": "Q IT Runbooks",
-          "path": "c:/Users/gregt/LocalCode/Azure Automation/Quisitive/it-automation-01"
-        },
-        {
-          "color": "#ACB78E",
-          "id": "prodevvg5lhbgm7mgp0tdxc",
-          "isGitRepo": true,
-          "name": "ProDev",
-          "path": "c:\\Users\\gregt\\LocalCode\\ProDev"
-        }
-      ]
-    },
-    {
-      "groupName": "Frameworks",
-      "id": "frameworks56xylv85xmfs0b96v",
-      "projects": [
-        {
-          "color": "#efbe00",
-          "id": "learningframeworkugn5ub9x4mfs0c74f",
-          "isGitRepo": true,
-          "name": "Learning Framework",
-          "path": "c:/Users/gregt/LocalCode/LearningFramework"
-        }
-      ]
     }
   ],
   "dashboard.projectTileWidth": 350,
@@ -540,8 +383,7 @@
   "github.copilot.chat.agent.temperature": 0,
   "github.copilot.chat.anthropic.thinking.budgetTokens": 16000,
   "github.copilot.chat.askQuestions.enabled": true,
-  "github.copilot.chat.claudeAgent.enabled": true,
-  "github.copilot.chat.codeGeneration.useInstructionFiles": false, //Disables auto-insertion of instruction files
+  "github.copilot.chat.claudeAgent.enabled": true, //Disables auto-insertion of instruction files
   "github.copilot.chat.commitMessageGeneration.instructions": [],
   "github.copilot.editor.enableCodeActions": true,
   "github.copilot.enable": {
@@ -687,12 +529,12 @@
   "hediet.vscode-drawio.theme": "min",
   "html.autoClosingTags": true,
   "html.autoCreateQuotes": false,
-  "inlineChat.affordance": "editor",
+  "inlineChat.affordance": "gutter",
   "inlineChat.defaultModel": "GPT-5 mini (copilot)",
   "inlineChat.enableV2": false,
   "inlineChat.finishOnType": true,
   "inlineChat.holdToSpeech": true,
-  "inlineChat.renderMode": "zone",
+  "inlineChat.renderMode": "hover",
   "javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
   "markdown-preview-enhanced.alwaysShowBacklinksInPreview": false,
   "markdown-preview-enhanced.automaticallyShowPreviewOfMarkdownBeingEdited": false,
@@ -1210,12 +1052,16 @@
     "workbench.settings.editor",
     "workbench.startupEditor",
     "@azure.enableCustomModeRecommendations",
-    "powershell.integratedConsole.startInBackground"
+    "powershell.integratedConsole.startInBackground",
+    "github.copilot.chat.searchSubagent.enabled",
+    "workbench.settings.alwaysShowAdvancedSettings"
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
-  "workbench.startupEditor": "welcomePageInEmptyWorkbench",
+  "workbench.startupEditor": "agentSessionsWelcomePage",
   "workbench.tips.enabled": true,
   "powershell.integratedConsole.showOnStartup": false,
-  "powershell.integratedConsole.startInBackground": true
+  "powershell.integratedConsole.startInBackground": true,
+  "github.copilot.chat.searchSubagent.enabled": true,
+  "workbench.settings.alwaysShowAdvancedSettings": true
 }
