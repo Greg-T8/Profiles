@@ -125,9 +125,6 @@
   "chat.checkpoints.enabled": true,
   "chat.customAgentInSubagent.enabled": false,
   "chat.editing.confirmEditRequestRemoval": false,
-  "chat.instructionsFilesLocations": {
-    "~/LocalCode/Agent-Toolkit/instructions": true
-  },
   "chat.mcp.gallery.enabled": true,
   "chat.notifyWindowOnResponseReceived": "off",
   "chat.promptFilesLocations": {
@@ -534,7 +531,6 @@
   "inlineChat.enableV2": false,
   "inlineChat.finishOnType": true,
   "inlineChat.holdToSpeech": true,
-  "inlineChat.renderMode": "hover",
   "javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
   "markdown-preview-enhanced.alwaysShowBacklinksInPreview": false,
   "markdown-preview-enhanced.automaticallyShowPreviewOfMarkdownBeingEdited": false,
@@ -1058,7 +1054,7 @@
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
-  "workbench.startupEditor": "agentSessionsWelcomePage",
+  "workbench.startupEditor": "none",
   "workbench.tips.enabled": true,
   "powershell.integratedConsole.showOnStartup": false,
   "powershell.integratedConsole.startInBackground": true,

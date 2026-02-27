@@ -420,10 +420,6 @@
     "when": "inlineEditIsVisible || inlineSuggestionVisible"
   },
   {
-    "key": "ctrl+shift+h",
-    "command": "terminal.focus"
-  },
-  {
     "key": "ctrl+f",
     "command": "-actions.find",
     "when": "editorFocus || editorIsOpen"
@@ -718,5 +714,32 @@
     "key": "shift+enter",
     "command": "-workbench.action.terminal.sendSequence",
     "when": "config.terminal.integrated.enableWin32InputMode && terminalFocus && terminalShellIntegrationEnabled && !accessibilityModeEnabled && terminalShellType == 'pwsh'"
+  },
+  {
+    "key": "ctrl+;",
+    "command": "workbench.action.openSettings2"
+  },
+  {
+    "key": "ctrl+shift+j",
+    "command": "workbench.action.chat.openSessionTargetPicker",
+    "when": "chatIsEnabled && inChatInput && chatLocation == 'panel'"
+  },
+  {
+    "key": "ctrl+w",
+    "command": "workbench.action.moveEditorToNewWindow",
+    "when": "editorFocus"
+  },
+  {
+    "key": "ctrl+shift+w",
+    "command": "workbench.action.closeActiveEditor",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+f4",
+    "command": "-workbench.action.closeActiveEditor"
+  },
+  {
+    "key": "ctrl+shift+w",
+    "command": "-workbench.action.closeWindow"
   },
 ]
