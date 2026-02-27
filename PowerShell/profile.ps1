@@ -118,7 +118,6 @@ Set-Alias -Name ll -Value Get-ChildItem -Force
 Set-Alias -Name cfj -Value ConvertFrom-Json
 Set-Alias -Name tf -Value terraform
 Set-Alias -Name gim -Value Get-InstalledModule
-Set-Alias -Name tnc -Value Test-NetConnection
 Set-Alias -Name rdn -Value Resolve-DNSName
 Remove-Item Alias:dir -ErrorAction SilentlyContinue
 Set-Alias -Name gcp -Value Get-CurrentAzProfile
