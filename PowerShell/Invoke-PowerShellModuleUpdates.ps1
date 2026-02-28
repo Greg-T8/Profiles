@@ -1,10 +1,60 @@
+#region HEADER
+# Script-level help and metadata.
+<#
+.SYNOPSIS
+Updates installed PowerShell modules and writes run logs.
+
+.DESCRIPTION
+Runs targeted or broad module maintenance for CurrentUser-installed modules.
+The script records update and cleanup output to indexed log files under %APPDATA%.
+
+.CONTEXT
+User login maintenance automation (Windows Task Scheduler)
+
+.AUTHOR
+Greg Tate
+
+.PARAMETER RetentionDays
+Overrides the default log retention period (in days). Use a value from 0 to 3650.
+
+.PARAMETER AllModules
+Updates all modules installed in CurrentUser scope, excluding configured ignore list entries.
+
+.PARAMETER Common
+Uses the configured common module list (default parameter set).
+
+.PARAMETER ModuleName
+Updates only the specified module names when they are installed in CurrentUser scope.
+
+.PARAMETER RecentHistoryLines
+Number of recent PSReadLine history lines used by refresh logic (reserved for compatibility).
+
+.PARAMETER ShowTiming
+Displays per-module timing diagnostics in console output.
+
+.EXAMPLE
+.\Invoke-PowerShellModuleUpdates.ps1 -Common
+
+.EXAMPLE
+.\Invoke-PowerShellModuleUpdates.ps1 -AllModules
+
+.EXAMPLE
+.\Invoke-PowerShellModuleUpdates.ps1 -ModuleName 'Az.Accounts','Microsoft.Graph.Authentication' -ShowTiming
+
+.NOTES
+Program: Invoke-PowerShellModuleUpdates.ps1
+#>
+
 # -------------------------------------------------------------------------
 # Program: Invoke-PowerShellModuleUpdates.ps1
 # Description: Updates PowerShell modules and WinGet packages with per-tool logs for login automation.
 # Context: User login maintenance automation (Windows Task Scheduler)
 # Author: Greg Tate
 # ------------------------------------------------------------------------
+#endregion
 
+#region PARAMETERS
+# Script parameter definitions.
 [CmdletBinding(DefaultParameterSetName = 'Common')]
 param(
     [ValidateRange(0, 3650)]
@@ -21,9 +71,14 @@ param(
     [string[]]$ModuleName,
 
     [ValidateRange(100, 50000)]
-    [int]$RecentHistoryLines = 5000
-)
+    [int]$RecentHistoryLines = 5000,
 
+    [switch]$ShowTiming
+)
+#endregion
+
+#region CONFIGURATION
+# Script configuration and startup state.
 # Configure module scope for PowerShell update and cleanup phases.
 $ModuleUpdateConfig = @{
     Scope           = 'Selected'
@@ -56,7 +111,10 @@ $Script:ModuleUpdateScriptPath = if ($PSCommandPath) { $PSCommandPath } else { $
 # Capture switch states here because $PSBoundParameters is not visible inside & $Main.
 $useAllModules = $PSBoundParameters.ContainsKey('AllModules')
 $useModuleNameList = $PSBoundParameters.ContainsKey('ModuleName')
+#endregion
 
+#region MAIN
+# High-level orchestration flow.
 $Main = {
     . $Helpers
     $powerShellChanged = $false
@@ -68,12 +126,15 @@ $Main = {
     if ($useAllModules) { $moduleScopeMode = 'AllUserScoped' }
     if ($useModuleNameList) { $moduleScopeMode = 'ModuleNameList' }
 
-    $moduleUpdateParameters = New-ModuleUpdateParameters -ModuleUpdateConfig $ModuleUpdateConfig -ScopeMode $moduleScopeMode -ModuleName $ModuleName -RecentHistoryLines $RecentHistoryLines
+    $moduleUpdateParameters = New-ModuleUpdateParameters -ModuleUpdateConfig $ModuleUpdateConfig -ScopeMode $moduleScopeMode -ModuleName $ModuleName -RecentHistoryLines $RecentHistoryLines -ShowTiming:$ShowTiming
     $powerShellChanged = Invoke-PowerShellModuleUpdates -PowerShellLogPath $logContext.PowerShellLogPath -ModuleUpdateParameters $moduleUpdateParameters
 
     Open-UpdateLogs -PowerShellLogPath $logContext.PowerShellLogPath -RefreshedModulesLogPath $logContext.RefreshedModulesLogPath -PowerShellChanged:$powerShellChanged -RefreshLogCreated:$refreshLogCreated
 }
+#endregion
 
+#region HELPERS
+# Supporting helper functions.
 $Helpers = {
     function New-ModuleUpdateParameters {
         param(
@@ -85,7 +146,9 @@ $Helpers = {
 
             [string[]]$ModuleName = @(),
 
-            [int]$RecentHistoryLines = 5000
+            [int]$RecentHistoryLines = 5000,
+
+            [switch]$ShowTiming
         )
 
         # Build a lookup of modules installed in CurrentUser scope only.
@@ -102,7 +165,7 @@ $Helpers = {
                 throw '-AllModules found no modules in CurrentUser scope.'
             }
 
-            return @{ Name = @($allUserScopedModules) }
+            return @{ Name = @($allUserScopedModules); ShowTiming = [bool]$ShowTiming; ScopeMode = 'AllUserScoped' }
         }
 
         # Honor explicit module list for targeted update and cleanup.
@@ -120,7 +183,7 @@ $Helpers = {
                 throw '-ModuleName values were not found in CurrentUser scope.'
             }
 
-            return @{ Name = $matchedModules }
+            return @{ Name = $matchedModules; ShowTiming = [bool]$ShowTiming; ScopeMode = 'ModuleNameList' }
         }
 
         # Use common selected module list from config.
@@ -135,7 +198,7 @@ $Helpers = {
                 throw '-Common found no configured modules in CurrentUser scope.'
             }
 
-            return @{ Name = $selectedModulesFromConfig }
+            return @{ Name = $selectedModulesFromConfig; ShowTiming = [bool]$ShowTiming; ScopeMode = 'Common' }
         }
 
         throw "Invalid scope mode '$ScopeMode'. Use 'Common', 'AllUserScoped', or 'ModuleNameList'."
@@ -148,30 +211,7 @@ $Helpers = {
             (Join-Path -Path $HOME -ChildPath 'Documents\WindowsPowerShell\Modules')
         )
 
-        $supportsScope = (Get-Command Get-InstalledModule -ErrorAction SilentlyContinue).Parameters.ContainsKey('Scope')
-
-        if ($supportsScope) {
-            $currentUserInstalled = Get-InstalledModule -Scope CurrentUser -ErrorAction SilentlyContinue
-        }
-        else {
-            $allInstalled = Get-InstalledModule -ErrorAction SilentlyContinue
-            $currentUserInstalled = $allInstalled | Where-Object {
-                $installRoot = "$($_.InstalledLocation)"
-                $userModuleRoots | Where-Object { $installRoot -like "$($_)*" }
-            }
-        }
-
         $moduleNames = @()
-        if ($currentUserInstalled) {
-            $moduleNames += $currentUserInstalled | Select-Object -ExpandProperty Name -Unique
-        }
-
-        if (Get-Command Get-InstalledPSResource -ErrorAction SilentlyContinue) {
-            $currentUserResources = Get-InstalledPSResource -Scope CurrentUser -ErrorAction SilentlyContinue
-            if ($currentUserResources) {
-                $moduleNames += $currentUserResources | Select-Object -ExpandProperty Name -Unique
-            }
-        }
 
         $userPathModules = Get-Module -ListAvailable -ErrorAction SilentlyContinue | Where-Object {
             $moduleBase = "$($_.ModuleBase)"
@@ -179,6 +219,15 @@ $Helpers = {
         }
         if ($userPathModules) {
             $moduleNames += $userPathModules | Select-Object -ExpandProperty Name -Unique
+        }
+
+        if (Get-Command Get-InstalledPSResource -ErrorAction SilentlyContinue) {
+            $currentUserResources = Get-InstalledPSResource -Scope CurrentUser -ErrorAction SilentlyContinue
+            if ($currentUserResources) {
+                $moduleNames += $currentUserResources |
+                    Where-Object { "$($_.Type)" -eq 'Module' } |
+                    Select-Object -ExpandProperty Name -Unique
+            }
         }
 
         return @($moduleNames | Sort-Object -Unique)
@@ -560,7 +609,9 @@ $Helpers = {
         param(
             [switch]$All,
             [string[]]$Name,
-            [switch]$SkipRemoveOldVersions
+            [switch]$SkipRemoveOldVersions,
+            [switch]$ShowTiming,
+            [string]$ScopeMode
         )
 
         # Validate mutually exclusive scope parameters.
@@ -568,9 +619,9 @@ $Helpers = {
             throw 'Specify either -All or -Name, but not both.'
         }
 
-        # Ensure PowerShellGet v2 is available.
-        if (-not (Get-Command Get-InstalledModule -ErrorAction SilentlyContinue)) {
-            Write-Error 'PowerShellGet v2 not detected. This script requires the PowerShellGet module (v2).'
+        # Ensure module update commands are available.
+        if (-not (Get-Command Update-Module -ErrorAction SilentlyContinue) -or -not (Get-Command Find-Module -ErrorAction SilentlyContinue)) {
+            Write-Error 'PowerShellGet is required. This script needs Update-Module and Find-Module.'
             return
         }
 
@@ -588,36 +639,24 @@ $Helpers = {
             Write-Host " `'$repoName`' is now trusted." -ForegroundColor Green
         }
 
-        # Resolve module scope from parameters.
-        $targetPatterns = @()
+        # Build explicit module names to process.
+        $moduleNamesToProcess = @()
         if ($Name) {
-            $targetPatterns = $Name
+            $moduleNamesToProcess = @($Name | Where-Object { -not [string]::IsNullOrWhiteSpace("$_") } | Sort-Object -Unique)
         }
         else {
-            $targetPatterns = '*'
+            $moduleNamesToProcess = @(Get-Module -ListAvailable -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Name -Unique | Sort-Object)
             $All = $true
         }
 
-        # Discover installed modules for the selected scope.
-        $modules = foreach ($pattern in ($targetPatterns | Select-Object -Unique)) {
-            try {
-                Get-InstalledModule -Name $pattern -ErrorAction Stop
-            }
-            catch {
-                Write-Warning "No installed module matched '$pattern'."
-            }
-        }
-
-        $modules = $modules | Sort-Object -Property Name -Unique
-
-        if (-not $modules) {
+        if (-not $moduleNamesToProcess) {
             Write-Host 'No modules found from Get-InstalledModule.' -ForegroundColor Yellow
             return
         }
 
         $updatedModules = [System.Collections.Generic.List[string]]::new()
         $skippedModules = [System.Collections.Generic.List[string]]::new()
-        $totalModules = @($modules).Count
+        $totalModules = @($moduleNamesToProcess).Count
         $moduleIndex = 0
 
         # Detect modules loaded in this session that cannot be updated in-place.
@@ -625,44 +664,141 @@ $Helpers = {
 
         Write-Progress -Id 1 -Activity 'PowerShell module maintenance' -Status 'Module update phase starting' -PercentComplete 0
 
-        foreach ($mod in $modules) {
+        foreach ($moduleName in $moduleNamesToProcess) {
+            $moduleStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
             $moduleIndex++
             $percentComplete = [int](($moduleIndex / $totalModules) * 100)
-            Write-Host "Processing module: $($mod.Name)" -ForegroundColor DarkGray
+            Write-Host "Processing module: $moduleName" -ForegroundColor DarkGray
             Write-Progress -Id 1 -Activity 'PowerShell module maintenance' -Status "Update/Cleanup phase: checking $moduleIndex of $totalModules modules" -PercentComplete $percentComplete
 
+            # Resolve installed module metadata for this specific module name.
+            $preLookupStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+            $installedVersions = @(Get-Module -ListAvailable -Name $moduleName -ErrorAction SilentlyContinue | Sort-Object -Property Version -Descending)
+            $mod = $installedVersions | Select-Object -First 1
+            $preLookupStopwatch.Stop()
+            if ($ShowTiming) {
+                Write-Host ("Timing: [{0}] Get-Module (pre/all versions): {1:N2}s" -f $moduleName, $preLookupStopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkCyan
+            }
+
+            if (-not $mod) {
+                $skippedModules.Add("$moduleName (not-found)")
+                Write-Host "Skipping '$moduleName' — module metadata was not found." -ForegroundColor DarkYellow
+                $moduleStopwatch.Stop()
+                if ($ShowTiming) {
+                    Write-Host ("Timing: [{0}] Total (not-found): {1:N2}s" -f $moduleName, $moduleStopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkCyan
+                }
+                continue
+            }
+
             # Skip modules currently loaded in the session — they cannot be updated in-place.
-            if ($loadedModuleNames -contains $mod.Name) {
-                $skippedModules.Add("$($mod.Name) (in-use)")
-                Write-Warning "Skipping '$($mod.Name)' — module is loaded in this session and cannot be updated in-place."
+            if ($loadedModuleNames -contains $moduleName) {
+                $skippedModules.Add("$moduleName (in-use)")
+                Write-Host "Skipping '$moduleName' — module is loaded in this session and cannot be updated in-place." -ForegroundColor DarkYellow
+                $moduleStopwatch.Stop()
+                if ($ShowTiming) {
+                    Write-Host ("Timing: [{0}] Total (in-use): {1:N2}s" -f $moduleName, $moduleStopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkCyan
+                }
+                continue
+            }
+
+            # Check gallery for a newer version before running update.
+            $checkUpdateStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+            $galleryModule = Find-Module -Name $moduleName -Repository $repoName -ErrorAction SilentlyContinue
+            $checkUpdateStopwatch.Stop()
+            if ($ShowTiming) {
+                Write-Host ("Timing: [{0}] Find-Module (check): {1:N2}s" -f $moduleName, $checkUpdateStopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkCyan
+            }
+
+            if (-not $galleryModule) {
+                $skippedModules.Add("$moduleName (not-in-gallery)")
+                Write-Host "Skipping '$moduleName' — no PSGallery listing was found." -ForegroundColor DarkYellow
+                $moduleStopwatch.Stop()
+                if ($ShowTiming) {
+                    Write-Host ("Timing: [{0}] Total (not-in-gallery): {1:N2}s" -f $moduleName, $moduleStopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkCyan
+                }
                 continue
             }
 
             try {
                 # Use string comparison to handle prerelease version tags (e.g. 1.0.0-beta4).
                 $startingVersionStr = "$($mod.Version)"
-                Update-Module -Name $mod.Name -ErrorAction Stop
+                $galleryVersionStr = "$($galleryModule.Version)"
 
-                $latestInstalled = Get-InstalledModule -Name $mod.Name -ErrorAction SilentlyContinue
+                $hasUpdate = $true
+                try {
+                    $hasUpdate = ([version]$galleryVersionStr -gt [version]$startingVersionStr)
+                }
+                catch {
+                    $hasUpdate = ($galleryVersionStr -ne $startingVersionStr)
+                }
+
+                if (-not $hasUpdate) {
+                    $skippedModules.Add("$moduleName (up-to-date)")
+                    if ($ShowTiming) {
+                        Write-Host ("Timing: [{0}] Update skipped (up-to-date): installed={1}; gallery={2}" -f $moduleName, $startingVersionStr, $galleryVersionStr) -ForegroundColor DarkCyan
+                    }
+                    $moduleStopwatch.Stop()
+                    if ($ShowTiming) {
+                        Write-Host ("Timing: [{0}] Total (up-to-date): {1:N2}s" -f $moduleName, $moduleStopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkCyan
+                    }
+                    continue
+                }
+
+                # Skip modules that are not tracked by PowerShellGet Install-Module.
+                $installedByPowerShellGet = Get-InstalledModule -Name $moduleName -ErrorAction SilentlyContinue
+                if (-not $installedByPowerShellGet) {
+                    $skippedModules.Add("$moduleName (not-installed-via-install-module)")
+                    Write-Host "Skipping '$moduleName' — module was not installed using Install-Module." -ForegroundColor DarkYellow
+                    $moduleStopwatch.Stop()
+                    if ($ShowTiming) {
+                        Write-Host ("Timing: [{0}] Total (not-installed-via-install-module): {1:N2}s" -f $moduleName, $moduleStopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkCyan
+                    }
+                    continue
+                }
+
+                $updateStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+                Update-Module -Name $moduleName -ErrorAction Stop
+                $updateStopwatch.Stop()
+                if ($ShowTiming) {
+                    Write-Host ("Timing: [{0}] Update-Module: {1:N2}s" -f $moduleName, $updateStopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkCyan
+                }
+
+                $postLookupStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+                $latestInstalled = Get-Module -ListAvailable -Name $moduleName -ErrorAction SilentlyContinue | Sort-Object -Property Version -Descending | Select-Object -First 1
+                $postLookupStopwatch.Stop()
+                if ($ShowTiming) {
+                    Write-Host ("Timing: [{0}] Get-Module (post/all versions): {1:N2}s" -f $moduleName, $postLookupStopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkCyan
+                }
+
                 $latestVersionStr = if ($latestInstalled) { "$($latestInstalled.Version)" } else { $startingVersionStr }
 
                 if ($latestVersionStr -ne $startingVersionStr) {
-                    $updatedModules.Add("$($mod.Name): $startingVersionStr -> $latestVersionStr")
+                    $updatedModules.Add("${moduleName}: $startingVersionStr -> $latestVersionStr")
                 }
             }
             catch {
-                $skippedModules.Add("$($mod.Name) (error)")
-                Write-Warning "⚠ Failed to update '$($mod.Name)': $_"
+                $skippedModules.Add("$moduleName (error)")
+                Write-Warning "⚠ Failed to update '$moduleName': $_"
             }
 
             # Run old-version cleanup for this module immediately after update.
             if (-not $SkipRemoveOldVersions -and (Get-Command Remove-OldModuleVersions -ErrorAction SilentlyContinue)) {
                 try {
-                    Remove-OldModuleVersions -Name $mod.Name -Confirm:$false
+                    $cleanupStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+                    Remove-OldModuleVersions -Name $moduleName -Confirm:$false
+                    $cleanupStopwatch.Stop()
+                    if ($ShowTiming) {
+                        Write-Host ("Timing: [{0}] Remove-OldModuleVersions: {1:N2}s" -f $moduleName, $cleanupStopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkCyan
+                    }
                 }
                 catch {
-                    Write-Warning "⚠ Failed to remove old module versions for '$($mod.Name)': $_"
+                    Write-Warning "⚠ Failed to remove old module versions for '$moduleName': $_"
                 }
+            }
+
+            $moduleStopwatch.Stop()
+            if ($ShowTiming) {
+                Write-Host ("Timing: [{0}] Total: {1:N2}s" -f $moduleName, $moduleStopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkCyan
             }
         }
 
@@ -693,19 +829,22 @@ $Helpers = {
         $runHeader = "`n===== PowerShell module maintenance started: $(Get-Date -Format s) ====="
         $runHeader | Tee-Object -FilePath $PowerShellLogPath -Append | Out-Null
 
-        # Record whether this run targets all modules or only a configured subset.
-        if ($ModuleUpdateParameters.ContainsKey('All')) {
-            'Scope: All installed modules' | Tee-Object -FilePath $PowerShellLogPath -Append | Out-Null
+        # Record scope context with compact module display for non-all modes.
+        $scopeMode = if ($ModuleUpdateParameters.ContainsKey('ScopeMode')) { "$($ModuleUpdateParameters.ScopeMode)" } else { 'ModuleNameList' }
+        if ($scopeMode -eq 'AllUserScoped') {
+            'Scope: All user-scoped modules' | Tee-Object -FilePath $PowerShellLogPath -Append | Out-Null
         }
         else {
-            'Scope: Selected modules' | Tee-Object -FilePath $PowerShellLogPath -Append | Out-Null
-            $ModuleUpdateParameters.Name |
-                ForEach-Object { "- $_" } |
-                Tee-Object -FilePath $PowerShellLogPath -Append |
-                Out-Null
+            $scopeLabel = if ($scopeMode -eq 'Common') { 'Common' } else { 'ModuleName' }
+            $moduleListInline = @($ModuleUpdateParameters.Name) -join ', '
+            "Scope: $scopeLabel | Modules: $moduleListInline" | Tee-Object -FilePath $PowerShellLogPath -Append | Out-Null
         }
 
-        $logLines = [System.Collections.Generic.List[string]]::new()
+        $updatedModuleLines = [System.Collections.Generic.List[string]]::new()
+        $cleanupLines = [System.Collections.Generic.List[string]]::new()
+        $warningErrorLines = [System.Collections.Generic.List[string]]::new()
+        $summaryLines = [System.Collections.Generic.List[string]]::new()
+        $skippedLines = [System.Collections.Generic.List[string]]::new()
 
         # Run module update and cleanup and process all streams in real time.
         & {
@@ -714,10 +853,10 @@ $Helpers = {
             $entry = $_
 
             if ($entry -is [System.Management.Automation.WarningRecord]) {
-                $logLines.Add("WARNING: $($entry.Message)")
+                $warningErrorLines.Add("WARNING: $($entry.Message)")
             }
             elseif ($entry -is [System.Management.Automation.ErrorRecord]) {
-                $logLines.Add("ERROR: $($entry.Exception.Message)")
+                $warningErrorLines.Add("ERROR: $($entry.Exception.Message)")
             }
             else {
                 $text = "$entry"
@@ -726,22 +865,40 @@ $Helpers = {
                 if ($text -match '^Processing module:') {
                     $text | Out-Host
                 }
+                # Show per-call timing diagnostics in console only.
+                elseif ($text -match '^Timing:') {
+                    $text | Out-Host
+                }
                 # Capture module version change lines (Name: old -> new).
                 elseif ($text -match '^[^:]+:\s+[^\s]+\s+->\s+[^\s]+$') {
-                    $logLines.Add($text)
+                    $updatedModuleLines.Add($text)
                 }
-                # Capture summary, cleanup, and skipped module lines.
-                elseif ($text -match '^(Summary:|Skipped modules:|Cleanup:|  - )') {
-                    $logLines.Add($text)
+                # Capture cleanup and moved-module changes.
+                elseif ($text -match '^Cleanup:') {
+                    $cleanupLines.Add($text)
+                }
+                # Capture summary and skipped module lines.
+                elseif ($text -match '^Summary:') {
+                    $summaryLines.Add($text)
+                }
+                elseif ($text -match '^Skipped modules:|^  - ') {
+                    $skippedLines.Add($text)
                 }
                 elseif ($text -like 'WARNING:*' -or $text -like 'ERROR:*') {
-                    $logLines.Add($text)
+                    $warningErrorLines.Add($text)
                 }
             }
         }
 
         # Track whether any module versions changed or old versions were cleaned up.
-        $hasModuleChanges = $logLines | Where-Object { $_ -match '^[^:]+:\s+[^\s]+\s+->\s+[^\s]+$' -or $_ -match '^Cleanup:' } | Select-Object -First 1
+        $hasModuleChanges = ($updatedModuleLines.Count -gt 0 -or $cleanupLines.Count -gt 0)
+
+        $logLines = [System.Collections.Generic.List[string]]::new()
+        $updatedModuleLines | ForEach-Object { $logLines.Add($_) }
+        $cleanupLines | ForEach-Object { $logLines.Add($_) }
+        $warningErrorLines | ForEach-Object { $logLines.Add($_) }
+        $summaryLines | ForEach-Object { $logLines.Add($_) }
+        $skippedLines | ForEach-Object { $logLines.Add($_) }
 
         # Note when there were no module version changes and no warnings/errors.
         if ($logLines.Count -eq 0) {
@@ -753,7 +910,7 @@ $Helpers = {
         # Record completion timestamp.
         "===== PowerShell module maintenance completed: $(Get-Date -Format s) =====" | Tee-Object -FilePath $PowerShellLogPath -Append | Out-Null
 
-        return [bool]$hasModuleChanges
+        return $hasModuleChanges
     }
 
     function Open-UpdateLogs {
@@ -779,7 +936,10 @@ $Helpers = {
         }
     }
 }
+#endregion
 
+#region EXECUTION
+# Script entrypoint wrapper.
 try {
     Push-Location -Path $PSScriptRoot
     & $Main
@@ -787,3 +947,4 @@ try {
 finally {
     Pop-Location
 }
+#endregion
