@@ -1123,6 +1123,7 @@
   "github.copilot.chat.searchSubagent.enabled": true,
   "workbench.settings.alwaysShowAdvancedSettings": true,
   "chat.instructionsFilesLocations": {
-    "~/.copilot/instructions": true
+    "~/.copilot/instructions": true,
+    "~/LocalCode/Agent-Toolkit": true
   }
 }
