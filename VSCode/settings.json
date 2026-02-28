@@ -162,6 +162,61 @@
   "dashboard.openOnStartup": "empty workspace",
   "dashboard.projectData": [
     {
+      "id": "clientsacck9xha7mm66b5q8",
+      "groupName": "Clients",
+      "projects": [
+        {
+          "isGitRepo": true,
+          "id": "tcucixgm86k5mm66h2q6",
+          "name": "TCU",
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\TCU\\TCU.code-workspace",
+          "color": "#4C1979"
+        },
+        {
+          "isGitRepo": true,
+          "id": "bello8t3bzuwzmm66hlz1",
+          "name": "Bell",
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\Bell\\Client-Bell.code-workspace",
+          "color": "#2F5D3A"
+        },
+        {
+          "isGitRepo": false,
+          "id": "gooselol5jgch9mm66i79i",
+          "name": "Goose",
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\GooseCreekISD\\GooseCreekISD.code-workspace",
+          "color": "#282961"
+        }
+      ]
+    },
+    {
+      "id": "projectsu85uk6mvamm66iem5",
+      "groupName": "Learning",
+      "projects": [
+        {
+          "isGitRepo": true,
+          "id": "learningazurez7bjmeomkmm66rd4i",
+          "name": "LearningAzure",
+          "path": "c:\\Users\\gregt\\LocalCode\\LearningAzure\\LearningAzure.code-workspace",
+          "color": "#4683ca"
+        },
+        {
+          "isGitRepo": true,
+          "id": "terraformpracticexe0nomgakmm66jka6",
+          "name": "Terraform-Practice",
+          "path": "c:\\Users\\gregt\\LocalCode\\Terraform-Practice\\Terraform-Practice.code-workspace",
+          "color": "#6b2c91"
+        },
+        {
+          "isGitRepo": true,
+          "id": "videotonotesxhl46tqmumm66ivrs",
+          "name": "VideoToNotes",
+          "path": "c:\\Users\\gregt\\LocalCode\\VideoToNotes\\VideoToNotes.code-workspace",
+          "color": "#8b4789"
+        }
+      ],
+      "collapsed": false
+    },
+    {
       "groupName": "Profiles",
       "id": "profiles2ce7zszmvmaipjlz7",
       "projects": [
@@ -192,6 +247,13 @@
           "isGitRepo": false,
           "name": "SSH",
           "path": "c:/Users/gregt/OneDrive/Apps/ssh/ssh.code-workspace"
+        },
+        {
+          "isGitRepo": true,
+          "id": "agenttoolkit4ymzfdlrtmm67907i",
+          "name": "Agent-Toolkit",
+          "path": "c:\\Users\\gregt\\LocalCode\\Agent-Toolkit\\Agent-Toolkit.code-workspace",
+          "color": "#0D0332"
         },
         {
           "color": "#e916a0",
@@ -229,70 +291,14 @@
           "path": "c:/Users/gregt/OneDrive/Apps/Profiles/draw.io"
         }
       ]
-    },
-    {
-      "id": "clientsacck9xha7mm66b5q8",
-      "groupName": "Clients",
-      "projects": [
-        {
-          "isGitRepo": true,
-          "id": "tcucixgm86k5mm66h2q6",
-          "name": "TCU",
-          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\TCU\\TCU.code-workspace",
-          "color": "#4C1979"
-        },
-        {
-          "isGitRepo": true,
-          "id": "bello8t3bzuwzmm66hlz1",
-          "name": "Bell",
-          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\Bell\\Client-Bell.code-workspace",
-          "color": "#2F5D3A"
-        },
-        {
-          "isGitRepo": false,
-          "id": "gooselol5jgch9mm66i79i",
-          "name": "Goose",
-          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\GooseCreekISD\\GooseCreekISD.code-workspace",
-          "color": "#282961"
-        }
-      ]
-    },
-    {
-      "id": "projectsu85uk6mvamm66iem5",
-      "groupName": "Projects",
-      "projects": [
-        {
-          "isGitRepo": true,
-          "id": "videotonotesxhl46tqmumm66ivrs",
-          "name": "VideoToNotes",
-          "path": "c:\\Users\\gregt\\LocalCode\\VideoToNotes\\VideoToNotes.code-workspace",
-          "color": "#8b4789"
-        },
-        {
-          "isGitRepo": true,
-          "id": "terraformpracticexe0nomgakmm66jka6",
-          "name": "Terraform-Practice",
-          "path": "c:\\Users\\gregt\\LocalCode\\Terraform-Practice\\Terraform-Practice.code-workspace",
-          "color": "#6b2c91"
-        }
-      ]
-    },
-    {
-      "id": "studies3kcrd5m8wmm66qyt1",
-      "groupName": "Studies",
-      "projects": [
-        {
-          "isGitRepo": true,
-          "id": "learningazurez7bjmeomkmm66rd4i",
-          "name": "LearningAzure",
-          "path": "c:\\Users\\gregt\\LocalCode\\LearningAzure\\LearningAzure.code-workspace",
-          "color": "#4683ca"
-        }
-      ]
     }
   ],
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
+    [
+      "#0D0332",
+      "Black Rock"
+    ],
     [
       "#780109",
       "Japanese Maple"
@@ -348,10 +354,6 @@
     [
       "#A69279",
       "Donkey Brown"
-    ],
-    [
-      "#FCD917",
-      "Candlelight"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
