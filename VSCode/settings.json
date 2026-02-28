@@ -104,7 +104,7 @@
     ],
     "editor.tabSize": 2
   },
-  "@azure.argTenant": "547b168b-bd3f-4cfc-ae2b-665f52672fae",
+  "@azure.argTenant": "",
   "@azure.enableCustomModeRecommendations": false,
   "azureResourceGroups.enableChatStandIn": false,
   "azureTerraform.survey": {
@@ -186,6 +186,13 @@
           "name": "VideoToNotes",
           "path": "c:\\Users\\gregt\\LocalCode\\Projects\\VideoToNotes\\VideoToNotes.code-workspace",
           "color": "#8b4789"
+        },
+        {
+          "isGitRepo": true,
+          "id": "hypervoh8xrbq98mm6av71w",
+          "name": "Hyper-V",
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\Hyper-V\\Hyper-V.code-workspace",
+          "color": "#1e214f"
         }
       ],
       "collapsed": false
@@ -297,6 +304,10 @@
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
     [
+      "#1e214f",
+      "Port Gore"
+    ],
+    [
       "#0D0332",
       "Black Rock"
     ],
@@ -351,10 +362,6 @@
     [
       "#45B1E8",
       "Picton Blue"
-    ],
-    [
-      "#A69279",
-      "Donkey Brown"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
