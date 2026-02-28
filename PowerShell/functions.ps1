@@ -102,8 +102,18 @@ function Update-AllInstalledModules {
         Ensures PSGallery is trusted, then updates all modules installed via Install-Module.
     #>
 
+    [OutputType([string[]])]
     [CmdletBinding()]
-    param()
+    param(
+        [switch]$All,
+        [string[]]$Name,
+        [switch]$SkipRemoveOldVersions
+    )
+
+    # Validate mutually exclusive scope parameters.
+    if ($All -and $Name) {
+        throw 'Specify either -All or -Name, but not both.'
+    }
 
     # Ensure PowerShellGet v2 is available
     if (-not (Get-Command Get-InstalledModule -ErrorAction SilentlyContinue)) {
@@ -125,21 +135,82 @@ function Update-AllInstalledModules {
         # Write-Host "✓ `'$repoName`' is now trusted." -ForegroundColor Green
         Write-Host " `'$repoName`' is now trusted." -ForegroundColor Green
     }
+    # Resolve module scope from parameters.
+    $targetPatterns = @()
+    if ($Name) {
+        $targetPatterns = $Name
+    }
+    else {
+        $targetPatterns = '*'
+        $All = $true
+    }
 
+    # Discover installed modules for the selected scope.
+    $modules = foreach ($pattern in ($targetPatterns | Select-Object -Unique)) {
+        try {
+            Get-InstalledModule -Name $pattern -ErrorAction Stop
+        }
+        catch {
+            Write-Warning "No installed module matched '$pattern'."
+        }
+    }
 
+    $modules = $modules | Sort-Object -Property Name -Unique
 
-    $modules = Get-InstalledModule
+    if (-not $modules) {
+        Write-Host 'No modules found from Get-InstalledModule.' -ForegroundColor Yellow
+        return
+    }
+
+    $updatedModules = [System.Collections.Generic.List[string]]::new()
+    $totalModules = @($modules).Count
+    $moduleIndex = 0
+    Write-Progress -Id 1 -Activity 'PowerShell module maintenance' -Status 'Module update phase starting' -PercentComplete 0
 
     foreach ($mod in $modules) {
+        $moduleIndex++
+        $percentComplete = [int](($moduleIndex / $totalModules) * 100)
+        Write-Progress -Id 1 -Activity 'PowerShell module maintenance' -Status "Update phase: checking $moduleIndex of $totalModules modules" -PercentComplete $percentComplete
+
         try {
-            Write-Host "Updating module '$($mod.Name)'..." -ForegroundColor Cyan
+            $startingVersion = [version]$mod.Version
             Update-Module -Name $mod.Name -ErrorAction Stop
-            Write-Host "✓ Updated '$($mod.Name)'" -ForegroundColor Green
+
+            $latestVersion = Get-InstalledModule -Name $mod.Name -AllVersions |
+                Sort-Object -Property Version -Descending |
+                Select-Object -First 1 -ExpandProperty Version
+
+            if ([version]$latestVersion -gt $startingVersion) {
+                $updatedModules.Add("$($mod.Name): $startingVersion -> $latestVersion")
+            }
         }
         catch {
             Write-Warning "⚠ Failed to update '$($mod.Name)': $_"
         }
     }
+
+    Write-Progress -Id 1 -Activity 'PowerShell module maintenance' -Status 'Update phase completed' -PercentComplete 100
+
+    if (-not $SkipRemoveOldVersions -and (Get-Command Remove-OldModuleVersions -ErrorAction SilentlyContinue)) {
+        Write-Progress -Id 1 -Activity 'PowerShell module maintenance' -Status 'Cleanup phase: removing old module versions' -PercentComplete 100
+        Write-Host 'Removing older module versions...' -ForegroundColor Cyan
+        try {
+            if ($All) {
+                Remove-OldModuleVersions -All -Confirm:$false
+            }
+            else {
+                Remove-OldModuleVersions -Name $targetPatterns -Confirm:$false
+            }
+            Write-Host 'Old module version cleanup complete.' -ForegroundColor Green
+        }
+        catch {
+            Write-Warning "⚠ Failed to remove old module versions: $_"
+        }
+    }
+
+    Write-Progress -Id 1 -Activity 'PowerShell module maintenance' -Completed
+
+    $updatedModules
 }
 
 # Retrieves the Windows Experience Index (WEI) score and assessment date.
@@ -222,6 +293,7 @@ function Remove-OldModuleVersions {
         [Parameter(ValueFromPipeline, ValueFromPipelineByPropertyName)]
         [string[]] $Name,
 
+        [switch] $All,
         [switch] $IncludeGraph,
         [switch] $IncludeAz,
 
@@ -232,12 +304,13 @@ function Remove-OldModuleVersions {
     begin {
         # Build the target name list
         $targets = @()
+        if ($All) { $targets += '*' }
         if ($IncludeGraph) { $targets += 'Microsoft.Graph*' }
         if ($IncludeAz) { $targets += 'Az*' }
         if ($Name) { $targets += $Name }
 
         if (-not $targets) {
-            throw 'Specify at least one target via -Name, -IncludeGraph, or -IncludeAz.'
+            throw 'Specify at least one target via -All, -Name, -IncludeGraph, or -IncludeAz.'
         }
 
         Write-Verbose ('Targets: {0}' -f (($targets | Select-Object -Unique) -join ', '))
@@ -247,7 +320,7 @@ function Remove-OldModuleVersions {
         # Discover all installed module entries (all versions) for the targets
         $installed = foreach ($pattern in ($targets | Select-Object -Unique)) {
             try {
-                Get-Module -Name $pattern -ListAvailable -ErrorAction Stop
+                Get-InstalledModule -Name $pattern -AllVersions -ErrorAction Stop
             }
             catch {
                 Write-Verbose "No installed modules matched pattern '$pattern'."
@@ -262,7 +335,14 @@ function Remove-OldModuleVersions {
         # Group by module name to compare versions
         $byName = $installed | Group-Object Name
 
+        $groupCount = @($byName).Count
+        $groupIndex = 0
+
         foreach ($group in $byName) {
+            $groupIndex++
+            $cleanupPercent = [int](($groupIndex / $groupCount) * 100)
+            Write-Progress -Id 2 -ParentId 1 -Activity 'PowerShell module maintenance cleanup' -Status "Cleanup phase: checking $groupIndex of $groupCount modules" -PercentComplete $cleanupPercent
+
             $name = $group.Name
             $versions = $group.Group | Sort-Object Version -Descending
 
@@ -308,6 +388,8 @@ function Remove-OldModuleVersions {
                 }
             }
         }
+
+        Write-Progress -Id 2 -ParentId 1 -Activity 'PowerShell module maintenance cleanup' -Completed
     }
 }
 
