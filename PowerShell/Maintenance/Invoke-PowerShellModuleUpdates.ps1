@@ -33,13 +33,13 @@ Number of recent PSReadLine history lines used by refresh logic (reserved for co
 Displays per-module timing diagnostics in console output.
 
 .EXAMPLE
-.\Invoke-PowerShellModuleUpdates.ps1 -Common
+.\Maintenance\Invoke-PowerShellModuleUpdates.ps1 -Common
 
 .EXAMPLE
-.\Invoke-PowerShellModuleUpdates.ps1 -AllModules
+.\Maintenance\Invoke-PowerShellModuleUpdates.ps1 -AllModules
 
 .EXAMPLE
-.\Invoke-PowerShellModuleUpdates.ps1 -ModuleName 'Az.Accounts','Microsoft.Graph.Authentication' -ShowTiming
+.\Maintenance\Invoke-PowerShellModuleUpdates.ps1 -ModuleName 'Az.Accounts','Microsoft.Graph.Authentication' -ShowTiming
 
 .NOTES
 Program: Invoke-PowerShellModuleUpdates.ps1
