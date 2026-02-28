@@ -44,13 +44,6 @@ Displays per-module timing diagnostics in console output.
 .NOTES
 Program: Invoke-PowerShellModuleUpdates.ps1
 #>
-
-# -------------------------------------------------------------------------
-# Program: Invoke-PowerShellModuleUpdates.ps1
-# Description: Updates PowerShell modules and WinGet packages with per-tool logs for login automation.
-# Context: User login maintenance automation (Windows Task Scheduler)
-# Author: Greg Tate
-# ------------------------------------------------------------------------
 #endregion
 
 #region PARAMETERS
