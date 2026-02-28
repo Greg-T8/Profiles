@@ -1125,6 +1125,6 @@
   "workbench.settings.alwaysShowAdvancedSettings": true,
   "chat.instructionsFilesLocations": {
     "~/.copilot/instructions": true,
-    "~/LocalCode/Agent-Toolkit": true
+    "~/LocalCode/Agent-Toolkit/instructions": true
   }
 }
