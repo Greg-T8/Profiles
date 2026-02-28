@@ -224,9 +224,7 @@ $Helpers = {
         if (Get-Command Get-InstalledPSResource -ErrorAction SilentlyContinue) {
             $currentUserResources = Get-InstalledPSResource -Scope CurrentUser -ErrorAction SilentlyContinue
             if ($currentUserResources) {
-                $moduleNames += $currentUserResources |
-                    Where-Object { "$($_.Type)" -eq 'Module' } |
-                    Select-Object -ExpandProperty Name -Unique
+                $moduleNames += $currentUserResources | Select-Object -ExpandProperty Name -Unique
             }
         }
 
@@ -682,7 +680,7 @@ $Helpers = {
 
             if (-not $mod) {
                 $skippedModules.Add("$moduleName (not-found)")
-                Write-Host "Skipping '$moduleName' — module metadata was not found." -ForegroundColor DarkYellow
+                Write-Warning "Skipping '$moduleName' — module metadata was not found."
                 $moduleStopwatch.Stop()
                 if ($ShowTiming) {
                     Write-Host ("Timing: [{0}] Total (not-found): {1:N2}s" -f $moduleName, $moduleStopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkCyan
@@ -693,7 +691,7 @@ $Helpers = {
             # Skip modules currently loaded in the session — they cannot be updated in-place.
             if ($loadedModuleNames -contains $moduleName) {
                 $skippedModules.Add("$moduleName (in-use)")
-                Write-Host "Skipping '$moduleName' — module is loaded in this session and cannot be updated in-place." -ForegroundColor DarkYellow
+                Write-Warning "Skipping '$moduleName' — module is loaded in this session and cannot be updated in-place."
                 $moduleStopwatch.Stop()
                 if ($ShowTiming) {
                     Write-Host ("Timing: [{0}] Total (in-use): {1:N2}s" -f $moduleName, $moduleStopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkCyan
@@ -711,7 +709,7 @@ $Helpers = {
 
             if (-not $galleryModule) {
                 $skippedModules.Add("$moduleName (not-in-gallery)")
-                Write-Host "Skipping '$moduleName' — no PSGallery listing was found." -ForegroundColor DarkYellow
+                Write-Warning "Skipping '$moduleName' — no PSGallery listing was found."
                 $moduleStopwatch.Stop()
                 if ($ShowTiming) {
                     Write-Host ("Timing: [{0}] Total (not-in-gallery): {1:N2}s" -f $moduleName, $moduleStopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkCyan
@@ -740,18 +738,6 @@ $Helpers = {
                     $moduleStopwatch.Stop()
                     if ($ShowTiming) {
                         Write-Host ("Timing: [{0}] Total (up-to-date): {1:N2}s" -f $moduleName, $moduleStopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkCyan
-                    }
-                    continue
-                }
-
-                # Skip modules that are not tracked by PowerShellGet Install-Module.
-                $installedByPowerShellGet = Get-InstalledModule -Name $moduleName -ErrorAction SilentlyContinue
-                if (-not $installedByPowerShellGet) {
-                    $skippedModules.Add("$moduleName (not-installed-via-install-module)")
-                    Write-Host "Skipping '$moduleName' — module was not installed using Install-Module." -ForegroundColor DarkYellow
-                    $moduleStopwatch.Stop()
-                    if ($ShowTiming) {
-                        Write-Host ("Timing: [{0}] Total (not-installed-via-install-module): {1:N2}s" -f $moduleName, $moduleStopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkCyan
                     }
                     continue
                 }

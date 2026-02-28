@@ -135,8 +135,18 @@ function Get-WinExperienceIndex {
 }
 
 function Get-WinGetUpdates {
+    param(
+        [switch]$IncludeUnknown
+    )
+
     Get-WinGetPackage |
-        Where-Object IsUpdateAvailable |
+        Where-Object {
+            $_.IsUpdateAvailable -or
+            (
+                $IncludeUnknown -and
+                [string]::Equals("$($_.InstalledVersion)", 'Unknown', [System.StringComparison]::OrdinalIgnoreCase)
+            )
+        } |
         Select-Object Name, Id, InstalledVersion, IsUpdateAvailable,
             @{n='AvailableVersions'; e={ $_.AvailableVersions | Select-Object -First 1 }}
 }
