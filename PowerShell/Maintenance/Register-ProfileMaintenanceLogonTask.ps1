@@ -1,6 +1,6 @@
 # -------------------------------------------------------------------------
 # Program: Register-ProfileMaintenanceLogonTask.ps1
-# Description: Creates a logon scheduled task that runs WinGet app and PowerShell module updates with no profile.
+# Description: Creates a logon scheduled task that runs WinGet app and PowerShell module updates with no profile in a hidden console.
 # Context: User login maintenance automation (Windows Task Scheduler)
 # Author: Greg Tate
 # ------------------------------------------------------------------------
@@ -10,7 +10,7 @@
 Creates or updates a Windows Scheduled Task for WinGet app and PowerShell module updates at user logon.
 
 .DESCRIPTION
-Registers a scheduled task that runs both maintenance scripts at logon using PowerShell with -NoProfile:
+Registers a scheduled task that runs both maintenance scripts at logon using PowerShell with -NoProfile in a hidden window:
 - Invoke-PowerShellModuleUpdates.ps1
 - Invoke-WingetUpdates.ps1
 
@@ -204,8 +204,8 @@ $Helpers = {
         )
 
         # Create two actions so both maintenance scripts run at each user logon.
-        $action1 = New-ScheduledTaskAction -Execute $Context.PwshPath -Argument "-NoProfile -File `"$($Context.ModuleUpdateScriptPath)`"" -WorkingDirectory $Context.ScriptRoot
-        $action2 = New-ScheduledTaskAction -Execute $Context.PwshPath -Argument "-NoProfile -File `"$($Context.WingetUpdateScriptPath)`"" -WorkingDirectory $Context.ScriptRoot
+        $action1 = New-ScheduledTaskAction -Execute $Context.PwshPath -Argument "-NoProfile -WindowStyle Hidden -File `"$($Context.ModuleUpdateScriptPath)`" -AllModules" -WorkingDirectory $Context.ScriptRoot
+        $action2 = New-ScheduledTaskAction -Execute $Context.PwshPath -Argument "-NoProfile -WindowStyle Hidden -File `"$($Context.WingetUpdateScriptPath)`"" -WorkingDirectory $Context.ScriptRoot
 
         # Trigger task at logon for the current user account.
         $trigger = New-ScheduledTaskTrigger -AtLogOn -User $Context.CurrentUser
