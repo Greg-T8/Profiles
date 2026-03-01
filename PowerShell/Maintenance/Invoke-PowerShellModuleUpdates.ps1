@@ -89,6 +89,7 @@ $ModuleUpdateConfig = @{
     )
     IgnoreModules   = @(
         'PSReadLine'
+		'Microsoft.PowerShell.PSResourceGet'
     )
 }
 
@@ -217,7 +218,18 @@ $Helpers = {
         if (Get-Command Get-InstalledPSResource -ErrorAction SilentlyContinue) {
             $currentUserResources = Get-InstalledPSResource -Scope CurrentUser -ErrorAction SilentlyContinue
             if ($currentUserResources) {
-                $moduleNames += $currentUserResources | Select-Object -ExpandProperty Name -Unique
+                # Keep only module resources and omit script resources from the module update list.
+                $moduleResources = @($currentUserResources | Where-Object {
+                    if ($_.PSObject.Properties['Type']) {
+                        return ("$($_.Type)" -eq 'Module')
+                    }
+
+                    return $true
+                })
+
+                if ($moduleResources) {
+                    $moduleNames += $moduleResources | Select-Object -ExpandProperty Name -Unique
+                }
             }
         }
 
@@ -532,7 +544,19 @@ $Helpers = {
                 Write-Progress -Id 2 -ParentId 1 -Activity 'PowerShell module maintenance cleanup' -Status "Cleanup phase: checking $groupIndex of $groupCount modules" -PercentComplete $cleanupPercent
 
                 $name = $group.Name
-                $versions = $group.Group | Sort-Object Version -Descending
+                # Sort versions numerically so values like 7.11.1 rank newer than 7.9.0.
+                $versions = $group.Group | Sort-Object -Property @(
+                    @{ Expression = {
+                            try {
+                                [version](("$($_.Version)" -split '-')[0])
+                            }
+                            catch {
+                                [version]'0.0'
+                            }
+                        }
+                    },
+                    @{ Expression = { "$($_.Version)" } }
+                ) -Descending
 
                 # Determine which entries to remove
                 $toRemove = if ($RemoveAll) {
@@ -702,7 +726,7 @@ $Helpers = {
 
             if (-not $galleryModule) {
                 $skippedModules.Add("$moduleName (not-in-gallery)")
-                Write-Warning "Skipping '$moduleName' — no PSGallery listing was found."
+                Write-Host "Skipping '$moduleName' — no PSGallery listing was found." -ForegroundColor DarkGray
                 $moduleStopwatch.Stop()
                 if ($ShowTiming) {
                     Write-Host ("Timing: [{0}] Total (not-in-gallery): {1:N2}s" -f $moduleName, $moduleStopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkCyan
