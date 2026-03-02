@@ -99,7 +99,7 @@ if (Test-Path -Path "$profileDir/functions.ps1") {
 }
 
 # Load personal configuration
-$personalConfigPath = "$env:OneDriveConsumer/Documents/PowerShell/Config/PersonalConfig.psd1"
+$personalConfigPath = "$env:OneDriveConsumer/Apps/PowerShell/PersonalConfig.psd1"
 if (Test-Path -Path $personalConfigPath) {
     $Personal = Import-PowerShellDataFile -Path $personalConfigPath
 }
