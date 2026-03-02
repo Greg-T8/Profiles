@@ -1145,10 +1145,12 @@
     "powershell.integratedConsole.startInBackground",
     "github.copilot.chat.searchSubagent.enabled",
     "workbench.settings.alwaysShowAdvancedSettings",
-    "editor.scrollbar.verticalScrollbarSize"
+    "editor.scrollbar.verticalScrollbarSize",
+    "python.analysis.typeCheckingMode"
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "none",
-  "workbench.tips.enabled": true
+  "workbench.tips.enabled": true,
+  "python.analysis.typeCheckingMode": "basic"
 }
