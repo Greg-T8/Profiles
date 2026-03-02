@@ -727,7 +727,7 @@
   {
     "key": "ctrl+w",
     "command": "workbench.action.moveEditorToNewWindow",
-    "when": "editorFocus"
+    "when": "editorFocus || activeEditor == WebviewEditor"
   },
   {
     "key": "ctrl+shift+w",
