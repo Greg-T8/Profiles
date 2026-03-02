@@ -683,12 +683,32 @@ function Sync-AzModuleContext {
         [string]$AccountId
     )
 
+    $syncOverallTimer = [System.Diagnostics.Stopwatch]::StartNew()
+    $syncStepTimer = [System.Diagnostics.Stopwatch]::StartNew()
+    $syncSlowestStepName = $null
+    $syncSlowestStepMs = 0.0
+    $writeSyncStepTiming = {
+        param([string]$Step)
+        $elapsedMs = $syncStepTimer.Elapsed.TotalMilliseconds
+        if ($elapsedMs -gt $syncSlowestStepMs) {
+            $syncSlowestStepMs = $elapsedMs
+            $syncSlowestStepName = $Step
+        }
+        Write-Verbose ("Sync-AzModuleContext: {0,-35} {1,8:N1} ms (total {2,8:N1} ms)" -f $Step, $elapsedMs, $syncOverallTimer.Elapsed.TotalMilliseconds)
+        $syncStepTimer.Restart()
+    }
+
     $getAzContextCommand = Get-Command -Name Get-AzContext -ErrorAction SilentlyContinue
     $selectAzContextCommand = Get-Command -Name Select-AzContext -ErrorAction SilentlyContinue
     $connectAzAccountCommand = Get-Command -Name Connect-AzAccount -ErrorAction SilentlyContinue
+    & $writeSyncStepTiming "Discovered Az cmdlets"
 
     if (-not $getAzContextCommand -or -not $selectAzContextCommand -or -not $connectAzAccountCommand) {
         Write-Warning "Az PowerShell module is not available. Install/import Az.Accounts to enable module context switching."
+        if ($syncSlowestStepName) {
+            Write-Verbose ("Sync-AzModuleContext slowest step: {0} ({1:N1} ms)" -f $syncSlowestStepName, $syncSlowestStepMs)
+        }
+        Write-Verbose ("Sync-AzModuleContext total duration: {0:N1} ms" -f $syncOverallTimer.Elapsed.TotalMilliseconds)
         return [PSCustomObject][ordered]@{
             HasAzModule      = $false
             Switched         = $false
@@ -707,6 +727,7 @@ function Sync-AzModuleContext {
     catch {
         $allContexts = @()
     }
+    & $writeSyncStepTiming "Loaded available Az contexts"
 
     $matchingContext = $null
     if ($allContexts.Count -gt 0) {
@@ -724,9 +745,11 @@ function Sync-AzModuleContext {
             } | Select-Object -First 1
         }
     }
+    & $writeSyncStepTiming "Matched context by subscription/tenant"
 
     if ($matchingContext) {
         Select-AzContext -Name $matchingContext.Name -ErrorAction Stop | Out-Null
+        & $writeSyncStepTiming "Selected existing Az context"
     }
     else {
         Write-Host "Connecting Az PowerShell context for profile '$ProfileName'..." -ForegroundColor Yellow
@@ -742,9 +765,16 @@ function Sync-AzModuleContext {
         }
 
         Connect-AzAccount @connectParams | Out-Null
+        & $writeSyncStepTiming "Connected new Az context"
     }
 
     $currentContext = Get-AzContext -ErrorAction SilentlyContinue
+    & $writeSyncStepTiming "Read current Az context"
+    if ($syncSlowestStepName) {
+        Write-Verbose ("Sync-AzModuleContext slowest step: {0} ({1:N1} ms)" -f $syncSlowestStepName, $syncSlowestStepMs)
+    }
+    Write-Verbose ("Sync-AzModuleContext total duration: {0:N1} ms" -f $syncOverallTimer.Elapsed.TotalMilliseconds)
+
     return [PSCustomObject][ordered]@{
         HasAzModule      = $true
         Switched         = ($null -ne $currentContext)
@@ -1236,23 +1266,43 @@ function Use-AzProfile {
         [switch]$SelectAccount
     )
 
+    $overallTimer = [System.Diagnostics.Stopwatch]::StartNew()
+    $stepTimer = [System.Diagnostics.Stopwatch]::StartNew()
+    $slowestStepName = $null
+    $slowestStepMs = 0.0
+    $writeStepTiming = {
+        param([string]$Step)
+        $elapsedMs = $stepTimer.Elapsed.TotalMilliseconds
+        if ($elapsedMs -gt $slowestStepMs) {
+            $slowestStepMs = $elapsedMs
+            $slowestStepName = $Step
+        }
+        Write-Verbose ("{0,-50} {1,8:N1} ms (total {2,8:N1} ms)" -f $Step, $elapsedMs, $overallTimer.Elapsed.TotalMilliseconds)
+        $stepTimer.Restart()
+    }
+
     # Handle default profile specially
     if ($Name -eq '(default)' -or $Name -eq 'default') {
         # Set to default Azure config directory
         $configDir = Join-Path $HOME ".azure"
         $env:AZURE_CONFIG_DIR = $configDir
+        & $writeStepTiming "Set AZURE_CONFIG_DIR for default profile"
 
         Write-Host "Switching to profile: " -NoNewline
         Write-Host "(default)" -ForegroundColor Cyan -NoNewline
         Write-Host " (Default Azure CLI profile)"
 
         # Check if we need to login
+        $accountInfo = $null
         $needsLogin = $Force.IsPresent
 
         if (-not $needsLogin) {
             try {
-                $null = az account show 2>$null
-                if ($LASTEXITCODE -ne 0) {
+                $accountJson = az account show -o json 2>$null
+                if ($LASTEXITCODE -eq 0 -and $accountJson) {
+                    $accountInfo = $accountJson | ConvertFrom-Json
+                }
+                else {
                     $needsLogin = $true
                 }
             }
@@ -1260,6 +1310,7 @@ function Use-AzProfile {
                 $needsLogin = $true
             }
         }
+        & $writeStepTiming "Checked existing Azure CLI login"
 
         # Perform login if needed
         if ($needsLogin) {
@@ -1279,24 +1330,30 @@ function Use-AzProfile {
                 Write-Error "Login failed for default profile"
                 return
             }
+
+            & $writeStepTiming "Completed Azure CLI login"
         }
 
         # Show current context
-        $accountInfo = az account show -o json 2>$null | ConvertFrom-Json
+        if (-not $accountInfo) {
+            $accountInfo = az account show -o json 2>$null | ConvertFrom-Json
+            & $writeStepTiming "Retrieved Azure CLI account context"
+        }
 
         # Sync Az module context to match CLI profile context
         $azModuleContext = $null
         if ($accountInfo) {
             $azModuleContext = Sync-AzModuleContext -ProfileName '(default)' -TenantId $accountInfo.tenantId -SubscriptionId $accountInfo.id -AccountId $accountInfo.user.name
         }
+        & $writeStepTiming "Synchronized Az PowerShell module context"
+
+        if ($slowestStepName) {
+            Write-Verbose ("Use-AzProfile slowest step: {0} ({1:N1} ms)" -f $slowestStepName, $slowestStepMs)
+        }
+        Write-Verbose ("Use-AzProfile total duration: {0:N1} ms" -f $overallTimer.Elapsed.TotalMilliseconds)
 
         # Return context info
         return [PSCustomObject][ordered]@{
-            Profile        = '(default)'
-            User           = $accountInfo.user.name
-            TenantId       = $accountInfo.tenantId
-            Subscription   = $accountInfo.name
-            SubscriptionId = $accountInfo.id
             AzCliIsLoggedIn = ($null -ne $accountInfo)
             AzCliUser      = $accountInfo.user.name
             AzCliTenantId  = $accountInfo.tenantId
@@ -1313,6 +1370,8 @@ function Use-AzProfile {
 
     # Get all configured profiles from Personal and Work configs
     $allConfiguredProfiles = Get-AllAzureProfileConfigs
+    & $writeStepTiming "Loaded and merged profile configuration"
+
     if ($allConfiguredProfiles.Count -eq 0) {
         Write-Error "No Azure profiles configured. Add AzureProfiles section to PersonalConfig.psd1 or WorkConfig.psd1"
         return
@@ -1320,6 +1379,8 @@ function Use-AzProfile {
 
     # Get the profile configuration
     $profileConfig = $allConfiguredProfiles[$Name]
+    & $writeStepTiming "Resolved requested profile configuration"
+
     if (-not $profileConfig) {
         $availableProfiles = $allConfiguredProfiles.Keys -join ', '
         Write-Error "Profile '$Name' not found. Available profiles: $availableProfiles"
@@ -1329,18 +1390,23 @@ function Use-AzProfile {
     # Set the config directory for this profile
     $configDir = Join-Path $HOME ".azure\profiles\$Name"
     $env:AZURE_CONFIG_DIR = $configDir
+    & $writeStepTiming "Set AZURE_CONFIG_DIR for named profile"
 
     Write-Host "Switching to profile: " -NoNewline
     Write-Host $Name -ForegroundColor Cyan -NoNewline
     Write-Host " ($($profileConfig.Description))"
 
     # Check if we need to login
+    $accountInfo = $null
     $needsLogin = $Force.IsPresent
 
     if (-not $needsLogin) {
         try {
-            $null = az account show 2>$null
-            if ($LASTEXITCODE -ne 0) {
+            $accountJson = az account show -o json 2>$null
+            if ($LASTEXITCODE -eq 0 -and $accountJson) {
+                $accountInfo = $accountJson | ConvertFrom-Json
+            }
+            else {
                 $needsLogin = $true
             }
         }
@@ -1348,6 +1414,7 @@ function Use-AzProfile {
             $needsLogin = $true
         }
     }
+    & $writeStepTiming "Checked existing Azure CLI login"
 
     # Perform login if needed
     if ($needsLogin) {
@@ -1367,18 +1434,33 @@ function Use-AzProfile {
             Write-Error "Login failed for profile '$Name'"
             return
         }
+
+        & $writeStepTiming "Completed Azure CLI login"
     }
 
     # Set subscription if configured
+    $shouldRefreshAccountInfo = $false
+
     if ($profileConfig.SubscriptionId) {
-        az account set --subscription $profileConfig.SubscriptionId 2>$null
-        if ($LASTEXITCODE -ne 0) {
-            Write-Warning "Could not set subscription: $($profileConfig.SubscriptionId)"
+        if (-not $accountInfo -or $accountInfo.id -ne $profileConfig.SubscriptionId) {
+            az account set --subscription $profileConfig.SubscriptionId 2>$null
+            if ($LASTEXITCODE -ne 0) {
+                Write-Warning "Could not set subscription: $($profileConfig.SubscriptionId)"
+            }
+
+            & $writeStepTiming "Set Azure CLI subscription"
+            $shouldRefreshAccountInfo = $true
+        }
+        else {
+            Write-Verbose "Azure CLI subscription already matches target; skipping account set"
         }
     }
 
     # Show current context
-    $accountInfo = az account show -o json 2>$null | ConvertFrom-Json
+    if (-not $accountInfo -or $shouldRefreshAccountInfo) {
+        $accountInfo = az account show -o json 2>$null | ConvertFrom-Json
+        & $writeStepTiming "Retrieved Azure CLI account context"
+    }
 
     # Validate we're in the expected tenant
     if ($accountInfo.tenantId -ne $profileConfig.TenantId) {
@@ -1387,14 +1469,15 @@ function Use-AzProfile {
 
     # Sync Az module context to match CLI profile context
     $azModuleContext = Sync-AzModuleContext -ProfileName $Name -TenantId $accountInfo.tenantId -SubscriptionId $accountInfo.id -AccountId $accountInfo.user.name
+    & $writeStepTiming "Synchronized Az PowerShell module context"
+
+    if ($slowestStepName) {
+        Write-Verbose ("Use-AzProfile slowest step: {0} ({1:N1} ms)" -f $slowestStepName, $slowestStepMs)
+    }
+    Write-Verbose ("Use-AzProfile total duration: {0:N1} ms" -f $overallTimer.Elapsed.TotalMilliseconds)
 
     # Return context info
     [PSCustomObject][ordered]@{
-        Profile        = $Name
-        User           = $accountInfo.user.name
-        TenantId       = $accountInfo.tenantId
-        Subscription   = $accountInfo.name
-        SubscriptionId = $accountInfo.id
         AzCliIsLoggedIn = ($null -ne $accountInfo)
         AzCliUser      = $accountInfo.user.name
         AzCliTenantId  = $accountInfo.tenantId
