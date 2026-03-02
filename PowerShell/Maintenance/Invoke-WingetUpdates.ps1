@@ -36,8 +36,8 @@ $Helpers = {
             [int]$RetentionDaysOverride = -1
         )
 
-        # Create and return update log path under %APPDATA%.
-        $logDirectory = Join-Path -Path $env:APPDATA -ChildPath '_UserPackageAndModuleUpdates'
+        # Create and return update log path under the script-local logs folder.
+        $logDirectory = Join-Path -Path $PSScriptRoot -ChildPath 'logs'
         if (-not (Test-Path -Path $logDirectory)) {
             New-Item -Path $logDirectory -ItemType Directory -Force | Out-Null
         }
@@ -102,75 +102,86 @@ $Helpers = {
         $runHeader = "`n===== WinGet update started: $(Get-Date -Format s) ====="
         $runHeader | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
 
-        # Execute WinGet updates silently and capture output to the WinGet log.
-        if (Get-Command -Name winget.exe -ErrorAction SilentlyContinue) {
-            $originalConsoleEncoding = [Console]::OutputEncoding
-            $originalOutputEncoding = $OutputEncoding
-            $stdoutPath = Join-Path -Path $env:TEMP -ChildPath ("winget-update-{0}.stdout.log" -f ([guid]::NewGuid().ToString('N')))
-            $stderrPath = Join-Path -Path $env:TEMP -ChildPath ("winget-update-{0}.stderr.log" -f ([guid]::NewGuid().ToString('N')))
+        # Execute WinGet updates via Microsoft.WinGet.Client for structured object output.
+        if (Get-Module -ListAvailable -Name 'Microsoft.WinGet.Client') {
+            $originalProgressPreference = $ProgressPreference
+            $successfulUpdates = 0
+            $updateResults = @()
             try {
-                # Force UTF-8 so winget progress characters render correctly.
-                [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
-                $OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+                # Suppress progress records so logs remain text/object focused.
+                $ProgressPreference = 'SilentlyContinue'
 
-                # Run winget with redirected output, then sanitize noisy progress/spinner lines.
-                $wingetProcess = Start-Process -FilePath 'winget.exe' -ArgumentList @(
-                    'update'
-                    '--all'
-                    '--silent'
-                    '--disable-interactivity'
-                    '--accept-package-agreements'
-                    '--accept-source-agreements'
-                ) -NoNewWindow -PassThru -Wait -RedirectStandardOutput $stdoutPath -RedirectStandardError $stderrPath
+                # Load WinGet cmdlets and verify the package manager is ready.
+                Import-Module -Name Microsoft.WinGet.Client -ErrorAction Stop
+                Assert-WinGetPackageManager -ErrorAction Stop | Out-Null
 
-                $rawOutput = @()
-                if (Test-Path -Path $stdoutPath) {
-                    $rawOutput += Get-Content -Path $stdoutPath -ErrorAction SilentlyContinue
-                }
-                if (Test-Path -Path $stderrPath) {
-                    $rawOutput += Get-Content -Path $stderrPath -ErrorAction SilentlyContinue
+                # Discover all installed packages that currently have updates available.
+                $availableUpdates = Get-WinGetPackage -ErrorAction Stop |
+                    Where-Object { $_.IsUpdateAvailable }
+
+                # Exit cleanly when there are no upgrades to apply.
+                if (-not $availableUpdates) {
+                    'No package upgrades available.' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                    "===== WinGet update completed: $(Get-Date -Format s) =====" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                    return $false
                 }
 
-                $cleanOutput = $rawOutput |
-                    ForEach-Object { "$($_)".TrimEnd() } |
-                    Where-Object {
-                        -not [string]::IsNullOrWhiteSpace($_) -and
-                        $_ -notmatch '^\s*[-\\|/]\s*$' -and
-                        $_ -notmatch 'Γû'
+                # Write a structured snapshot of all pending package upgrades.
+                'Packages with available updates:' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                $availableUpdates |
+                    Select-Object Name, Id, InstalledVersion, @{Name = 'AvailableVersion'; Expression = {
+                        if ($_.AvailableVersions -and $_.AvailableVersions.Count -gt 0) {
+                            $_.AvailableVersions[0]
+                        }
+                        else {
+                            $null
+                        }
+                    } }, Source |
+                    ConvertTo-Json -Depth 4 |
+                    Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+
+                # Apply upgrades one package at a time to preserve per-package status logging.
+                foreach ($package in $availableUpdates) {
+                    try {
+                        $result = $package | Update-WinGetPackage -Mode Silent -Confirm:$false -ErrorAction Stop
+                        $successfulUpdates += 1
+
+                        if ($null -ne $result) {
+                            $updateResults += $result
+                        }
+
+                        "Updated package: $($package.Name) [$($package.Id)]" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
                     }
-
-                if ($cleanOutput) {
-                    $cleanOutput | Tee-Object -FilePath $WinGetLogPath -Append | Out-Host
-                }
-                else {
-                    'No clean winget output lines were produced.' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                    catch {
+                        # Continue processing remaining packages while capturing update failures.
+                        "Failed package update: $($package.Name) [$($package.Id)] - $($_.Exception.Message)" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                    }
                 }
 
-                # Determine whether winget actually changed any package(s).
-                $hasWingetChanges = $cleanOutput | Where-Object {
-                    $_ -match '^Successfully installed$' -or
-                    $_ -match '^Successfully upgraded$'
-                } | Select-Object -First 1
+                # Emit structured install/update result objects when available.
+                if ($updateResults) {
+                    'Package update results:' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                    $updateResults |
+                        Select-Object * |
+                        ConvertTo-Json -Depth 6 |
+                        Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                }
 
-                "winget exit code: $($wingetProcess.ExitCode)" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                "winget updates applied: $successfulUpdates" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
                 "===== WinGet update completed: $(Get-Date -Format s) =====" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
-                return [bool]$hasWingetChanges
+                return ($successfulUpdates -gt 0)
+            }
+            catch {
+                "WinGet module update failed: $($_.Exception.Message)" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                "===== WinGet update completed: $(Get-Date -Format s) =====" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                return $false
             }
             finally {
-                [Console]::OutputEncoding = $originalConsoleEncoding
-                $OutputEncoding = $originalOutputEncoding
-
-                if (Test-Path -Path $stdoutPath) {
-                    Remove-Item -Path $stdoutPath -Force -ErrorAction SilentlyContinue
-                }
-
-                if (Test-Path -Path $stderrPath) {
-                    Remove-Item -Path $stderrPath -Force -ErrorAction SilentlyContinue
-                }
+                $ProgressPreference = $originalProgressPreference
             }
         }
 
-        'winget.exe was not found on PATH.' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+        'Microsoft.WinGet.Client module was not found.' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
         "===== WinGet update completed: $(Get-Date -Format s) =====" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
         return $false
     }
