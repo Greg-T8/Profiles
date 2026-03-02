@@ -125,6 +125,10 @@
   "chat.checkpoints.enabled": true,
   "chat.customAgentInSubagent.enabled": false,
   "chat.editing.confirmEditRequestRemoval": false,
+  "chat.instructionsFilesLocations": {
+    "~/.copilot/instructions": true,
+    "~/LocalCode/Agent-Toolkit/instructions": true
+  },
   "chat.mcp.gallery.enabled": true,
   "chat.notifyWindowOnResponseReceived": "off",
   "chat.promptFilesLocations": {
@@ -135,6 +139,7 @@
   "chat.tools.autoExpandFailures": true,
   "chat.tools.terminal.autoApprove": {},
   "chat.tools.urls.autoApprove": {
+    "https://*.terraform.io": true,
     "https://code.visualstudio.com": {
       "approveRequest": false,
       "approveResponse": true
@@ -154,8 +159,7 @@
     "https://raw.githubusercontent.com": {
       "approveRequest": false,
       "approveResponse": true
-    },
-    "https://*.terraform.io": true
+    }
   },
   "chat.viewProgressBadge.enabled": true,
   "chat.viewSessions.orientation": "stacked",
@@ -163,64 +167,64 @@
   "dashboard.openOnStartup": "empty workspace",
   "dashboard.projectData": [
     {
-      "id": "projectsu85uk6mvamm66iem5",
+      "collapsed": false,
       "groupName": "Learning and Projects",
+      "id": "projectsu85uk6mvamm66iem5",
       "projects": [
         {
-          "isGitRepo": true,
+          "color": "#4683ca",
           "id": "learningazurez7bjmeomkmm66rd4i",
+          "isGitRepo": true,
           "name": "LearningAzure",
-          "path": "c:\\Users\\gregt\\LocalCode\\Learning\\LearningAzure\\LearningAzure.code-workspace",
-          "color": "#4683ca"
+          "path": "c:\\Users\\gregt\\LocalCode\\Learning\\LearningAzure\\LearningAzure.code-workspace"
         },
         {
-          "isGitRepo": true,
+          "color": "#6b2c91",
           "id": "terraformpracticexe0nomgakmm66jka6",
+          "isGitRepo": true,
           "name": "Terraform-Practice",
-          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\Terraform\\Terraform-Practice.code-workspace",
-          "color": "#6b2c91"
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\Terraform\\Terraform-Practice.code-workspace"
         },
         {
-          "isGitRepo": true,
+          "color": "#8b4789",
           "id": "videotonotesxhl46tqmumm66ivrs",
+          "isGitRepo": true,
           "name": "VideoToNotes",
-          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\VideoToNotes\\VideoToNotes.code-workspace",
-          "color": "#8b4789"
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\VideoToNotes\\VideoToNotes.code-workspace"
         },
         {
-          "isGitRepo": true,
+          "color": "#1e214f",
           "id": "hypervoh8xrbq98mm6av71w",
+          "isGitRepo": true,
           "name": "Hyper-V",
-          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\Hyper-V\\Hyper-V.code-workspace",
-          "color": "#1e214f"
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\Hyper-V\\Hyper-V.code-workspace"
         }
-      ],
-      "collapsed": false
+      ]
     },
     {
-      "id": "clientsacck9xha7mm66b5q8",
       "groupName": "Clients",
+      "id": "clientsacck9xha7mm66b5q8",
       "projects": [
         {
-          "isGitRepo": true,
+          "color": "#4C1979",
           "id": "tcucixgm86k5mm66h2q6",
-          "name": "TCU",
-          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\TCU\\TCU.code-workspace",
-          "color": "#4C1979"
-        },
-        {
           "isGitRepo": true,
-          "id": "bello8t3bzuwzmm66hlz1",
-          "name": "Bell",
-          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\Bell\\Client-Bell.code-workspace",
-          "color": "#2F5D3A"
+          "name": "TCU",
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\TCU\\TCU.code-workspace"
         },
         {
-          "isGitRepo": false,
+          "color": "#2F5D3A",
+          "id": "bello8t3bzuwzmm66hlz1",
+          "isGitRepo": true,
+          "name": "Bell",
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\Bell\\Client-Bell.code-workspace"
+        },
+        {
+          "color": "#282961",
           "id": "gooselol5jgch9mm66i79i",
+          "isGitRepo": false,
           "name": "Goose",
-          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\GooseCreekISD\\GooseCreekISD.code-workspace",
-          "color": "#282961"
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\GooseCreekISD\\GooseCreekISD.code-workspace"
         }
       ]
     },
@@ -257,11 +261,11 @@
           "path": "c:/Users/gregt/OneDrive/Apps/ssh/ssh.code-workspace"
         },
         {
-          "isGitRepo": true,
+          "color": "#0D0332",
           "id": "agenttoolkit4ymzfdlrtmm67907i",
+          "isGitRepo": true,
           "name": "Agent-Toolkit",
-          "path": "c:\\Users\\gregt\\LocalCode\\Agent-Toolkit\\Agent-Toolkit.code-workspace",
-          "color": "#0D0332"
+          "path": "c:\\Users\\gregt\\LocalCode\\Agent-Toolkit\\Agent-Toolkit.code-workspace"
         },
         {
           "color": "#e916a0",
@@ -404,6 +408,7 @@
     "strings": false
   },
   "editor.quickSuggestionsDelay": 250,
+  "editor.scrollbar.verticalScrollbarSize": 20,
   "editor.snippetSuggestions": "bottom",
   "editor.suggest.preview": true,
   "editor.suggest.showFolders": true,
@@ -453,6 +458,7 @@
   "github.copilot.chat.askQuestions.enabled": true,
   "github.copilot.chat.claudeAgent.enabled": true, //Disables auto-insertion of instruction files
   "github.copilot.chat.commitMessageGeneration.instructions": [],
+  "github.copilot.chat.searchSubagent.enabled": true,
   "github.copilot.editor.enableCodeActions": true,
   "github.copilot.enable": {
     "*": true,
@@ -671,7 +677,8 @@
   "powershell.cwd": "${fileDirname}",
   "powershell.helpCompletion": "BlockComment",
   "powershell.integratedConsole.focusConsoleOnExecute": true,
-  "powershell.integratedConsole.showOnStartup": true,
+  "powershell.integratedConsole.showOnStartup": false,
+  "powershell.integratedConsole.startInBackground": true,
   "powershell.powerShellDefaultVersion": "PowerShell (x64)",
   "powershell.promptToUpdatePowerShell": false,
   "powershell.scriptAnalysis.enable": true,
@@ -866,26 +873,26 @@
   "window.zoomLevel": 2,
   "workbench.activityBar.location": "top",
   "workbench.colorCustomizations": {
+    "activityBar.background": "#0d1a24",
+    "activityBar.border": "#1f3d5f",
+    "activityBar.foreground": "#d1e4ff",
     "diffEditor.insertedLineBackground": "#002b4d",
     "diffEditor.insertedTextBackground": "#003a66",
     "diffEditor.removedLineBackground": "#4d2600",
     "diffEditor.removedTextBackground": "#663300",
+    "editor.background": "#081019",
+    "editor.lineHighlightBackground": "#1a2a3f",
     "editorGutter.addedBackground": "#2f81f7",
     "editorGutter.deletedBackground": "#ff9e3d",
     "editorOverviewRuler.addedForeground": "#58a6ff",
     "editorOverviewRuler.deletedForeground": "#ffb86b",
-    "activityBar.background": "#0d1a24",
-    "activityBar.foreground": "#d1e4ff",
-    "activityBar.border": "#1f3d5f",
+    "panel.background": "#0b1018",
+    "panel.border": "#1a2a3c",
     "sideBar.background": "#0f151e",
     "sideBar.foreground": "#e1e7f0",
     "statusBar.background": "#101c2b",
-    "statusBar.foreground": "#eaf5ff",
     "statusBar.border": "#2f4a63",
-    "panel.background": "#0b1018",
-    "panel.border": "#1a2a3c",
-    "editor.background": "#081019",
-    "editor.lineHighlightBackground": "#1a2a3f",
+    "statusBar.foreground": "#eaf5ff",
     "titleBar.activeBackground": "#1f3d5f",
     "titleBar.activeForeground": "#d1e4ff",
     "titleBar.inactiveBackground": "#142a47"
@@ -904,6 +911,7 @@
   "workbench.iconTheme": "vs-seti",
   "workbench.panel.defaultLocation": "right",
   "workbench.productIconTheme": "Default",
+  "workbench.settings.alwaysShowAdvancedSettings": true,
   "workbench.settings.applyToAllProfiles": [
     "betterAlign.alignAfterTypeEnter",
     "betterAlign.indentBase",
@@ -1134,18 +1142,11 @@
     "@azure.enableCustomModeRecommendations",
     "powershell.integratedConsole.startInBackground",
     "github.copilot.chat.searchSubagent.enabled",
-    "workbench.settings.alwaysShowAdvancedSettings"
+    "workbench.settings.alwaysShowAdvancedSettings",
+    "editor.scrollbar.verticalScrollbarSize"
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "none",
-  "workbench.tips.enabled": true,
-  "powershell.integratedConsole.showOnStartup": false,
-  "powershell.integratedConsole.startInBackground": true,
-  "github.copilot.chat.searchSubagent.enabled": true,
-  "workbench.settings.alwaysShowAdvancedSettings": true,
-  "chat.instructionsFilesLocations": {
-    "~/.copilot/instructions": true,
-    "~/LocalCode/Agent-Toolkit/instructions": true
-  }
+  "workbench.tips.enabled": true
 }
