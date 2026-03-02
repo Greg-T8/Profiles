@@ -122,6 +122,7 @@ Set-Alias -Name rdn -Value Resolve-DNSName
 Remove-Item Alias:dir -ErrorAction SilentlyContinue
 Set-Alias -Name gcp -Value Get-CurrentAzProfile
 Set-Alias -Name uap -Value Use-AzProfile
+Set-Alias -Name ct -Value copilot
 function Set-GitRepoRoot { Set-Location (git rev-parse --show-toplevel) }
 Set-Alias -Name sgr -Value Set-GitRepoRoot
 
