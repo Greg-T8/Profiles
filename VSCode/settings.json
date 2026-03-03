@@ -179,20 +179,6 @@
           "path": "c:\\Users\\gregt\\LocalCode\\Learning\\LearningAzure\\LearningAzure.code-workspace"
         },
         {
-          "color": "#6b2c91",
-          "id": "terraformpracticexe0nomgakmm66jka6",
-          "isGitRepo": true,
-          "name": "Terraform-Practice",
-          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\Terraform\\Terraform-Practice.code-workspace"
-        },
-        {
-          "color": "#8b4789",
-          "id": "videotonotesxhl46tqmumm66ivrs",
-          "isGitRepo": true,
-          "name": "VideoToNotes",
-          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\VideoToNotes\\VideoToNotes.code-workspace"
-        },
-        {
           "color": "#1e214f",
           "id": "hypervoh8xrbq98mm6av71w",
           "isGitRepo": true,
@@ -200,11 +186,31 @@
           "path": "c:\\Users\\gregt\\LocalCode\\Projects\\Hyper-V\\Hyper-V.code-workspace"
         },
         {
+          "color": "#6b2c91",
+          "id": "terraformpracticexe0nomgakmm66jka6",
+          "isGitRepo": true,
+          "name": "Terraform-Practice",
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\Terraform\\Terraform-Practice.code-workspace"
+        }
+      ]
+    },
+    {
+      "id": "projectshb76ydg10mmaoptep",
+      "groupName": "Projects",
+      "projects": [
+        {
           "isGitRepo": true,
           "id": "documentwriterm4jvkfl7cmm9panzj",
           "name": "DocumentWriter",
           "path": "c:\\Users\\gregt\\LocalCode\\Projects\\DocumentWriter\\DocumentWriter.code-workspace",
           "color": "#C59922"
+        },
+        {
+          "color": "#8b4789",
+          "id": "videotonotesxhl46tqmumm66ivrs",
+          "isGitRepo": true,
+          "name": "VideoToNotes",
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\VideoToNotes\\VideoToNotes.code-workspace"
         }
       ]
     },
@@ -1153,11 +1159,13 @@
     "github.copilot.chat.searchSubagent.enabled",
     "workbench.settings.alwaysShowAdvancedSettings",
     "editor.scrollbar.verticalScrollbarSize",
-    "python.analysis.typeCheckingMode"
+    "python.analysis.typeCheckingMode",
+    "python.terminal.activateEnvironment"
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "none",
   "workbench.tips.enabled": true,
-  "python.analysis.typeCheckingMode": "basic"
+  "python.analysis.typeCheckingMode": "basic",
+  "python.terminal.activateEnvironment": false
 }
