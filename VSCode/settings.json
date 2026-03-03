@@ -198,6 +198,13 @@
           "isGitRepo": true,
           "name": "Hyper-V",
           "path": "c:\\Users\\gregt\\LocalCode\\Projects\\Hyper-V\\Hyper-V.code-workspace"
+        },
+        {
+          "isGitRepo": true,
+          "id": "documentwriterm4jvkfl7cmm9panzj",
+          "name": "DocumentWriter",
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\DocumentWriter\\DocumentWriter.code-workspace",
+          "color": "#C59922"
         }
       ]
     },
@@ -308,6 +315,10 @@
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
     [
+      "#C59922",
+      "Nugget"
+    ],
+    [
       "#1e214f",
       "Port Gore"
     ],
@@ -362,10 +373,6 @@
     [
       "#02A4D3",
       "Cerulean"
-    ],
-    [
-      "#45B1E8",
-      "Picton Blue"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
