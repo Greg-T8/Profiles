@@ -742,4 +742,19 @@
     "key": "ctrl+shift+w",
     "command": "-workbench.action.closeWindow"
   },
+  {
+    "key": "alt+r",
+    "command": "-toggleFindRegex",
+    "when": "editorFocus"
+  },
+  {
+    "key": "alt+r",
+    "command": "-toggleSearchRegex",
+    "when": "searchViewletFocus"
+  },
+  {
+    "key": "alt+r",
+    "command": "vscode-neovim.restart",
+    "when": "editorTextFocus"
+  },
 ]
