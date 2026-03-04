@@ -108,7 +108,7 @@
   "@azure.enableCustomModeRecommendations": false,
   "azureResourceGroups.enableChatStandIn": false,
   "azureTerraform.survey": {
-    "surveyPromptDate": "2026-03-03T18:38:25.544Z",
+    "surveyPromptDate": "never",
     "surveyPromptIgnoredCount": 0
   },
   "betterAlign.alignAfterTypeEnter": false,
@@ -1160,7 +1160,8 @@
     "workbench.settings.alwaysShowAdvancedSettings",
     "editor.scrollbar.verticalScrollbarSize",
     "python.analysis.typeCheckingMode",
-    "python.terminal.activateEnvironment"
+    "python.terminal.activateEnvironment",
+    "azureTerraform.survey"
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
