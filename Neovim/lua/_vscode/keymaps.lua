@@ -18,6 +18,11 @@ vim.api.nvim_set_keymap('n', '<leader>fw',
     "<Cmd>call VSCodeNotify('workbench.action.moveEditorToNewWindow')<CR>",
     { noremap = true, silent = true })
 
+-- Restart VSCode Neovim
+vim.api.nvim_set_keymap('n', '<leader>rr',
+    "<Cmd>call VSCodeNotify('vscode-neovim.restart')<CR>",
+    { noremap = true, silent = true })
+
 -- ==============================================================================
 -- TERMINAL KEYBINDINGS
 -- ==============================================================================
