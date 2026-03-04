@@ -87,8 +87,8 @@ $Helpers = {
             [int]$RetentionDaysOverride = -1
         )
 
-        # Create and return update log path under the script-local logs folder.
-        $logDirectory = Join-Path -Path $PSScriptRoot -ChildPath 'logs'
+        # Create and return update log path under the shared AppData log folder used by Invoke-PowerShellModuleUpdates.
+        $logDirectory = Join-Path -Path $env:APPDATA -ChildPath '_UserPackageAndModuleUpdates'
         if (-not (Test-Path -Path $logDirectory)) {
             New-Item -Path $logDirectory -ItemType Directory -Force | Out-Null
         }
