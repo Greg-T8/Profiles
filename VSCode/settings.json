@@ -253,6 +253,13 @@
           "path": "c:/Users/gregt/OneDrive/Apps/Profiles/VSCode"
         },
         {
+          "color": "#1E90FF",
+          "id": "agenttoolkit4ymzfdlrtmm67907i",
+          "isGitRepo": true,
+          "name": "Agent-Toolkit",
+          "path": "c:\\Users\\gregt\\LocalCode\\Agent-Toolkit\\Agent-Toolkit.code-workspace"
+        },
+        {
           "color": "#012456",
           "id": "powershellz7gs6blw9maiqej5p",
           "isGitRepo": true,
@@ -274,18 +281,18 @@
           "path": "c:/Users/gregt/OneDrive/Apps/ssh/ssh.code-workspace"
         },
         {
-          "color": "#1E90FF",
-          "id": "agenttoolkit4ymzfdlrtmm67907i",
-          "isGitRepo": true,
-          "name": "Agent-Toolkit",
-          "path": "c:\\Users\\gregt\\LocalCode\\Agent-Toolkit\\Agent-Toolkit.code-workspace"
-        },
-        {
           "color": "#e916a0",
           "id": "githubprofilehmhoxw6k5maiqd6ny",
           "isGitRepo": true,
           "name": "GitHub Profile",
           "path": "c:/Users/gregt/OneDrive/Code/GitHub/GitHubProfile"
+        },
+        {
+          "color": "#863c3c",
+          "id": "kinesisadv360propzyl5z5ldmaiqdlui",
+          "isGitRepo": true,
+          "name": "KinesisAdv360Pro",
+          "path": "c:/Users/gregt/OneDrive/Code/GitHub/KinesisAdv360Pro"
         },
         {
           "color": "#C1BAB0",
@@ -300,20 +307,6 @@
           "isGitRepo": true,
           "name": "Windows Terminal",
           "path": "c:/Users/gregt/OneDrive/Apps/Profiles/Windows Terminal"
-        },
-        {
-          "color": "#863c3c",
-          "id": "kinesisadv360propzyl5z5ldmaiqdlui",
-          "isGitRepo": true,
-          "name": "KinesisAdv360Pro",
-          "path": "c:/Users/gregt/OneDrive/Code/GitHub/KinesisAdv360Pro"
-        },
-        {
-          "color": "#f0921c",
-          "id": "drawiod7v84rsbpmcnq2fwp",
-          "isGitRepo": true,
-          "name": "draw.io",
-          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/draw.io"
         }
       ]
     }
@@ -1161,12 +1154,16 @@
     "editor.scrollbar.verticalScrollbarSize",
     "python.analysis.typeCheckingMode",
     "python.terminal.activateEnvironment",
-    "azureTerraform.survey"
+    "azureTerraform.survey",
+    "workbench.view.showQuietly"
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "none",
   "workbench.tips.enabled": true,
   "python.analysis.typeCheckingMode": "basic",
-  "python.terminal.activateEnvironment": false
+  "python.terminal.activateEnvironment": false,
+  "workbench.view.showQuietly": {
+    "workbench.panel.output": true
+  }
 }
