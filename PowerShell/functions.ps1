@@ -11,11 +11,6 @@ function Get-ClipboardExcel {
     Get-Clipboard | ConvertFrom-Csv -Delimiter "`t"
 }
 
-# Opens the VS Code PowerShell profile in a new window.
-function ep {
-    code -n --profile 'PowerShell' $PROFILE.CurrentUserAllHosts
-}
-
 # Opens VSCode with a temporary user data directory, or cleans up the temp directory if -Clean is specified.
 function tempcode {
     param (
@@ -53,28 +48,6 @@ function CleanUpSnagitFolder {
     $folderPath = "$env:USERPROFILE/Snagit Captures"
     $cutoffDate = (Get-Date).AddMonths(-1)
     Get-ChildItem -Path $folderPath -File | Where-Object { $_.LastWriteTime -lt $cutoffDate } | Remove-Item -Force
-}
-
-# Removes all but the latest version of each installed PowerShell module for the current user.
-function RemoveOldModules {
-    [OutputType()]
-    $psresources = Get-InstalledPSResource -Scope CurrentUser
-    $groupedResources = $psresources | Group-Object -Property Name
-    foreach ($group in $groupedResources) {
-        $latestVersion = $group.Group | Sort-Object -Property Version -Descending | Select-Object -First 1
-        $oldVersions = $group.Group | Where-Object { $_.Version -ne $latestVersion.Version }
-        foreach ($oldVersion in $oldVersions) {
-            Write-Host "Uninstalling $($oldVersion.Name) version $($oldVersion.Version)"
-            try {
-                Uninstall-PSResource -Name $oldVersion.Name -Version $oldVersion.Version -ProgressAction SilentlyContinue
-            }
-            catch {
-                $err = $_.Exception.Message
-                Write-Host "Failed to uninstall $($oldVersion.Name) version $($oldVersion.Version): $err" -ForegroundColor Red
-                continue
-            }
-        }
-    }
 }
 
 # Creates a file if it doesn't exist, or updates its last modified time if it does (like Unix 'touch').
@@ -573,218 +546,7 @@ function Install-WSLDistribution {
 # Functions for managing multiple Azure CLI contexts across accounts/tenants.
 # Uses separate AZURE_CONFIG_DIR per profile to isolate token caches and
 # prevent context bleeding between tenants.
-# Profiles can be defined in either $Personal.AzureProfiles or $Work.AzureProfiles
-
-function Get-AllAzureProfileConfigs {
-    <#
-    .SYNOPSIS
-        Returns a merged hashtable of Azure profiles from Personal and Work configs.
-    .DESCRIPTION
-        Combines AzureProfiles from $Personal and $Work configurations.
-        Personal profiles take precedence if there's a name conflict.
-    #>
-    [CmdletBinding()]
-    [OutputType([hashtable])]
-    param()
-
-    $merged = @{}
-
-    # Add Work profiles first (lower precedence)
-    if ($Work -and $Work.AzureProfiles) {
-        foreach ($key in $Work.AzureProfiles.Keys) {
-            $merged[$key] = $Work.AzureProfiles[$key]
-        }
-    }
-
-    # Add Personal profiles (higher precedence, overwrites Work if conflict)
-    if ($Personal -and $Personal.AzureProfiles) {
-        foreach ($key in $Personal.AzureProfiles.Keys) {
-            $merged[$key] = $Personal.AzureProfiles[$key]
-        }
-    }
-
-    return $merged
-}
-
-function Get-AzModuleCurrentContext {
-    <#
-    .SYNOPSIS
-        Gets the current Az PowerShell module context, if available.
-    .DESCRIPTION
-        Returns details about the current Az module context and login state.
-        If Az module cmdlets are not available, HasAzModule is false.
-    #>
-    [CmdletBinding()]
-    [OutputType([PSCustomObject])]
-    param()
-
-    $getAzContextCommand = Get-Command -Name Get-AzContext -ErrorAction SilentlyContinue
-    if (-not $getAzContextCommand) {
-        return [PSCustomObject][ordered]@{
-            HasAzModule     = $false
-            LoggedIn        = $false
-            ContextName     = $null
-            Account         = $null
-            TenantId        = $null
-            Subscription    = $null
-            SubscriptionId  = $null
-        }
-    }
-
-    $currentContext = $null
-    try {
-        $currentContext = Get-AzContext -ErrorAction Stop
-    }
-    catch {
-        # No active Az context
-    }
-
-    return [PSCustomObject][ordered]@{
-        HasAzModule     = $true
-        LoggedIn        = ($null -ne $currentContext)
-        ContextName     = $currentContext.Name
-        Account         = $currentContext.Account.Id
-        TenantId        = $currentContext.Tenant.Id
-        Subscription    = $currentContext.Subscription.Name
-        SubscriptionId  = $currentContext.Subscription.Id
-    }
-}
-
-function Sync-AzModuleContext {
-    <#
-    .SYNOPSIS
-        Aligns Az PowerShell module context with the selected profile.
-    .DESCRIPTION
-        Selects an existing Az context when one matches the provided tenant,
-        subscription, or account. If no match exists, attempts Connect-AzAccount
-        to register/select a context for the same identity scope.
-    .PARAMETER ProfileName
-        Friendly profile name being activated.
-    .PARAMETER TenantId
-        Target tenant ID.
-    .PARAMETER SubscriptionId
-        Target subscription ID.
-    .PARAMETER AccountId
-        Optional account UPN/email to constrain context matching.
-    #>
-    [CmdletBinding()]
-    [OutputType([PSCustomObject])]
-    param(
-        [Parameter(Mandatory)]
-        [string]$ProfileName,
-
-        [Parameter(Mandatory)]
-        [string]$TenantId,
-
-        [Parameter(Mandatory)]
-        [string]$SubscriptionId,
-
-        [Parameter()]
-        [string]$AccountId
-    )
-
-    $syncOverallTimer = [System.Diagnostics.Stopwatch]::StartNew()
-    $syncStepTimer = [System.Diagnostics.Stopwatch]::StartNew()
-    $syncSlowestStepName = $null
-    $syncSlowestStepMs = 0.0
-    $writeSyncStepTiming = {
-        param([string]$Step)
-        $elapsedMs = $syncStepTimer.Elapsed.TotalMilliseconds
-        if ($elapsedMs -gt $syncSlowestStepMs) {
-            $syncSlowestStepMs = $elapsedMs
-            $syncSlowestStepName = $Step
-        }
-        Write-Verbose ("Sync-AzModuleContext: {0,-35} {1,8:N1} ms (total {2,8:N1} ms)" -f $Step, $elapsedMs, $syncOverallTimer.Elapsed.TotalMilliseconds)
-        $syncStepTimer.Restart()
-    }
-
-    $getAzContextCommand = Get-Command -Name Get-AzContext -ErrorAction SilentlyContinue
-    $selectAzContextCommand = Get-Command -Name Select-AzContext -ErrorAction SilentlyContinue
-    $connectAzAccountCommand = Get-Command -Name Connect-AzAccount -ErrorAction SilentlyContinue
-    & $writeSyncStepTiming "Discovered Az cmdlets"
-
-    if (-not $getAzContextCommand -or -not $selectAzContextCommand -or -not $connectAzAccountCommand) {
-        Write-Warning "Az PowerShell module is not available. Install/import Az.Accounts to enable module context switching."
-        if ($syncSlowestStepName) {
-            Write-Verbose ("Sync-AzModuleContext slowest step: {0} ({1:N1} ms)" -f $syncSlowestStepName, $syncSlowestStepMs)
-        }
-        Write-Verbose ("Sync-AzModuleContext total duration: {0:N1} ms" -f $syncOverallTimer.Elapsed.TotalMilliseconds)
-        return [PSCustomObject][ordered]@{
-            HasAzModule      = $false
-            Switched         = $false
-            ContextName      = $null
-            Account          = $null
-            TenantId         = $null
-            Subscription     = $null
-            SubscriptionId   = $null
-        }
-    }
-
-    $allContexts = @()
-    try {
-        $allContexts = @(Get-AzContext -ListAvailable -ErrorAction SilentlyContinue)
-    }
-    catch {
-        $allContexts = @()
-    }
-    & $writeSyncStepTiming "Loaded available Az contexts"
-
-    $matchingContext = $null
-    if ($allContexts.Count -gt 0) {
-        $matchingContext = $allContexts | Where-Object {
-            $_.Subscription -and $_.Subscription.Id -eq $SubscriptionId
-        } | Select-Object -First 1
-
-        if (-not $matchingContext) {
-            $matchingContext = $allContexts | Where-Object {
-                $_.Tenant -and $_.Tenant.Id -eq $TenantId -and
-                (
-                    -not $AccountId -or
-                    ($_.Account -and $_.Account.Id -eq $AccountId)
-                )
-            } | Select-Object -First 1
-        }
-    }
-    & $writeSyncStepTiming "Matched context by subscription/tenant"
-
-    if ($matchingContext) {
-        Select-AzContext -Name $matchingContext.Name -ErrorAction Stop | Out-Null
-        & $writeSyncStepTiming "Selected existing Az context"
-    }
-    else {
-        Write-Host "Connecting Az PowerShell context for profile '$ProfileName'..." -ForegroundColor Yellow
-
-        $connectParams = @{
-            Tenant          = $TenantId
-            Subscription    = $SubscriptionId
-            ErrorAction     = 'Stop'
-        }
-
-        if ($AccountId) {
-            $connectParams.AccountId = $AccountId
-        }
-
-        Connect-AzAccount @connectParams | Out-Null
-        & $writeSyncStepTiming "Connected new Az context"
-    }
-
-    $currentContext = Get-AzContext -ErrorAction SilentlyContinue
-    & $writeSyncStepTiming "Read current Az context"
-    if ($syncSlowestStepName) {
-        Write-Verbose ("Sync-AzModuleContext slowest step: {0} ({1:N1} ms)" -f $syncSlowestStepName, $syncSlowestStepMs)
-    }
-    Write-Verbose ("Sync-AzModuleContext total duration: {0:N1} ms" -f $syncOverallTimer.Elapsed.TotalMilliseconds)
-
-    return [PSCustomObject][ordered]@{
-        HasAzModule      = $true
-        Switched         = ($null -ne $currentContext)
-        ContextName      = $currentContext.Name
-        Account          = $currentContext.Account.Id
-        TenantId         = $currentContext.Tenant.Id
-        Subscription     = $currentContext.Subscription.Name
-        SubscriptionId   = $currentContext.Subscription.Id
-    }
-}
+# Profiles are defined as top-level keys in $Personal and $Work configs.
 
 function Get-AzProfiles {
     <#
@@ -820,6 +582,8 @@ function Get-AzProfiles {
         [Parameter()]
         [switch]$DiscoveredOnly
     )
+
+    . $script:AzureCliProfileHelpers
 
     $profilesDir = Join-Path $HOME ".azure\profiles"
     $allProfiles = @{}
@@ -952,9 +716,11 @@ function Get-AzProfiles {
     # Merge with configured profiles from Personal and Work configs
     if (-not $DiscoveredOnly.IsPresent) {
         # Check Personal config
-        if ($Personal -and $Personal.AzureProfiles) {
-            foreach ($name in $Personal.AzureProfiles.Keys) {
-                $profileConfig = $Personal.AzureProfiles[$name]
+        $personalProfiles = Get-AzureProfilesFromConfig -Config $Personal
+        if ($personalProfiles.Count -gt 0) {
+            foreach ($name in $personalProfiles.Keys) {
+                $profileConfig = $personalProfiles[$name]
+                $configuredPrimarySub = if ($profileConfig.ContainsKey('PrimarySub')) { $profileConfig.PrimarySub } else { $profileConfig.SubscriptionId }
                 $configDir = Join-Path $HOME ".azure\profiles\$name"
                 $configFile = Join-Path $configDir "azureProfile.json"
                 $isLoggedIn = Test-Path $configFile
@@ -984,8 +750,8 @@ function Get-AzProfiles {
                     $allProfiles[$name].Account = $profileConfig.Account
                     $allProfiles[$name].AzCliAccount = $profileConfig.Account
                     $allProfiles[$name].TenantId = $profileConfig.TenantId
-                    $allProfiles[$name].SubscriptionId = $profileConfig.SubscriptionId
-                    $allProfiles[$name].AzCliSubscriptionId = $profileConfig.SubscriptionId
+                    $allProfiles[$name].SubscriptionId = $configuredPrimarySub
+                    $allProfiles[$name].AzCliSubscriptionId = $configuredPrimarySub
                 }
                 else {
                     # Add Personal config profile
@@ -993,14 +759,14 @@ function Get-AzProfiles {
                         Name        = $name
                         Description = $profileConfig.Description
                         Account     = $profileConfig.Account
-                        SubscriptionId = $profileConfig.SubscriptionId
+                        SubscriptionId = $configuredPrimarySub
                         AzConfigDir = if (Test-Path $configDir) { $configDir } else { $null }
                         LoggedIn    = $isLoggedIn
                         CurrentUser = $currentUser
                         TenantId    = $profileConfig.TenantId
                         ConfigSource = $null  # Will be set below
                         AzCliAccount = $profileConfig.Account
-                        AzCliSubscriptionId = $profileConfig.SubscriptionId
+                        AzCliSubscriptionId = $configuredPrimarySub
                         AzCliConfigDir = if (Test-Path $configDir) { $configDir } else { $null }
                         AzCliIsLoggedIn = $isLoggedIn
                         AzCliLoggedIn = $isLoggedIn
@@ -1021,9 +787,11 @@ function Get-AzProfiles {
         }
 
         # Check Work config
-        if ($Work -and $Work.AzureProfiles) {
-            foreach ($name in $Work.AzureProfiles.Keys) {
-                $profileConfig = $Work.AzureProfiles[$name]
+        $workProfiles = Get-AzureProfilesFromConfig -Config $Work
+        if ($workProfiles.Count -gt 0) {
+            foreach ($name in $workProfiles.Keys) {
+                $profileConfig = $workProfiles[$name]
+                $configuredPrimarySub = if ($profileConfig.ContainsKey('PrimarySub')) { $profileConfig.PrimarySub } else { $profileConfig.SubscriptionId }
                 $configDir = Join-Path $HOME ".azure\profiles\$name"
                 $configFile = Join-Path $configDir "azureProfile.json"
                 $isLoggedIn = Test-Path $configFile
@@ -1053,8 +821,8 @@ function Get-AzProfiles {
                     $allProfiles[$name].Account = $profileConfig.Account
                     $allProfiles[$name].AzCliAccount = $profileConfig.Account
                     $allProfiles[$name].TenantId = $profileConfig.TenantId
-                    $allProfiles[$name].SubscriptionId = $profileConfig.SubscriptionId
-                    $allProfiles[$name].AzCliSubscriptionId = $profileConfig.SubscriptionId
+                    $allProfiles[$name].SubscriptionId = $configuredPrimarySub
+                    $allProfiles[$name].AzCliSubscriptionId = $configuredPrimarySub
                 }
                 else {
                     # Add Work config profile
@@ -1062,14 +830,14 @@ function Get-AzProfiles {
                         Name        = $name
                         Description = $profileConfig.Description
                         Account     = $profileConfig.Account
-                        SubscriptionId = $profileConfig.SubscriptionId
+                        SubscriptionId = $configuredPrimarySub
                         AzConfigDir = if (Test-Path $configDir) { $configDir } else { $null }
                         LoggedIn    = $isLoggedIn
                         CurrentUser = $currentUser
                         TenantId    = $profileConfig.TenantId
                         ConfigSource = $null  # Will be set below
                         AzCliAccount = $profileConfig.Account
-                        AzCliSubscriptionId = $profileConfig.SubscriptionId
+                        AzCliSubscriptionId = $configuredPrimarySub
                         AzCliConfigDir = if (Test-Path $configDir) { $configDir } else { $null }
                         AzCliIsLoggedIn = $isLoggedIn
                         AzCliLoggedIn = $isLoggedIn
@@ -1112,19 +880,45 @@ function Get-AzProfiles {
             $matchingContext = $null
 
             if ($profileRecord.SubscriptionId) {
-                $matchingContext = $azModuleContexts | Where-Object {
+                $subscriptionMatches = @($azModuleContexts | Where-Object {
                     $_.Subscription -and $_.Subscription.Id -eq $profileRecord.SubscriptionId
-                } | Select-Object -First 1
+                })
+
+                if ($profileRecord.Account) {
+                    $subscriptionMatches = @($subscriptionMatches | Where-Object {
+                        $_.Account -and $_.Account.Id -eq $profileRecord.Account
+                    })
+                }
+
+                if ($subscriptionMatches.Count -gt 0) {
+                    $matchingContext = $subscriptionMatches | Where-Object {
+                        $_.Name -ieq $name
+                    } | Select-Object -First 1
+
+                    if (-not $matchingContext) {
+                        $matchingContext = $subscriptionMatches | Select-Object -First 1
+                    }
+                }
             }
 
             if (-not $matchingContext -and $profileRecord.TenantId) {
-                $matchingContext = $azModuleContexts | Where-Object {
+                $tenantMatches = @($azModuleContexts | Where-Object {
                     $_.Tenant -and $_.Tenant.Id -eq $profileRecord.TenantId -and
                     (
                         -not $profileRecord.Account -or
                         ($_.Account -and $_.Account.Id -eq $profileRecord.Account)
                     )
-                } | Select-Object -First 1
+                })
+
+                if ($tenantMatches.Count -gt 0) {
+                    $matchingContext = $tenantMatches | Where-Object {
+                        $_.Name -ieq $name
+                    } | Select-Object -First 1
+
+                    if (-not $matchingContext) {
+                        $matchingContext = $tenantMatches | Select-Object -First 1
+                    }
+                }
             }
 
             if ($matchingContext) {
@@ -1160,6 +954,8 @@ function Get-CurrentAzProfile {
     [CmdletBinding()]
     [OutputType([PSCustomObject])]
     param()
+
+    . $script:AzureCliProfileHelpers
 
     # Get current CLI config directory
     $currentConfigDir = $env:AZURE_CONFIG_DIR
@@ -1234,7 +1030,7 @@ function Use-AzProfile {
         account/tenant combination. Logs in if not already authenticated for
         that profile.
     .PARAMETER Name
-        The profile name as defined in WorkConfig.psd1 AzureProfiles section,
+        The profile name as defined as a top-level key in PersonalConfig.psd1 or WorkConfig.psd1,
         or '(default)' for the default Azure CLI profile.
     .PARAMETER Force
         Forces re-authentication even if already logged in.
@@ -1265,6 +1061,8 @@ function Use-AzProfile {
         [Parameter()]
         [switch]$SelectAccount
     )
+
+    . $script:AzureCliProfileHelpers
 
     $overallTimer = [System.Diagnostics.Stopwatch]::StartNew()
     $stepTimer = [System.Diagnostics.Stopwatch]::StartNew()
@@ -1373,7 +1171,7 @@ function Use-AzProfile {
     & $writeStepTiming "Loaded and merged profile configuration"
 
     if ($allConfiguredProfiles.Count -eq 0) {
-        Write-Error "No Azure profiles configured. Add AzureProfiles section to PersonalConfig.psd1 or WorkConfig.psd1"
+        Write-Error "No Azure profiles configured. Add profile keys to PersonalConfig.psd1 or WorkConfig.psd1"
         return
     }
 
@@ -1386,6 +1184,8 @@ function Use-AzProfile {
         Write-Error "Profile '$Name' not found. Available profiles: $availableProfiles"
         return
     }
+
+    $configuredPrimarySub = if ($profileConfig.ContainsKey('PrimarySub')) { $profileConfig.PrimarySub } else { $profileConfig.SubscriptionId }
 
     # Set the config directory for this profile
     $configDir = Join-Path $HOME ".azure\profiles\$Name"
@@ -1441,11 +1241,11 @@ function Use-AzProfile {
     # Set subscription if configured
     $shouldRefreshAccountInfo = $false
 
-    if ($profileConfig.SubscriptionId) {
-        if (-not $accountInfo -or $accountInfo.id -ne $profileConfig.SubscriptionId) {
-            az account set --subscription $profileConfig.SubscriptionId 2>$null
+    if ($configuredPrimarySub) {
+        if (-not $accountInfo -or $accountInfo.id -ne $configuredPrimarySub) {
+            az account set --subscription $configuredPrimarySub 2>$null
             if ($LASTEXITCODE -ne 0) {
-                Write-Warning "Could not set subscription: $($profileConfig.SubscriptionId)"
+                Write-Warning "Could not set subscription: $configuredPrimarySub"
             }
 
             & $writeStepTiming "Set Azure CLI subscription"
@@ -1517,6 +1317,8 @@ function Use-AzProfileSubscription {
         [Alias('Subscription')]
         [string]$SubscriptionID
     )
+
+    . $script:AzureCliProfileHelpers
 
     $accountInfo = $null
     try {
@@ -1620,6 +1422,8 @@ Set-Alias -Name azp -Value Use-AzProfile -Scope Global
 $azProfileCompleter = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
 
+    . $script:AzureCliProfileHelpers
+
     # Add default profile first
     $results = @([System.Management.Automation.CompletionResult]::new(
         '(default)',
@@ -1698,6 +1502,8 @@ function New-AzProfile {
         [switch]$FromConfig
     )
 
+    . $script:AzureCliProfileHelpers
+
 
     # Handle FromConfig parameter set
     if ($FromConfig.IsPresent) {
@@ -1712,7 +1518,7 @@ function New-AzProfile {
         $profileConfig = $allConfiguredProfiles[$Name]
         $TenantId = $profileConfig.TenantId
         $Description = $profileConfig.Description
-        $SubscriptionId = $profileConfig.SubscriptionId
+        $SubscriptionId = if ($profileConfig.ContainsKey('PrimarySub')) { $profileConfig.PrimarySub } else { $profileConfig.SubscriptionId }
 
         Write-Host "Initializing config directory for existing profile: " -NoNewline
         Write-Host $Name -ForegroundColor Cyan
@@ -1778,7 +1584,7 @@ function New-AzProfile {
         $newProfile = @{
             Account        = $accountInfo.user.name
             TenantId       = $accountInfo.tenantId
-            SubscriptionId = $SubscriptionId
+            PrimarySub     = $SubscriptionId
             Description    = $Description
         }
 
@@ -1799,7 +1605,7 @@ function New-AzProfile {
         '$Name' = @{
             Account        = '$($newProfile.Account)'
             TenantId       = '$($newProfile.TenantId)'
-            SubscriptionId = '$SubscriptionId'
+            PrimarySub     = '$SubscriptionId'
             Description    = '$Description'
         }
 "@ -ForegroundColor Cyan
@@ -1820,20 +1626,20 @@ function New-AzProfile {
                 # Read the current file content
                 $content = Get-Content $configPath -Raw
 
-                # Find the AzureProfiles section and add the new profile
+                # Find the profile template section and add the new profile
                 $profileEntry = @"
 
-        '$Name' = @{
-            Account        = '$($newProfile.Account)'
-            TenantId       = '$($newProfile.TenantId)'
-            SubscriptionId = '$SubscriptionId'
-            Description    = '$Description'
-        }
+    '$Name' = @{
+        Account        = '$($newProfile.Account)'
+        TenantId       = '$($newProfile.TenantId)'
+        PrimarySub     = '$SubscriptionId'
+        Description    = '$Description'
+    }
 "@
-            # Insert before the closing of AzureProfiles (look for the template comment or closing brace)
-            $insertPattern = "        # Template for adding new"
+            # Insert before the template comment marker.
+            $insertPattern = "# Template for adding new"
             if ($content -match [regex]::Escape($insertPattern)) {
-                $content = $content -replace [regex]::Escape($insertPattern), "$profileEntry`n`n        # Template for adding new"
+                $content = $content -replace [regex]::Escape($insertPattern), "$profileEntry`n`n    # Template for adding new"
                 Set-Content -Path $configPath -Value $content -NoNewline
                 Write-Host "Profile saved to config file" -ForegroundColor Green
             }
@@ -1920,6 +1726,8 @@ function Remove-AzProfile {
         [switch]$KeepConfig
     )
 
+    . $script:AzureCliProfileHelpers
+
     $allConfiguredProfiles = Get-AllAzureProfileConfigs
     $profileConfig = $null
     if ($allConfiguredProfiles.ContainsKey($Name)) {
@@ -1944,8 +1752,9 @@ function Remove-AzProfile {
     $removeAzContextCommand = Get-Command -Name Remove-AzContext -ErrorAction SilentlyContinue
 
     if ($getAzContextCommand -and $removeAzContextCommand -and $profileConfig) {
+        $configuredPrimarySub = if ($profileConfig.ContainsKey('PrimarySub')) { $profileConfig.PrimarySub } else { $profileConfig.SubscriptionId }
         $matchingContexts = @(Get-AzContext -ListAvailable -ErrorAction SilentlyContinue | Where-Object {
-            ($profileConfig.SubscriptionId -and $_.Subscription -and $_.Subscription.Id -eq $profileConfig.SubscriptionId) -or
+            ($configuredPrimarySub -and $_.Subscription -and $_.Subscription.Id -eq $configuredPrimarySub) -or
             (
                 $profileConfig.TenantId -and
                 $_.Tenant -and
@@ -1978,16 +1787,28 @@ function Remove-AzProfile {
     # Remove from in-memory config unless KeepConfig is specified
     if (-not $KeepConfig.IsPresent) {
         $removed = $false
+        $personalProfiles = Get-AzureProfilesFromConfig -Config $Personal
+        $workProfiles = Get-AzureProfilesFromConfig -Config $Work
 
-        if ($Personal -and $Personal.AzureProfiles -and $Personal.AzureProfiles.ContainsKey($Name)) {
-            $Personal.AzureProfiles.Remove($Name)
+        if ($personalProfiles.ContainsKey($Name)) {
+            if ($Personal.ContainsKey('AzureProfiles') -and $Personal.AzureProfiles -is [hashtable]) {
+                $Personal.AzureProfiles.Remove($Name)
+            }
+            else {
+                $Personal.Remove($Name)
+            }
             Write-Host "Removed profile from Personal in-memory configuration" -ForegroundColor Green
             Write-Host "Note: To remove from PersonalConfig.psd1, edit the file manually." -ForegroundColor Yellow
             $removed = $true
         }
 
-        if ($Work -and $Work.AzureProfiles -and $Work.AzureProfiles.ContainsKey($Name)) {
-            $Work.AzureProfiles.Remove($Name)
+        if ($workProfiles.ContainsKey($Name)) {
+            if ($Work.ContainsKey('AzureProfiles') -and $Work.AzureProfiles -is [hashtable]) {
+                $Work.AzureProfiles.Remove($Name)
+            }
+            else {
+                $Work.Remove($Name)
+            }
             Write-Host "Removed profile from Work in-memory configuration" -ForegroundColor Green
             Write-Host "Note: To remove from WorkConfig.psd1, edit the file manually." -ForegroundColor Yellow
             $removed = $true
@@ -2001,5 +1822,298 @@ function Remove-AzProfile {
 
 # Register argument completer for Remove-AzProfile
 Register-ArgumentCompleter -CommandName Remove-AzProfile -ParameterName Name -ScriptBlock $azProfileCompleter
+
+# Helper functions for Azure CLI profile management.
+$script:AzureCliProfileHelpers = {
+    function Get-AzureProfilesFromConfig {
+        <#
+        .SYNOPSIS
+            Extracts Azure profile entries from a loaded config hashtable.
+        .DESCRIPTION
+            Returns profile records from top-level config keys. For backward compatibility,
+            this also supports legacy configs that still nest profiles under AzureProfiles.
+        .PARAMETER Config
+            The loaded config hashtable from PersonalConfig.psd1 or WorkConfig.psd1.
+        #>
+        [CmdletBinding()]
+        [OutputType([hashtable])]
+        param(
+            [Parameter()]
+            [hashtable]$Config
+        )
+
+        $profiles = @{}
+        if (-not $Config) {
+            return $profiles
+        }
+
+        $profileTable = if ($Config.ContainsKey('AzureProfiles') -and $Config.AzureProfiles -is [hashtable]) {
+            $Config.AzureProfiles
+        }
+        else {
+            $Config
+        }
+
+        foreach ($entry in $profileTable.GetEnumerator()) {
+            $profileName = [string]$entry.Key
+            $profileValue = $entry.Value
+
+            if (
+                $profileName -ne 'AzureProfiles' -and
+                $profileValue -is [hashtable] -and
+                (
+                    $profileValue.ContainsKey('TenantId') -or
+                    $profileValue.ContainsKey('Account') -or
+                    $profileValue.ContainsKey('PrimarySub') -or
+                    $profileValue.ContainsKey('SubscriptionId') -or
+                    $profileValue.ContainsKey('Description')
+                )
+            ) {
+                $profiles[$profileName] = $profileValue
+            }
+        }
+
+        return $profiles
+    }
+
+    function Get-AllAzureProfileConfigs {
+        <#
+        .SYNOPSIS
+            Returns a merged hashtable of Azure profiles from Personal and Work configs.
+        .DESCRIPTION
+            Combines top-level profile entries from $Personal and $Work configurations.
+            Personal profiles take precedence if there's a name conflict.
+        #>
+        [CmdletBinding()]
+        [OutputType([hashtable])]
+        param()
+
+        $merged = @{}
+        $workProfiles = Get-AzureProfilesFromConfig -Config $Work
+        $personalProfiles = Get-AzureProfilesFromConfig -Config $Personal
+
+        # Add Work profiles first (lower precedence)
+        if ($workProfiles.Count -gt 0) {
+            foreach ($key in $workProfiles.Keys) {
+                $merged[$key] = $workProfiles[$key]
+            }
+        }
+
+        # Add Personal profiles (higher precedence, overwrites Work if conflict)
+        if ($personalProfiles.Count -gt 0) {
+            foreach ($key in $personalProfiles.Keys) {
+                $merged[$key] = $personalProfiles[$key]
+            }
+        }
+
+        return $merged
+    }
+
+    function Get-AzModuleCurrentContext {
+        <#
+        .SYNOPSIS
+            Gets the current Az PowerShell module context, if available.
+        .DESCRIPTION
+            Returns details about the current Az module context and login state.
+            If Az module cmdlets are not available, HasAzModule is false.
+        #>
+        [CmdletBinding()]
+        [OutputType([PSCustomObject])]
+        param()
+
+        $getAzContextCommand = Get-Command -Name Get-AzContext -ErrorAction SilentlyContinue
+        if (-not $getAzContextCommand) {
+            return [PSCustomObject][ordered]@{
+                HasAzModule     = $false
+                LoggedIn        = $false
+                ContextName     = $null
+                Account         = $null
+                TenantId        = $null
+                Subscription    = $null
+                SubscriptionId  = $null
+            }
+        }
+
+        $currentContext = $null
+        try {
+            $currentContext = Get-AzContext -ErrorAction Stop
+        }
+        catch {
+            # No active Az context
+        }
+
+        return [PSCustomObject][ordered]@{
+            HasAzModule     = $true
+            LoggedIn        = ($null -ne $currentContext)
+            ContextName     = $currentContext.Name
+            Account         = $currentContext.Account.Id
+            TenantId        = $currentContext.Tenant.Id
+            Subscription    = $currentContext.Subscription.Name
+            SubscriptionId  = $currentContext.Subscription.Id
+        }
+    }
+
+    function Sync-AzModuleContext {
+        <#
+        .SYNOPSIS
+            Aligns Az PowerShell module context with the selected profile.
+        .DESCRIPTION
+            Selects an existing Az context when one matches the provided tenant,
+            subscription, or account. If no match exists, attempts Connect-AzAccount
+            to register/select a context for the same identity scope.
+        .PARAMETER ProfileName
+            Friendly profile name being activated.
+        .PARAMETER TenantId
+            Target tenant ID.
+        .PARAMETER SubscriptionId
+            Target subscription ID.
+        .PARAMETER AccountId
+            Optional account UPN/email to constrain context matching.
+        #>
+        [CmdletBinding()]
+        [OutputType([PSCustomObject])]
+        param(
+            [Parameter(Mandatory)]
+            [string]$ProfileName,
+
+            [Parameter(Mandatory)]
+            [string]$TenantId,
+
+            [Parameter(Mandatory)]
+            [string]$SubscriptionId,
+
+            [Parameter()]
+            [string]$AccountId
+        )
+
+        $syncOverallTimer = [System.Diagnostics.Stopwatch]::StartNew()
+        $syncStepTimer = [System.Diagnostics.Stopwatch]::StartNew()
+        $syncSlowestStepName = $null
+        $syncSlowestStepMs = 0.0
+        $writeSyncStepTiming = {
+            param([string]$Step)
+            $elapsedMs = $syncStepTimer.Elapsed.TotalMilliseconds
+            if ($elapsedMs -gt $syncSlowestStepMs) {
+                $syncSlowestStepMs = $elapsedMs
+                $syncSlowestStepName = $Step
+            }
+            Write-Verbose ("Sync-AzModuleContext: {0,-35} {1,8:N1} ms (total {2,8:N1} ms)" -f $Step, $elapsedMs, $syncOverallTimer.Elapsed.TotalMilliseconds)
+            $syncStepTimer.Restart()
+        }
+
+        $getAzContextCommand = Get-Command -Name Get-AzContext -ErrorAction SilentlyContinue
+        $selectAzContextCommand = Get-Command -Name Select-AzContext -ErrorAction SilentlyContinue
+        $connectAzAccountCommand = Get-Command -Name Connect-AzAccount -ErrorAction SilentlyContinue
+        & $writeSyncStepTiming "Discovered Az cmdlets"
+
+        if (-not $getAzContextCommand -or -not $selectAzContextCommand -or -not $connectAzAccountCommand) {
+            Write-Warning "Az PowerShell module is not available. Install/import Az.Accounts to enable module context switching."
+            if ($syncSlowestStepName) {
+                Write-Verbose ("Sync-AzModuleContext slowest step: {0} ({1:N1} ms)" -f $syncSlowestStepName, $syncSlowestStepMs)
+            }
+            Write-Verbose ("Sync-AzModuleContext total duration: {0:N1} ms" -f $syncOverallTimer.Elapsed.TotalMilliseconds)
+            return [PSCustomObject][ordered]@{
+                HasAzModule      = $false
+                Switched         = $false
+                ContextName      = $null
+                Account          = $null
+                TenantId         = $null
+                Subscription     = $null
+                SubscriptionId   = $null
+            }
+        }
+
+        $allContexts = @()
+        try {
+            $allContexts = @(Get-AzContext -ListAvailable -ErrorAction SilentlyContinue)
+        }
+        catch {
+            $allContexts = @()
+        }
+        & $writeSyncStepTiming "Loaded available Az contexts"
+
+        $matchingContext = $null
+        if ($allContexts.Count -gt 0) {
+            $subscriptionMatches = @($allContexts | Where-Object {
+                $_.Subscription -and $_.Subscription.Id -eq $SubscriptionId
+            })
+
+            if ($AccountId) {
+                $subscriptionMatches = @($subscriptionMatches | Where-Object {
+                    $_.Account -and $_.Account.Id -eq $AccountId
+                })
+            }
+
+            if ($subscriptionMatches.Count -gt 0) {
+                $matchingContext = $subscriptionMatches | Where-Object {
+                    $_.Name -ieq $ProfileName
+                } | Select-Object -First 1
+
+                if (-not $matchingContext) {
+                    $matchingContext = $subscriptionMatches | Select-Object -First 1
+                }
+            }
+
+            if (-not $matchingContext) {
+                $tenantMatches = @($allContexts | Where-Object {
+                    $_.Tenant -and $_.Tenant.Id -eq $TenantId -and
+                    (
+                        -not $AccountId -or
+                        ($_.Account -and $_.Account.Id -eq $AccountId)
+                    )
+                })
+
+                if ($tenantMatches.Count -gt 0) {
+                    $matchingContext = $tenantMatches | Where-Object {
+                        $_.Name -ieq $ProfileName
+                    } | Select-Object -First 1
+
+                    if (-not $matchingContext) {
+                        $matchingContext = $tenantMatches | Select-Object -First 1
+                    }
+                }
+            }
+        }
+        & $writeSyncStepTiming "Matched context by subscription/tenant"
+
+        if ($matchingContext) {
+            Select-AzContext -Name $matchingContext.Name -ErrorAction Stop | Out-Null
+            & $writeSyncStepTiming "Selected existing Az context"
+        }
+        else {
+            Write-Host "Connecting Az PowerShell context for profile '$ProfileName'..." -ForegroundColor Yellow
+
+            $connectParams = @{
+                Tenant          = $TenantId
+                Subscription    = $SubscriptionId
+                ErrorAction     = 'Stop'
+            }
+
+            if ($AccountId) {
+                $connectParams.AccountId = $AccountId
+            }
+
+            Connect-AzAccount @connectParams | Out-Null
+            & $writeSyncStepTiming "Connected new Az context"
+        }
+
+        $currentContext = Get-AzContext -ErrorAction SilentlyContinue
+        & $writeSyncStepTiming "Read current Az context"
+        if ($syncSlowestStepName) {
+            Write-Verbose ("Sync-AzModuleContext slowest step: {0} ({1:N1} ms)" -f $syncSlowestStepName, $syncSlowestStepMs)
+        }
+        Write-Verbose ("Sync-AzModuleContext total duration: {0:N1} ms" -f $syncOverallTimer.Elapsed.TotalMilliseconds)
+
+        return [PSCustomObject][ordered]@{
+            HasAzModule      = $true
+            Switched         = ($null -ne $currentContext)
+            ContextName      = $currentContext.Name
+            Account          = $currentContext.Account.Id
+            TenantId         = $currentContext.Tenant.Id
+            Subscription     = $currentContext.Subscription.Name
+            SubscriptionId   = $currentContext.Subscription.Id
+        }
+    }
+}
 
 #endregion

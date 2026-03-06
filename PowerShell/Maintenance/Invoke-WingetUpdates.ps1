@@ -183,12 +183,16 @@ $Helpers = {
         # Write a run header for this WinGet update pass.
         $runHeader = "`n===== WinGet update started: $(Get-Date -Format s) ====="
         $runHeader | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+        'Scope: All installed WinGet packages' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
 
-        # Execute WinGet updates via Microsoft.WinGet.Client for structured object output.
+        # Execute WinGet updates via Microsoft.WinGet.Client and emit text-first log lines.
         if (Get-Module -ListAvailable -Name 'Microsoft.WinGet.Client') {
             $originalProgressPreference = $ProgressPreference
             $successfulUpdates = 0
-            $updateResults = @()
+            $installedPackageCount = 0
+            $updatedPackageLines = [System.Collections.Generic.List[string]]::new()
+            $pinnedPackageLines = [System.Collections.Generic.List[string]]::new()
+            $skippedPackageLines = [System.Collections.Generic.List[string]]::new()
             try {
                 # Suppress progress records so logs remain text/object focused.
                 $ProgressPreference = 'SilentlyContinue'
@@ -197,59 +201,105 @@ $Helpers = {
                 Import-Module -Name Microsoft.WinGet.Client -ErrorAction Stop
                 Assert-WinGetPackageManager -ErrorAction Stop | Out-Null
 
-                # Discover all installed packages that currently have updates available.
-                $availableUpdates = Get-WinGetPackage -ErrorAction Stop |
-                    Where-Object { $_.IsUpdateAvailable }
+                # Discover all installed packages and compute pending updates from that set.
+                $installedPackages = @(Get-WinGetPackage -ErrorAction Stop)
+                $installedPackageCount = $installedPackages.Count
+                $availableUpdates = @($installedPackages | Where-Object { $_.IsUpdateAvailable })
+
+                # Read pinned package metadata from winget CLI output.
+                if (Get-Command -Name winget -ErrorAction SilentlyContinue) {
+                    $pinListOutput = @(winget pin list --disable-interactivity 2>$null)
+                    if ($LASTEXITCODE -eq 0 -and $pinListOutput) {
+                        $pinListOutput | ForEach-Object {
+                            $line = "$($_)".Trim()
+                            if (-not $line) {
+                                return
+                            }
+
+                            if ($line -match '^Name\s+Id\s+Version\s+Source\s+Pin type$') {
+                                return
+                            }
+
+                            if ($line -match '^-{3,}$') {
+                                return
+                            }
+
+                            $columns = @($line -split '\s{2,}')
+                            if ($columns.Count -ge 2) {
+                                $pinnedPackageLines.Add("  - $($columns[0]) [$($columns[1])] (pinned)")
+                            }
+                        }
+                    }
+                }
+
+                # Record up-to-date packages in a compact, line-oriented format.
+                $installedPackages |
+                    Where-Object { -not $_.IsUpdateAvailable } |
+                    ForEach-Object {
+                        $skippedPackageLines.Add("  - $($_.Name) [$($_.Id)] (up-to-date)")
+                    }
 
                 # Exit cleanly when there are no upgrades to apply.
                 if (-not $availableUpdates) {
-                    'No package upgrades available.' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                    "Summary: $installedPackageCount packages checked, 0 updated, $($skippedPackageLines.Count) skipped." | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                    'Pinned packages:' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                    if ($pinnedPackageLines.Count -gt 0) {
+                        $pinnedPackageLines | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                    }
+                    else {
+                        '  - None' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                    }
+
+                    if ($skippedPackageLines.Count -gt 0) {
+                        'Skipped packages:' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                        $skippedPackageLines | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                    }
                     "===== WinGet update completed: $(Get-Date -Format s) =====" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
                     return $false
                 }
 
-                # Write a structured snapshot of all pending package upgrades.
-                'Packages with available updates:' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
-                $availableUpdates |
-                    Select-Object Name, Id, InstalledVersion, @{Name = 'AvailableVersion'; Expression = {
-                        if ($_.AvailableVersions -and $_.AvailableVersions.Count -gt 0) {
-                            $_.AvailableVersions[0]
-                        }
-                        else {
-                            $null
-                        }
-                    } }, Source |
-                    ConvertTo-Json -Depth 4 |
-                    Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
-
                 # Apply upgrades one package at a time to preserve per-package status logging.
                 foreach ($package in $availableUpdates) {
                     try {
-                        $result = $package | Update-WinGetPackage -Mode Silent -Confirm:$false -ErrorAction Stop
+                        $package | Update-WinGetPackage -Mode Silent -Confirm:$false -ErrorAction Stop | Out-Null
                         $successfulUpdates += 1
 
-                        if ($null -ne $result) {
-                            $updateResults += $result
+                        if ($package.AvailableVersions -and $package.AvailableVersions.Count -gt 0) {
+                            $availableVersion = $package.AvailableVersions[0]
+                        }
+                        else {
+                            $availableVersion = '?'
                         }
 
-                        "Updated package: $($package.Name) [$($package.Id)]" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                        $updatedPackageLines.Add("  - $($package.Name) [$($package.Id)] ($($package.InstalledVersion) -> $availableVersion)")
                     }
                     catch {
                         # Continue processing remaining packages while capturing update failures.
-                        "Failed package update: $($package.Name) [$($package.Id)] - $($_.Exception.Message)" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                        $skippedPackageLines.Add("  - $($package.Name) [$($package.Id)] (error: $($_.Exception.Message))")
                     }
                 }
 
-                # Emit structured install/update result objects when available.
-                if ($updateResults) {
-                    'Package update results:' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
-                    $updateResults |
-                        Select-Object * |
-                        ConvertTo-Json -Depth 6 |
-                        Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                # Write compact summary and grouped package result lines.
+                "Summary: $installedPackageCount packages checked, $successfulUpdates updated, $($skippedPackageLines.Count) skipped." | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+
+                if ($updatedPackageLines.Count -gt 0) {
+                    'Updated packages:' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                    $updatedPackageLines | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
                 }
 
-                "winget updates applied: $successfulUpdates" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                'Pinned packages:' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                if ($pinnedPackageLines.Count -gt 0) {
+                    $pinnedPackageLines | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                }
+                else {
+                    '  - None' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                }
+
+                if ($skippedPackageLines.Count -gt 0) {
+                    'Skipped packages:' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                    $skippedPackageLines | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                }
+
                 "===== WinGet update completed: $(Get-Date -Format s) =====" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
                 return ($successfulUpdates -gt 0)
             }
