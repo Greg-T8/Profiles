@@ -195,15 +195,15 @@
       ]
     },
     {
-      "id": "projectshb76ydg10mmaoptep",
       "groupName": "Projects",
+      "id": "projectshb76ydg10mmaoptep",
       "projects": [
         {
-          "isGitRepo": true,
+          "color": "#C59922",
           "id": "documentwriterm4jvkfl7cmm9panzj",
+          "isGitRepo": true,
           "name": "DocumentWriter",
-          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\DocumentWriter\\DocumentWriter.code-workspace",
-          "color": "#C59922"
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\DocumentWriter\\DocumentWriter.code-workspace"
         },
         {
           "color": "#8b4789",
@@ -459,6 +459,7 @@
   "git.autofetch": true,
   "git.confirmSync": false,
   "git.enableSmartCommit": true,
+  "git.openRepositoryInParentFolders": "always",
   "github.copilot.chat.agent.temperature": 0,
   "github.copilot.chat.anthropic.thinking.budgetTokens": 16000,
   "github.copilot.chat.askQuestions.enabled": true,
@@ -691,6 +692,8 @@
   "powershell.scriptAnalysis.settingsPath": "C:/Users/gregt/OneDrive/Code/PowerShell/PSScriptAnalyzerSettings.psd1",
   "powershell.sideBar.CommandExplorerVisibility": false,
   "prettyxml.settings.indentSpaceLength": 2,
+  "python.analysis.typeCheckingMode": "basic",
+  "python.terminal.activateEnvironment": false,
   "rewrap.autoWrap.enabled": false,
   "rewrap.autoWrap.notification": "icon",
   "rewrap.doubleSentenceSpacing": false,
@@ -887,8 +890,8 @@
     "diffEditor.removedLineBackground": "#4d2600",
     "diffEditor.removedTextBackground": "#434140",
     "editor.background": "#081019",
-    "editor.selectionBackground": "#d100ff66",
     "editor.inactiveSelectionBackground": "#d100ff33",
+    "editor.selectionBackground": "#d100ff66",
     "editor.selectionHighlightBackground": "#d100ff1f",
     "editorGutter.addedBackground": "#2f81f7",
     "editorGutter.deletedBackground": "#ff9e3d",
@@ -1161,10 +1164,7 @@
   "workbench.settings.openDefaultSettings": false,
   "workbench.startupEditor": "none",
   "workbench.tips.enabled": true,
-  "python.analysis.typeCheckingMode": "basic",
-  "python.terminal.activateEnvironment": false,
   "workbench.view.showQuietly": {
     "workbench.panel.output": true
-  },
-  "git.openRepositoryInParentFolders": "always"
+  }
 }
