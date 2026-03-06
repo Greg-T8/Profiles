@@ -54,8 +54,8 @@ $Main = {
     $wingetChanged = $false
     $logContext = New-UpdateLogContext -LogRetentionConfig $LogRetentionConfig -RetentionDaysOverride $RetentionDays
 
-    $wingetChanged = Invoke-WinGetUpdates -WinGetLogPath $logContext.WinGetLogPath
-    Open-UpdateLogs -WinGetLogPath $logContext.WinGetLogPath -WingetChanged:$wingetChanged
+    $wingetChanged = Invoke-WinGetUpdate -WinGetLogPath $logContext.WinGetLogPath
+    Open-UpdateLog -WinGetLogPath $logContext.WinGetLogPath -WingetChanged:$wingetChanged
 }
 
 $Helpers = {
@@ -80,6 +80,7 @@ $Helpers = {
         .OUTPUTS
             PSCustomObject with LogDirectory and WinGetLogPath properties.
         #>
+        [CmdletBinding(SupportsShouldProcess)]
         param(
             [Parameter(Mandatory)]
             [hashtable]$LogRetentionConfig,
@@ -90,14 +91,16 @@ $Helpers = {
         # Create and return update log path under the shared AppData log folder used by Invoke-PowerShellModuleUpdates.
         $logDirectory = Join-Path -Path $env:APPDATA -ChildPath '_UserPackageAndModuleUpdates'
         if (-not (Test-Path -Path $logDirectory)) {
-            New-Item -Path $logDirectory -ItemType Directory -Force | Out-Null
+            if ($PSCmdlet.ShouldProcess($logDirectory, 'Create log directory')) {
+                New-Item -Path $logDirectory -ItemType Directory -Force | Out-Null
+            }
         }
 
         # Apply retention policy before determining the next same-day index.
         if ($LogRetentionConfig.Enabled) {
             $effectiveRetentionDays = if ($RetentionDaysOverride -ge 0) { $RetentionDaysOverride } else { [int]$LogRetentionConfig.RetentionDays }
             if ($effectiveRetentionDays -gt 0) {
-                Remove-OldUpdateLogs -LogDirectory $logDirectory -RetentionDays $effectiveRetentionDays
+                Remove-OldUpdateLog -LogDirectory $logDirectory -RetentionDays $effectiveRetentionDays
             }
         }
 
@@ -123,7 +126,7 @@ $Helpers = {
         }
     }
 
-    function Remove-OldUpdateLogs {
+    function Remove-OldUpdateLog {
         <#
         .SYNOPSIS
             Removes indexed WinGet log files older than the retention threshold.
@@ -139,6 +142,7 @@ $Helpers = {
             Age threshold in days. Log files older than this value are deleted.
             Must be between 1 and 3650.
         #>
+        [CmdletBinding(SupportsShouldProcess)]
         param(
             [Parameter(Mandatory)]
             [string]$LogDirectory,
@@ -150,15 +154,20 @@ $Helpers = {
 
         # Remove indexed winget log files older than the configured retention period.
         $cutoff = (Get-Date).AddDays(-$RetentionDays)
-        Get-ChildItem -Path $LogDirectory -File -ErrorAction SilentlyContinue |
+        $logsToRemove = Get-ChildItem -Path $LogDirectory -File -ErrorAction SilentlyContinue |
             Where-Object {
                 $_.Name -match '^\d{4}-\d{2}-\d{2}-\d{3}-WinGetUpdates\.log$' -and
                 $_.LastWriteTime -lt $cutoff
-            } |
-            Remove-Item -Force -ErrorAction SilentlyContinue
+            }
+
+        foreach ($logFile in $logsToRemove) {
+            if ($PSCmdlet.ShouldProcess($logFile.FullName, 'Remove old WinGet log')) {
+                Remove-Item -Path $logFile.FullName -Force -ErrorAction SilentlyContinue
+            }
+        }
     }
 
-    function Invoke-WinGetUpdates {
+    function Invoke-WinGetUpdate {
         <#
         .SYNOPSIS
             Runs WinGet package upgrades via Microsoft.WinGet.Client and logs results.
@@ -173,7 +182,7 @@ $Helpers = {
             Full path to the log file where run output should be appended.
 
         .OUTPUTS
-            System.Boolean — $true if one or more packages were updated; otherwise $false.
+            System.Boolean - $true if one or more packages were updated; otherwise $false.
         #>
         param(
             [Parameter(Mandatory)]
@@ -318,7 +327,7 @@ $Helpers = {
         return $false
     }
 
-    function Open-UpdateLogs {
+    function Open-UpdateLog {
         <#
         .SYNOPSIS
             Opens the WinGet log file when package updates were applied.
