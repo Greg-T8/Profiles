@@ -1165,5 +1165,6 @@
   "python.terminal.activateEnvironment": false,
   "workbench.view.showQuietly": {
     "workbench.panel.output": true
-  }
+  },
+  "git.openRepositoryInParentFolders": "always"
 }
