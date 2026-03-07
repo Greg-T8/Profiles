@@ -458,6 +458,7 @@
   "files.trimTrailingWhitespace": true,
   "git.autofetch": true,
   "git.confirmSync": false,
+  "git.decorations.enabled": true,
   "git.enableSmartCommit": true,
   "git.openRepositoryInParentFolders": "always",
   "github.copilot.chat.agent.temperature": 0,
@@ -831,7 +832,6 @@
   },
   "terminal.integrated.suggest.showStatusBar": true,
   "terminal.integrated.suggest.suggestOnTriggerCharacters": false,
-  "terminal.integrated.tabs.enabled": false,
   "terminal.integrated.useWslProfiles": false,
   "vscode-neovim.compositeKeys": {
     "jj": {
@@ -885,18 +885,18 @@
     "activityBar.background": "#0d1a24",
     "activityBar.border": "#1f3d5f",
     "activityBar.foreground": "#d1e4ff",
-    "diffEditor.insertedLineBackground": "#002b4d",
-    "diffEditor.insertedTextBackground": "#003a66",
+    "diffEditor.insertedLineBackground": "#0079fb33",
+    "diffEditor.insertedTextBackground": "#0099ff4d",
     "diffEditor.removedLineBackground": "#4d2600",
-    "diffEditor.removedTextBackground": "#434140",
+    "diffEditor.removedTextBackground": "#663300",
     "editor.background": "#081019",
-    "editor.inactiveSelectionBackground": "#d100ff33",
-    "editor.selectionBackground": "#d100ff66",
-    "editor.selectionHighlightBackground": "#d100ff1f",
+    "editor.inactiveSelectionBackground": "#ffff0026",
+    "editor.selectionBackground": "#ffff004d",
+    "editor.selectionHighlightBackground": "#ffff001f",
     "editorGutter.addedBackground": "#2f81f7",
-    "editorGutter.deletedBackground": "#ff9e3d",
-    "editorOverviewRuler.addedForeground": "#58a6ff",
-    "editorOverviewRuler.deletedForeground": "#ffb86b",
+    "editorGutter.deletedBackground": "#ff2a2a",
+    "editorOverviewRuler.addedForeground": "#3fa7ff",
+    "editorOverviewRuler.deletedForeground": "#cc5a00",
     "panel.background": "#0b1018",
     "panel.border": "#1a2a3c",
     "sideBar.background": "#0f151e",
@@ -906,7 +906,7 @@
     "statusBar.foreground": "#eaf5ff",
     "titleBar.activeBackground": "#1f3d5f",
     "titleBar.activeForeground": "#d1e4ff",
-    "titleBar.inactiveBackground": "#142a47"
+    "titleBar.inactiveBackground": "#142a47",
   },
   "workbench.colorTheme": "Default Dark Modern",
   "workbench.editor.enablePreview": true,
@@ -1158,7 +1158,13 @@
     "python.analysis.typeCheckingMode",
     "python.terminal.activateEnvironment",
     "azureTerraform.survey",
-    "workbench.view.showQuietly"
+    "workbench.view.showQuietly",
+    "terminal.integrated.tabs.showActions",
+    "terminal.integrated.tabs.showActiveTerminal",
+    "terminal.integrated.tabs.hideCondition",
+    "git.decorations.enabled",
+    "scm.diffDecorations",
+    "scm.diffDecorationsGutterVisibility"
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
@@ -1166,5 +1172,9 @@
   "workbench.tips.enabled": true,
   "workbench.view.showQuietly": {
     "workbench.panel.output": true
-  }
+  },
+  "terminal.integrated.tabs.showActions": "always",
+  "terminal.integrated.tabs.showActiveTerminal": "always",
+  "terminal.integrated.tabs.hideCondition": "never",
+  "terminal.integrated.tabs.enabled": false
 }
