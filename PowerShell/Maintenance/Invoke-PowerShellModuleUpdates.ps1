@@ -47,10 +47,6 @@ Program: Invoke-PowerShellModuleUpdates.ps1
 #endregion
 
 #region PARAMETERS
-# Script parameter definitions.
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseSingularNouns', '', Scope = 'Function', Target = '*', Justification = 'Script-local helper names are intentionally descriptive and stable for maintenance automation.')]
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseShouldProcessForStateChangingFunctions', '', Scope = 'Function', Target = '*', Justification = 'Script executes as unattended maintenance and does not expose WhatIf/Confirm workflow.')]
-[Diagnostics.CodeAnalysis.SuppressMessageAttribute('PSUseOutputTypeCorrectly', '', Scope = 'Function', Target = '*', Justification = 'OutputType declarations are used for editor/documentation hints in this script module wrapper pattern.')]
 [CmdletBinding(DefaultParameterSetName = 'Common')]
 param(
     [ValidateRange(0, 3650)]
@@ -92,7 +88,6 @@ $ModuleUpdateConfig = @{
     )
     IgnoreModules   = @(
         'PSReadLine'
-        'Microsoft.PowerShell.PSResourceGet'
     )
 }
 
