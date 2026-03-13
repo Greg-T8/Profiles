@@ -43,11 +43,16 @@ function GetMicrosoftLicenseCatalog {
     Write-Output $licenseCatalog
 }
 
-# Removes Snagit files older than one month from the OneDriveConsumer/Snagit folder.
+# Runs Snagit capture cleanup via the dedicated maintenance script.
 function CleanUpSnagitFolder {
-    $folderPath = "$env:USERPROFILE/Snagit Captures"
-    $cutoffDate = (Get-Date).AddMonths(-1)
-    Get-ChildItem -Path $folderPath -File | Where-Object { $_.LastWriteTime -lt $cutoffDate } | Remove-Item -Force
+    $cleanupScriptPath = Join-Path -Path $PSScriptRoot -ChildPath 'Maintenance\Invoke-SnagitCaptureFolderCleanup.ps1'
+
+    if (-not (Test-Path -Path $cleanupScriptPath)) {
+        Write-Error "Cleanup script not found: $cleanupScriptPath"
+        return
+    }
+
+    & $cleanupScriptPath
 }
 
 # Creates a file if it doesn't exist, or updates its last modified time if it does (like Unix 'touch').

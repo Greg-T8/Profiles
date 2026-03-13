@@ -1,18 +1,19 @@
 # -------------------------------------------------------------------------
 # Program: Register-ProfileMaintenanceLogonTask.ps1
-# Description: Creates a logon scheduled task that runs WinGet app and PowerShell module updates with no profile in a hidden console.
+# Description: Creates a logon scheduled task that runs WinGet app, PowerShell module, and Snagit capture cleanup updates with no profile in a hidden console.
 # Context: User login maintenance automation (Windows Task Scheduler)
 # Author: Greg Tate
 # ------------------------------------------------------------------------
 
 <#
 .SYNOPSIS
-Creates or updates a Windows Scheduled Task for WinGet app and PowerShell module updates at user logon.
+Creates or updates a Windows Scheduled Task for profile maintenance scripts at user logon.
 
 .DESCRIPTION
-Registers a scheduled task that runs both maintenance scripts at logon using PowerShell with -NoProfile in a hidden window:
+Registers a scheduled task that runs maintenance scripts at logon using PowerShell with -NoProfile in a hidden window:
 - Invoke-PowerShellModuleUpdates.ps1
 - Invoke-WingetUpdates.ps1
+- Invoke-SnagitCaptureFolderCleanup.ps1
 
 The task runs with highest privileges for the current user.
 
@@ -64,7 +65,7 @@ $Main = {
     $context = Get-TaskRegistrationContext
     Confirm-TaskRegistrationPrerequisites -Context $context
 
-    # Register or update the scheduled task with two logon actions.
+    # Register or update the scheduled task with all logon actions.
     Register-ProfileMaintenanceTask -Context $context
 
     # Show the resulting task details for quick verification.
@@ -84,6 +85,7 @@ $Helpers = {
         $scriptRoot = $PSScriptRoot
         $moduleUpdateScriptPath = Join-Path -Path $scriptRoot -ChildPath 'Invoke-PowerShellModuleUpdates.ps1'
         $wingetUpdateScriptPath = Join-Path -Path $scriptRoot -ChildPath 'Invoke-WingetUpdates.ps1'
+        $snagitCleanupScriptPath = Join-Path -Path $scriptRoot -ChildPath 'Invoke-SnagitCaptureFolderCleanup.ps1'
         $currentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
         $pwshCommand = Get-Command -Name 'pwsh.exe' -ErrorAction SilentlyContinue
         $normalizedTaskPath = ConvertTo-NormalizedTaskPath -TaskPath $TaskPath
@@ -92,6 +94,7 @@ $Helpers = {
             ScriptRoot             = $scriptRoot
             ModuleUpdateScriptPath = $moduleUpdateScriptPath
             WingetUpdateScriptPath = $wingetUpdateScriptPath
+            SnagitCleanupScriptPath = $snagitCleanupScriptPath
             CurrentUser            = $currentUser
             PwshPath               = if ($pwshCommand) { $pwshCommand.Source } else { $null }
             TaskName               = $TaskName
@@ -125,13 +128,17 @@ $Helpers = {
             [pscustomobject]$Context
         )
 
-        # Ensure both maintenance scripts exist in the same folder as this script.
+        # Ensure maintenance scripts exist in the same folder as this script.
         if (-not (Test-Path -Path $Context.ModuleUpdateScriptPath)) {
             throw "Script not found: $($Context.ModuleUpdateScriptPath)"
         }
 
         if (-not (Test-Path -Path $Context.WingetUpdateScriptPath)) {
             throw "Script not found: $($Context.WingetUpdateScriptPath)"
+        }
+
+        if (-not (Test-Path -Path $Context.SnagitCleanupScriptPath)) {
+            throw "Script not found: $($Context.SnagitCleanupScriptPath)"
         }
 
         # Ensure PowerShell executable is available for scheduled task actions.
@@ -203,9 +210,10 @@ $Helpers = {
             [pscustomobject]$Context
         )
 
-        # Create two actions so both maintenance scripts run at each user logon.
+        # Create actions so all maintenance scripts run at each user logon.
         $action1 = New-ScheduledTaskAction -Execute $Context.PwshPath -Argument "-NoProfile -WindowStyle Hidden -File `"$($Context.ModuleUpdateScriptPath)`" -AllModules" -WorkingDirectory $Context.ScriptRoot
         $action2 = New-ScheduledTaskAction -Execute $Context.PwshPath -Argument "-NoProfile -WindowStyle Hidden -File `"$($Context.WingetUpdateScriptPath)`"" -WorkingDirectory $Context.ScriptRoot
+        $action3 = New-ScheduledTaskAction -Execute $Context.PwshPath -Argument "-NoProfile -WindowStyle Hidden -File `"$($Context.SnagitCleanupScriptPath)`"" -WorkingDirectory $Context.ScriptRoot
 
         # Trigger task at logon for the current user account.
         $trigger = New-ScheduledTaskTrigger -AtLogOn -User $Context.CurrentUser
@@ -220,7 +228,7 @@ $Helpers = {
         Ensure-ScheduledTaskFolder -TaskPath $Context.TaskPath
 
         # Register or replace the task definition.
-        $taskDefinition = New-ScheduledTask -Action @($action1, $action2) -Principal $principal -Trigger $trigger -Settings $settings
+        $taskDefinition = New-ScheduledTask -Action @($action1, $action2, $action3) -Principal $principal -Trigger $trigger -Settings $settings
         Register-ScheduledTask -TaskPath $Context.TaskPath -TaskName $Context.TaskName -InputObject $taskDefinition -Force | Out-Null
     }
 
