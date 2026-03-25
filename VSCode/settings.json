@@ -194,6 +194,33 @@
       ]
     },
     {
+      "groupName": "Clients",
+      "id": "clientsacck9xha7mm66b5q8",
+      "projects": [
+        {
+          "color": "#4C1979",
+          "id": "tcucixgm86k5mm66h2q6",
+          "isGitRepo": true,
+          "name": "TCU",
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\TCU\\TCU.code-workspace"
+        },
+        {
+          "color": "#282961",
+          "id": "gooselol5jgch9mm66i79i",
+          "isGitRepo": false,
+          "name": "Goose",
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\GooseCreekISD\\GooseCreekISD.code-workspace"
+        },
+        {
+          "color": "#2F5D3A",
+          "id": "bello8t3bzuwzmm66hlz1",
+          "isGitRepo": true,
+          "name": "Bell",
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\Bell\\Client-Bell.code-workspace"
+        }
+      ]
+    },
+    {
       "groupName": "Projects",
       "id": "projectshb76ydg10mmaoptep",
       "projects": [
@@ -210,33 +237,20 @@
           "isGitRepo": true,
           "name": "VideoToNotes",
           "path": "c:\\Users\\gregt\\LocalCode\\Projects\\VideoToNotes\\VideoToNotes.code-workspace"
-        }
-      ]
-    },
-    {
-      "groupName": "Clients",
-      "id": "clientsacck9xha7mm66b5q8",
-      "projects": [
-        {
-          "color": "#4C1979",
-          "id": "tcucixgm86k5mm66h2q6",
-          "isGitRepo": true,
-          "name": "TCU",
-          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\TCU\\TCU.code-workspace"
         },
         {
-          "color": "#2F5D3A",
-          "id": "bello8t3bzuwzmm66hlz1",
           "isGitRepo": true,
-          "name": "Bell",
-          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\Bell\\Client-Bell.code-workspace"
+          "id": "epubsplitterz34ttmscjmmt4u86l",
+          "name": "ePubSplitter",
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\ePubSplitter\\ePubSplitter.code-workspace",
+          "color": "#1B127B"
         },
         {
-          "color": "#282961",
-          "id": "gooselol5jgch9mm66i79i",
           "isGitRepo": false,
-          "name": "Goose",
-          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\GooseCreekISD\\GooseCreekISD.code-workspace"
+          "id": "linguacircuitr1i3pvmxlmmyuk168",
+          "name": "LinguaCircuit",
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\LinguaCircuit\\LinguaCircuit.code-workspace",
+          "color": "#F8DD5C"
         }
       ]
     },
@@ -284,14 +298,14 @@
           "id": "githubprofilehmhoxw6k5maiqd6ny",
           "isGitRepo": true,
           "name": "GitHub Profile",
-          "path": "c:/Users/gregt/OneDrive/Code/GitHub/GitHubProfile"
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\GitHubProfile"
         },
         {
           "color": "#863c3c",
           "id": "kinesisadv360propzyl5z5ldmaiqdlui",
           "isGitRepo": true,
           "name": "KinesisAdv360Pro",
-          "path": "c:/Users/gregt/OneDrive/Code/GitHub/KinesisAdv360Pro"
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\KinesisAdv360Pro\\KinesisAdv360Pro.code-workspace"
         },
         {
           "color": "#C1BAB0",
@@ -312,6 +326,22 @@
   ],
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
+    [
+      "#1B127B",
+      "Deep Koamaru"
+    ],
+    [
+      "#F8DD5C",
+      "Energy Yellow"
+    ],
+    [
+      "#e916a0",
+      "Red Violet"
+    ],
+    [
+      "#863c3c",
+      "Lotus"
+    ],
     [
       "#C59922",
       "Nugget"
@@ -355,22 +385,6 @@
     [
       "#8EABC1",
       "Nepal"
-    ],
-    [
-      "#ACB78E",
-      "Swamp Green"
-    ],
-    [
-      "#516E3D",
-      "Chalet Green"
-    ],
-    [
-      "#0B1304",
-      "Black Forest"
-    ],
-    [
-      "#02A4D3",
-      "Cerulean"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
