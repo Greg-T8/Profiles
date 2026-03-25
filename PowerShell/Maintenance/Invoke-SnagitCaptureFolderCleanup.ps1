@@ -83,9 +83,6 @@ $Main = {
     $cutoffDate = (Get-Date).AddDays(-$effectiveAgeInDays)
     $cleanupResult = Invoke-SnagitCaptureCleanup -CaptureFolderPath $CaptureFolderPath -CutoffDate $cutoffDate -SnagitCleanupLogPath $logContext.SnagitCleanupLogPath
 
-    # Open the log only when one or more files were removed.
-    Open-CleanupLog -SnagitCleanupLogPath $logContext.SnagitCleanupLogPath -FilesRemoved $cleanupResult.FilesRemoved
-
     $cleanupResult
 }
 #endregion
