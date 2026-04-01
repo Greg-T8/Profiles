@@ -281,8 +281,30 @@ function Get-GitPromptStatusText {
 		return $gitStatusText
 	}
 
+	$branchMatch = [regex]::Match($gitStatusText, '^\s*(?:\x1b\[[0-9;]*m)*\[(?<branch>[^\s\]]+)')
+	if (-not $branchMatch.Success) {
+		return $gitStatusText
+	}
+	$branchName = $branchMatch.Groups['branch'].Value
+
+	if (-not $cache) {
+		$cache = @{}
+	}
+	if (-not $cache.ContainsKey('RemoteCheckedAt')) {
+		$cache.RemoteCheckedAt = [datetime]::MinValue
+	}
+	if (-not $cache.ContainsKey('RemoteCount')) {
+		$cache.RemoteCount = $null
+	}
+	if (-not $cache.ContainsKey('UpstreamByBranch') -or $null -eq $cache.UpstreamByBranch) {
+		$cache.UpstreamByBranch = @{}
+	}
+	if (-not $cache.ContainsKey('UpstreamCheckedAtByBranch') -or $null -eq $cache.UpstreamCheckedAtByBranch) {
+		$cache.UpstreamCheckedAtByBranch = @{}
+	}
+
 	$remoteCount = $null
-	if ($cache -and $cache.RemoteCount -ne $null -and (($cacheNow - $cache.Timestamp).TotalSeconds -lt $cacheTtlSeconds)) {
+	if ($cache.RemoteCount -ne $null -and (($cacheNow - $cache.RemoteCheckedAt).TotalSeconds -lt $cacheTtlSeconds)) {
 		$remoteCount = [int]$cache.RemoteCount
 	}
 	else {
@@ -297,21 +319,17 @@ function Get-GitPromptStatusText {
 		$remoteCount = @($remoteNames | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }).Count
 	}
 
-	if (-not $cache) {
-		$cache = @{ Timestamp = $cacheNow; RemoteCount = $remoteCount; Upstream = $null }
-	}
-	else {
-		$cache.Timestamp = $cacheNow
-		$cache.RemoteCount = $remoteCount
-	}
+	$cache.RemoteCheckedAt = $cacheNow
+	$cache.RemoteCount = $remoteCount
 	$script:GitPromptMetaCache[$cacheKey] = $cache
 
 	if ($remoteCount -le 1) {
 		return $gitStatusText
 	}
 
-	$upstream = if ($cache.Upstream) { $cache.Upstream } else { $null }
-	if ([string]::IsNullOrWhiteSpace($upstream) -or (($cacheNow - $cache.Timestamp).TotalSeconds -ge $cacheTtlSeconds)) {
+	$upstream = if ($cache.UpstreamByBranch.ContainsKey($branchName)) { $cache.UpstreamByBranch[$branchName] } else { $null }
+	$upstreamCheckedAt = if ($cache.UpstreamCheckedAtByBranch.ContainsKey($branchName)) { $cache.UpstreamCheckedAtByBranch[$branchName] } else { [datetime]::MinValue }
+	if ([string]::IsNullOrWhiteSpace($upstream) -or (($cacheNow - $upstreamCheckedAt).TotalSeconds -ge $cacheTtlSeconds)) {
 		try {
 			$upstream = git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>$null
 		}
@@ -319,17 +337,12 @@ function Get-GitPromptStatusText {
 			$upstream = $null
 		}
 
-		$cache.Upstream = $upstream
-		$cache.Timestamp = $cacheNow
+		$cache.UpstreamByBranch[$branchName] = $upstream
+		$cache.UpstreamCheckedAtByBranch[$branchName] = $cacheNow
 		$script:GitPromptMetaCache[$cacheKey] = $cache
 	}
 
 	if ([string]::IsNullOrWhiteSpace($upstream)) {
-		return $gitStatusText
-	}
-
-	$branchMatch = [regex]::Match($gitStatusText, '^\s*(?:\x1b\[[0-9;]*m)*\[(?<branch>[^\s\]]+)')
-	if (-not $branchMatch.Success) {
 		return $gitStatusText
 	}
 
