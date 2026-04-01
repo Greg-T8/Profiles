@@ -139,11 +139,12 @@
   "chat.tools.autoExpandFailures": true,
   "chat.tools.terminal.autoApprove": {},
   "chat.tools.urls.autoApprove": {
-    "https://*.terraform.io": true,
     "https://code.visualstudio.com": {
       "approveRequest": false,
       "approveResponse": true
     },
+    "https://github.com/microsoft/vscode/wiki/*": true,
+    "https://*.terraform.io": true,
     "https://docs.github.com": {
       "approveRequest": false,
       "approveResponse": true
@@ -159,7 +160,8 @@
     "https://raw.githubusercontent.com": {
       "approveRequest": false,
       "approveResponse": true
-    }
+    },
+    "https://developer.hashicorp.com": true
   },
   "chat.viewProgressBadge.enabled": true,
   "dashboard.displayProjectPath": true,
@@ -225,18 +227,11 @@
       "id": "projectshb76ydg10mmaoptep",
       "projects": [
         {
-          "color": "#C59922",
-          "id": "documentwriterm4jvkfl7cmm9panzj",
-          "isGitRepo": true,
-          "name": "DocumentWriter",
-          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\DocumentWriter\\DocumentWriter.code-workspace"
-        },
-        {
-          "color": "#8b4789",
-          "id": "videotonotesxhl46tqmumm66ivrs",
-          "isGitRepo": true,
-          "name": "VideoToNotes",
-          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\VideoToNotes\\VideoToNotes.code-workspace"
+          "isGitRepo": false,
+          "id": "linguacircuitr1i3pvmxlmmyuk168",
+          "name": "LinguaCircuit",
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\LinguaCircuit\\LinguaCircuit.code-workspace",
+          "color": "#F8DD5C"
         },
         {
           "isGitRepo": true,
@@ -246,11 +241,18 @@
           "color": "#1B127B"
         },
         {
-          "isGitRepo": false,
-          "id": "linguacircuitr1i3pvmxlmmyuk168",
-          "name": "LinguaCircuit",
-          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\LinguaCircuit\\LinguaCircuit.code-workspace",
-          "color": "#F8DD5C"
+          "color": "#8b4789",
+          "id": "videotonotesxhl46tqmumm66ivrs",
+          "isGitRepo": true,
+          "name": "VideoToNotes",
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\VideoToNotes\\VideoToNotes.code-workspace"
+        },
+        {
+          "color": "#C59922",
+          "id": "documentwriterm4jvkfl7cmm9panzj",
+          "isGitRepo": true,
+          "name": "DocumentWriter",
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\DocumentWriter\\DocumentWriter.code-workspace"
         }
       ]
     },
@@ -924,7 +926,6 @@
     "titleBar.activeForeground": "#d1e4ff",
     "titleBar.inactiveBackground": "#142a47",
   },
-  "workbench.colorTheme": "Default Dark Modern",
   "workbench.editor.enablePreview": true,
   "workbench.editor.enablePreviewFromQuickOpen": true,
   "workbench.editor.highlightModifiedTabs": true,
