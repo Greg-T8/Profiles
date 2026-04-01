@@ -20,6 +20,7 @@ $ErrorActionPreference = 'Stop'
 
 # Store the actual profile script path for reloading
 $script:ProfilePath = $PSCommandPath
+$script:GitPromptMetaCache = @{}
 
 # Set PSStyle formatting colors (PowerShell Core only)
 if ($PSVersionTable.PSEdition -eq 'Core') {
@@ -51,7 +52,7 @@ function prompt {
 		"$ESC[2m" +                                                  # Start dim/faint mode
 		$(Get-MyPromptPath) +                                        # Display shortened path
 		"$ESC[22m" +                                                 # Reset dim/faint mode
-		"$(if ($script:PoshGitLoaded) { "$(& $GitPromptScriptBlock)" })" +  # Git status if in git repo
+		"$(if ($script:PoshGitLoaded) { "$(Get-GitPromptStatusText)" })" +   # Git status if in git repo
 		"$ESC[23m" +                                                 # Reset italic mode
 		"`n" +                                                       # New line
 		"$ESC[38;2;0;179;226m" +                                     # Set foreground color to cyan RGB(0,179,226)
@@ -262,6 +263,79 @@ function Test-GitDirectory {
 		}
 	}
 	return $false
+}
+
+function Get-GitPromptStatusText {
+	# Get prompt status and include upstream tracking branch when available.
+	if (-not $script:PoshGitLoaded) {
+		return ''
+	}
+
+	$cacheKey = "$(Get-Location)"
+	$cacheNow = [datetime]::UtcNow
+	$cacheTtlSeconds = 5
+	$cache = if ($script:GitPromptMetaCache.ContainsKey($cacheKey)) { $script:GitPromptMetaCache[$cacheKey] } else { $null }
+
+	$gitStatusText = & $GitPromptScriptBlock
+	if ([string]::IsNullOrWhiteSpace($gitStatusText)) {
+		return $gitStatusText
+	}
+
+	$remoteCount = $null
+	if ($cache -and $cache.RemoteCount -ne $null -and (($cacheNow - $cache.Timestamp).TotalSeconds -lt $cacheTtlSeconds)) {
+		$remoteCount = [int]$cache.RemoteCount
+	}
+	else {
+		$remoteNames = @()
+		try {
+			$remoteNames = @(git remote 2>$null)
+		}
+		catch {
+			$remoteNames = @()
+		}
+
+		$remoteCount = @($remoteNames | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }).Count
+	}
+
+	if (-not $cache) {
+		$cache = @{ Timestamp = $cacheNow; RemoteCount = $remoteCount; Upstream = $null }
+	}
+	else {
+		$cache.Timestamp = $cacheNow
+		$cache.RemoteCount = $remoteCount
+	}
+	$script:GitPromptMetaCache[$cacheKey] = $cache
+
+	if ($remoteCount -le 1) {
+		return $gitStatusText
+	}
+
+	$upstream = if ($cache.Upstream) { $cache.Upstream } else { $null }
+	if ([string]::IsNullOrWhiteSpace($upstream) -or (($cacheNow - $cache.Timestamp).TotalSeconds -ge $cacheTtlSeconds)) {
+		try {
+			$upstream = git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>$null
+		}
+		catch {
+			$upstream = $null
+		}
+
+		$cache.Upstream = $upstream
+		$cache.Timestamp = $cacheNow
+		$script:GitPromptMetaCache[$cacheKey] = $cache
+	}
+
+	if ([string]::IsNullOrWhiteSpace($upstream)) {
+		return $gitStatusText
+	}
+
+	$branchMatch = [regex]::Match($gitStatusText, '^\s*(?:\x1b\[[0-9;]*m)*\[(?<branch>[^\s\]]+)')
+	if (-not $branchMatch.Success) {
+		return $gitStatusText
+	}
+
+	$statusPrefix = $gitStatusText.Substring(0, $branchMatch.Index)
+	$statusSuffix = $gitStatusText.Substring($branchMatch.Index + $branchMatch.Length)
+	"$statusPrefix [$($branchMatch.Groups['branch'].Value) -> $upstream$statusSuffix"
 }
 
 function Get-MyPromptPath {
