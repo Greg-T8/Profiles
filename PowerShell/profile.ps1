@@ -22,6 +22,9 @@ $ErrorActionPreference = 'Stop'
 $script:ProfilePath = $PSCommandPath
 $script:GitPromptMetaCache = @{}
 
+# Keep venv activation from replacing the custom prompt function.
+$env:VIRTUAL_ENV_DISABLE_PROMPT = '1'
+
 # Set PSStyle formatting colors (PowerShell Core only)
 if ($PSVersionTable.PSEdition -eq 'Core') {
 	$PSStyle.Formatting.Verbose = $PSStyle.Foreground.Cyan
@@ -41,16 +44,24 @@ function prompt {
 		$script:PoshGitLoaded = Initialize-PoshGit
 	}
 
+	$pythonVenvPromptText = Get-PythonVenvPromptText
+
 	# Use different prompt styles based on PowerShell edition
 	if ($PSVersionTable.PSEdition -eq 'Core') {
 		# PowerShell Core with ANSI escape codes
 		$ESC = [char]0x1b                                            # ESC character for ANSI sequences
+		$pythonVenvPromptStyledText = if ([string]::IsNullOrWhiteSpace($pythonVenvPromptText)) {
+			''
+		}
+		else {
+			"$ESC[38;2;76;220;100m$pythonVenvPromptText$ESC[0m$ESC[38;2;0;179;226m"
+		}
 		"`n" +                                                       # New line
 		"$ESC[38;2;0;179;226m" +                                     # Set foreground color to cyan RGB(0,179,226)
 		'╭─( ' +                                                     # Box drawing characters and opening parenthesis
 		"$ESC[3m" +                                                  # Start italic mode
 		"$ESC[2m" +                                                  # Start dim/faint mode
-		$(Get-MyPromptPath) +                                        # Display shortened path
+		"$pythonVenvPromptStyledText$(Get-MyPromptPath)" +          # Display optional Python env label and shortened path
 		"$ESC[22m" +                                                 # Reset dim/faint mode
 		"$(if ($script:PoshGitLoaded) { "$(Get-GitPromptStatusText)" })" +   # Git status if in git repo
 		"$ESC[23m" +                                                 # Reset italic mode
@@ -247,6 +258,27 @@ if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
 #endregion
 
 #region PROMPT HELPER FUNCTIONS
+
+function Get-PythonVenvPromptText {
+	# Resolve active Python venv label exactly as set by Activate.ps1 when present.
+	$venvPrompt = $null
+
+	if (Get-Variable -Name '_PYTHON_VENV_PROMPT_PREFIX' -Scope Global -ErrorAction SilentlyContinue) {
+		$venvPrompt = (Get-Variable -Name '_PYTHON_VENV_PROMPT_PREFIX' -Scope Global -ValueOnly)
+	}
+	elseif (-not [string]::IsNullOrWhiteSpace($env:VIRTUAL_ENV_PROMPT)) {
+		$venvPrompt = $env:VIRTUAL_ENV_PROMPT
+	}
+	elseif (-not [string]::IsNullOrWhiteSpace($env:VIRTUAL_ENV)) {
+		$venvPrompt = Split-Path -Path $env:VIRTUAL_ENV -Leaf
+	}
+
+	if ([string]::IsNullOrWhiteSpace($venvPrompt)) {
+		return ''
+	}
+
+	"($venvPrompt) "
+}
 
 function Test-GitDirectory {
 	# Check if current directory is a git repository
