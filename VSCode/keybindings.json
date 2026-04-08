@@ -756,5 +756,5 @@
     "key": "alt+r",
     "command": "vscode-neovim.restart",
     "when": "editorTextFocus"
-  },
+  }
 ]

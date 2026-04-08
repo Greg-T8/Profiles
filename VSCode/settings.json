@@ -57,7 +57,7 @@
       80
     ],
     "editor.tabSize": 2,
-    "editor.wordWrap": "wordWrapColumn",
+    "editor.wordWrap": "bounded",
     "editor.wordWrapColumn": 80,
     "files.autoSave": "onWindowChange",
     "files.trimTrailingWhitespace": false,
@@ -139,12 +139,12 @@
   "chat.tools.autoExpandFailures": true,
   "chat.tools.terminal.autoApprove": {},
   "chat.tools.urls.autoApprove": {
+    "https://*.terraform.io": true,
     "https://code.visualstudio.com": {
       "approveRequest": false,
       "approveResponse": true
     },
-    "https://github.com/microsoft/vscode/wiki/*": true,
-    "https://*.terraform.io": true,
+    "https://developer.hashicorp.com": true,
     "https://docs.github.com": {
       "approveRequest": false,
       "approveResponse": true
@@ -153,6 +153,7 @@
       "approveRequest": false,
       "approveResponse": true
     },
+    "https://github.com/microsoft/vscode/wiki/*": true,
     "https://learn.microsoft.com": {
       "approveRequest": false,
       "approveResponse": true
@@ -160,10 +161,10 @@
     "https://raw.githubusercontent.com": {
       "approveRequest": false,
       "approveResponse": true
-    },
-    "https://developer.hashicorp.com": true
+    }
   },
   "chat.viewProgressBadge.enabled": true,
+  "chat.viewSessions.orientation": "stacked",
   "dashboard.displayProjectPath": true,
   "dashboard.openOnStartup": "empty workspace",
   "dashboard.projectData": [
@@ -196,7 +197,8 @@
       ]
     },
     {
-      "groupName": "Clients",
+      "collapsed": false,
+      "groupName": "Clients and Work Projects",
       "id": "clientsacck9xha7mm66b5q8",
       "projects": [
         {
@@ -219,6 +221,13 @@
           "isGitRepo": true,
           "name": "Bell",
           "path": "c:\\Users\\gregt\\LocalCode\\Clients\\Bell\\Client-Bell.code-workspace"
+        },
+        {
+          "color": "#00b3e2",
+          "id": "infraterraformqz8iyjzhfmnhjdlpx",
+          "isGitRepo": false,
+          "name": "Infra-Terraform",
+          "path": "c:\\Users\\gregt\\LocalCode\\Quisitive\\Infra-Terraform\\Infra-Terraform.code-workspace"
         }
       ]
     },
@@ -227,18 +236,18 @@
       "id": "projectshb76ydg10mmaoptep",
       "projects": [
         {
-          "isGitRepo": false,
+          "color": "#F8DD5C",
           "id": "linguacircuitr1i3pvmxlmmyuk168",
+          "isGitRepo": false,
           "name": "LinguaCircuit",
-          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\LinguaCircuit\\LinguaCircuit.code-workspace",
-          "color": "#F8DD5C"
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\LinguaCircuit\\LinguaCircuit.code-workspace"
         },
         {
-          "isGitRepo": true,
+          "color": "#1B127B",
           "id": "epubsplitterz34ttmscjmmt4u86l",
+          "isGitRepo": true,
           "name": "ePubSplitter",
-          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\ePubSplitter\\ePubSplitter.code-workspace",
-          "color": "#1B127B"
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\ePubSplitter\\ePubSplitter.code-workspace"
         },
         {
           "color": "#8b4789",
@@ -329,6 +338,14 @@
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
     [
+      "#00b3e2",
+      "Cerulean"
+    ],
+    [
+      "#3e3e4b",
+      "Tuna"
+    ],
+    [
       "#1B127B",
       "Deep Koamaru"
     ],
@@ -379,14 +396,6 @@
     [
       "#996666",
       "Copper Rose"
-    ],
-    [
-      "#C1BAB0",
-      "Tea"
-    ],
-    [
-      "#8EABC1",
-      "Nepal"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
@@ -415,7 +424,7 @@
   "editor.guides.bracketPairsHorizontal": true,
   "editor.guides.highlightActiveBracketPair": true,
   "editor.guides.highlightActiveIndentation": true,
-  "editor.inlineSuggest.enabled": true, // Controls Copilot suggestions
+  "editor.inlineSuggest.enabled": false, // Controls Copilot suggestions
   "editor.inlineSuggest.suppressSuggestions": true,
   "editor.inlineSuggest.syntaxHighlightingEnabled": true,
   "editor.insertSpaces": false,
@@ -676,6 +685,17 @@
     "MD060": false // Table column style - table pipe is missing space
   },
   "markdownlint.run": "onSave",
+  "MarkdownPaste.autoSelectClipboardType": "html&text",
+  "MarkdownPaste.enableAI": false,
+  "MarkdownPaste.path": "${fileDirname}/.img",
+  "MarkdownPaste.imageRules": [
+    {
+      "linkPattern": "<img src='${imageFilePath}' width='600'>",
+      "match": ".*\\.md$",
+      "targetPath": "${fileDirname}/.img/${datetime|yyyy-MM-DD-HH-mm-ss}"
+    }
+  ],
+  "MarkdownPaste.silence": true,
   "markdowntable.alignColumnHeader": false,
   "markdowntable.alignData": false,
   "pasteimg.path": "${currentFileDir}/.img",
@@ -710,6 +730,7 @@
   "prettyxml.settings.indentSpaceLength": 2,
   "python.analysis.typeCheckingMode": "basic",
   "python.terminal.activateEnvironment": false,
+  "redhat.telemetry.enabled": true,
   "rewrap.autoWrap.enabled": false,
   "rewrap.autoWrap.notification": "icon",
   "rewrap.doubleSentenceSpacing": false,
@@ -847,6 +868,10 @@
   },
   "terminal.integrated.suggest.showStatusBar": true,
   "terminal.integrated.suggest.suggestOnTriggerCharacters": false,
+  "terminal.integrated.tabs.enabled": false,
+  "terminal.integrated.tabs.hideCondition": "never",
+  "terminal.integrated.tabs.showActions": "always",
+  "terminal.integrated.tabs.showActiveTerminal": "always",
   "terminal.integrated.useWslProfiles": false,
   "vscode-neovim.compositeKeys": {
     "jj": {
@@ -900,13 +925,13 @@
     "activityBar.background": "#0d1a24",
     "activityBar.border": "#1f3d5f",
     "activityBar.foreground": "#d1e4ff",
+    "chat.requestBorder": "#466B86",
+    "chat.requestBubbleBackground": "#4DA8FF80",
+    "chat.requestBubbleHoverBackground": "#4DA8FFB3",
     "diffEditor.insertedLineBackground": "#0079fb33",
     "diffEditor.insertedTextBackground": "#0099ff4d",
     "diffEditor.removedLineBackground": "#4d2600",
     "diffEditor.removedTextBackground": "#663300",
-    "chat.requestBubbleBackground": "#4DA8FF80",
-    "chat.requestBubbleHoverBackground": "#4DA8FFB3",
-    "chat.requestBorder": "#466B86",
     "editor.background": "#081019",
     "editor.inactiveSelectionBackground": "#ffff0026",
     "editor.selectionBackground": "#ffff004d",
@@ -924,7 +949,7 @@
     "statusBar.foreground": "#eaf5ff",
     "titleBar.activeBackground": "#1f3d5f",
     "titleBar.activeForeground": "#d1e4ff",
-    "titleBar.inactiveBackground": "#142a47",
+    "titleBar.inactiveBackground": "#142a47"
   },
   "workbench.editor.enablePreview": true,
   "workbench.editor.enablePreviewFromQuickOpen": true,
@@ -932,6 +957,7 @@
   "workbench.editor.limit.enabled": true,
   "workbench.editor.limit.perEditorGroup": true,
   "workbench.editor.limit.value": 5,
+  "workbench.editor.useModal": "off",
   "workbench.editor.wrapTabs": true,
   "workbench.editorAssociations": {
     "*.svg": "hediet.vscode-drawio-text"
@@ -1181,7 +1207,13 @@
     "terminal.integrated.tabs.hideCondition",
     "git.decorations.enabled",
     "scm.diffDecorations",
-    "scm.diffDecorationsGutterVisibility"
+    "scm.diffDecorationsGutterVisibility",
+    "MarkdownPaste.autoSelectClipboardType",
+    "MarkdownPaste.enableAI",
+    "MarkdownPaste.imageRules",
+    "MarkdownPaste.path",
+    "MarkdownPaste.silence",
+    "MarkdownPaste.rules"
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
@@ -1189,11 +1221,5 @@
   "workbench.tips.enabled": true,
   "workbench.view.showQuietly": {
     "workbench.panel.output": true
-  },
-  "terminal.integrated.tabs.showActions": "always",
-  "terminal.integrated.tabs.showActiveTerminal": "always",
-  "terminal.integrated.tabs.hideCondition": "never",
-  "terminal.integrated.tabs.enabled": false,
-  "chat.viewSessions.orientation": "stacked",
-  "redhat.telemetry.enabled": true
+  }
 }
