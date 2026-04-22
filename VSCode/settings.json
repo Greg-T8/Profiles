@@ -83,6 +83,12 @@
     "editor.tabSize": 4,
     "rewrap.wrappingColumn": 115
   },
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.insertSpaces": true,
+    "editor.rulers": [79],
+    "editor.tabSize": 4,
+  },
   "[snippets]": {
     "editor.defaultFormatter": "vscode.json-language-features"
   },
@@ -104,7 +110,6 @@
     ],
     "editor.tabSize": 2
   },
-  "@azure.argTenant": "",
   "@azure.enableCustomModeRecommendations": false,
   "azureResourceGroups.enableChatStandIn": false,
   "azureTerraform.survey": {
@@ -202,25 +207,11 @@
       "id": "clientsacck9xha7mm66b5q8",
       "projects": [
         {
-          "color": "#4C1979",
-          "id": "tcucixgm86k5mm66h2q6",
           "isGitRepo": true,
-          "name": "TCU",
-          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\TCU\\TCU.code-workspace"
-        },
-        {
-          "color": "#282961",
-          "id": "gooselol5jgch9mm66i79i",
-          "isGitRepo": false,
-          "name": "Goose",
-          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\GooseCreekISD\\GooseCreekISD.code-workspace"
-        },
-        {
-          "color": "#2F5D3A",
-          "id": "bello8t3bzuwzmm66hlz1",
-          "isGitRepo": true,
-          "name": "Bell",
-          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\Bell\\Client-Bell.code-workspace"
+          "id": "azuregovernance1jywyu2t8mnu7dtdy",
+          "name": "Azure Governance",
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\AzureGovernance\\AzureGovernance.code-workspace",
+          "color": "#4683ca"
         },
         {
           "color": "#00b3e2",
@@ -228,6 +219,34 @@
           "isGitRepo": false,
           "name": "Infra-Terraform",
           "path": "c:\\Users\\gregt\\LocalCode\\Quisitive\\Infra-Terraform\\Infra-Terraform.code-workspace"
+        },
+        {
+          "color": "#282961",
+          "id": "gooselol5jgch9mm66i79i",
+          "isGitRepo": true,
+          "name": "Goose Creek ISD",
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\GooseCreekISD\\GooseCreekISD.code-workspace"
+        },
+        {
+          "color": "#4C1979",
+          "id": "tcucixgm86k5mm66h2q6",
+          "isGitRepo": true,
+          "name": "TCU",
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\TCU\\TCU.code-workspace"
+        },
+        {
+          "color": "#2F5D3A",
+          "id": "bello8t3bzuwzmm66hlz1",
+          "isGitRepo": true,
+          "name": "Bell Lumber & Pole",
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\Bell\\Client-Bell.code-workspace"
+        },
+        {
+          "isGitRepo": true,
+          "id": "austinenergyth44gg9mmmoa4d3ay",
+          "name": "Austin Energy",
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\AustinEnergy\\AustinEnergy.code-workspace",
+          "color": "#00a3ad"
         }
       ]
     },
@@ -338,6 +357,22 @@
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
     [
+      "#2F5D3A",
+      "Killarney"
+    ],
+    [
+      "#282961",
+      "Jacarta"
+    ],
+    [
+      "#00a3ad",
+      "Bondi Blue"
+    ],
+    [
+      "#4683ca",
+      "Indigo"
+    ],
+    [
       "#00b3e2",
       "Cerulean"
     ],
@@ -380,22 +415,6 @@
     [
       "#6A5D1B",
       "Himalaya"
-    ],
-    [
-      "#ADDFAD",
-      "Moss Green"
-    ],
-    [
-      "#C4D0B0",
-      "Coriander"
-    ],
-    [
-      "#8A73D6",
-      "True V"
-    ],
-    [
-      "#996666",
-      "Copper Rose"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
@@ -424,7 +443,7 @@
   "editor.guides.bracketPairsHorizontal": true,
   "editor.guides.highlightActiveBracketPair": true,
   "editor.guides.highlightActiveIndentation": true,
-  "editor.inlineSuggest.enabled": false, // Controls Copilot suggestions
+  "editor.inlineSuggest.enabled": true, // Controls Copilot suggestions
   "editor.inlineSuggest.suppressSuggestions": true,
   "editor.inlineSuggest.syntaxHighlightingEnabled": true,
   "editor.insertSpaces": false,
@@ -504,7 +523,7 @@
     "python": true,
     "scminput": false
   },
-  "github.copilot.nextEditSuggestions.enabled": true,
+  "github.copilot.nextEditSuggestions.enabled": false,
   "github.copilot.renameSuggestions.triggerAutomatically": true,
   "github.copilot.selectedCompletionModel": "",
   "hediet.vscode-drawio.appearance": "automatic",
@@ -789,7 +808,8 @@
   "settingsSync.ignoredSettings": [
     "chat.promptFilesLocations",
     "dashboard.openOnStartup",
-    "powershell.scriptAnalysis.settingsPath"
+    "powershell.scriptAnalysis.settingsPath",
+    "-@azure.argTenant"
   ],
   "terminal.integrated.commandsToSkipShell": [
     "workbench.action.toggleAuxiliaryBar",
@@ -1213,7 +1233,9 @@
     "MarkdownPaste.imageRules",
     "MarkdownPaste.path",
     "MarkdownPaste.silence",
-    "MarkdownPaste.rules"
+    "MarkdownPaste.rules",
+    "azureMcp.readOnly",
+    "@azure.argTenant"
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
@@ -1221,5 +1243,11 @@
   "workbench.tips.enabled": true,
   "workbench.view.showQuietly": {
     "workbench.panel.output": true
-  }
+  },
+  "azureMcp.readOnly": true,
+  "azureResourceGroups.selectedSubscriptions": [
+    "547b168b-bd3f-4cfc-ae2b-665f52672fae/e091f6e7-031a-4924-97bb-8c983ca5d21a",
+    "547b168b-bd3f-4cfc-ae2b-665f52672fae/e6ad7655-b3ba-4324-8361-fcfdc59973a5"
+  ],
+  "@azure.argTenant": "547b168b-bd3f-4cfc-ae2b-665f52672fae"
 }

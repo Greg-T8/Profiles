@@ -48,7 +48,7 @@
     Installs the profile but doesn't activate it in the current session.
 
 .NOTES
-    This script requires administrator privileges on Windows systems.
+    Administrator privileges are recommended on Windows for full functionality.
 #>
 
 [CmdletBinding()]
@@ -69,7 +69,7 @@ $Main = {
     # Main installation workflow
     Initialize-PlatformDetection
     Show-InstallBanner
-    Confirm-AdministratorRole
+    Show-PrivilegeLimitations
     Set-PowerShellExecutionPolicy
     Install-NuGetProvider
     New-InstallationDirectory
@@ -136,14 +136,18 @@ $Helpers = {
         Write-Host ""
     }
 
-    function Confirm-AdministratorRole {
-        # Verify administrator privileges on Windows
+    function Show-PrivilegeLimitations {
+        # Warn when running without Administrator privileges on Windows
         if ($script:onWindows -and -not $script:isAdmin) {
-            Write-Host "`n=== PowerShell Profile Installer ===" -ForegroundColor Cyan
-            Write-Host "`n[ERROR] This script must be run as Administrator." -ForegroundColor Red
-            Write-Host "`nPlease restart PowerShell with administrator privileges and try again." -ForegroundColor Yellow
-            Write-Host "Right-click PowerShell and select 'Run as Administrator'`n" -ForegroundColor Yellow
-            exit 1
+            Write-Host ""
+            Write-Host "============================================================" -ForegroundColor Yellow
+            Write-Host "[WARNING] Running without Administrator privileges on Windows." -ForegroundColor Yellow
+            Write-Host "[WARNING] Installation will continue with limited capabilities." -ForegroundColor Yellow
+            Write-Host "============================================================" -ForegroundColor Yellow
+            Write-Host "  - LocalMachine execution policy changes are skipped." -ForegroundColor Yellow
+            Write-Host "  - Execution policy changes (if needed) are applied only to CurrentUser scope." -ForegroundColor Yellow
+            Write-Host "  - Some repository/provider trust operations may fail if machine policy blocks them." -ForegroundColor Yellow
+            Write-Host ""
         }
     }
 
@@ -161,6 +165,7 @@ $Helpers = {
                     Write-Host "[OK] Execution policy updated for all users`n" -ForegroundColor Green
                 }
                 else {
+                    Write-Host "[INFO] Not elevated: skipping LocalMachine execution policy changes." -ForegroundColor Cyan
                     Write-Host "Setting execution policy to RemoteSigned (CurrentUser scope)..." -ForegroundColor Yellow
                     Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
                     Write-Host "[OK] Execution policy updated for current user`n" -ForegroundColor Green
