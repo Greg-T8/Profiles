@@ -1235,7 +1235,8 @@
     "MarkdownPaste.silence",
     "MarkdownPaste.rules",
     "azureMcp.readOnly",
-    "@azure.argTenant"
+    "@azure.argTenant",
+    "workbench.editor.tabSizing"
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
@@ -1249,5 +1250,7 @@
     "547b168b-bd3f-4cfc-ae2b-665f52672fae/e091f6e7-031a-4924-97bb-8c983ca5d21a",
     "547b168b-bd3f-4cfc-ae2b-665f52672fae/e6ad7655-b3ba-4324-8361-fcfdc59973a5"
   ],
-  "@azure.argTenant": "547b168b-bd3f-4cfc-ae2b-665f52672fae"
+  "@azure.argTenant": "547b168b-bd3f-4cfc-ae2b-665f52672fae",
+  "workbench.editor.tabSizing": "shrink",
+  "workbench.editor.tabSizingFixedMaxWidth": 200
 }
