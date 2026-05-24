@@ -1422,8 +1422,6 @@ function Use-AzProfileSubscription {
     }
 }
 
-# Create alias for quick access
-Set-Alias -Name azp -Value Use-AzProfile -Scope Global
 
 # Register argument completer for Use-AzProfile profile names (for both function and alias)
 $azProfileCompleter = {
@@ -2123,7 +2121,6 @@ function Use-MgProfile {
     Get-CurrentMgProfile
 }
 
-Set-Alias -Name mgp -Value Use-MgProfile -Scope Global -Force
 
 function New-MgProfile {
     <#
