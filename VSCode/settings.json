@@ -247,6 +247,13 @@
           "name": "Austin Energy",
           "path": "c:\\Users\\gregt\\LocalCode\\Clients\\AustinEnergy\\AustinEnergy.code-workspace",
           "color": "#00a3ad"
+        },
+        {
+          "isGitRepo": true,
+          "id": "d4cijab7n1k3mplnhtzu",
+          "name": "D4C",
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\D4C\\D4C.code-workspace",
+          "color": "#1B51A3"
         }
       ]
     },
@@ -350,12 +357,27 @@
           "isGitRepo": true,
           "name": "Windows Terminal",
           "path": "c:/Users/gregt/OneDrive/Apps/Profiles/Windows Terminal"
+        },
+        {
+          "isGitRepo": true,
+          "id": "profilesekzwdssqzmpwntozn",
+          "name": "Profiles",
+          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles",
+          "color": "#026395"
         }
       ]
     }
   ],
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
+    [
+      "#026395",
+      "Bahama Blue"
+    ],
+    [
+      "#1B51A3",
+      "Fun Blue"
+    ],
     [
       "#2F5D3A",
       "Killarney"
@@ -407,14 +429,6 @@
     [
       "#0D0332",
       "Black Rock"
-    ],
-    [
-      "#780109",
-      "Japanese Maple"
-    ],
-    [
-      "#6A5D1B",
-      "Himalaya"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
