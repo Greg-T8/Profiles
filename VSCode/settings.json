@@ -214,6 +214,13 @@
           "color": "#4683ca"
         },
         {
+          "isGitRepo": true,
+          "id": "inframaindxulh4tchmq6zek2a",
+          "name": "Infra-Main",
+          "path": "c:\\Users\\gregt\\LocalCode\\Quisitive\\Infra-Main\\Infra-Main.code-workspace",
+          "color": "#b2e8f6"
+        },
+        {
           "color": "#00b3e2",
           "id": "infraterraformqz8iyjzhfmnhjdlpx",
           "isGitRepo": false,
@@ -371,6 +378,14 @@
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
     [
+      "#b2e8f6",
+      "Charlotte"
+    ],
+    [
+      "#e5f7fc",
+      "Foam"
+    ],
+    [
       "#026395",
       "Bahama Blue"
     ],
@@ -421,14 +436,6 @@
     [
       "#C59922",
       "Nugget"
-    ],
-    [
-      "#1e214f",
-      "Port Gore"
-    ],
-    [
-      "#0D0332",
-      "Black Rock"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
