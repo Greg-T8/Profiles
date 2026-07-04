@@ -169,7 +169,6 @@
     }
   },
   "chat.viewProgressBadge.enabled": true,
-  "chat.viewSessions.orientation": "stacked",
   "dashboard.displayProjectPath": true,
   "dashboard.openOnStartup": "empty workspace",
   "dashboard.projectData": [
@@ -261,6 +260,13 @@
           "name": "D4C",
           "path": "c:\\Users\\gregt\\LocalCode\\Clients\\D4C\\D4C.code-workspace",
           "color": "#1B51A3"
+        },
+        {
+          "isGitRepo": false,
+          "id": "laramaryjf77225ymquzr7xo",
+          "name": "Laramar",
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\Laramar",
+          "color": "#410056"
         }
       ]
     },
@@ -373,10 +379,31 @@
           "color": "#026395"
         }
       ]
+    },
+    {
+      "id": "booksgecbiog44mr6cor7k",
+      "groupName": "Books",
+      "projects": [
+        {
+          "isGitRepo": true,
+          "id": "handsonllms83cxmnyx3mr6cuybz",
+          "name": "Hands-On LLMs",
+          "path": "c:\\Users\\gregt\\OneDrive\\eBooks\\Hands-On Large Language Models\\Code-Hands-On-LLMs\\Hands-On-LLMs.code-workspace",
+          "color": "#B7410E"
+        }
+      ]
     }
   ],
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
+    [
+      "#B7410E",
+      "Rust"
+    ],
+    [
+      "#410056",
+      "Ripe Plum"
+    ],
     [
       "#b2e8f6",
       "Charlotte"
@@ -428,14 +455,6 @@
     [
       "#e916a0",
       "Red Violet"
-    ],
-    [
-      "#863c3c",
-      "Lotus"
-    ],
-    [
-      "#C59922",
-      "Nugget"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
@@ -1273,5 +1292,8 @@
   ],
   "@azure.argTenant": "547b168b-bd3f-4cfc-ae2b-665f52672fae",
   "workbench.editor.tabSizing": "shrink",
-  "workbench.editor.tabSizingFixedMaxWidth": 200
+  "workbench.editor.tabSizingFixedMaxWidth": 200,
+  "workbench.colorTheme": "Dark 2026",
+  "claudeCode.preferredLocation": "panel",
+  "chat.viewSessions.orientation": "stacked"
 }
