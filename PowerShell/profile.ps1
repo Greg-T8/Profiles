@@ -591,5 +591,3 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 }
 
 #endregion
-
-# Add new aliases for Azure and Git commands
