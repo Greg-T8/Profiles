@@ -248,18 +248,6 @@
                 "icon": "D:/WSL/Assembly/Assembly.png",
                 "name": "Assembly"
             },
-            {
-                "commandline": "%WINDIR%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -ExecutionPolicy ByPass -NoExit -Command \"& 'C:\\Users\\gregt\\miniconda3\\shell\\condabin\\conda-hook.ps1' ; conda activate 'C:\\Users\\gregt\\miniconda3' \"",
-                "name": "Anaconda PowerShell Prompt (miniconda3)",
-                "icon": "C:\\Users\\gregt\\miniconda3\\Menu\\anaconda_powershell_prompt.ico",
-                "startingDirectory": "C:\\Users\\gregt"
-            },
-            {
-                "commandline": "%WINDIR%\\System32\\cmd.exe \"/K\" C:\\Users\\gregt\\miniconda3\\Scripts\\activate.bat C:\\Users\\gregt\\miniconda3",
-                "name": "Anaconda Prompt (miniconda3)",
-                "icon": "C:\\Users\\gregt\\miniconda3\\Menu\\anaconda_prompt.ico",
-                "startingDirectory": "C:\\Users\\gregt"
-            }
         ]
     },
     "schemes": [],

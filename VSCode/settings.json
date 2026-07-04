@@ -1276,7 +1276,8 @@
     "MarkdownPaste.rules",
     "azureMcp.readOnly",
     "@azure.argTenant",
-    "workbench.editor.tabSizing"
+    "workbench.editor.tabSizing",
+    "dotnetAcquisitionExtension.enableLanguageModelTools"
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
@@ -1295,5 +1296,6 @@
   "workbench.editor.tabSizingFixedMaxWidth": 200,
   "workbench.colorTheme": "Dark 2026",
   "claudeCode.preferredLocation": "panel",
-  "chat.viewSessions.orientation": "stacked"
+  "chat.viewSessions.orientation": "stacked",
+  "dotnetAcquisitionExtension.enableLanguageModelTools": false
 }
