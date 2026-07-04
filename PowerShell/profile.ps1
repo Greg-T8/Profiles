@@ -264,6 +264,7 @@ if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
 function Get-PythonVenvPromptText {
 	# Resolve active Python venv label exactly as set by Activate.ps1 when present.
 	$venvPrompt = $null
+	$promptLabels = @()
 
 	if (Get-Variable -Name '_PYTHON_VENV_PROMPT_PREFIX' -Scope Global -ErrorAction SilentlyContinue) {
 		$venvPrompt = (Get-Variable -Name '_PYTHON_VENV_PROMPT_PREFIX' -Scope Global -ValueOnly)
@@ -276,10 +277,30 @@ function Get-PythonVenvPromptText {
 	}
 
 	if ([string]::IsNullOrWhiteSpace($venvPrompt)) {
+		$venvPrompt = $null
+	}
+
+	if (-not [string]::IsNullOrWhiteSpace($venvPrompt)) {
+		$promptLabels += "($venvPrompt)"
+	}
+
+	$condaPrompt = $null
+	if (-not [string]::IsNullOrWhiteSpace($env:CONDA_PROMPT_MODIFIER)) {
+		$condaPrompt = $env:CONDA_PROMPT_MODIFIER.Trim()
+	}
+	elseif (-not [string]::IsNullOrWhiteSpace($env:CONDA_DEFAULT_ENV)) {
+		$condaPrompt = "($($env:CONDA_DEFAULT_ENV))"
+	}
+
+	if (-not [string]::IsNullOrWhiteSpace($condaPrompt)) {
+		$promptLabels += $condaPrompt
+	}
+
+	if ($promptLabels.Count -eq 0) {
 		return ''
 	}
 
-	"($venvPrompt) "
+	($promptLabels -join ' ') + ' '
 }
 
 function Test-GitDirectory {
