@@ -100,7 +100,7 @@ else {
 }
 
 # Load custom functions
-if (Test-Path -Path "$profileDir/functions.ps1") {
+if ($PSVersionTable.PSEdition -eq 'Core' -and (Test-Path -Path "$profileDir/functions.ps1")) {
 	try {
 		. "$profileDir/functions.ps1"
 	}
