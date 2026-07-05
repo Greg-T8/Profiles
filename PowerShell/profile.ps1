@@ -38,18 +38,19 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 #endregion
 
 #region ALIASES
-
 Set-Alias -Name ll -Value Get-ChildItem -Force
 Set-Alias -Name cfj -Value ConvertFrom-Json
-Set-Alias -Name tf -Value terraform
 Set-Alias -Name gim -Value Get-InstalledModule
 Set-Alias -Name rdn -Value Resolve-DNSName
-Remove-Item Alias:dir -ErrorAction SilentlyContinue
 Set-Alias -Name uap -Value Use-AzProfile
 Set-Alias -Name ump -Value Use-MgProfile
-Set-Alias -Name gcp -Value Get-CurrentAzProfile
-Set-Alias -Name gmp -Value Get-CurrentMgProfile
-Set-Alias -Name ct -Value copilot
+Set-Alias -Name gcap -Value Get-CurrentAzProfile
+Set-Alias -Name gcmp -Value Get-CurrentMgProfile
+Set-Alias -Name tf -Value terraform
+
+Remove-Item Alias:dir -ErrorAction SilentlyContinue
+
+# Git aliases
 function Set-GitRepoRoot { Set-Location (git rev-parse --show-toplevel) }
 Set-Alias -Name sgr -Value Set-GitRepoRoot
 
@@ -94,7 +95,7 @@ function prompt {
 		'╭─( ' +                                                     # Box drawing characters and opening parenthesis
 		"$ESC[3m" +                                                  # Start italic mode
 		"$ESC[2m" +                                                  # Start dim/faint mode
-		"$pythonVenvPromptStyledText$(Get-MyPromptPath)" +          # Display optional Python env label and shortened path
+		"$pythonVenvPromptStyledText$(Get-MyPromptPath)" +           # Display optional Python env label and shortened path
 		"$ESC[22m" +                                                 # Reset dim/faint mode
 		"$(if ($script:PoshGitLoaded) { "$(Get-GitPromptStatusText)" })" +   # Git status if in git repo
 		"$ESC[23m" +                                                 # Reset italic mode
@@ -201,7 +202,6 @@ $tabKeyHandler = {
 		[Microsoft.PowerShell.PSConsoleReadLine]::Complete()
 	}
 }
-
 Set-PSReadLineKeyHandler -ViMode Insert  -Key Tab -ScriptBlock $tabKeyHandler
 Set-PSReadLineKeyHandler -ViMode Command -Key Tab -Function Complete
 Set-PSReadLineKeyHandler -ViMode Insert  -Chord Shift+Tab -Function TabCompletePrevious
@@ -254,6 +254,7 @@ if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
 		# Set initial cursor to blinking line for Insert mode
 		Write-Host -NoNewline "`e[5 q"
 	}
+
 }
 
 #endregion
