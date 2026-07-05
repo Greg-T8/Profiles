@@ -22,7 +22,7 @@ $ErrorActionPreference = 'Stop'
 $script:ProfilePath = $PSCommandPath
 $script:GitPromptMetaCache = @{}
 
-# Keep venv activation from replacing the custom prompt function.
+# Keep Python venv activation from replacing the custom prompt function.
 $env:VIRTUAL_ENV_DISABLE_PROMPT = '1'
 
 # Set PSStyle formatting colors (PowerShell Core only)
@@ -31,14 +31,47 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 	$PSStyle.Formatting.Warning = $PSStyle.Foreground.Yellow
 }
 
+# Force UTF-8 encoding to avoid question marks in the prompt when using non-ASCII characters (e.g., box-drawing characters)
+# See open bug: https://github.com/PowerShell/PSReadLine/issues/2866
+[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+
 #endregion
+
+#region ALIASES
+
+Set-Alias -Name ll -Value Get-ChildItem -Force
+Set-Alias -Name cfj -Value ConvertFrom-Json
+Set-Alias -Name tf -Value terraform
+Set-Alias -Name gim -Value Get-InstalledModule
+Set-Alias -Name rdn -Value Resolve-DNSName
+Remove-Item Alias:dir -ErrorAction SilentlyContinue
+Set-Alias -Name uap -Value Use-AzProfile
+Set-Alias -Name ump -Value Use-MgProfile
+Set-Alias -Name gcp -Value Get-CurrentAzProfile
+Set-Alias -Name gmp -Value Get-CurrentMgProfile
+Set-Alias -Name ct -Value copilot
+function Set-GitRepoRoot { Set-Location (git rev-parse --show-toplevel) }
+Set-Alias -Name sgr -Value Set-GitRepoRoot
+
+# Docker aliases
+function DockerExec { docker exec -it @args }
+function DockerImageList { docker image ls -a --no-trunc @args }
+function DockerContainerList { docker container ls -a --no-trunc @args }
+function RegCtlCmd { docker run --rm regclient/regctl @args }
+
+Set-Alias -Name dex -Value DockerExec
+Set-Alias -Name dil -Value DockerImageList
+Set-Alias -Name dcl -Value DockerContainerList
+Set-Alias -Name regctl -Value RegCtlCmd
+
+#endregion
+
 
 #region PROMPT FUNCTION
 # Two-line prompt with box-drawing characters
 # Format:
 #   ╭─( ~/path/to/directory [git-status]
 #   ╰╴>
-
 function prompt {
 	if (-not $script:PoshGitLoaded -and $PSVersionTable.PSEdition -eq 'Core' -and (Test-GitDirectory)) {
 		$script:PoshGitLoaded = Initialize-PoshGit
@@ -124,43 +157,6 @@ if (Test-Path -Path $workConfigPath) {
 
 #endregion
 
-#region ALIASES
-
-Set-Alias -Name ll -Value Get-ChildItem -Force
-Set-Alias -Name cfj -Value ConvertFrom-Json
-Set-Alias -Name tf -Value terraform
-Set-Alias -Name gim -Value Get-InstalledModule
-Set-Alias -Name rdn -Value Resolve-DNSName
-Remove-Item Alias:dir -ErrorAction SilentlyContinue
-Set-Alias -Name uap -Value Use-AzProfile
-Set-Alias -Name ump -Value Use-MgProfile
-Set-Alias -Name gcp -Value Get-CurrentAzProfile
-Set-Alias -Name gmp -Value Get-CurrentMgProfile
-Set-Alias -Name ct -Value copilot
-function Set-GitRepoRoot { Set-Location (git rev-parse --show-toplevel) }
-Set-Alias -Name sgr -Value Set-GitRepoRoot
-
-# Docker aliases
-function DockerExec { docker exec -it @args }
-function DockerImageList { docker image ls -a --no-trunc @args }
-function DockerContainerList { docker container ls -a --no-trunc @args }
-function RegCtlCmd { docker run --rm regclient/regctl @args }
-
-Set-Alias -Name dex -Value DockerExec
-Set-Alias -Name dil -Value DockerImageList
-Set-Alias -Name dcl -Value DockerContainerList
-Set-Alias -Name regctl -Value RegCtlCmd
-
-#endregion
-
-#region RELOAD PROFILE
-# Note: Due to PowerShell scoping rules, profile reload cannot be wrapped in a
-# function and have changes persist. You must dot-source the profile directly:
-#   . $script:ProfilePath
-# Or define an alias/function as a reminder, but you'll still need to manually
-# dot-source for function definition changes to take effect.#
-
-#endregion
 
 #region PSREADLINE CONFIGURATION
 
@@ -170,6 +166,9 @@ if (-not (Get-Module PSReadline)) { Import-Module PSReadLine }
 # Basic PSReadLine options
 Set-PSReadLineOption -EditMode Vi
 Set-PSReadLineOption -ContinuationPrompt ''
+
+# Avoids question marks when prompt spans multiple lines
+Set-PSReadLineOption -ExtraPromptLineCount 1
 
 # PredictionViewStyle requires PSReadLine 2.1.0+ (PowerShell Core)
 if ($PSVersionTable.PSEdition -eq 'Core') {
