@@ -86,8 +86,10 @@
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.insertSpaces": true,
-    "editor.rulers": [79],
-    "editor.tabSize": 4,
+    "editor.rulers": [
+      79
+    ],
+    "editor.tabSize": 4
   },
   "[snippets]": {
     "editor.defaultFormatter": "vscode.json-language-features"
@@ -110,8 +112,14 @@
     ],
     "editor.tabSize": 2
   },
+  "@azure.argTenant": "547b168b-bd3f-4cfc-ae2b-665f52672fae",
   "@azure.enableCustomModeRecommendations": false,
+  "azureMcp.readOnly": true,
   "azureResourceGroups.enableChatStandIn": false,
+  "azureResourceGroups.selectedSubscriptions": [
+    "547b168b-bd3f-4cfc-ae2b-665f52672fae/e091f6e7-031a-4924-97bb-8c983ca5d21a",
+    "547b168b-bd3f-4cfc-ae2b-665f52672fae/e6ad7655-b3ba-4324-8361-fcfdc59973a5"
+  ],
   "azureTerraform.survey": {
     "surveyPromptDate": "never",
     "surveyPromptIgnoredCount": 0
@@ -169,6 +177,7 @@
     }
   },
   "chat.viewProgressBadge.enabled": true,
+  "claudeCode.preferredLocation": "panel",
   "dashboard.displayProjectPath": true,
   "dashboard.openOnStartup": "empty workspace",
   "dashboard.projectData": [
@@ -206,18 +215,18 @@
       "id": "clientsacck9xha7mm66b5q8",
       "projects": [
         {
-          "isGitRepo": true,
+          "color": "#4683ca",
           "id": "azuregovernance1jywyu2t8mnu7dtdy",
+          "isGitRepo": true,
           "name": "Azure Governance",
-          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\AzureGovernance\\AzureGovernance.code-workspace",
-          "color": "#4683ca"
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\AzureGovernance\\AzureGovernance.code-workspace"
         },
         {
-          "isGitRepo": true,
+          "color": "#b2e8f6",
           "id": "inframaindxulh4tchmq6zek2a",
+          "isGitRepo": true,
           "name": "Infra-Main",
-          "path": "c:\\Users\\gregt\\LocalCode\\Quisitive\\Infra-Main\\Infra-Main.code-workspace",
-          "color": "#b2e8f6"
+          "path": "c:\\Users\\gregt\\LocalCode\\Quisitive\\Infra-Main\\Infra-Main.code-workspace"
         },
         {
           "color": "#00b3e2",
@@ -248,25 +257,25 @@
           "path": "c:\\Users\\gregt\\LocalCode\\Clients\\Bell\\Client-Bell.code-workspace"
         },
         {
-          "isGitRepo": true,
+          "color": "#00a3ad",
           "id": "austinenergyth44gg9mmmoa4d3ay",
-          "name": "Austin Energy",
-          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\AustinEnergy\\AustinEnergy.code-workspace",
-          "color": "#00a3ad"
-        },
-        {
           "isGitRepo": true,
-          "id": "d4cijab7n1k3mplnhtzu",
-          "name": "D4C",
-          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\D4C\\D4C.code-workspace",
-          "color": "#1B51A3"
+          "name": "Austin Energy",
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\AustinEnergy\\AustinEnergy.code-workspace"
         },
         {
-          "isGitRepo": false,
+          "color": "#1B51A3",
+          "id": "d4cijab7n1k3mplnhtzu",
+          "isGitRepo": true,
+          "name": "D4C",
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\D4C\\D4C.code-workspace"
+        },
+        {
+          "color": "#410056",
           "id": "laramaryjf77225ymquzr7xo",
+          "isGitRepo": false,
           "name": "Laramar",
-          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\Laramar",
-          "color": "#410056"
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\Laramar"
         }
       ]
     },
@@ -372,24 +381,24 @@
           "path": "c:/Users/gregt/OneDrive/Apps/Profiles/Windows Terminal"
         },
         {
-          "isGitRepo": true,
+          "color": "#026395",
           "id": "profilesekzwdssqzmpwntozn",
+          "isGitRepo": true,
           "name": "Profiles",
-          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles",
-          "color": "#026395"
+          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles"
         }
       ]
     },
     {
-      "id": "booksgecbiog44mr6cor7k",
       "groupName": "Books",
+      "id": "booksgecbiog44mr6cor7k",
       "projects": [
         {
-          "isGitRepo": true,
+          "color": "#B7410E",
           "id": "handsonllms83cxmnyx3mr6cuybz",
+          "isGitRepo": true,
           "name": "Hands-On LLMs",
-          "path": "c:\\Users\\gregt\\OneDrive\\eBooks\\Hands-On Large Language Models\\Code-Hands-On-LLMs\\Hands-On-LLMs.code-workspace",
-          "color": "#B7410E"
+          "path": "c:\\Users\\gregt\\OneDrive\\eBooks\\Hands-On Large Language Models\\Code-Hands-On-LLMs\\Hands-On-LLMs.code-workspace"
         }
       ]
     }
@@ -460,6 +469,7 @@
   "dashboard.storeProjectsInSettings": true,
   "debug.inlineValues": "auto",
   "diffEditor.ignoreTrimWhitespace": false,
+  "dotnetAcquisitionExtension.enableLanguageModelTools": false,
   "editor.acceptSuggestionOnCommitCharacter": false,
   "editor.acceptSuggestionOnEnter": "off",
   "editor.accessibilitySupport": "off",
@@ -545,8 +555,6 @@
   "git.enableSmartCommit": true,
   "git.openRepositoryInParentFolders": "always",
   "github.copilot.chat.agent.temperature": 0,
-  "github.copilot.chat.anthropic.thinking.budgetTokens": 16000,
-  "github.copilot.chat.askQuestions.enabled": true,
   "github.copilot.chat.claudeAgent.enabled": true, //Disables auto-insertion of instruction files
   "github.copilot.chat.commitMessageGeneration.instructions": [],
   "github.copilot.chat.searchSubagent.enabled": true,
@@ -694,11 +702,8 @@
   "hediet.vscode-drawio.theme": "min",
   "html.autoClosingTags": true,
   "html.autoCreateQuotes": false,
-  "inlineChat.affordance": "gutter",
+  "inlineChat.affordance": "off",
   "inlineChat.defaultModel": "GPT-5 mini (copilot)",
-  "inlineChat.enableV2": false,
-  "inlineChat.finishOnType": true,
-  "inlineChat.holdToSpeech": true,
   "javascript.format.insertSpaceAfterOpeningAndBeforeClosingEmptyBraces": false,
   "markdown-preview-enhanced.alwaysShowBacklinksInPreview": false,
   "markdown-preview-enhanced.automaticallyShowPreviewOfMarkdownBeingEdited": false,
@@ -746,7 +751,6 @@
   "markdownlint.run": "onSave",
   "MarkdownPaste.autoSelectClipboardType": "html&text",
   "MarkdownPaste.enableAI": false,
-  "MarkdownPaste.path": "${fileDirname}/.img",
   "MarkdownPaste.imageRules": [
     {
       "linkPattern": "<img src='${imageFilePath}' width='600'>",
@@ -754,6 +758,7 @@
       "targetPath": "${fileDirname}/.img/${datetime|yyyy-MM-DD-HH-mm-ss}"
     }
   ],
+  "MarkdownPaste.path": "${fileDirname}/.img",
   "MarkdownPaste.silence": true,
   "markdowntable.alignColumnHeader": false,
   "markdowntable.alignData": false,
@@ -849,7 +854,6 @@
     "chat.promptFilesLocations",
     "dashboard.openOnStartup",
     "powershell.scriptAnalysis.settingsPath",
-    "-@azure.argTenant"
   ],
   "terminal.integrated.commandsToSkipShell": [
     "workbench.action.toggleAuxiliaryBar",
@@ -1011,12 +1015,15 @@
     "titleBar.activeForeground": "#d1e4ff",
     "titleBar.inactiveBackground": "#142a47"
   },
+  "workbench.colorTheme": "Dark 2026",
   "workbench.editor.enablePreview": true,
   "workbench.editor.enablePreviewFromQuickOpen": true,
   "workbench.editor.highlightModifiedTabs": true,
   "workbench.editor.limit.enabled": true,
   "workbench.editor.limit.perEditorGroup": true,
   "workbench.editor.limit.value": 5,
+  "workbench.editor.tabSizing": "shrink",
+  "workbench.editor.tabSizingFixedMaxWidth": 200,
   "workbench.editor.useModal": "off",
   "workbench.editor.wrapTabs": true,
   "workbench.editorAssociations": {
@@ -1027,6 +1034,10 @@
   "workbench.productIconTheme": "Default",
   "workbench.settings.alwaysShowAdvancedSettings": true,
   "workbench.settings.applyToAllProfiles": [
+    "@azure.argTenant",
+    "@azure.enableCustomModeRecommendations",
+    "azureMcp.readOnly",
+    "azureTerraform.survey",
     "betterAlign.alignAfterTypeEnter",
     "betterAlign.indentBase",
     "chat.agent.enable",
@@ -1059,6 +1070,7 @@
     "cSpell.showSuggestionsLinkInEditorContextMenu",
     "cSpell.suggestionMenuType",
     "debug.inlineValues",
+    "dotnetAcquisitionExtension.enableLanguageModelTools",
     "editor.autoClosingBrackets",
     "editor.autoClosingQuotes",
     "editor.autoIndent",
@@ -1087,6 +1099,7 @@
     "editor.quickSuggestions",
     "editor.quickSuggestionsDelay",
     "editor.rulers",
+    "editor.scrollbar.verticalScrollbarSize",
     "editor.snippetSuggestions",
     "editor.suggest.preview",
     "editor.suggest.showFolders",
@@ -1114,6 +1127,7 @@
     "files.trimTrailingWhitespace",
     "git.autofetch",
     "git.confirmSync",
+    "git.decorations.enabled",
     "git.enableSmartCommit",
     "github.copilot.chat.agent.thinkingTool",
     "github.copilot.chat.askQuestions.enabled",
@@ -1123,6 +1137,7 @@
     "github.copilot.chat.commitMessageGeneration.instructions",
     "github.copilot.chat.copilotMemory.enabled",
     "github.copilot.chat.search.semanticTextResults",
+    "github.copilot.chat.searchSubagent.enabled",
     "github.copilot.editor.enableAutoCompletions",
     "github.copilot.enable",
     "github.copilot.nextEditSuggestions.enabled",
@@ -1174,6 +1189,12 @@
     "markdown.updateLinksOnFileMove.enabled",
     "markdownlint.config",
     "markdownlint.run",
+    "MarkdownPaste.autoSelectClipboardType",
+    "MarkdownPaste.enableAI",
+    "MarkdownPaste.imageRules",
+    "MarkdownPaste.path",
+    "MarkdownPaste.rules",
+    "MarkdownPaste.silence",
     "markdowntable.alignColumnHeader",
     "markdowntable.alignData",
     "pasteimg.path",
@@ -1199,18 +1220,23 @@
     "powershell.helpCompletion",
     "powershell.integratedConsole.focusConsoleOnExecute",
     "powershell.integratedConsole.showOnStartup",
+    "powershell.integratedConsole.startInBackground",
     "powershell.powerShellDefaultVersion",
     "powershell.promptToUpdatePowerShell",
     "powershell.scriptAnalysis.enable",
     "powershell.scriptAnalysis.settingsPath",
     "powershell.sideBar.CommandExplorerVisibility",
     "prettyxml.settings.indentSpaceLength",
+    "python.analysis.typeCheckingMode",
+    "python.terminal.activateEnvironment",
     "rewrap.autoWrap.enabled",
     "rewrap.autoWrap.notification",
     "rewrap.doubleSentenceSpacing",
     "rewrap.reformat",
     "rewrap.wholeComment",
     "rewrap.wrappingColumn",
+    "scm.diffDecorations",
+    "scm.diffDecorationsGutterVisibility",
     "search.exclude",
     "settings.cycle",
     "settingsSync.ignoredSettings",
@@ -1231,6 +1257,9 @@
     "terminal.integrated.suggest.quickSuggestions",
     "terminal.integrated.suggest.showStatusBar",
     "terminal.integrated.suggest.suggestOnTriggerCharacters",
+    "terminal.integrated.tabs.hideCondition",
+    "terminal.integrated.tabs.showActions",
+    "terminal.integrated.tabs.showActiveTerminal",
     "terminal.useWslProfiles",
     "vscode-neovim.compositeKeys",
     "vscode-neovim.ctrlKeysForInsertMode",
@@ -1246,38 +1275,16 @@
     "window.zoomLevel",
     "workbench.activityBar.location",
     "workbench.colorCustomizations",
+    "workbench.editor.tabSizing",
     "workbench.editorAssociations",
     "workbench.experimental.enableNewProfilesUI",
     "workbench.iconTheme",
     "workbench.panel.defaultLocation",
     "workbench.productIconTheme",
+    "workbench.settings.alwaysShowAdvancedSettings",
     "workbench.settings.editor",
     "workbench.startupEditor",
-    "@azure.enableCustomModeRecommendations",
-    "powershell.integratedConsole.startInBackground",
-    "github.copilot.chat.searchSubagent.enabled",
-    "workbench.settings.alwaysShowAdvancedSettings",
-    "editor.scrollbar.verticalScrollbarSize",
-    "python.analysis.typeCheckingMode",
-    "python.terminal.activateEnvironment",
-    "azureTerraform.survey",
     "workbench.view.showQuietly",
-    "terminal.integrated.tabs.showActions",
-    "terminal.integrated.tabs.showActiveTerminal",
-    "terminal.integrated.tabs.hideCondition",
-    "git.decorations.enabled",
-    "scm.diffDecorations",
-    "scm.diffDecorationsGutterVisibility",
-    "MarkdownPaste.autoSelectClipboardType",
-    "MarkdownPaste.enableAI",
-    "MarkdownPaste.imageRules",
-    "MarkdownPaste.path",
-    "MarkdownPaste.silence",
-    "MarkdownPaste.rules",
-    "azureMcp.readOnly",
-    "@azure.argTenant",
-    "workbench.editor.tabSizing",
-    "dotnetAcquisitionExtension.enableLanguageModelTools"
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
@@ -1286,16 +1293,5 @@
   "workbench.view.showQuietly": {
     "workbench.panel.output": true
   },
-  "azureMcp.readOnly": true,
-  "azureResourceGroups.selectedSubscriptions": [
-    "547b168b-bd3f-4cfc-ae2b-665f52672fae/e091f6e7-031a-4924-97bb-8c983ca5d21a",
-    "547b168b-bd3f-4cfc-ae2b-665f52672fae/e6ad7655-b3ba-4324-8361-fcfdc59973a5"
-  ],
-  "@azure.argTenant": "547b168b-bd3f-4cfc-ae2b-665f52672fae",
-  "workbench.editor.tabSizing": "shrink",
-  "workbench.editor.tabSizingFixedMaxWidth": 200,
-  "workbench.colorTheme": "Dark 2026",
-  "claudeCode.preferredLocation": "panel",
-  "chat.viewSessions.orientation": "stacked",
-  "dotnetAcquisitionExtension.enableLanguageModelTools": false
+  "chat.viewSessions.orientation": "stacked"
 }
