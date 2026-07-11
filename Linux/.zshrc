@@ -87,6 +87,10 @@ export KEYTIMEOUT=10
 export EDITOR=vim
 export VISUAL=vim
 
+# Keep Python/Conda activation scripts from mutating prompt text directly
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+export CONDA_CHANGEPS1=false
+
 # Enable edit-command-line: Press 'v' in normal mode to edit command in vim
 autoload -Uz edit-command-line
 zle -N edit-command-line
@@ -390,6 +394,49 @@ function get_prompt_path() {
     echo "$prompt_path"
 }
 
+# Returns active Python/Conda environment labels for prompt display
+function get_python_env_prompt() {
+    local venv_prompt=""
+    local conda_prompt=""
+    local -a prompt_labels=()
+
+    if [[ -n "$VIRTUAL_ENV_PROMPT" ]]; then
+        venv_prompt="$VIRTUAL_ENV_PROMPT"
+    elif [[ -n "$VIRTUAL_ENV" ]]; then
+        venv_prompt="$(basename "$VIRTUAL_ENV")"
+    fi
+
+    venv_prompt="${venv_prompt#"${venv_prompt%%[![:space:]]*}"}"
+    venv_prompt="${venv_prompt%"${venv_prompt##*[![:space:]]}"}"
+
+    if [[ -n "$venv_prompt" ]]; then
+        if [[ "$venv_prompt" == \(*\) ]]; then
+            prompt_labels+=("$venv_prompt")
+        else
+            prompt_labels+=("($venv_prompt)")
+        fi
+    fi
+
+    if [[ -n "$CONDA_PROMPT_MODIFIER" ]]; then
+        conda_prompt="$CONDA_PROMPT_MODIFIER"
+    elif [[ -n "$CONDA_DEFAULT_ENV" ]]; then
+        conda_prompt="($CONDA_DEFAULT_ENV)"
+    fi
+
+    conda_prompt="${conda_prompt#"${conda_prompt%%[![:space:]]*}"}"
+    conda_prompt="${conda_prompt%"${conda_prompt##*[![:space:]]}"}"
+
+    if [[ -n "$conda_prompt" ]]; then
+        prompt_labels+=("$conda_prompt")
+    fi
+
+    if (( ${#prompt_labels[@]} == 0 )); then
+        return
+    fi
+
+    echo "${(j: :)prompt_labels} "
+}
+
 # Prompt configuration
 # See: https://zsh.sourceforge.io/Doc/Release/Prompt-Expansion.html
 # %F  = start foreground color
@@ -404,7 +451,8 @@ get_ssh_host() {
 }
 
 PROMPT=$'\n'\
-$'%F{cyan}╭─( $(get_ssh_host)$(get_prompt_path)'\
+$'%F{cyan}╭─( $(get_ssh_host)%F{green}$(get_python_env_prompt)%F{cyan}$(get_prompt_path)'\
 '%F{yellow}${vcs_info_msg_0_}%f'\
 $'\n'\
 $'%F{cyan}╰─%f%# '
+export HSA_ENABLE_DXG_DETECTION=1

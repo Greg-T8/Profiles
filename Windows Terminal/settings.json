@@ -272,6 +272,30 @@
                 "hidden": false,
                 "name": "HandsOnLLM",
                 "source": "Microsoft.WSL"
+            },
+            {
+                "guid": "{8a3ed809-7af2-5dd6-809d-1e2dc6235e87}",
+                "hidden": false,
+                "name": "PyTorch",
+                "source": "Microsoft.WSL"
+            },
+            {
+                "guid": "{45393c34-bf61-5295-8c48-38fb71f5610a}",
+                "hidden": false,
+                "name": "PyTorch",
+                "source": "Microsoft.WSL"
+            },
+            {
+                "guid": "{9361c9f5-c388-551e-ab72-c5526dae44d2}",
+                "hidden": false,
+                "name": "PyTorch",
+                "source": "Microsoft.WSL"
+            },
+            {
+                "guid": "{4fee78de-7337-5b3b-b820-9d18edda5410}",
+                "hidden": false,
+                "name": "PyTorch",
+                "source": "Microsoft.WSL"
             }
         ]
     },

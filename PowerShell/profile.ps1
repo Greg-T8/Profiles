@@ -46,6 +46,7 @@ Set-Alias -Name uap -Value Use-AzProfile
 Set-Alias -Name ugp -Value Use-MgProfile
 Set-Alias -Name gcap -Value Get-CurrentAzProfile
 Set-Alias -Name gcgp -Value Get-CurrentMgProfile
+Set-Alias -Name uas -Value Use-AzProfileSubscription
 Set-Alias -Name tf -Value terraform
 
 Remove-Item Alias:dir -ErrorAction SilentlyContinue
