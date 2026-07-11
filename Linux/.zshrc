@@ -7,7 +7,7 @@
 # ==============================================================================
 # TMUX AUTO-START
 # ==============================================================================
-# Automatically start tmux if available and not already in a tmux session
+# Optionally start tmux when TMUX_AUTOSTART=1 and not already in a tmux session
 #
 # SETUP: To use separate sessions in VS Code vs Windows Terminal, add this to
 # VS Code settings.json (Ctrl+Shift+P -> "Preferences: Open User Settings (JSON)"):
@@ -16,7 +16,7 @@
 #       "TMUX_SESSION": "vscode"
 #   }
 #
-if command -v tmux &> /dev/null && [ -z "$TMUX" ] && [ -z "$TMUX_AUTOSTART_SKIP" ]; then
+if command -v tmux &> /dev/null && [ -z "$TMUX" ] && [ "$TMUX_AUTOSTART" = "1" ] && [ -z "$TMUX_AUTOSTART_SKIP" ]; then
     # Detect VS Code terminal and use appropriate session name
     if [ -n "$VSCODE_SHELL_INTEGRATION" ]; then
         SESSION_NAME="vscode"
