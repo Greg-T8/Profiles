@@ -456,3 +456,19 @@ $'%F{cyan}╭─( $(get_ssh_host)%F{green}$(get_python_env_prompt)%F{cyan}$(get_
 $'\n'\
 $'%F{cyan}╰─%f%# '
 export HSA_ENABLE_DXG_DETECTION=1
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/home/gtate/miniconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/home/gtate/miniconda3/etc/profile.d/conda.sh" ]; then
+        . "/home/gtate/miniconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/home/gtate/miniconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
