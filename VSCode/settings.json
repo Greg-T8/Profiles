@@ -1293,5 +1293,6 @@
   "workbench.view.showQuietly": {
     "workbench.panel.output": true
   },
+  "explorer.confirmPasteNative": false,
   "chat.viewSessions.orientation": "stacked"
 }
