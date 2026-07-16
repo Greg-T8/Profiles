@@ -1294,5 +1294,6 @@
     "workbench.panel.output": true
   },
   "explorer.confirmPasteNative": false,
+  "chatgpt.followUpQueueMode": "steer",
   "chat.viewSessions.orientation": "stacked"
 }
