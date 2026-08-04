@@ -251,18 +251,6 @@ $Helpers = {
                 # Exit cleanly when there are no upgrades to apply.
                 if (-not $availableUpdates) {
                     "Summary: $installedPackageCount packages checked, 0 updated, $($skippedPackageLines.Count) skipped." | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
-                    'Pinned packages:' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
-                    if ($pinnedPackageLines.Count -gt 0) {
-                        $pinnedPackageLines | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
-                    }
-                    else {
-                        '  - None' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
-                    }
-
-                    if ($skippedPackageLines.Count -gt 0) {
-                        'Skipped packages:' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
-                        $skippedPackageLines | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
-                    }
                     "===== WinGet update completed: $(Get-Date -Format s) =====" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
                     return $false
                 }
@@ -294,19 +282,6 @@ $Helpers = {
                 if ($updatedPackageLines.Count -gt 0) {
                     'Updated packages:' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
                     $updatedPackageLines | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
-                }
-
-                'Pinned packages:' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
-                if ($pinnedPackageLines.Count -gt 0) {
-                    $pinnedPackageLines | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
-                }
-                else {
-                    '  - None' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
-                }
-
-                if ($skippedPackageLines.Count -gt 0) {
-                    'Skipped packages:' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
-                    $skippedPackageLines | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
                 }
 
                 "===== WinGet update completed: $(Get-Date -Format s) =====" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null

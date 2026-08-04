@@ -845,7 +845,6 @@ $Helpers = {
         $cleanupLines = [System.Collections.Generic.List[string]]::new()
         $warningErrorLines = [System.Collections.Generic.List[string]]::new()
         $summaryLines = [System.Collections.Generic.List[string]]::new()
-        $skippedLines = [System.Collections.Generic.List[string]]::new()
 
         # Run module update and cleanup and process all streams in real time.
         & {
@@ -882,9 +881,6 @@ $Helpers = {
                 elseif ($text -match '^Summary:') {
                     $summaryLines.Add($text)
                 }
-                elseif ($text -match '^Skipped modules:|^  - ') {
-                    $skippedLines.Add($text)
-                }
                 elseif ($text -like 'WARNING:*' -or $text -like 'ERROR:*') {
                     $warningErrorLines.Add($text)
                 }
@@ -899,7 +895,6 @@ $Helpers = {
         $cleanupLines | ForEach-Object { $logLines.Add($_) }
         $warningErrorLines | ForEach-Object { $logLines.Add($_) }
         $summaryLines | ForEach-Object { $logLines.Add($_) }
-        $skippedLines | ForEach-Object { $logLines.Add($_) }
 
         # Note when there were no module version changes and no warnings/errors.
         if ($logLines.Count -eq 0) {
