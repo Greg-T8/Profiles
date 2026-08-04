@@ -206,6 +206,13 @@
           "isGitRepo": true,
           "name": "Terraform-Practice",
           "path": "c:\\Users\\gregt\\LocalCode\\Projects\\Terraform\\Terraform-Practice.code-workspace"
+        },
+        {
+          "isGitRepo": true,
+          "id": "alzcmuev0oltmrxf3yr1",
+          "name": "ALZ",
+          "path": "c:\\Users\\gregt\\LocalCode\\Lab\\ALZ\\ALZ.code-workspace",
+          "color": "#ABA0D9"
         }
       ]
     },
@@ -214,6 +221,34 @@
       "groupName": "Clients and Work Projects",
       "id": "clientsacck9xha7mm66b5q8",
       "projects": [
+        {
+          "isGitRepo": false,
+          "id": "bart6dyuv0k58mscyxp05",
+          "name": "BART",
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\BART\\BART.code-workspace",
+          "color": "#041C2C"
+        },
+        {
+          "color": "#1B51A3",
+          "id": "d4cijab7n1k3mplnhtzu",
+          "isGitRepo": true,
+          "name": "D4C",
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\D4C\\D4C.code-workspace"
+        },
+        {
+          "color": "#00a3ad",
+          "id": "austinenergyth44gg9mmmoa4d3ay",
+          "isGitRepo": true,
+          "name": "Austin Energy",
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\AustinEnergy\\AustinEnergy.code-workspace"
+        },
+        {
+          "color": "#2F5D3A",
+          "id": "bello8t3bzuwzmm66hlz1",
+          "isGitRepo": true,
+          "name": "Bell Lumber & Pole",
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\Bell\\Client-Bell.code-workspace"
+        },
         {
           "color": "#4683ca",
           "id": "azuregovernance1jywyu2t8mnu7dtdy",
@@ -248,27 +283,6 @@
           "isGitRepo": true,
           "name": "TCU",
           "path": "c:\\Users\\gregt\\LocalCode\\Clients\\TCU\\TCU.code-workspace"
-        },
-        {
-          "color": "#2F5D3A",
-          "id": "bello8t3bzuwzmm66hlz1",
-          "isGitRepo": true,
-          "name": "Bell Lumber & Pole",
-          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\Bell\\Client-Bell.code-workspace"
-        },
-        {
-          "color": "#00a3ad",
-          "id": "austinenergyth44gg9mmmoa4d3ay",
-          "isGitRepo": true,
-          "name": "Austin Energy",
-          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\AustinEnergy\\AustinEnergy.code-workspace"
-        },
-        {
-          "color": "#1B51A3",
-          "id": "d4cijab7n1k3mplnhtzu",
-          "isGitRepo": true,
-          "name": "D4C",
-          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\D4C\\D4C.code-workspace"
         },
         {
           "color": "#410056",
@@ -406,6 +420,14 @@
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
     [
+      "#041C2C",
+      "Black Pearl"
+    ],
+    [
+      "#ABA0D9",
+      "Cold Purple"
+    ],
+    [
       "#B7410E",
       "Rust"
     ],
@@ -456,14 +478,6 @@
     [
       "#1B127B",
       "Deep Koamaru"
-    ],
-    [
-      "#F8DD5C",
-      "Energy Yellow"
-    ],
-    [
-      "#e916a0",
-      "Red Violet"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
@@ -556,7 +570,9 @@
   "git.openRepositoryInParentFolders": "always",
   "github.copilot.chat.agent.temperature": 0,
   "github.copilot.chat.claudeAgent.enabled": true, //Disables auto-insertion of instruction files
-  "github.copilot.chat.commitMessageGeneration.instructions": [],
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+
+  ],
   "github.copilot.chat.searchSubagent.enabled": true,
   "github.copilot.editor.enableCodeActions": true,
   "github.copilot.enable": {
