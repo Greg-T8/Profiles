@@ -68,6 +68,10 @@ Set-Alias -Name regctl -Value RegCtlCmd
 
 #endregion
 
+#region Default Parameter Values
+$PSDefaultParameterValues['Use-AzProfile:Name'] = 'Lab'
+
+#endregion
 
 #region PROMPT FUNCTION
 # Two-line prompt with box-drawing characters
