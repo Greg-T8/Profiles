@@ -54,12 +54,52 @@ Remove-Item Alias:dir -ErrorAction SilentlyContinue
 # Git aliases
 function Set-GitRepoRoot { Set-Location (git rev-parse --show-toplevel) }
 function Show-GhFailedRunLog {
-	gh run list --status failure --limit 1 --json databaseId --jq '.[0].databaseId' |
-		ForEach-Object { gh run view $_ --log-failed } |
-		Select-String '╷|Error:|Planning failed|Process completed with exit code' -Context 5,15
+	[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+	$OutputEncoding = [Console]::OutputEncoding
+
+	[System.Text.Encoding]::RegisterProvider(
+		[System.Text.CodePagesEncodingProvider]::Instance
+	)
+
+	$cp437 = [System.Text.Encoding]::GetEncoding(437)
+	$utf8  = [System.Text.UTF8Encoding]::new($false)
+
+	$ansiPattern = '(?:\x1B\[[0-?]*[ -/]*[@-~]|\^\[\[[0-?]*[ -/]*[@-~])'
+	$githubPrefix = '^.*?\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z\s*'
+
+	$runId = gh run list `
+		--status failure `
+		--limit 1 `
+		--json databaseId `
+		--jq '.[0].databaseId'
+
+	gh run view $runId --log-failed |
+		ForEach-Object {
+			$line = $_ -replace $ansiPattern, ''
+			$line = $line -replace $githubPrefix, ''
+
+			# Repair UTF-8 text that was incorrectly decoded as CP437.
+			if ($line -match 'Γ(?:ö|ò)') {
+				$line = $utf8.GetString($cp437.GetBytes($line))
+			}
+
+			# Optional: remove Terraform box-drawing characters completely.
+			$line = $line -replace '[\u2500-\u257F]', ''
+
+			$line.TrimEnd()
+		} |
+		Select-String `
+			-Pattern 'Error:|Planning failed|Process completed with exit code' `
+			-Context 5, 15 |
+		ForEach-Object {
+			# Output plain strings instead of Select-String's > indicators.
+			$_.Context.PreContext
+			$_.Line
+			$_.Context.PostContext
+		}
 }
 Set-Alias -Name sgr -Value Set-GitRepoRoot
-Set-Alias -Name runlog -Value Show-GhFailedRunLog
+Set-Alias -Name ghel -Value Show-GhFailedRunLog
 
 # Docker aliases
 function DockerExec { docker exec -it @args }
