@@ -183,7 +183,7 @@
   "dashboard.projectData": [
     {
       "collapsed": false,
-      "groupName": "Learning and Projects",
+      "groupName": "Learning",
       "id": "projectsu85uk6mvamm66iem5",
       "projects": [
         {
@@ -213,6 +213,13 @@
           "name": "ALZ",
           "path": "c:\\Users\\gregt\\LocalCode\\Lab\\ALZ\\ALZ.code-workspace",
           "color": "#ABA0D9"
+        },
+        {
+          "isGitRepo": true,
+          "id": "azurenamingtool2j1lswib2mshcwsg2",
+          "name": "Azure Naming Tool",
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\Azure_Naming_Tool\\github_action_logs\\Azure_Naming_Tool.code-workspace",
+          "color": "#4077ce"
         }
       ]
     },
@@ -298,18 +305,18 @@
       "id": "projectshb76ydg10mmaoptep",
       "projects": [
         {
-          "color": "#F8DD5C",
-          "id": "linguacircuitr1i3pvmxlmmyuk168",
-          "isGitRepo": false,
-          "name": "LinguaCircuit",
-          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\LinguaCircuit\\LinguaCircuit.code-workspace"
-        },
-        {
           "color": "#1B127B",
           "id": "epubsplitterz34ttmscjmmt4u86l",
           "isGitRepo": true,
           "name": "ePubSplitter",
           "path": "c:\\Users\\gregt\\LocalCode\\Projects\\ePubSplitter\\ePubSplitter.code-workspace"
+        },
+        {
+          "color": "#F8DD5C",
+          "id": "linguacircuitr1i3pvmxlmmyuk168",
+          "isGitRepo": false,
+          "name": "LinguaCircuit",
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\LinguaCircuit\\LinguaCircuit.code-workspace"
         },
         {
           "color": "#8b4789",
@@ -420,6 +427,10 @@
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
     [
+      "#4077ce",
+      "Indigo"
+    ],
+    [
       "#041C2C",
       "Black Pearl"
     ],
@@ -462,10 +473,6 @@
     [
       "#00a3ad",
       "Bondi Blue"
-    ],
-    [
-      "#4683ca",
-      "Indigo"
     ],
     [
       "#00b3e2",
