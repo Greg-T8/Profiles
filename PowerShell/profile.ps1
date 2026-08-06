@@ -53,7 +53,13 @@ Remove-Item Alias:dir -ErrorAction SilentlyContinue
 
 # Git aliases
 function Set-GitRepoRoot { Set-Location (git rev-parse --show-toplevel) }
+function Show-GhFailedRunLog {
+	gh run list --status failure --limit 1 --json databaseId --jq '.[0].databaseId' |
+		ForEach-Object { gh run view $_ --log-failed } |
+		Select-String '╷|Error:|Planning failed|Process completed with exit code' -Context 5,15
+}
 Set-Alias -Name sgr -Value Set-GitRepoRoot
+Set-Alias -Name runlog -Value Show-GhFailedRunLog
 
 # Docker aliases
 function DockerExec { docker exec -it @args }
