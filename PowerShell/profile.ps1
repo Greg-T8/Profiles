@@ -54,6 +54,11 @@ Remove-Item Alias:dir -ErrorAction SilentlyContinue
 # Git aliases
 function Set-GitRepoRoot { Set-Location (git rev-parse --show-toplevel) }
 function Show-GhFailedRunLog {
+	param(
+		[Alias('R')]
+		[string]$Repository
+	)
+
 	[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
 	$OutputEncoding = [Console]::OutputEncoding
 
@@ -67,13 +72,17 @@ function Show-GhFailedRunLog {
 	$ansiPattern = '(?:\x1B\[[0-?]*[ -/]*[@-~]|\^\[\[[0-?]*[ -/]*[@-~])'
 	$githubPrefix = '^.*?\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z\s*'
 
+	# Use an explicit repository when the current location is outside a Git worktree.
+	$repositoryArgument = if ($Repository) { @('--repo', $Repository) } else { @() }
+
 	$runId = gh run list `
+		@repositoryArgument `
 		--status failure `
 		--limit 1 `
 		--json databaseId `
 		--jq '.[0].databaseId'
 
-	gh run view $runId --log-failed |
+	gh run view $runId @repositoryArgument --log-failed |
 		ForEach-Object {
 			$line = $_ -replace $ansiPattern, ''
 			$line = $line -replace $githubPrefix, ''
