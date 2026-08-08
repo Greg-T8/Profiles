@@ -1,4 +1,9 @@
 ﻿<#
+    Program: profile.ps1
+    Description: Configures the interactive PowerShell environment and prompt.
+    Context: Personal cross-host PowerShell profile.
+    Author: Greg Tate
+
     This is my PowerShell profile script I use in the context of $Profile.CurrentUserAllHosts.
 
     The prompt function mimmics the behavior of the Oh-My-Posh prompt for PowerShell, but without requiring the
@@ -109,6 +114,210 @@ function Show-GhFailedRunLog {
 }
 Set-Alias -Name sgr -Value Set-GitRepoRoot
 Set-Alias -Name ghel -Value Show-GhFailedRunLog
+
+# Display failed task logs from the latest failed Azure DevOps pipeline run.
+function Show-AdoFailedRunLog {
+	[CmdletBinding()]
+	param(
+		[Parameter(Mandatory)]
+		[Alias('O')]
+		[string]$Organization,
+
+		[Parameter(Mandatory)]
+		[Alias('P')]
+		[string]$Project,
+
+		[Alias('D')]
+		[int]$PipelineId,
+
+		[switch]$FullLog
+	)
+
+	# Confirm the Azure CLI is available before invoking Azure DevOps commands.
+	if (-not (Get-Command -Name az -ErrorAction SilentlyContinue)) {
+		throw 'Azure CLI is required. Install it from https://aka.ms/installazurecliwindows.'
+	}
+
+	# Normalize a short organization name into the Azure DevOps Services URL expected by the CLI.
+	$organizationUrl = $Organization.TrimEnd('/')
+	if ($organizationUrl -notmatch '^https?://') {
+		$organizationUrl = "https://dev.azure.com/$organizationUrl"
+	}
+
+	# Restrict the run query to one pipeline only when the caller supplies its ID.
+	$pipelineArgument = @()
+	if ($PipelineId) {
+		$pipelineArgument = @('--pipeline-ids', $PipelineId)
+	}
+
+	# Retrieve the most recent failed pipeline run.
+	$runOutput = az pipelines runs list `
+		--organization $organizationUrl `
+		--project $Project `
+		@pipelineArgument `
+		--status completed `
+		--result failed `
+		--top 1 `
+		--query '[0]' `
+		--output json
+	if ($LASTEXITCODE -ne 0) {
+		throw 'Unable to retrieve Azure DevOps pipeline runs.'
+	}
+
+	# Stop cleanly when the filtered run query returned no results.
+	if ([string]::IsNullOrWhiteSpace(($runOutput -join [Environment]::NewLine)) -or
+		($runOutput -join [Environment]::NewLine) -eq 'null') {
+		Write-Warning 'No failed Azure DevOps pipeline runs were found.'
+		return
+	}
+
+	# Retrieve timeline records so only failed task logs are requested.
+	$run = $runOutput | ConvertFrom-Json
+	$timelineOutput = az devops invoke `
+		--area build `
+		--resource timeline `
+		--route-parameters "project=$Project" "buildId=$($run.id)" `
+		--organization $organizationUrl `
+		--api-version 7.1 `
+		--output json
+	if ($LASTEXITCODE -ne 0) {
+		throw "Unable to retrieve the timeline for Azure DevOps run $($run.id)."
+	}
+
+	# Select failed timeline records that reference an individual task log.
+	$timeline = $timelineOutput | ConvertFrom-Json
+	$failedRecord = @(
+		$timeline.records |
+			Where-Object { $_.result -eq 'failed' -and $_.log.id }
+	)
+	if (-not $failedRecord) {
+		Write-Warning "Run $($run.id) failed, but Azure DevOps did not return a failed task log."
+		return
+	}
+
+	# Retrieve and display the logs for every failed task.
+	foreach ($record in $failedRecord) {
+		Write-Host "`n--- Failed task: $($record.name) ---" -ForegroundColor Red
+
+		# Request plain-text content for the failed task's individual build log.
+		# Azure CLI requires a file destination for this plain-text REST response.
+		$logPath = Join-Path `
+			-Path ([System.IO.Path]::GetTempPath()) `
+			-ChildPath "ado-run-$($run.id)-log-$($record.log.id)-$([guid]::NewGuid()).log"
+		try {
+			# Write the failed task log to a unique temporary file.
+			$null = az devops invoke `
+				--area build `
+				--resource logs `
+				--route-parameters "project=$Project" "buildId=$($run.id)" "logId=$($record.log.id)" `
+				--organization $organizationUrl `
+				--api-version 7.1 `
+				--accept-media-type text/plain `
+				--out-file $logPath
+
+			# Skip a task when its log cannot be retrieved and continue with the next failed task.
+			if ($LASTEXITCODE -ne 0) {
+				Write-Warning "Unable to retrieve log $($record.log.id) for task '$($record.name)'."
+				continue
+			}
+
+			# Read the downloaded task log before removing its temporary file.
+			$logOutput = Get-Content -LiteralPath $logPath
+		}
+		finally {
+			# Remove the uniquely named temporary log file after every retrieval attempt.
+			if (Test-Path -LiteralPath $logPath) {
+				Remove-Item -LiteralPath $logPath -Force
+			}
+		}
+
+		# Strip terminal color codes that may be present in task output.
+		$cleanLog = @(
+			$logOutput |
+				ForEach-Object { $_ -replace '\x1B\[[0-?]*[ -/]*[@-~]', '' }
+		)
+
+		# Remove Azure Pipelines UTC timestamps from the beginning of each log line.
+		$cleanLog = @(
+			$cleanLog |
+				ForEach-Object {
+					$_ -replace '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z\s*', ''
+				}
+		)
+
+		# Remove Terraform box-drawing glyphs and their incorrectly decoded equivalents.
+		$cleanLog = @(
+			$cleanLog |
+				ForEach-Object {
+					$_ -replace 'Γ(?:ò╖|öé|ò╡)\s?', '' -replace '[\u2500-\u257F]', ''
+				}
+		)
+		if ($FullLog) {
+			$cleanLog
+			continue
+		}
+
+		# Highlight error context, while retaining the full log when no known marker exists.
+		$failureContext = $cleanLog |
+			Select-String `
+				-Pattern '##\[error\]|##vso\[task\.logissue type=error|^ERROR:|Error:|Planning failed|Process completed with exit code' `
+				-Context 5, 15
+		if ($failureContext) {
+			$failureContext |
+				ForEach-Object {
+					$_.Context.PreContext
+					$_.Line
+					$_.Context.PostContext
+				}
+		}
+		else {
+			$cleanLog
+		}
+
+		# Prevent the legacy direct-stream attempt below from running for this task.
+		continue
+		$logOutput = az devops invoke `
+			--area build `
+			--resource logs `
+			--route-parameters "project=$Project" "buildId=$($run.id)" "logId=$($record.log.id)" `
+			--organization $organizationUrl `
+			--api-version 7.1 `
+			--accept-media-type text/plain `
+			--output tsv
+		if ($LASTEXITCODE -ne 0) {
+			Write-Warning "Unable to retrieve log $($record.log.id) for task '$($record.name)'."
+			continue
+		}
+
+		# Strip terminal color codes that may be present in task output.
+		$cleanLog = @(
+			$logOutput |
+				ForEach-Object { $_ -replace '\x1B\[[0-?]*[ -/]*[@-~]', '' }
+		)
+		if ($FullLog) {
+			$cleanLog
+			continue
+		}
+
+		# Highlight error context, while retaining the full log when no known marker exists.
+		$failureContext = $cleanLog |
+			Select-String `
+				-Pattern '##\[error\]|##vso\[task\.logissue type=error|^ERROR:|Error:|Planning failed|Process completed with exit code' `
+				-Context 5, 15
+		if ($failureContext) {
+			$failureContext |
+				ForEach-Object {
+					$_.Context.PreContext
+					$_.Line
+					$_.Context.PostContext
+				}
+		}
+		else {
+			$cleanLog
+		}
+	}
+}
+Set-Alias -Name adel -Value Show-AdoFailedRunLog
 
 # Docker aliases
 function DockerExec { docker exec -it @args }
