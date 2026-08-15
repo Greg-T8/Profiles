@@ -555,6 +555,84 @@ function Install-WSLDistribution {
 # config-dir environment variable. Az and Mg profile switching are independent.
 # Profiles are defined as top-level keys in $Personal and $Work configs.
 
+# Retrieves billing subscriptions for the configured personal billing account.
+function Get-BillingSubscriptions {
+    [CmdletBinding()]
+    [OutputType([PSCustomObject])]
+    param()
+
+    # Verify the Azure CLI is available before making the billing API request.
+    if (-not (Get-Command -Name az -ErrorAction SilentlyContinue)) {
+        throw 'Azure CLI is required. Install it from https://aka.ms/installazurecliwindows.'
+    }
+
+    # Require the billing account ID supplied by the personal profile configuration.
+    if (
+        -not $Personal -or
+        -not $Personal.ContainsKey('BillingAccountId') -or
+        [string]::IsNullOrWhiteSpace($Personal.BillingAccountId)
+    ) {
+        throw 'Personal.BillingAccountId is not configured. Add it to PersonalConfig.psd1 and reload the profile.'
+    }
+
+    # Initialize the billing API request and the accumulated subscription results.
+    $billingAccountId = [string]$Personal.BillingAccountId
+    $apiVersion = '2024-04-01'
+    $requestUrl = "https://management.azure.com/providers/Microsoft.Billing/billingAccounts/$billingAccountId/billingSubscriptions?api-version=$apiVersion"
+    $subscriptions = @()
+
+    # Follow each continuation link so the command returns every billing subscription.
+    do {
+        $restOutput = az rest `
+            --method get `
+            --url $requestUrl `
+            --headers 'x-ms-service-tenant-info=true' `
+            --output json 2>&1
+
+        # Stop with Azure CLI details when the billing request fails.
+        if ($LASTEXITCODE -ne 0) {
+            $details = ($restOutput | Out-String).Trim()
+            throw "Unable to retrieve billing subscriptions. $details"
+        }
+
+        # Convert the page response before reading its values and continuation link.
+        try {
+            $response = $restOutput | ConvertFrom-Json -ErrorAction Stop
+        }
+        catch {
+            throw "Unable to parse the billing subscriptions response. $($_.Exception.Message)"
+        }
+
+        # Shape each API result into the profile command's stable output contract.
+        foreach ($billingSubscription in @($response.value)) {
+            if ($null -eq $billingSubscription) {
+                continue
+            }
+
+            $properties = $billingSubscription.properties
+            $subscriptions += [PSCustomObject][ordered]@{
+                SubscriptionName  = $properties.displayName
+                SubscriptionId    = $properties.subscriptionId
+                TenantId          = $properties.provisioningTenantId
+                BillingProfile    = $properties.billingProfileDisplayName
+                BillingProfileId  = $properties.billingProfileName
+                InvoiceSection    = $properties.invoiceSectionDisplayName
+                ProductType       = $properties.productType
+                Status            = $properties.status
+                PurchaseDate      = $properties.purchaseDate
+                TermStartDate     = $properties.termStartDate
+                TermEndDate       = $properties.termEndDate
+                AutoRenew         = $properties.autoRenew
+            }
+        }
+
+        $requestUrl = $response.nextLink
+    }
+    while ($requestUrl)
+
+    return $subscriptions | Sort-Object -Property SubscriptionName
+}
+
 function Get-AzProfiles {
     <#
     .SYNOPSIS
