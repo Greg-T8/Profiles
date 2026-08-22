@@ -53,6 +53,7 @@ Set-Alias -Name gcap -Value Get-CurrentAzProfile
 Set-Alias -Name gcgp -Value Get-CurrentMgProfile
 Set-Alias -Name uas -Value Use-AzProfileSubscription
 Set-Alias -Name gbs -Value Get-BillingSubscriptions
+Set-Alias -Name td -Value Get-TimeDifference
 Set-Alias -Name tf -Value terraform
 
 Remove-Item Alias:dir -ErrorAction SilentlyContinue

@@ -1,3 +1,10 @@
+# -------------------------------------------------------------------------
+# Program: functions.ps1
+# Description: Provides custom interactive PowerShell profile functions.
+# Context: Personal cross-host PowerShell profile.
+# Author: Greg Tate
+# -------------------------------------------------------------------------
+
 #region UTILITY FUNCTIONS
 
 # Reverts to the default dir function in cmd.exe
@@ -31,6 +38,59 @@ function tempcode {
 }
 
 
+# Calculates the elapsed time between two clock values with AM implied unless PM is specified.
+function Get-TimeDifference {
+    [CmdletBinding()]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory, Position = 0)]
+        [ValidateNotNullOrEmpty()]
+        [string]$Start,
+
+        [Parameter(Mandatory, Position = 1)]
+        [ValidateNotNullOrEmpty()]
+        [string]$End
+    )
+
+    # Convert the supported clock syntax into today's DateTime value.
+    $convertToTime = {
+        param(
+            [string]$Value,
+
+            [string]$ParameterName
+        )
+
+        # Reject dates, 24-hour values, and explicit AM to keep AM implicit.
+        if ($Value -notmatch '^\s*(?<Hour>0?[1-9]|1[0-2])(?::(?<Minute>[0-5][0-9]))?\s*(?<Period>pm)?\s*$') {
+            throw "$ParameterName must be H, H:mm, Hpm, or H:mmpm. AM is implicit; use pm for PM."
+        }
+
+        # Normalize the captured 12-hour value to its 24-hour equivalent.
+        $hour = [int]$matches.Hour
+        $minute = if ($matches.Minute) { [int]$matches.Minute } else { 0 }
+        if ($matches.Period) {
+            $hour = if ($hour -eq 12) { 12 } else { $hour + 12 }
+        }
+        elseif ($hour -eq 12) {
+            $hour = 0
+        }
+
+        return [datetime]::Today.AddHours($hour).AddMinutes($minute)
+    }
+
+    # Parse both values before determining whether the interval passes midnight.
+    $startTime = & $convertToTime -Value $Start -ParameterName 'Start'
+    $endTime = & $convertToTime -Value $End -ParameterName 'End'
+
+    # Treat an earlier end time as occurring on the following day.
+    if ($endTime -lt $startTime) {
+        $endTime = $endTime.AddDays(1)
+    }
+
+    # Return a compact duration that retains total hours without wrapping at 24.
+    $duration = $endTime - $startTime
+    '{0}:{1:D2}' -f [math]::Floor($duration.TotalHours), $duration.Minutes
+}
 # Downloads and outputs the Microsoft license catalog as PowerShell objects.
 function GetMicrosoftLicenseCatalog {
     [OutputType([PSCustomObject[]])]
