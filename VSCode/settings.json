@@ -177,6 +177,8 @@
     }
   },
   "chat.viewProgressBadge.enabled": true,
+  "chat.viewSessions.orientation": "stacked",
+  "chatgpt.followUpQueueMode": "steer",
   "claudeCode.preferredLocation": "panel",
   "dashboard.displayProjectPath": true,
   "dashboard.openOnStartup": "empty workspace",
@@ -208,18 +210,18 @@
           "path": "c:\\Users\\gregt\\LocalCode\\Projects\\Terraform\\Terraform-Practice.code-workspace"
         },
         {
-          "isGitRepo": true,
+          "color": "#ABA0D9",
           "id": "alzcmuev0oltmrxf3yr1",
+          "isGitRepo": true,
           "name": "ALZ",
-          "path": "c:\\Users\\gregt\\LocalCode\\Lab\\ALZ\\ALZ.code-workspace",
-          "color": "#ABA0D9"
+          "path": "c:\\Users\\gregt\\LocalCode\\Lab\\ALZ\\ALZ.code-workspace"
         },
         {
-          "isGitRepo": true,
+          "color": "#4077ce",
           "id": "azurenamingtool2j1lswib2mshcwsg2",
+          "isGitRepo": true,
           "name": "Azure Naming Tool",
-          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\Azure_Naming_Tool\\github_action_logs\\Azure_Naming_Tool.code-workspace",
-          "color": "#4077ce"
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\Azure_Naming_Tool\\github_action_logs\\Azure_Naming_Tool.code-workspace"
         }
       ]
     },
@@ -229,11 +231,11 @@
       "id": "clientsacck9xha7mm66b5q8",
       "projects": [
         {
-          "isGitRepo": false,
+          "color": "#041C2C",
           "id": "bart6dyuv0k58mscyxp05",
+          "isGitRepo": false,
           "name": "BART",
-          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\BART\\BART.code-workspace",
-          "color": "#041C2C"
+          "path": "c:\\Users\\gregt\\LocalCode\\Clients\\BART\\BART.code-workspace"
         },
         {
           "color": "#1B51A3",
@@ -304,6 +306,13 @@
       "groupName": "Projects",
       "id": "projectshb76ydg10mmaoptep",
       "projects": [
+        {
+          "color": "#E64E03",
+          "id": "azurecostmanagementiy3x8z6rqmsr8jnjj",
+          "isGitRepo": true,
+          "name": "AzureCostManagement",
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\AzureCostManagement\\AzureCostManagement.code-workspace"
+        },
         {
           "color": "#1B127B",
           "id": "epubsplitterz34ttmscjmmt4u86l",
@@ -427,6 +436,10 @@
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
     [
+      "#E64E03",
+      "Trinidad"
+    ],
+    [
       "#4077ce",
       "Indigo"
     ],
@@ -481,10 +494,6 @@
     [
       "#3e3e4b",
       "Tuna"
-    ],
-    [
-      "#1B127B",
-      "Deep Koamaru"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
@@ -554,6 +563,7 @@
   "editor.wordWrap": "off",
   "explorer.confirmDelete": false,
   "explorer.confirmDragAndDrop": false,
+  "explorer.confirmPasteNative": false,
   "explorer.sortOrder": "default",
   "extensions.experimental.affinity": {
     "asvetliakov.vscode-neovim": 1,
@@ -577,9 +587,7 @@
   "git.openRepositoryInParentFolders": "always",
   "github.copilot.chat.agent.temperature": 0,
   "github.copilot.chat.claudeAgent.enabled": true, //Disables auto-insertion of instruction files
-  "github.copilot.chat.commitMessageGeneration.instructions": [
-
-  ],
+  "github.copilot.chat.commitMessageGeneration.instructions": [],
   "github.copilot.chat.searchSubagent.enabled": true,
   "github.copilot.editor.enableCodeActions": true,
   "github.copilot.enable": {
@@ -885,7 +893,9 @@
     "workbench.action.focusSideBar",
     "workbench.action.focusAuxiliaryBar",
     "workbench.action.increaseViewSize",
-    "workbench.action.decreaseViewSize"
+    "workbench.action.decreaseViewSize",
+    "workbench.action.quickOpenTerm",
+    "workbench.action.terminal.rename"
   ],
   "terminal.integrated.copyOnSelection": true,
   "terminal.integrated.defaultProfile.linux": "zsh",
@@ -959,6 +969,7 @@
   "terminal.integrated.tabs.hideCondition": "never",
   "terminal.integrated.tabs.showActions": "always",
   "terminal.integrated.tabs.showActiveTerminal": "always",
+  "terminal.integrated.tabs.title": "${workspaceFolder}",
   "terminal.integrated.useWslProfiles": false,
   "vscode-neovim.compositeKeys": {
     "jj": {
@@ -1038,7 +1049,7 @@
     "titleBar.activeForeground": "#d1e4ff",
     "titleBar.inactiveBackground": "#142a47"
   },
-  "workbench.colorTheme": "Dark 2026",
+  "workbench.colorTheme": "GitHub Dark",
   "workbench.editor.enablePreview": true,
   "workbench.editor.enablePreviewFromQuickOpen": true,
   "workbench.editor.highlightModifiedTabs": true,
@@ -1052,9 +1063,10 @@
   "workbench.editorAssociations": {
     "*.svg": "hediet.vscode-drawio-text"
   },
-  "workbench.iconTheme": "vs-seti",
+  "workbench.iconTheme": "material-icon-theme",
   "workbench.panel.defaultLocation": "right",
-  "workbench.productIconTheme": "Default",
+  "workbench.productIconTheme": "fluent-icons",
+  "workbench.sash.size": 1,
   "workbench.settings.alwaysShowAdvancedSettings": true,
   "workbench.settings.applyToAllProfiles": [
     "@azure.argTenant",
@@ -1308,6 +1320,8 @@
     "workbench.settings.editor",
     "workbench.startupEditor",
     "workbench.view.showQuietly",
+    "terminal.integrated.tabs.title",
+    "workbench.sash.size"
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
@@ -1316,7 +1330,6 @@
   "workbench.view.showQuietly": {
     "workbench.panel.output": true
   },
-  "explorer.confirmPasteNative": false,
-  "chatgpt.followUpQueueMode": "steer",
-  "chat.viewSessions.orientation": "stacked"
+  "workbench.secondarySideBar.defaultVisibility": "hidden",
+  "chat.titleBar.openInAgentsWindow.enabled": false
 }

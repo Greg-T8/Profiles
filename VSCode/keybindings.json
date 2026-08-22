@@ -756,18 +756,33 @@
     "key": "alt+r",
     "command": "vscode-neovim.restart",
     "when": "editorTextFocus"
-},
-{
+  },
+  {
     "key": "shift+enter",
     "command": "workbench.action.terminal.sendSequence",
     "args": {
-        "text": "\u001b\r"
+      "text": "\u001b\r"
     },
     "when": "terminalFocus"
-},
-{
-  "key": "ctrl+shift+m",
-  "command": "-workbench.actions.view.problems",
-  "when": "workbench.panel.markers.view.active"
-}
+  },
+  {
+    "key": "ctrl+shift+m",
+    "command": "-workbench.actions.view.problems",
+    "when": "workbench.panel.markers.view.active"
+  },
+  {
+    "key": "alt+c",
+    "command": "workbench.action.terminal.new",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "alt+t",
+    "command": "workbench.action.quickOpenTerm",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "alt+r",
+    "command": "workbench.action.terminal.rename",
+    "when": "terminalFocus"
+  }
 ]
