@@ -18,7 +18,7 @@ A lightweight, portable PowerShell profile optimized for remote development envi
 Run this single command in any PowerShell session:
 
 ```powershell
-irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/bootstrap.ps1 | iex
+irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/RemoteProfile/bootstrap.ps1 | iex
 ```
 
 **What it does:**
@@ -33,14 +33,14 @@ irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/bootstrap
 
 ```powershell
 # After connecting to remote host:
-irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/bootstrap.ps1 | iex
+irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/RemoteProfile/bootstrap.ps1 | iex
 ```
 
 ### Azure Cloud Shell
 
 ```powershell
 # In Cloud Shell:
-irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/bootstrap.ps1 | iex
+irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/RemoteProfile/bootstrap.ps1 | iex
 ```
 
 ### Dev Container / Codespace
@@ -49,21 +49,21 @@ Add to your `.devcontainer/devcontainer.json`:
 
 ```json
 {
-  "postCreateCommand": "pwsh -Command 'irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/bootstrap.ps1 | iex'"
+  "postCreateCommand": "pwsh -Command 'irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/RemoteProfile/bootstrap.ps1 | iex'"
 }
 ```
 
 Or in a Dockerfile:
 
 ```dockerfile
-RUN pwsh -Command "irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/bootstrap.ps1 | iex"
+RUN pwsh -Command "irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/RemoteProfile/bootstrap.ps1 | iex"
 ```
 
 ### Windows Sandbox / Test VM
 
 ```powershell
 # First-time setup in new environment:
-irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/bootstrap.ps1 | iex
+irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/RemoteProfile/bootstrap.ps1 | iex
 ```
 
 ## 📦 What Gets Installed
@@ -72,12 +72,52 @@ The installer copies these files to your system:
 
 | File | Description |
 |------|-------------|
-| `profile.ps1` | Main profile configuration (remote-optimized, no OneDrive dependencies) |
+| `profile.ps1` | Root profile configuration, aliases, PSReadLine settings, and prompt |
 | `functions.ps1` | Custom PowerShell functions for productivity |
-| `prompt.ps1` | Custom prompt with git integration and path shortening |
-| `PSScriptAnalyzerSettings.psd1` | Code analysis settings |
+| `Modules/MSCloudProfile/MSCloudProfile.psd1` | Module manifest and public command contract |
+| `Modules/MSCloudProfile/MSCloudProfile.psm1` | Deterministic module loader and public export boundary |
+| `Modules/MSCloudProfile/Public/*.ps1` | One file per exported Az, Graph, or Entra profile command |
+| `Modules/MSCloudProfile/Private/*.ps1` | Themed configuration, context, and profile-cache helper groups |
 
 **Installation Location:** `$HOME\Documents\PowerShell\`
+
+### Repository Layout
+
+```text
+PowerShell/
+├── profile.ps1
+├── functions.ps1
+├── Modules/
+│   └── MSCloudProfile/
+│       ├── MSCloudProfile.psd1
+│       └── MSCloudProfile.psm1
+│       ├── Public/
+│       │   ├── Get-AzProfiles.ps1
+│       │   ├── Get-CurrentAzProfile.ps1
+│       │   ├── Use-AzProfile.ps1
+│       │   ├── Use-AzProfileSubscription.ps1
+│       │   ├── New-AzProfile.ps1
+│       │   ├── Remove-AzProfile.ps1
+│       │   ├── Get-MgProfiles.ps1
+│       │   ├── Get-CurrentMgProfile.ps1
+│       │   ├── Use-MgProfile.ps1
+│       │   ├── New-MgProfile.ps1
+│       │   └── Remove-MgProfile.ps1
+│       └── Private/
+│           ├── ProfileConfiguration.ps1
+│           ├── AzModuleContext.ps1
+│           ├── MgProfileStore.ps1
+│           └── MgModuleContext.ps1
+├── RemoteProfile/
+│   ├── bootstrap.ps1
+│   └── Install-RemoteProfile.ps1
+├── Maintenance/
+└── PSScriptAnalyzerSettings.psd1
+```
+
+`profile.ps1` remains the root entrypoint. PowerShell 7 dot-sources
+`functions.ps1`, loads personal and work configuration when available, and then
+imports the `MSCloudProfile` manifest by its relative path.
 
 ### Profile Features
 
@@ -93,6 +133,11 @@ The installer copies these files to your system:
 - `cfj` → `ConvertFrom-Json`
 - `tf` → `terraform`
 - `gim` → `Get-InstalledModule`
+- `uap` → `Use-AzProfile`
+- `ugp` → `Use-MgProfile`
+- `gcap` → `Get-CurrentAzProfile`
+- `gcgp` → `Get-CurrentMgProfile`
+- `uas` → `Use-AzProfileSubscription`
 
 **Custom Functions Include:**
 - `Get-ClipboardExcel` - Convert Excel clipboard data to objects
@@ -100,7 +145,9 @@ The installer copies these files to your system:
 - `Update-AllInstalledModules` - Update all PowerShell modules
 - `Remove-OldModuleVersions` - Clean up old module versions
 - `Measure-ProfileLoad` - Analyze profile loading performance
-- And many more! (See `functions.ps1` for full list)
+- `Get-AzProfiles` - List configured and discovered Azure profiles
+- `Get-MgProfiles` - List configured and cached Microsoft Graph profiles
+- And many more! (See `functions.ps1` and `Modules/MSCloudProfile` for the full list.)
 
 ## ⚙️ Advanced Installation Options
 
@@ -108,7 +155,7 @@ For more control, download the installer manually:
 
 ```powershell
 # Download installer
-irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/Install-RemoteProfile.ps1 -OutFile install.ps1
+irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/RemoteProfile/Install-RemoteProfile.ps1 -OutFile install.ps1
 
 # Custom install path:
 .\install.ps1 -InstallPath "C:\CustomPath"
@@ -130,7 +177,7 @@ irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/Install-R
 Simply re-run the installer:
 
 ```powershell
-irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/bootstrap.ps1 | iex
+irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/RemoteProfile/bootstrap.ps1 | iex
 ```
 
 The installer will:

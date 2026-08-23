@@ -17,7 +17,25 @@
     2. Download individual files directly from GitHub (fallback method)
 
     Files installed:
-    - profile.ps1  (main profile script containing all customizations)
+    - profile.ps1
+    - functions.ps1
+    - Modules/MSCloudProfile/MSCloudProfile.psd1
+    - Modules/MSCloudProfile/MSCloudProfile.psm1
+    - Modules/MSCloudProfile/Public/Get-AzProfiles.ps1
+    - Modules/MSCloudProfile/Public/Get-CurrentAzProfile.ps1
+    - Modules/MSCloudProfile/Public/Use-AzProfile.ps1
+    - Modules/MSCloudProfile/Public/Use-AzProfileSubscription.ps1
+    - Modules/MSCloudProfile/Public/New-AzProfile.ps1
+    - Modules/MSCloudProfile/Public/Remove-AzProfile.ps1
+    - Modules/MSCloudProfile/Public/Get-MgProfiles.ps1
+    - Modules/MSCloudProfile/Public/Get-CurrentMgProfile.ps1
+    - Modules/MSCloudProfile/Public/Use-MgProfile.ps1
+    - Modules/MSCloudProfile/Public/New-MgProfile.ps1
+    - Modules/MSCloudProfile/Public/Remove-MgProfile.ps1
+    - Modules/MSCloudProfile/Private/ProfileConfiguration.ps1
+    - Modules/MSCloudProfile/Private/AzModuleContext.ps1
+    - Modules/MSCloudProfile/Private/MgProfileStore.ps1
+    - Modules/MSCloudProfile/Private/MgModuleContext.ps1
 
 .PARAMETER GitHubRepo
     The GitHub repository in the format 'owner/repo'. Defaults to 'Greg-T8/Profiles'.
@@ -85,6 +103,7 @@ $Helpers = {
     $script:onWindows = $null
     $script:isAdmin = $null
     $script:windowsPowerShellPath = $null
+    $script:gitAvailable = $null
 
     function Initialize-PlatformDetection {
         # Detect if running on Windows
@@ -97,6 +116,9 @@ $Helpers = {
         else {
             $script:onWindows = $true
         }
+
+        # Detect Git once so the requested installation method can be selected consistently.
+        $script:gitAvailable = $null -ne (Get-Command -Name git -ErrorAction SilentlyContinue)
 
         # Check if running as administrator
         $script:isAdmin = $false
@@ -239,8 +261,89 @@ $Helpers = {
     }
 
     function Install-ProfileFile {
-        # Install profile files using direct download
-        Install-ProfileWithDownload
+        # Select Git by default when available unless raw download was explicitly requested.
+        if ($script:gitAvailable -and -not $UseRawDownload) {
+            Install-ProfileWithGit
+        }
+        else {
+            Install-ProfileWithDownload
+        }
+    }
+
+    function Get-ProfilePayload {
+        # Return the complete relative file set required by profile.ps1 at runtime.
+        @(
+            'profile.ps1'
+            'functions.ps1'
+            'Modules/MSCloudProfile/MSCloudProfile.psd1'
+            'Modules/MSCloudProfile/MSCloudProfile.psm1'
+            'Modules/MSCloudProfile/Public/Get-AzProfiles.ps1'
+            'Modules/MSCloudProfile/Public/Get-CurrentAzProfile.ps1'
+            'Modules/MSCloudProfile/Public/Use-AzProfile.ps1'
+            'Modules/MSCloudProfile/Public/Use-AzProfileSubscription.ps1'
+            'Modules/MSCloudProfile/Public/New-AzProfile.ps1'
+            'Modules/MSCloudProfile/Public/Remove-AzProfile.ps1'
+            'Modules/MSCloudProfile/Public/Get-MgProfiles.ps1'
+            'Modules/MSCloudProfile/Public/Get-CurrentMgProfile.ps1'
+            'Modules/MSCloudProfile/Public/Use-MgProfile.ps1'
+            'Modules/MSCloudProfile/Public/New-MgProfile.ps1'
+            'Modules/MSCloudProfile/Public/Remove-MgProfile.ps1'
+            'Modules/MSCloudProfile/Private/ProfileConfiguration.ps1'
+            'Modules/MSCloudProfile/Private/AzModuleContext.ps1'
+            'Modules/MSCloudProfile/Private/MgProfileStore.ps1'
+            'Modules/MSCloudProfile/Private/MgModuleContext.ps1'
+        )
+    }
+
+    function Copy-ProfilePayload {
+        # Copy a previously verified profile payload into one PowerShell profile directory.
+        [CmdletBinding()]
+        param(
+            [Parameter(Mandatory)]
+            [string]$SourceRoot,
+
+            [Parameter(Mandatory)]
+            [string]$DestinationRoot
+        )
+
+        $payload = Get-ProfilePayload
+        $missingFile = @(
+            foreach ($relativePath in $payload) {
+                $sourcePath = Join-Path $SourceRoot $relativePath
+                if (-not (Test-Path -LiteralPath $sourcePath -PathType Leaf)) {
+                    $sourcePath
+                }
+            }
+        )
+
+        # Refuse partial installation when any required source file is missing.
+        if ($missingFile.Count -gt 0) {
+            throw "Required profile payload is incomplete: $($missingFile -join ', ')"
+        }
+
+        # Recreate the payload's relative directory structure at the destination.
+        foreach ($relativePath in $payload) {
+            $sourcePath = Join-Path $SourceRoot $relativePath
+            $destinationPath = Join-Path $DestinationRoot $relativePath
+            $destinationParent = Split-Path -Parent $destinationPath
+
+            if (-not (Test-Path -LiteralPath $destinationParent)) {
+                New-Item -ItemType Directory -Path $destinationParent -Force | Out-Null
+            }
+
+            $resolvedSource = (Resolve-Path -LiteralPath $sourcePath).Path
+            $resolvedDestination = if (Test-Path -LiteralPath $destinationPath) {
+                (Resolve-Path -LiteralPath $destinationPath).Path
+            }
+            else {
+                $destinationPath
+            }
+
+            # Avoid copying a file over itself when the installation and active profile roots match.
+            if ($resolvedSource -ne $resolvedDestination) {
+                Copy-Item -LiteralPath $sourcePath -Destination $destinationPath -Force
+            }
+        }
     }
 
     function Install-ProfileWithGit {
@@ -271,36 +374,28 @@ $Helpers = {
             Write-Host "[OK] Repository cloned`n" -ForegroundColor Green
         }
 
-        $sourceFile = Join-Path $tempRepoPath "PowerShell\profile.ps1"
+        $sourceRoot = Join-Path $tempRepoPath 'PowerShell'
 
-        # Verify source file exists
-        if (-not (Test-Path $sourceFile)) {
-            Write-Warning "Source file not found: $sourceFile"
-            return
-        }
-
-        # Copy to PowerShell Core directory if it exists
+        # Copy the complete payload to the PowerShell Core directory when available.
         if (Test-Path $InstallPath) {
             Write-Host "Installing to PowerShell Core directory..." -ForegroundColor Cyan
-            $destPath = Join-Path $InstallPath "profile.ps1"
-            Copy-Item -Path $sourceFile -Destination $destPath -Force
-            Write-Host "  [OK] Installed profile.ps1" -ForegroundColor Green
+            Copy-ProfilePayload -SourceRoot $sourceRoot -DestinationRoot $InstallPath
+            Write-Host "  [OK] Installed profile payload" -ForegroundColor Green
         }
 
-        # Copy to Windows PowerShell directory (Windows only)
+        # Copy the complete payload to the Windows PowerShell directory on Windows.
         if ($script:onWindows -and $script:windowsPowerShellPath) {
             if (-not (Test-Path $script:windowsPowerShellPath)) {
                 New-Item -ItemType Directory -Path $script:windowsPowerShellPath -Force | Out-Null
             }
             Write-Host "`nInstalling to Windows PowerShell directory..." -ForegroundColor Cyan
-            $destPath = Join-Path $script:windowsPowerShellPath "profile.ps1"
-            Copy-Item -Path $sourceFile -Destination $destPath -Force
-            Write-Host "  [OK] Installed profile.ps1" -ForegroundColor Green
+            Copy-ProfilePayload -SourceRoot $sourceRoot -DestinationRoot $script:windowsPowerShellPath
+            Write-Host "  [OK] Installed profile payload" -ForegroundColor Green
         }
     }
 
     function Install-ProfileWithDownload {
-        # Download files directly from GitHub
+        # Download the complete profile payload into an isolated staging directory.
         if (-not $script:gitAvailable) {
             Write-Host "Git not detected. Using direct download method..." -ForegroundColor Yellow
         }
@@ -308,38 +403,47 @@ $Helpers = {
             Write-Host "Using direct download method..." -ForegroundColor Yellow
         }
 
-        $url = "https://raw.githubusercontent.com/$GitHubRepo/$Branch/PowerShell/profile.ps1"
+        $baseUrl = "https://raw.githubusercontent.com/$GitHubRepo/$Branch/PowerShell"
+        $stagingRoot = Join-Path `
+            -Path ([System.IO.Path]::GetTempPath()) `
+            -ChildPath "PowerShellProfile-$([guid]::NewGuid())"
 
-        # Download to PowerShell Core directory if it exists
-        if (Test-Path $InstallPath) {
-            Write-Host "Downloading to PowerShell Core directory..." -ForegroundColor Cyan
-            $destPath = Join-Path $InstallPath "profile.ps1"
+        try {
+            # Download every required file before changing either destination.
+            foreach ($relativePath in Get-ProfilePayload) {
+                $stagingPath = Join-Path $stagingRoot $relativePath
+                $stagingParent = Split-Path -Parent $stagingPath
+                if (-not (Test-Path -LiteralPath $stagingParent)) {
+                    New-Item -ItemType Directory -Path $stagingParent -Force | Out-Null
+                }
 
-            try {
-                Write-Host "  Downloading profile.ps1..." -ForegroundColor Yellow
-                Invoke-WebRequest -Uri $url -OutFile $destPath -UseBasicParsing
-                Write-Host "  [OK] Downloaded profile.ps1" -ForegroundColor Green
+                $urlPath = $relativePath.Replace('\', '/')
+                Write-Host "  Downloading $relativePath..." -ForegroundColor Yellow
+                Invoke-WebRequest `
+                    -Uri "$baseUrl/$urlPath" `
+                    -OutFile $stagingPath `
+                    -UseBasicParsing
             }
-            catch {
-                Write-Warning "Failed to download profile.ps1: $_"
+
+            # Install the verified staging payload into each applicable PowerShell directory.
+            if (Test-Path $InstallPath) {
+                Write-Host "Installing to PowerShell Core directory..." -ForegroundColor Cyan
+                Copy-ProfilePayload -SourceRoot $stagingRoot -DestinationRoot $InstallPath
+                Write-Host "  [OK] Installed profile payload" -ForegroundColor Green
             }
+
+            if ($script:onWindows -and $script:windowsPowerShellPath) {
+                Write-Host "`nInstalling to Windows PowerShell directory..." -ForegroundColor Cyan
+                Copy-ProfilePayload -SourceRoot $stagingRoot -DestinationRoot $script:windowsPowerShellPath
+                Write-Host "  [OK] Installed profile payload" -ForegroundColor Green
+            }
+
+            Write-Host "  [OK] Downloaded complete profile payload" -ForegroundColor Green
         }
-
-        # Download to Windows PowerShell directory (Windows only)
-        if ($script:onWindows -and $script:windowsPowerShellPath) {
-            if (-not (Test-Path $script:windowsPowerShellPath)) {
-                New-Item -ItemType Directory -Path $script:windowsPowerShellPath -Force | Out-Null
-            }
-            Write-Host "`nDownloading to Windows PowerShell directory..." -ForegroundColor Cyan
-            $destPath = Join-Path $script:windowsPowerShellPath "profile.ps1"
-
-            try {
-                Write-Host "  Downloading profile.ps1..." -ForegroundColor Yellow
-                Invoke-WebRequest -Uri $url -OutFile $destPath -UseBasicParsing
-                Write-Host "  [OK] Downloaded profile.ps1" -ForegroundColor Green
-            }
-            catch {
-                Write-Warning "Failed to download profile.ps1: $_"
+        finally {
+            # Remove the isolated staging directory after success or failure.
+            if (Test-Path -LiteralPath $stagingRoot) {
+                Remove-Item -LiteralPath $stagingRoot -Recurse -Force
             }
         }
     }
@@ -436,69 +540,61 @@ if ($psReadLine) {
     }
 
     function Update-ProfileScript {
-        # Copy profile from installation directory to the actual profile location if needed
+        # Copy the installed payload into each active PowerShell profile directory.
         Write-Host "`nConfiguring PowerShell profiles..." -ForegroundColor Cyan
 
         $profilePaths = @()
 
-        # Always add current PowerShell profile
-        $profilePaths += @{
-            Path        = $PROFILE.CurrentUserAllHosts
-            Name        = if ($PSVersionTable.PSVersion.Major -ge 6) { "PowerShell Core" } else { "Windows PowerShell" }
-            SourcePath  = Join-Path $InstallPath 'profile.ps1'
+        # Select the source matching the edition that is running the installer.
+        $currentSourceRoot = if ($PSVersionTable.PSVersion.Major -ge 6) {
+            $InstallPath
+        }
+        else {
+            $script:windowsPowerShellPath
         }
 
-        # If on Windows and running PowerShell Core, also configure Windows PowerShell
+        # Always configure the current edition's all-hosts profile directory.
+        $profilePaths += @{
+            DestinationRoot = Split-Path -Parent $PROFILE.CurrentUserAllHosts
+            Name            = if ($PSVersionTable.PSVersion.Major -ge 6) { 'PowerShell Core' } else { 'Windows PowerShell' }
+            SourceRoot      = $currentSourceRoot
+        }
+
+        # When running PowerShell Core on Windows, configure Windows PowerShell as well.
         if ($script:onWindows -and $PSVersionTable.PSVersion.Major -ge 6 -and $script:windowsPowerShellPath) {
             $windowsPowerShellProfilePath = Join-Path ([Environment]::GetFolderPath('MyDocuments')) 'WindowsPowerShell\profile.ps1'
-            $windowsPSSourcePath = Join-Path $script:windowsPowerShellPath 'profile.ps1'
             $profilePaths += @{
-                Path        = $windowsPowerShellProfilePath
-                Name        = "Windows PowerShell"
-                SourcePath  = $windowsPSSourcePath
+                DestinationRoot = Split-Path -Parent $windowsPowerShellProfilePath
+                Name            = 'Windows PowerShell'
+                SourceRoot      = $script:windowsPowerShellPath
             }
         }
 
-        # Copy profile files to their final locations
+        # Copy the complete payload so profile.ps1 always has its local dependencies.
         foreach ($profileInfo in $profilePaths) {
-            $profilePath = $profileInfo.Path
             $profileName = $profileInfo.Name
-            $sourceProfilePath = $profileInfo.SourcePath
+            $sourceRoot = $profileInfo.SourceRoot
+            $destinationRoot = $profileInfo.DestinationRoot
 
-            # Resolve to absolute paths for comparison
-            $resolvedSource = if (Test-Path $sourceProfilePath) {
-                (Resolve-Path $sourceProfilePath).Path
-            } else {
-                $sourceProfilePath
-            }
-            $resolvedDest = if (Test-Path $profilePath) {
-                (Resolve-Path $profilePath).Path
-            } else {
-                $profilePath
-            }
-
-            # Skip if source and destination are the same file
-            if ($resolvedSource -eq $resolvedDest) {
-                Write-Host "  $profileName profile already in place at: $profilePath" -ForegroundColor Green
+            if (-not (Test-Path -LiteralPath $sourceRoot)) {
+                Write-Host "  [WARNING] Source profile directory not found at: $sourceRoot" -ForegroundColor Yellow
                 continue
             }
 
-            # Copy the profile.ps1 to the profile location
-            if (Test-Path $sourceProfilePath) {
-                Write-Host "  Updating $profileName profile: $profilePath" -ForegroundColor Yellow
-
-                # Ensure parent directory exists
-                $profileDir = Split-Path -Parent $profilePath
-                if (-not (Test-Path $profileDir)) {
-                    New-Item -ItemType Directory -Path $profileDir -Force | Out-Null
-                }
-
-                Copy-Item -Path $sourceProfilePath -Destination $profilePath -Force
-                Write-Host "  [OK] $profileName profile updated" -ForegroundColor Green
+            if (-not (Test-Path -LiteralPath $destinationRoot)) {
+                New-Item -ItemType Directory -Path $destinationRoot -Force | Out-Null
             }
-            else {
-                Write-Host "  [WARNING] Source profile not found at: $sourceProfilePath" -ForegroundColor Yellow
+
+            $resolvedSource = (Resolve-Path -LiteralPath $sourceRoot).Path
+            $resolvedDestination = (Resolve-Path -LiteralPath $destinationRoot).Path
+            if ($resolvedSource -eq $resolvedDestination) {
+                Write-Host "  $profileName profile payload already in place at: $destinationRoot" -ForegroundColor Green
+                continue
             }
+
+            Write-Host "  Updating $profileName profile payload: $destinationRoot" -ForegroundColor Yellow
+            Copy-ProfilePayload -SourceRoot $sourceRoot -DestinationRoot $destinationRoot
+            Write-Host "  [OK] $profileName profile payload updated" -ForegroundColor Green
         }
     }
 
@@ -552,7 +648,9 @@ if ($psReadLine) {
         # Display completion message
         Write-Host "`n=== Installation Complete ===" -ForegroundColor Cyan
         Write-Host "`nInstalled file:" -ForegroundColor Gray
-        Write-Host "  - profile.ps1 (main profile script with all customizations)" -ForegroundColor Gray
+        Write-Host "  - profile.ps1 (root profile entrypoint)" -ForegroundColor Gray
+        Write-Host "  - functions.ps1 (PowerShell 7 productivity commands)" -ForegroundColor Gray
+        Write-Host "  - Modules/MSCloudProfile (Az, Graph, and Entra profile management)" -ForegroundColor Gray
         Write-Host ""
     }
 }

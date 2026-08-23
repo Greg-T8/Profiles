@@ -59,274 +59,13 @@ Set-Alias -Name tf -Value terraform
 Remove-Item Alias:dir -ErrorAction SilentlyContinue
 
 # Git aliases
-function Set-GitRepoRoot { Set-Location (git rev-parse --show-toplevel) }
-function Show-GhFailedRunLog {
-	param(
-		[Alias('R')]
-		[string]$Repository
-	)
-
-	[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
-	$OutputEncoding = [Console]::OutputEncoding
-
-	[System.Text.Encoding]::RegisterProvider(
-		[System.Text.CodePagesEncodingProvider]::Instance
-	)
-
-	$cp437 = [System.Text.Encoding]::GetEncoding(437)
-	$utf8  = [System.Text.UTF8Encoding]::new($false)
-
-	$ansiPattern = '(?:\x1B\[[0-?]*[ -/]*[@-~]|\^\[\[[0-?]*[ -/]*[@-~])'
-	$githubPrefix = '^.*?\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z\s*'
-
-	# Use an explicit repository when the current location is outside a Git worktree.
-	$repositoryArgument = if ($Repository) { @('--repo', $Repository) } else { @() }
-
-	$runId = gh run list `
-		@repositoryArgument `
-		--status failure `
-		--limit 1 `
-		--json databaseId `
-		--jq '.[0].databaseId'
-
-	gh run view $runId @repositoryArgument --log-failed |
-		ForEach-Object {
-			$line = $_ -replace $ansiPattern, ''
-			$line = $line -replace $githubPrefix, ''
-
-			# Repair UTF-8 text that was incorrectly decoded as CP437.
-			if ($line -match 'Γ(?:ö|ò)') {
-				$line = $utf8.GetString($cp437.GetBytes($line))
-			}
-
-			# Optional: remove Terraform box-drawing characters completely.
-			$line = $line -replace '[\u2500-\u257F]', ''
-
-			$line.TrimEnd()
-		} |
-		Select-String `
-			-Pattern 'Error:|Planning failed|Process completed with exit code' `
-			-Context 5, 15 |
-		ForEach-Object {
-			# Output plain strings instead of Select-String's > indicators.
-			$_.Context.PreContext
-			$_.Line
-			$_.Context.PostContext
-		}
-}
 Set-Alias -Name sgr -Value Set-GitRepoRoot
 Set-Alias -Name ghel -Value Show-GhFailedRunLog
 
-# Display failed task logs from the latest failed Azure DevOps pipeline run.
-function Show-AdoFailedRunLog {
-	[CmdletBinding()]
-	param(
-		[Parameter(Mandatory)]
-		[Alias('O')]
-		[string]$Organization,
-
-		[Parameter(Mandatory)]
-		[Alias('P')]
-		[string]$Project,
-
-		[Alias('D')]
-		[int]$PipelineId,
-
-		[switch]$FullLog
-	)
-
-	# Confirm the Azure CLI is available before invoking Azure DevOps commands.
-	if (-not (Get-Command -Name az -ErrorAction SilentlyContinue)) {
-		throw 'Azure CLI is required. Install it from https://aka.ms/installazurecliwindows.'
-	}
-
-	# Normalize a short organization name into the Azure DevOps Services URL expected by the CLI.
-	$organizationUrl = $Organization.TrimEnd('/')
-	if ($organizationUrl -notmatch '^https?://') {
-		$organizationUrl = "https://dev.azure.com/$organizationUrl"
-	}
-
-	# Restrict the run query to one pipeline only when the caller supplies its ID.
-	$pipelineArgument = @()
-	if ($PipelineId) {
-		$pipelineArgument = @('--pipeline-ids', $PipelineId)
-	}
-
-	# Retrieve the most recent failed pipeline run.
-	$runOutput = az pipelines runs list `
-		--organization $organizationUrl `
-		--project $Project `
-		@pipelineArgument `
-		--status completed `
-		--result failed `
-		--top 1 `
-		--query '[0]' `
-		--output json
-	if ($LASTEXITCODE -ne 0) {
-		throw 'Unable to retrieve Azure DevOps pipeline runs.'
-	}
-
-	# Stop cleanly when the filtered run query returned no results.
-	if ([string]::IsNullOrWhiteSpace(($runOutput -join [Environment]::NewLine)) -or
-		($runOutput -join [Environment]::NewLine) -eq 'null') {
-		Write-Warning 'No failed Azure DevOps pipeline runs were found.'
-		return
-	}
-
-	# Retrieve timeline records so only failed task logs are requested.
-	$run = $runOutput | ConvertFrom-Json
-	$timelineOutput = az devops invoke `
-		--area build `
-		--resource timeline `
-		--route-parameters "project=$Project" "buildId=$($run.id)" `
-		--organization $organizationUrl `
-		--api-version 7.1 `
-		--output json
-	if ($LASTEXITCODE -ne 0) {
-		throw "Unable to retrieve the timeline for Azure DevOps run $($run.id)."
-	}
-
-	# Select failed timeline records that reference an individual task log.
-	$timeline = $timelineOutput | ConvertFrom-Json
-	$failedRecord = @(
-		$timeline.records |
-			Where-Object { $_.result -eq 'failed' -and $_.log.id }
-	)
-	if (-not $failedRecord) {
-		Write-Warning "Run $($run.id) failed, but Azure DevOps did not return a failed task log."
-		return
-	}
-
-	# Retrieve and display the logs for every failed task.
-	foreach ($record in $failedRecord) {
-		Write-Host "`n--- Failed task: $($record.name) ---" -ForegroundColor Red
-
-		# Request plain-text content for the failed task's individual build log.
-		# Azure CLI requires a file destination for this plain-text REST response.
-		$logPath = Join-Path `
-			-Path ([System.IO.Path]::GetTempPath()) `
-			-ChildPath "ado-run-$($run.id)-log-$($record.log.id)-$([guid]::NewGuid()).log"
-		try {
-			# Write the failed task log to a unique temporary file.
-			$null = az devops invoke `
-				--area build `
-				--resource logs `
-				--route-parameters "project=$Project" "buildId=$($run.id)" "logId=$($record.log.id)" `
-				--organization $organizationUrl `
-				--api-version 7.1 `
-				--accept-media-type text/plain `
-				--out-file $logPath
-
-			# Skip a task when its log cannot be retrieved and continue with the next failed task.
-			if ($LASTEXITCODE -ne 0) {
-				Write-Warning "Unable to retrieve log $($record.log.id) for task '$($record.name)'."
-				continue
-			}
-
-			# Read the downloaded task log before removing its temporary file.
-			$logOutput = Get-Content -LiteralPath $logPath
-		}
-		finally {
-			# Remove the uniquely named temporary log file after every retrieval attempt.
-			if (Test-Path -LiteralPath $logPath) {
-				Remove-Item -LiteralPath $logPath -Force
-			}
-		}
-
-		# Strip terminal color codes that may be present in task output.
-		$cleanLog = @(
-			$logOutput |
-				ForEach-Object { $_ -replace '\x1B\[[0-?]*[ -/]*[@-~]', '' }
-		)
-
-		# Remove Azure Pipelines UTC timestamps from the beginning of each log line.
-		$cleanLog = @(
-			$cleanLog |
-				ForEach-Object {
-					$_ -replace '^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z\s*', ''
-				}
-		)
-
-		# Remove Terraform box-drawing glyphs and their incorrectly decoded equivalents.
-		$cleanLog = @(
-			$cleanLog |
-				ForEach-Object {
-					$_ -replace 'Γ(?:ò╖|öé|ò╡)\s?', '' -replace '[\u2500-\u257F]', ''
-				}
-		)
-		if ($FullLog) {
-			$cleanLog
-			continue
-		}
-
-		# Highlight error context, while retaining the full log when no known marker exists.
-		$failureContext = $cleanLog |
-			Select-String `
-				-Pattern '##\[error\]|##vso\[task\.logissue type=error|^ERROR:|Error:|Planning failed|Process completed with exit code' `
-				-Context 5, 15
-		if ($failureContext) {
-			$failureContext |
-				ForEach-Object {
-					$_.Context.PreContext
-					$_.Line
-					$_.Context.PostContext
-				}
-		}
-		else {
-			$cleanLog
-		}
-
-		# Prevent the legacy direct-stream attempt below from running for this task.
-		continue
-		$logOutput = az devops invoke `
-			--area build `
-			--resource logs `
-			--route-parameters "project=$Project" "buildId=$($run.id)" "logId=$($record.log.id)" `
-			--organization $organizationUrl `
-			--api-version 7.1 `
-			--accept-media-type text/plain `
-			--output tsv
-		if ($LASTEXITCODE -ne 0) {
-			Write-Warning "Unable to retrieve log $($record.log.id) for task '$($record.name)'."
-			continue
-		}
-
-		# Strip terminal color codes that may be present in task output.
-		$cleanLog = @(
-			$logOutput |
-				ForEach-Object { $_ -replace '\x1B\[[0-?]*[ -/]*[@-~]', '' }
-		)
-		if ($FullLog) {
-			$cleanLog
-			continue
-		}
-
-		# Highlight error context, while retaining the full log when no known marker exists.
-		$failureContext = $cleanLog |
-			Select-String `
-				-Pattern '##\[error\]|##vso\[task\.logissue type=error|^ERROR:|Error:|Planning failed|Process completed with exit code' `
-				-Context 5, 15
-		if ($failureContext) {
-			$failureContext |
-				ForEach-Object {
-					$_.Context.PreContext
-					$_.Line
-					$_.Context.PostContext
-				}
-		}
-		else {
-			$cleanLog
-		}
-	}
-}
+# Azure DevOps aliases
 Set-Alias -Name adel -Value Show-AdoFailedRunLog
 
 # Docker aliases
-function DockerExec { docker exec -it @args }
-function DockerImageList { docker image ls -a --no-trunc @args }
-function DockerContainerList { docker container ls -a --no-trunc @args }
-function RegCtlCmd { docker run --rm regclient/regctl @args }
-
 Set-Alias -Name dex -Value DockerExec
 Set-Alias -Name dil -Value DockerImageList
 Set-Alias -Name dcl -Value DockerContainerList
@@ -342,7 +81,7 @@ $PSDefaultParameterValues['Use-AzProfile:Name'] = 'Lab'
 #region PROMPT FUNCTION
 # Two-line prompt with box-drawing characters
 # Format:
-#   ╭─( ~/path/to/directory [git-status]
+#   ╭─( [az:Lab] [mg:Lab] (venv) ~/path/to/directory [git-status]
 #   ╰╴>
 function prompt {
 	if (-not $script:PoshGitLoaded -and $PSVersionTable.PSEdition -eq 'Core' -and (Test-GitDirectory)) {
@@ -355,6 +94,20 @@ function prompt {
 	if ($PSVersionTable.PSEdition -eq 'Core') {
 		# PowerShell Core with ANSI escape codes
 		$ESC = [char]0x1b                                            # ESC character for ANSI sequences
+		$azProfilePromptText = Get-AzProfilePromptText
+		$mgProfilePromptText = Get-MgProfilePromptText
+		$azProfilePromptStyledText = if ([string]::IsNullOrWhiteSpace($azProfilePromptText)) {
+			''
+		}
+		else {
+			"$ESC[38;2;0;120;212m$azProfilePromptText$ESC[38;2;0;179;226m"
+		}
+		$mgProfilePromptStyledText = if ([string]::IsNullOrWhiteSpace($mgProfilePromptText)) {
+			''
+		}
+		else {
+			"$ESC[38;2;76;220;100m$mgProfilePromptText$ESC[38;2;0;179;226m"
+		}
 		$pythonVenvPromptStyledText = if ([string]::IsNullOrWhiteSpace($pythonVenvPromptText)) {
 			''
 		}
@@ -366,7 +119,7 @@ function prompt {
 		'╭─( ' +                                                     # Box drawing characters and opening parenthesis
 		"$ESC[3m" +                                                  # Start italic mode
 		"$ESC[2m" +                                                  # Start dim/faint mode
-		"$pythonVenvPromptStyledText$(Get-MyPromptPath)" +           # Display optional Python env label and shortened path
+		"$azProfilePromptStyledText$mgProfilePromptStyledText$pythonVenvPromptStyledText$(Get-MyPromptPath)" + # Display optional context labels and shortened path
 		"$ESC[22m" +                                                 # Reset dim/faint mode
 		"$(if ($script:PoshGitLoaded) { "$(Get-GitPromptStatusText)" })" +   # Git status if in git repo
 		"$ESC[23m" +                                                 # Reset italic mode
@@ -401,7 +154,7 @@ $profileDir = if (Test-Path -Path "$env:OneDriveConsumer/Apps/Profiles/PowerShel
 }
 else {
 	# Fall back to the directory containing the profile script
-	Split-Path -Parent $PROFILE.CurrentUserAllHosts
+	Split-Path -Parent $script:ProfilePath
 }
 
 # Load custom functions
@@ -425,6 +178,18 @@ if (Test-Path -Path $personalConfigPath) {
 $workConfigPath = "$env:OneDriveCommercial/Code/PowerShell/Config/WorkConfig.psd1"
 if (Test-Path -Path $workConfigPath) {
 	$Work = Import-PowerShellDataFile -Path $workConfigPath
+}
+
+# Import Microsoft cloud profile management after configuration data is available.
+$msCloudProfileManifest = Join-Path $profileDir 'Modules/MSCloudProfile/MSCloudProfile.psd1'
+if ($PSVersionTable.PSEdition -eq 'Core' -and (Test-Path -Path $msCloudProfileManifest)) {
+	try {
+		Import-Module -Name $msCloudProfileManifest -Force -ErrorAction Stop
+	}
+	catch {
+		Write-Host "ERROR loading MSCloudProfile: $_" -ForegroundColor Red
+		Write-Host "Error details: $($_.Exception.Message)" -ForegroundColor Red
+	}
 }
 
 #endregion
@@ -531,6 +296,65 @@ if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
 #endregion
 
 #region PROMPT HELPER FUNCTIONS
+
+function Get-AzProfilePromptText {
+	# Resolve the active named Azure CLI profile without invoking Azure commands.
+	$configDir = $env:AZURE_CONFIG_DIR
+	if ([string]::IsNullOrWhiteSpace($configDir)) {
+		return ''
+	}
+
+	try {
+		# Accept native or alternate directory separators and ignore a trailing separator.
+		$trimCharacters = [char[]]@('\', '/')
+		$trimmedConfigDir = $configDir.TrimEnd($trimCharacters)
+		$profileName = [System.IO.Path]::GetFileName($trimmedConfigDir)
+		$profileDirectory = [System.IO.Path]::GetDirectoryName($trimmedConfigDir)
+		$expectedProfileDirectory = Join-Path (Join-Path $HOME '.azure') 'profiles'
+
+		# Display only directories created for named profiles under ~/.azure/profiles.
+		if (
+			[string]::IsNullOrWhiteSpace($profileName) -or
+			[string]::IsNullOrWhiteSpace($profileDirectory) -or
+			[System.IO.Path]::GetFullPath($profileDirectory).TrimEnd($trimCharacters) -ine
+			[System.IO.Path]::GetFullPath($expectedProfileDirectory).TrimEnd($trimCharacters)
+		) {
+			return ''
+		}
+
+		return "[az:$profileName] "
+	}
+	catch {
+		# Keep invalid profile paths from interrupting prompt rendering.
+		return ''
+	}
+}
+
+function Get-MgProfilePromptText {
+	# Resolve the active named Microsoft Graph profile from its existing state file.
+	try {
+		$userHome = if ($env:HOME) { $env:HOME } else { $env:USERPROFILE }
+		if ([string]::IsNullOrWhiteSpace($userHome)) {
+			return ''
+		}
+
+		$activeProfilePath = Join-Path (Join-Path (Join-Path $userHome '.mg') 'profiles') '.active'
+		if (-not (Test-Path -LiteralPath $activeProfilePath -PathType Leaf)) {
+			return ''
+		}
+
+		$profileName = (Get-Content -LiteralPath $activeProfilePath -Raw -ErrorAction Stop).Trim()
+		if ([string]::IsNullOrWhiteSpace($profileName) -or $profileName -ieq '(default)') {
+			return ''
+		}
+
+		return "[mg:$profileName] "
+	}
+	catch {
+		# Keep unavailable or unreadable state from interrupting prompt rendering.
+		return ''
+	}
+}
 
 function Get-PythonVenvPromptText {
 	# Resolve active Python venv label exactly as set by Activate.ps1 when present.
