@@ -1,77 +1,45 @@
 #!/bin/sh
 
+# -------------------------------------------------------------------------
+# Program: prepare-commit-msg
+# Description: Generate a Git commit message from staged changes with Copilot
+# Context: Personal Git workflow - bounded Copilot commit-message generation
+# Author: Greg Tate
+# -------------------------------------------------------------------------
+
 MSG_FILE="$1"
 SOURCE="$2"
+HOOK_DIRECTORY=$(cd "$(dirname -- "$0")" && pwd -W)
+REPOSITORY_PATH=$(git rev-parse --show-toplevel)
+COPILOT_MODEL="${COPILOT_COMMIT_MODEL:-mai-code-1.1-flash}"
 
-# Only generate a message for a normal `git commit`.
+# Only generate a message for a normal Git commit.
 if [ -n "$SOURCE" ]; then
     exit 0
 fi
 
-# Nothing staged.
+# Exit when there are no staged changes to describe.
 if git diff --cached --quiet; then
     exit 0
 fi
 
 echo "Generating commit message with GitHub Copilot..." >&2
 
+# Delegate prompt selection and Copilot invocation to the sibling PowerShell script.
 MESSAGE="$(
-    pwsh -NoProfile -NoLogo -NonInteractive -Command '
-        $diff = git diff --cached --no-ext-diff --no-color --unified=1
-
-        $prompt = @"
-
-Write only a Git commit message for the staged diff below.
-
-Use an imperative subject of at most 72 characters. Do not use Conventional
-Commit prefixes. Add a body only when useful to explain what changed and why.
-Do not include Markdown, commentary, trailers, or questions.
-
-Staged diff:
-
-$diff
-"@
-
-        $messages = @(
-            & copilot `
-                -p $prompt `
-                --model mai-code-1.1-flash `
-                --effort low `
-                --no-auto-update `
-                --no-ask-user `
-                --no-custom-instructions `
-                --disable-builtin-mcps `
-                --deny-tool=shell `
-                --excluded-tools="bash,powershell,list_bash,list_powershell,read_bash,read_powershell,stop_bash,stop_powershell,write_bash,write_powershell" `
-                --output-format=json `
-                2>$null |
-                ForEach-Object {
-                    try {
-                        $event = $_ | ConvertFrom-Json
-
-                        if (
-                            $event.type -eq "assistant.message" -and
-                            $event.data.content
-                        ) {
-                            $event.data.content
-                        }
-                    }
-                    catch {
-                    }
-                }
-        )
-
-        if ($messages.Count -gt 0) {
-            $messages[-1]
-        }
-    '
+    pwsh -NoProfile -NoLogo -NonInteractive \
+        -File "$HOOK_DIRECTORY/Get-CopilotCommitMessage.ps1" \
+        -RepositoryPath "$REPOSITORY_PATH" \
+        -Model "$COPILOT_MODEL"
 )"
 
 COPILOT_STATUS=$?
 
+# Abort the commit when Copilot cannot provide a usable message.
 if [ $COPILOT_STATUS -ne 0 ] || [ -z "$MESSAGE" ]; then
     echo "Copilot failed to generate a commit message." >&2
     exit 1
 fi
 
+# Replace the default message only after Copilot returns a usable response.
 printf '%s\n' "$MESSAGE" > "$MSG_FILE"
