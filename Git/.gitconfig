@@ -1,0 +1,18 @@
+[user]
+	email = gregt8@gmail.com
+	name = Greg Tate
+[init]
+	defaultBranch = main
+[credential]
+	useHttpPath = true
+	msauthUseBroker = false
+	helper = manager
+[help]
+	format = web
+[diff]
+	tool = vscode
+
+[includeIf "gitdir/i:C:/Users/gregt/LocalCode/Quisitive/Infra-Terraform/"]
+    path = ~/.gitconfig-work
+[core]
+	hooksPath = ~/.git-hooks
