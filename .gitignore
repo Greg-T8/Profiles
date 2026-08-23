@@ -30,3 +30,6 @@ TokenCache.dat
 *.local.json
 *.local.yaml
 *.local.yml
+
+# Workspace file
+*.code-workspace
