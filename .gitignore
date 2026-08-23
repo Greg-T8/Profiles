@@ -1,0 +1,32 @@
+# Operating-system metadata
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editor and IDE state
+.vs/
+*.user
+*.suo
+*.swp
+*.swo
+
+# Temporary and backup files
+*.tmp
+*.temp
+*.bak
+*.log
+
+# PowerShell transcripts and generated command history
+PowerShell_transcript.*
+*.clixml
+
+# Local Azure and PowerShell credential caches
+azureProfile.json
+TokenCache.dat
+*.token
+
+# Local-only configuration overrides
+*.local.ps1
+*.local.json
+*.local.yaml
+*.local.yml
