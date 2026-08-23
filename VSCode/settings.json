@@ -415,7 +415,7 @@
           "id": "profilesekzwdssqzmpwntozn",
           "isGitRepo": true,
           "name": "Profiles",
-          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles"
+          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\Profiles.code-workspace"
         }
       ]
     },
@@ -435,6 +435,10 @@
   ],
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
+    [
+      "#026395",
+      "Bahama Blue"
+    ],
     [
       "#E64E03",
       "Trinidad"
@@ -466,10 +470,6 @@
     [
       "#e5f7fc",
       "Foam"
-    ],
-    [
-      "#026395",
-      "Bahama Blue"
     ],
     [
       "#1B51A3",
