@@ -13,9 +13,8 @@ function Get-CurrentMgProfile {
     .SYNOPSIS
         Shows the currently active Microsoft Graph / Entra profile and live context.
     .DESCRIPTION
-        Reports the active profile name (tracked under ~/.mg/profiles/.active) and
-        the live Microsoft.Graph and Microsoft.Entra contexts, if those modules are
-        loaded and connected.
+        Reports the process-local active profile name and the live Microsoft.Graph
+        and Microsoft.Entra contexts, if those modules are loaded and connected.
     .EXAMPLE
         Get-CurrentMgProfile
     #>
@@ -38,11 +37,13 @@ function Get-CurrentMgProfile {
         MgClientId         = $mgContext.ClientId
         MgScopes           = $mgContext.Scopes
         MgAuthType         = $mgContext.AuthType
+        MgContextScope     = $mgContext.ContextScope
         HasEntraModule     = $entraContext.HasEntraModule
         EntraLoggedIn      = $entraContext.LoggedIn
         EntraAccount       = $entraContext.Account
         EntraTenantId      = $entraContext.TenantId
         EntraClientId      = $entraContext.ClientId
+        EntraContextScope  = $entraContext.ContextScope
         ContextSynchronized = (
             $mgContext.LoggedIn -and $entraContext.LoggedIn -and
             $mgContext.TenantId -eq $entraContext.TenantId

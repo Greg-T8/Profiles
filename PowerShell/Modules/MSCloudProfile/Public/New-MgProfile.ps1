@@ -14,10 +14,9 @@ function New-MgProfile {
         Creates a new Microsoft Graph / Entra profile or initializes an existing config entry.
     .DESCRIPTION
         In NewProfile mode, prompts for tenant/account details, runs Connect-MgGraph (and
-        Connect-Entra if available), captures the resulting context, and optionally saves
-        the entry to PersonalConfig.psd1 or WorkConfig.psd1. In FromConfig mode, takes an
-        existing config entry and creates its on-disk cache directory by performing the
-        initial sign-in via Use-MgProfile.
+        Connect-Entra if available) with process-scoped contexts, captures the resulting
+        context, and optionally saves the entry to PersonalConfig.psd1 or WorkConfig.psd1.
+        In FromConfig mode, activates an existing config entry via Use-MgProfile.
     .PARAMETER Name
         Profile name (top-level key in the config psd1).
     .PARAMETER TenantId
@@ -33,7 +32,7 @@ function New-MgProfile {
     .PARAMETER Save
         Prompts to save the profile to a config psd1 (NewProfile mode).
     .PARAMETER FromConfig
-        Initializes the cache directory for a profile already defined in config.
+        Activates a profile already defined in config.
     .EXAMPLE
         New-MgProfile -Name lab -TenantId <guid> -Save
     .EXAMPLE
@@ -70,7 +69,7 @@ function New-MgProfile {
 
 
     if ($FromConfig.IsPresent) {
-        # Delegate to Use-MgProfile to perform initial sign-in and cache creation.
+        # Delegate to Use-MgProfile to perform process-scoped activation.
         $allProfiles = Get-AllAzureProfileConfigs
         if (-not $allProfiles.ContainsKey($Name)) {
             throw "Profile '$Name' not found in any config."
@@ -79,42 +78,57 @@ function New-MgProfile {
         return Get-CurrentMgProfile
     }
 
-    # NewProfile mode: connect, then optionally write to config.
+    # Require Graph SDK support for process-scoped profile activation.
     $connectMgCommand = Get-Command -Name Connect-MgGraph -ErrorAction SilentlyContinue
     if (-not $connectMgCommand) {
         throw "Microsoft.Graph.Authentication module is not available."
     }
-
-    # Disconnect any current session so the new profile starts clean.
-    $currentMg = Get-MgModuleCurrentContext
-    $previousActive = Get-MgActiveProfileName
-    if ($previousActive -and $previousActive -ne '(default)') {
-        Save-MgProfileCache -ProfileName $previousActive
+    if (-not $connectMgCommand.Parameters.ContainsKey('ContextScope')) {
+        throw "Connect-MgGraph does not support ContextScope. Upgrade Microsoft.Graph.Authentication."
     }
-    if ($currentMg.LoggedIn) {
+
+    # Disconnect only prior process contexts so the persistent CurrentUser default remains intact.
+    $currentMg = Get-MgModuleCurrentContext
+    $currentEntra = Get-EntraModuleCurrentContext
+    if ($currentMg.LoggedIn -and [string]$currentMg.ContextScope -ieq 'Process') {
         try { Disconnect-MgGraph -ErrorAction Stop | Out-Null } catch { Write-Verbose "Disconnect-MgGraph failed: $_" }
     }
-    Clear-MgGraphLiveCache
-    Set-MgActiveProfileName -ProfileName $Name
+    if ($currentEntra.LoggedIn -and [string]$currentEntra.ContextScope -ieq 'Process') {
+        $disconnectEntraCommand = Get-Command -Name Disconnect-Entra -ErrorAction SilentlyContinue
+        if ($disconnectEntraCommand) {
+            try { Disconnect-Entra -ErrorAction Stop | Out-Null } catch { Write-Verbose "Disconnect-Entra failed: $_" }
+        }
+    }
+    Set-MgActiveProfileName -ProfileName '(default)'
 
-    $connectParams = @{ TenantId = $TenantId; ErrorAction = 'Stop' }
+    $connectParams = @{
+        TenantId     = $TenantId
+        ContextScope = 'Process'
+        ErrorAction  = 'Stop'
+    }
     if ($Scopes)   { $connectParams.Scopes   = $Scopes }
     if ($ClientId) { $connectParams.ClientId = $ClientId }
 
     Connect-MgGraph @connectParams | Out-Null
+    Set-MgActiveProfileName -ProfileName $Name
 
     $connectEntraCommand = Get-Command -Name Connect-Entra -ErrorAction SilentlyContinue
-    if ($connectEntraCommand) {
-        $entraParams = @{ TenantId = $TenantId; ErrorAction = 'Continue' }
+    if ($connectEntraCommand -and $connectEntraCommand.Parameters.ContainsKey('ContextScope')) {
+        $entraParams = @{
+            TenantId     = $TenantId
+            ContextScope = 'Process'
+            ErrorAction  = 'Continue'
+        }
         if ($Scopes)   { $entraParams.Scopes   = $Scopes }
         if ($ClientId) { $entraParams.ClientId = $ClientId }
         try { Connect-Entra @entraParams | Out-Null } catch { Write-Warning "Connect-Entra failed: $_" }
     }
+    elseif ($connectEntraCommand) {
+        Write-Warning "Connect-Entra does not support ContextScope. Upgrade Microsoft.Entra.Authentication."
+    }
 
     $newContext = Get-MgModuleCurrentContext
     $effectiveAccount = if ($Account) { $Account } else { $newContext.Account }
-
-    Save-MgProfileCache -ProfileName $Name
 
     if ($Save.IsPresent) {
         # Resolve writable config files (mirror New-AzProfile prompt flow).

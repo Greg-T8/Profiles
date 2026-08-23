@@ -331,19 +331,14 @@ function Get-AzProfilePromptText {
 }
 
 function Get-MgProfilePromptText {
-	# Resolve the active named Microsoft Graph profile from its existing state file.
+	# Resolve the active named Microsoft Graph profile from process-local session state.
 	try {
-		$userHome = if ($env:HOME) { $env:HOME } else { $env:USERPROFILE }
-		if ([string]::IsNullOrWhiteSpace($userHome)) {
+		$stateVariable = Get-Variable -Name MSCloudMgProfileName -Scope Global -ErrorAction SilentlyContinue
+		if (-not $stateVariable) {
 			return ''
 		}
 
-		$activeProfilePath = Join-Path (Join-Path (Join-Path $userHome '.mg') 'profiles') '.active'
-		if (-not (Test-Path -LiteralPath $activeProfilePath -PathType Leaf)) {
-			return ''
-		}
-
-		$profileName = (Get-Content -LiteralPath $activeProfilePath -Raw -ErrorAction Stop).Trim()
+		$profileName = [string]$stateVariable.Value
 		if ([string]::IsNullOrWhiteSpace($profileName) -or $profileName -ieq '(default)') {
 			return ''
 		}
@@ -351,7 +346,7 @@ function Get-MgProfilePromptText {
 		return "[mg:$profileName] "
 	}
 	catch {
-		# Keep unavailable or unreadable state from interrupting prompt rendering.
+		# Keep unavailable session state from interrupting prompt rendering.
 		return ''
 	}
 }

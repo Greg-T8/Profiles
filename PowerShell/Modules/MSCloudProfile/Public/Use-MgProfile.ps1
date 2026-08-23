@@ -13,14 +13,13 @@ function Use-MgProfile {
     .SYNOPSIS
         Switches the active Microsoft Graph / Entra profile.
     .DESCRIPTION
-        Saves the live ~/.mg files for the previously-active profile, restores any
-        cached files for the requested profile, then runs Connect-MgGraph and
-        Connect-Entra against the profile's tenant. The Microsoft.Graph SDK has no
-        AZURE_CONFIG_DIR equivalent, so per-profile isolation is implemented by
-        copying mg.authrecord.json / mg.context.json / mg.graphoptions.json in and
-        out of ~/.mg/ for each switch.
+        Connects named profiles with process-scoped Microsoft.Graph and Microsoft.Entra
+        contexts so they do not replace the persistent CurrentUser context. Use
+        '(default)' to return to the CurrentUser context. Named-profile state exists
+        only in the current PowerShell process.
     .PARAMETER Name
-        Profile name defined as a top-level key in PersonalConfig.psd1 or WorkConfig.psd1.
+        Profile name defined as a top-level key in PersonalConfig.psd1 or WorkConfig.psd1,
+        or '(default)' for the persistent CurrentUser context.
     .PARAMETER Scopes
         Optional delegated scopes for Connect-MgGraph. Falls back to the profile's
         MgScopes field; if neither is supplied, Connect-MgGraph uses its default scopes.
@@ -34,6 +33,9 @@ function Use-MgProfile {
         Use-MgProfile qu
     .EXAMPLE
         ugp lab -Scopes 'User.Read.All','Group.Read.All'
+    .EXAMPLE
+        ugp default
+        Returns to the persistent CurrentUser Microsoft Graph / Entra context.
     #>
     [CmdletBinding()]
     [OutputType([PSCustomObject])]
@@ -70,7 +72,112 @@ function Use-MgProfile {
         $stepTimer.Restart()
     }
 
-    # Resolve profile configuration.
+    # Require Graph SDK support for process-scoped named contexts.
+    $connectMgCommand = Get-Command -Name Connect-MgGraph -ErrorAction SilentlyContinue
+    if (-not $connectMgCommand) {
+        throw "Microsoft.Graph.Authentication module is not available. Install-Module Microsoft.Graph.Authentication."
+    }
+    if (-not $connectMgCommand.Parameters.ContainsKey('ContextScope')) {
+        throw "Connect-MgGraph does not support ContextScope. Upgrade Microsoft.Graph.Authentication."
+    }
+
+    # Use Entra only when its installed command also supports context isolation.
+    $connectEntraCommand = Get-Command -Name Connect-Entra -ErrorAction SilentlyContinue
+    if ($connectEntraCommand -and -not $connectEntraCommand.Parameters.ContainsKey('ContextScope')) {
+        Write-Warning "Connect-Entra does not support ContextScope. Upgrade Microsoft.Entra.Authentication."
+        $connectEntraCommand = $null
+    }
+
+    # Handle the persistent CurrentUser context separately from configured named profiles.
+    $isDefaultProfile = $Name -ieq '(default)' -or $Name -ieq 'default'
+    if ($isDefaultProfile) {
+        $currentMg = Get-MgModuleCurrentContext
+        $currentEntra = Get-EntraModuleCurrentContext
+        $activeName = Get-MgActiveProfileName
+        $mgIsDefault = $currentMg.LoggedIn -and [string]$currentMg.ContextScope -ieq 'CurrentUser'
+        $entraIsDefault = (
+            -not $connectEntraCommand -or
+            ($currentEntra.LoggedIn -and [string]$currentEntra.ContextScope -ieq 'CurrentUser')
+        )
+        & $writeStepTiming "Inspected current default contexts"
+
+        # Reuse an already-active CurrentUser context unless reconnection was requested.
+        if ($activeName -ieq '(default)' -and $mgIsDefault -and $entraIsDefault -and -not $Force.IsPresent) {
+            Write-Host "Already on Mg profile '(default)'. Use -Force to reconnect." -ForegroundColor Yellow
+            return Get-CurrentMgProfile
+        }
+
+        Write-Host "Switching to Mg profile: " -NoNewline
+        Write-Host "(default)" -ForegroundColor Cyan
+
+        # Disconnect the current process contexts before restoring CurrentUser contexts.
+        if (
+            $currentMg.LoggedIn -and
+            ([string]$currentMg.ContextScope -ieq 'Process' -or $Force.IsPresent)
+        ) {
+            try { Disconnect-MgGraph -ErrorAction Stop | Out-Null } catch { Write-Verbose "Disconnect-MgGraph failed: $_" }
+            & $writeStepTiming "Disconnected previous Mg session"
+        }
+        if (
+            $currentEntra.LoggedIn -and
+            ([string]$currentEntra.ContextScope -ieq 'Process' -or $Force.IsPresent)
+        ) {
+            $disconnectEntraCommand = Get-Command -Name Disconnect-Entra -ErrorAction SilentlyContinue
+            if ($disconnectEntraCommand) {
+                try { Disconnect-Entra -ErrorAction Stop | Out-Null } catch { Write-Verbose "Disconnect-Entra failed: $_" }
+                & $writeStepTiming "Disconnected previous Entra session"
+            }
+        }
+        Set-MgActiveProfileName -ProfileName '(default)'
+
+        # Reconnect the persistent Microsoft.Graph CurrentUser context.
+        $connectParams = @{
+            ContextScope = 'CurrentUser'
+            ErrorAction  = 'Stop'
+        }
+        if ($Scopes) { $connectParams.Scopes = $Scopes }
+        if ($ClientId) { $connectParams.ClientId = $ClientId }
+        if ($NoWelcome.IsPresent) { $connectParams.NoWelcome = $true }
+
+        try {
+            Connect-MgGraph @connectParams | Out-Null
+            & $writeStepTiming "Connected default Microsoft.Graph context"
+        }
+        catch {
+            Write-Error "Connect-MgGraph failed for profile '(default)': $_"
+            throw
+        }
+
+        # Reconnect the optional Microsoft.Entra CurrentUser context.
+        if ($connectEntraCommand) {
+            $entraParams = @{
+                ContextScope = 'CurrentUser'
+                ErrorAction  = 'Stop'
+            }
+            if ($Scopes) { $entraParams.Scopes = $Scopes }
+            if ($ClientId) { $entraParams.ClientId = $ClientId }
+            if ($NoWelcome.IsPresent) { $entraParams.NoWelcome = $true }
+
+            try {
+                Connect-Entra @entraParams | Out-Null
+                & $writeStepTiming "Connected default Microsoft.Entra context"
+            }
+            catch {
+                Write-Warning "Connect-Entra failed for profile '(default)': $_"
+            }
+        }
+        else {
+            Write-Warning "Microsoft.Entra module not found. Install-Module Microsoft.Entra to enable Entra cmdlets."
+        }
+
+        if ($slowestStepName) {
+            Write-Verbose ("Use-MgProfile slowest step: {0} ({1:N1} ms)" -f $slowestStepName, $slowestStepMs)
+        }
+        Write-Verbose ("Use-MgProfile total duration: {0:N1} ms" -f $overallTimer.Elapsed.TotalMilliseconds)
+        return Get-CurrentMgProfile
+    }
+
+    # Resolve named profile configuration.
     $allProfiles = Get-AllAzureProfileConfigs
     if (-not $allProfiles.ContainsKey($Name)) {
         throw "Profile '$Name' not found in PersonalConfig.psd1 or WorkConfig.psd1."
@@ -80,12 +187,6 @@ function Use-MgProfile {
 
     if (-not $profileConfig.TenantId) {
         throw "Profile '$Name' is missing a TenantId."
-    }
-
-    # Validate Connect-MgGraph availability.
-    $connectMgCommand = Get-Command -Name Connect-MgGraph -ErrorAction SilentlyContinue
-    if (-not $connectMgCommand) {
-        throw "Microsoft.Graph.Authentication module is not available. Install-Module Microsoft.Graph.Authentication."
     }
 
     # Determine effective Connect-MgGraph parameters from explicit args + config.
@@ -100,7 +201,11 @@ function Use-MgProfile {
 
     # Check current live Mg context to decide whether reconnect is needed.
     $currentMg = Get-MgModuleCurrentContext
-    $alreadyMatches = Resolve-MgProfileMatch -ProfileConfig $profileConfig -Context $currentMg
+    $currentEntra = Get-EntraModuleCurrentContext
+    $alreadyMatches = (
+        (Resolve-MgProfileMatch -ProfileConfig $profileConfig -Context $currentMg) -and
+        [string]$currentMg.ContextScope -ieq 'Process'
+    )
     & $writeStepTiming "Inspected current Mg context"
 
     $previousActive = Get-MgActiveProfileName
@@ -117,28 +222,27 @@ function Use-MgProfile {
     Write-Host "Switching to Mg profile: " -NoNewline
     Write-Host $Name -ForegroundColor Cyan
 
-    # Save the currently-live files into the previous profile's cache dir.
-    if ($previousActive -and $previousActive -ne '(default)') {
-        Save-MgProfileCache -ProfileName $previousActive
-        & $writeStepTiming "Saved previous profile cache ($previousActive)"
-    }
-
-    # Disconnect any active session before swapping files so live state is clean.
-    if ($currentMg.LoggedIn) {
+    # Disconnect active process contexts before connecting the requested profile.
+    if ($currentMg.LoggedIn -and [string]$currentMg.ContextScope -ieq 'Process') {
         try { Disconnect-MgGraph -ErrorAction Stop | Out-Null } catch { Write-Verbose "Disconnect-MgGraph failed: $_" }
         & $writeStepTiming "Disconnected previous Mg session"
     }
+    if ($currentEntra.LoggedIn -and [string]$currentEntra.ContextScope -ieq 'Process') {
+        $disconnectEntraCommand = Get-Command -Name Disconnect-Entra -ErrorAction SilentlyContinue
+        if ($disconnectEntraCommand) {
+            try { Disconnect-Entra -ErrorAction Stop | Out-Null } catch { Write-Verbose "Disconnect-Entra failed: $_" }
+            & $writeStepTiming "Disconnected previous Entra session"
+        }
+    }
 
-    # Swap live files to the requested profile.
-    Clear-MgGraphLiveCache
-    $restored = Restore-MgProfileCache -ProfileName $Name
-    Set-MgActiveProfileName -ProfileName $Name
-    & $writeStepTiming "Restored profile cache (restored=$restored)"
+    # Clear the marker until the requested Graph connection succeeds.
+    Set-MgActiveProfileName -ProfileName '(default)'
 
     # Build Connect-MgGraph parameter set.
     $connectParams = @{
-        TenantId    = $profileConfig.TenantId
-        ErrorAction = 'Stop'
+        TenantId     = $profileConfig.TenantId
+        ContextScope = 'Process'
+        ErrorAction  = 'Stop'
     }
     if ($effectiveScopes)   { $connectParams.Scopes   = $effectiveScopes }
     if ($effectiveClientId) { $connectParams.ClientId = $effectiveClientId }
@@ -146,6 +250,7 @@ function Use-MgProfile {
 
     try {
         Connect-MgGraph @connectParams | Out-Null
+        Set-MgActiveProfileName -ProfileName $Name
         & $writeStepTiming "Connected Microsoft.Graph"
     }
     catch {
@@ -154,11 +259,11 @@ function Use-MgProfile {
     }
 
     # Connect Microsoft.Entra against the same tenant (optional module).
-    $connectEntraCommand = Get-Command -Name Connect-Entra -ErrorAction SilentlyContinue
     if ($connectEntraCommand) {
         $entraParams = @{
-            TenantId    = $profileConfig.TenantId
-            ErrorAction = 'Stop'
+            TenantId     = $profileConfig.TenantId
+            ContextScope = 'Process'
+            ErrorAction  = 'Stop'
         }
         if ($effectiveScopes)   { $entraParams.Scopes   = $effectiveScopes }
         if ($effectiveClientId) { $entraParams.ClientId = $effectiveClientId }
@@ -175,10 +280,6 @@ function Use-MgProfile {
     else {
         Write-Warning "Microsoft.Entra module not found. Install-Module Microsoft.Entra to enable Entra cmdlets."
     }
-
-    # Capture refreshed live files for this profile.
-    Save-MgProfileCache -ProfileName $Name
-    & $writeStepTiming "Saved refreshed profile cache"
 
     if ($slowestStepName) {
         Write-Verbose ("Use-MgProfile slowest step: {0} ({1:N1} ms)" -f $slowestStepName, $slowestStepMs)

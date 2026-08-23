@@ -58,6 +58,7 @@ function Get-EntraModuleCurrentContext {
             Account        = $null
             ClientId       = $null
             Scopes         = $null
+            ContextScope   = $null
         }
     }
 
@@ -71,6 +72,7 @@ function Get-EntraModuleCurrentContext {
         Account        = $ctx.Account
         ClientId       = $ctx.ClientId
         Scopes         = $ctx.Scopes
+        ContextScope   = $ctx.ContextScope
     }
 }
 

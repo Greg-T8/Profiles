@@ -11,13 +11,12 @@
 function Remove-MgProfile {
     <#
     .SYNOPSIS
-        Removes a Microsoft Graph / Entra profile cache and optionally its config entry.
+        Removes a Microsoft Graph / Entra profile and optionally its legacy cache.
     .DESCRIPTION
-        Deletes the on-disk cache directory under ~/.mg/profiles/<name>/ and, unless
-        -KeepConfig is specified, removes the matching in-memory entries from
-        $Personal and $Work. The config psd1 files are NOT edited (matching the
-        behavior of Remove-AzProfile). If the profile is currently active, the live
-        Mg/Entra sessions are disconnected first.
+        Deletes any legacy on-disk cache directory under ~/.mg/profiles/<name>/ and,
+        unless -KeepConfig is specified, removes the matching in-memory entries from
+        $Personal and $Work. The config psd1 files are NOT edited. If the profile is
+        active in this process, its process-scoped Mg/Entra sessions are disconnected.
     .PARAMETER Name
         Profile name to remove.
     .PARAMETER KeepConfig
@@ -46,17 +45,22 @@ function Remove-MgProfile {
     if ($Name -ieq $activeName) {
         if (-not $PSCmdlet.ShouldProcess("active Mg/Entra session for '$Name'", 'Disconnect')) { return }
 
-        $disconnectMgCommand = Get-Command -Name Disconnect-MgGraph -ErrorAction SilentlyContinue
-        if ($disconnectMgCommand) {
-            try { Disconnect-MgGraph -ErrorAction Stop | Out-Null } catch { Write-Verbose "Disconnect-MgGraph failed: $_" }
+        $currentMg = Get-MgModuleCurrentContext
+        if ($currentMg.LoggedIn -and [string]$currentMg.ContextScope -ieq 'Process') {
+            $disconnectMgCommand = Get-Command -Name Disconnect-MgGraph -ErrorAction SilentlyContinue
+            if ($disconnectMgCommand) {
+                try { Disconnect-MgGraph -ErrorAction Stop | Out-Null } catch { Write-Verbose "Disconnect-MgGraph failed: $_" }
+            }
         }
 
-        $disconnectEntraCommand = Get-Command -Name Disconnect-Entra -ErrorAction SilentlyContinue
-        if ($disconnectEntraCommand) {
-            try { Disconnect-Entra -ErrorAction Stop | Out-Null } catch { Write-Verbose "Disconnect-Entra failed: $_" }
+        $currentEntra = Get-EntraModuleCurrentContext
+        if ($currentEntra.LoggedIn -and [string]$currentEntra.ContextScope -ieq 'Process') {
+            $disconnectEntraCommand = Get-Command -Name Disconnect-Entra -ErrorAction SilentlyContinue
+            if ($disconnectEntraCommand) {
+                try { Disconnect-Entra -ErrorAction Stop | Out-Null } catch { Write-Verbose "Disconnect-Entra failed: $_" }
+            }
         }
 
-        Clear-MgGraphLiveCache
         Set-MgActiveProfileName -ProfileName '(default)'
     }
 
@@ -96,6 +100,16 @@ $mgProfileCompleter = {
 
 
     $results = @()
+
+    # Offer the persistent CurrentUser context when completing Use-MgProfile.
+    if ($commandName -in @('Use-MgProfile', 'ugp')) {
+        $results += [System.Management.Automation.CompletionResult]::new(
+            '(default)',
+            '(default)',
+            'ParameterValue',
+            'Default CurrentUser Microsoft Graph / Entra context'
+        )
+    }
 
     $allProfiles = Get-AllAzureProfileConfigs
     if ($allProfiles.Count -gt 0) {

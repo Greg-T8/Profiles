@@ -1,12 +1,12 @@
 # -------------------------------------------------------------------------
 # Program: MgProfileStore.ps1
-# Description: Defines private Microsoft Graph profile cache and active-profile state helpers.
+# Description: Defines private Microsoft Graph legacy cache and session-state helpers.
 # Context: Personal cross-host PowerShell profile.
 # Author: Greg Tate
 # -------------------------------------------------------------------------
 
 #region PRIVATE MG PROFILE STORE
-# Defines private Microsoft Graph profile cache and active-profile state helpers.
+# Defines private Microsoft Graph legacy cache and session-state helpers.
 
 $script:MgGraphProfileFiles = @('mg.authrecord.json', 'mg.context.json', 'mg.graphoptions.json')
 
@@ -27,15 +27,12 @@ function Get-MgGraphProfileDir {
 }
 
 function Get-MgActiveProfileName {
-    # Reads the active profile name from ~/.mg/profiles/.active, defaulting to '(default)'.
-    $stateFile = Join-Path (Get-MgGraphProfilesRoot) '.active'
-    if (Test-Path -LiteralPath $stateFile) {
-        try {
-            $name = (Get-Content -LiteralPath $stateFile -Raw -ErrorAction Stop).Trim()
-            if ($name) { return $name }
-        }
-        catch { Write-Verbose "Could not read Mg active-profile state file: $_" }
+    # Reads the process-local active profile name, defaulting to '(default)'.
+    $stateVariable = Get-Variable -Name MSCloudMgProfileName -Scope Global -ErrorAction SilentlyContinue
+    if ($stateVariable -and -not [string]::IsNullOrWhiteSpace([string]$stateVariable.Value)) {
+        return [string]$stateVariable.Value
     }
+
     return '(default)'
 }
 
@@ -43,14 +40,18 @@ function Set-MgActiveProfileName {
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'None')]
     param([Parameter(Mandatory)][string]$ProfileName)
 
-    $profilesRoot = Get-MgGraphProfilesRoot
-    if (-not (Test-Path -LiteralPath $profilesRoot)) {
-        New-Item -Path $profilesRoot -ItemType Directory -Force | Out-Null
+    $stateTarget = '$global:MSCloudMgProfileName'
+    if (-not $PSCmdlet.ShouldProcess($stateTarget, "Set active Mg profile to '$ProfileName'")) {
+        return
     }
-    $stateFile = Join-Path $profilesRoot '.active'
-    if ($PSCmdlet.ShouldProcess($stateFile, "Write active profile name '$ProfileName'")) {
-        Set-Content -LiteralPath $stateFile -Value $ProfileName -NoNewline
+
+    # Remove named-profile state when returning to the default CurrentUser context.
+    if ($ProfileName -ieq '(default)' -or $ProfileName -ieq 'default') {
+        Remove-Variable -Name MSCloudMgProfileName -Scope Global -ErrorAction SilentlyContinue
+        return
     }
+
+    Set-Variable -Name MSCloudMgProfileName -Scope Global -Value $ProfileName
 }
 
 function Save-MgProfileCache {
