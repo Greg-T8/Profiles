@@ -12,7 +12,7 @@
 [diff]
 	tool = vscode
 
-[includeIf "gitdir/i:C:/Users/gregt/LocalCode/Quisitive/Infra-Terraform/"]
-    path = ~/.gitconfig-work
+[includeIf "gitdir/i:~/LocalCode/Quisitive/"]
+    path = "~/OneDrive - Quisitive/Apps/Git/.gitconfig-work"
 [core]
 	hooksPath = ~/.git-hooks
