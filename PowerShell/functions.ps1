@@ -541,7 +541,11 @@ function Measure-ProfileLoad {
     $profileTimes = 1..$Iterations | ForEach-Object {
         if ($ShowTiming) {
             Write-Host "`n  Profile $_/$Iterations with section timing:" -ForegroundColor Yellow
-            $ms = (Measure-Command { pwsh -Command "exit" }).TotalMilliseconds
+            # Preserve the interactive console required by PSReadLine while the child profile emits checkpoints.
+            $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+            Start-Process -FilePath pwsh -ArgumentList @('-Command', 'exit') -NoNewWindow -Wait
+            $stopwatch.Stop()
+            $ms = $stopwatch.Elapsed.TotalMilliseconds
             Write-Host ("  Total: {0}ms`n" -f [math]::Round($ms, 2)) -ForegroundColor Gray
         } else {
             Write-Host "  Profile $_/$Iterations..." -NoNewline

@@ -36,13 +36,6 @@ function script:Write-ProfileTime {
 }
 Write-ProfileTime 'Profile start'
 
-# Store the actual profile script path for reloading
-$script:ProfilePath = $PSCommandPath
-$script:GitPromptMetaCache = @{}
-$script:GitProbePath = $null
-$script:GitCommand = $null
-$script:GitCommandChecked = $false
-$script:PoshGitLoaded = $false
 
 # Keep Python venv activation from replacing the custom prompt function.
 $env:VIRTUAL_ENV_DISABLE_PROMPT = '1'
@@ -56,6 +49,7 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 # Force UTF-8 encoding to avoid question marks in the prompt when using non-ASCII characters (e.g., box-drawing characters)
 # See open bug: https://github.com/PowerShell/PSReadLine/issues/2866
 [Console]::OutputEncoding = [System.Text.UTF8Encoding]::new($false)
+Write-ProfileTime 'After startup initialization'
 
 #endregion
 
@@ -73,7 +67,6 @@ Set-Alias -Name gbs -Value Get-BillingSubscriptions
 Set-Alias -Name td -Value Get-TimeDifference
 Set-Alias -Name tf -Value terraform
 
-Remove-Item Alias:dir -ErrorAction SilentlyContinue
 
 # Git aliases
 Set-Alias -Name sgr -Value Set-GitRepoRoot
@@ -161,19 +154,16 @@ function prompt {
 
 #region LOAD EXTERNAL SCRIPTS
 
-# Determine the profile directory path
-# For symlinked profiles, use the OneDrive path
-# For remote/direct profiles, use the actual profile directory
-$profileDir = if (Test-Path -Path "$env:OneDriveConsumer/Apps/Profiles/PowerShell/functions.ps1") {
+# Prefer the known OneDrive profile root and resolve the script path only when it is unavailable.
+$profileDir = if (-not [string]::IsNullOrWhiteSpace($env:OneDriveConsumer)) {
 	"$env:OneDriveConsumer/Apps/Profiles/PowerShell"
 }
 else {
-	# Fall back to the directory containing the profile script
-	Split-Path -Parent $script:ProfilePath
+	Split-Path -Parent $PSCommandPath
 }
 
 # Load custom functions
-if ($PSVersionTable.PSEdition -eq 'Core' -and (Test-Path -Path "$profileDir/functions.ps1")) {
+if ($PSVersionTable.PSEdition -eq 'Core' -and [System.IO.File]::Exists("$profileDir/functions.ps1")) {
 	try {
 		. "$profileDir/functions.ps1"
 	}
@@ -182,31 +172,79 @@ if ($PSVersionTable.PSEdition -eq 'Core' -and (Test-Path -Path "$profileDir/func
 		Write-Host "Error details: $($_.Exception.Message)" -ForegroundColor Red
 	}
 }
+Write-ProfileTime 'After custom functions'
 
 # Load personal configuration
 $personalConfigPath = "$env:OneDriveConsumer/Apps/PowerShell/PersonalConfig.psd1"
-if (Test-Path -Path $personalConfigPath) {
+if ([System.IO.File]::Exists($personalConfigPath)) {
 	$Personal = Import-PowerShellDataFile -Path $personalConfigPath
 }
 
 # Load work configuration
 $workConfigPath = "$env:OneDriveCommercial/Code/PowerShell/Config/WorkConfig.psd1"
-if (Test-Path -Path $workConfigPath) {
+if ([System.IO.File]::Exists($workConfigPath)) {
 	$Work = Import-PowerShellDataFile -Path $workConfigPath
 }
+Write-ProfileTime 'After profile configuration'
 
-# Import Microsoft cloud profile management after configuration data is available.
-$msCloudProfileManifest = Join-Path $profileDir 'Modules/MSCloudProfile.psd1'
-if ($PSVersionTable.PSEdition -eq 'Core' -and (Test-Path -Path $msCloudProfileManifest)) {
-	try {
-		Import-Module -Name $msCloudProfileManifest -Force -ErrorAction Stop
+# Define immediate-use profile commands while deferring the complete MSCloudProfile module import.
+if ($PSVersionTable.PSEdition -eq 'Core') {
+	function Import-MSCloudProfile {
+		# Load the complete module the first time a profile-switching command is invoked.
+		if (Get-Module -Name MSCloudProfile) {
+			return
+		}
+
+		$msCloudProfileManifest = "$profileDir/Modules/MSCloudProfile.psd1"
+		if (-not [System.IO.File]::Exists($msCloudProfileManifest)) {
+			throw "MSCloudProfile module manifest was not found: $msCloudProfileManifest"
+		}
+
+		Import-Module -Name $msCloudProfileManifest -Global -ErrorAction Stop
 	}
-	catch {
-		Write-Host "ERROR loading MSCloudProfile: $_" -ForegroundColor Red
-		Write-Host "Error details: $($_.Exception.Message)" -ForegroundColor Red
+
+	function Use-AzProfile {
+		# Import and invoke the Azure profile-switching command on first use.
+		[CmdletBinding()]
+		param(
+			[Parameter(Mandatory, Position = 0)]
+			[string]$Name,
+
+			[Parameter()]
+			[switch]$Force,
+
+			[Parameter()]
+			[switch]$SelectAccount
+		)
+
+		Import-MSCloudProfile
+		& MSCloudProfile\Use-AzProfile @PSBoundParameters
+	}
+
+	function Use-MgProfile {
+		# Import and invoke the Microsoft Graph profile-switching command on first use.
+		[CmdletBinding()]
+		param(
+			[Parameter(Mandatory, Position = 0)]
+			[string]$Name,
+
+			[Parameter()]
+			[string[]]$Scopes,
+
+			[Parameter()]
+			[string]$ClientId,
+
+			[Parameter()]
+			[switch]$NoWelcome,
+
+			[Parameter()]
+			[switch]$Force
+		)
+
+		Import-MSCloudProfile
+		& MSCloudProfile\Use-MgProfile @PSBoundParameters
 	}
 }
-
 #endregion
 
 
@@ -219,6 +257,7 @@ Write-ProfileTime 'After PSReadLine import'
 
 # Basic PSReadLine options
 Set-PSReadLineOption -EditMode Vi
+Write-ProfileTime 'After Vi edit mode'
 Set-PSReadLineOption -ContinuationPrompt ''
 
 # Avoids question marks when prompt spans multiple lines
@@ -233,6 +272,7 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 if ($PSVersionTable.PSEdition -eq 'Core') {
 	Set-PSReadLineOption -PredictionSource HistoryAndPlugin -ErrorAction SilentlyContinue
 }
+Write-ProfileTime 'After PSReadLine options'
 
 # Tab completion key handlers
 $tabKeyHandler = {
@@ -309,8 +349,7 @@ if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
 	}
 
 }
-# Record the total cost of PSReadLine options and key-handler configuration.
-Write-ProfileTime 'After PSReadLine configuration'
+Write-ProfileTime 'After PSReadLine key handlers'
 
 #endregion
 
@@ -454,6 +493,11 @@ function Get-GitPromptStatusText {
 	# Get prompt status and include upstream tracking branch when available.
 	if (-not $script:PoshGitLoaded) {
 		return ''
+	}
+
+	# Create prompt metadata only when a loaded Posh-Git prompt needs it.
+	if ($null -eq $script:GitPromptMetaCache) {
+		$script:GitPromptMetaCache = @{}
 	}
 
 	$cacheKey = "$(Get-Location)"
@@ -726,3 +770,4 @@ function Initialize-PoshGit {
 }
 
 #endregion
+Write-ProfileTime 'Profile end'
