@@ -23,9 +23,26 @@
 
 $ErrorActionPreference = 'Stop'
 
+# Record profile timing only when PROFILE_TIMING is enabled.
+$script:ProfileTimer = [System.Diagnostics.Stopwatch]::StartNew()
+function script:Write-ProfileTime {
+	param([string]$Label)
+
+	# Emit elapsed profile time without affecting normal startup output.
+	if ($env:PROFILE_TIMING) {
+		$elapsed = $script:ProfileTimer.Elapsed.TotalMilliseconds
+		Write-Host ('  [{0,6:N1}ms] {1}' -f $elapsed, $Label) -ForegroundColor DarkGray
+	}
+}
+Write-ProfileTime 'Profile start'
+
 # Store the actual profile script path for reloading
 $script:ProfilePath = $PSCommandPath
 $script:GitPromptMetaCache = @{}
+$script:GitProbePath = $null
+$script:GitCommand = $null
+$script:GitCommandChecked = $false
+$script:PoshGitLoaded = $false
 
 # Keep Python venv activation from replacing the custom prompt function.
 $env:VIRTUAL_ENV_DISABLE_PROMPT = '1'
@@ -84,9 +101,7 @@ $PSDefaultParameterValues['Use-AzProfile:Name'] = 'Lab'
 #   ╭─( [az:Lab] [mg:Lab] (venv) ~/path/to/directory [git-status]
 #   ╰╴>
 function prompt {
-	if (-not $script:PoshGitLoaded -and $PSVersionTable.PSEdition -eq 'Core' -and (Test-GitDirectory)) {
-		$script:PoshGitLoaded = Initialize-PoshGit
-	}
+	Initialize-PromptPoshGit
 
 	$pythonVenvPromptText = Get-PythonVenvPromptText
 
@@ -198,7 +213,9 @@ if ($PSVersionTable.PSEdition -eq 'Core' -and (Test-Path -Path $msCloudProfileMa
 #region PSREADLINE CONFIGURATION
 
 # Import PSReadLine module
+Write-ProfileTime 'Before PSReadLine import'
 if (-not (Get-Module PSReadline)) { Import-Module PSReadLine }
+Write-ProfileTime 'After PSReadLine import'
 
 # Basic PSReadLine options
 Set-PSReadLineOption -EditMode Vi
@@ -292,6 +309,8 @@ if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
 	}
 
 }
+# Record the total cost of PSReadLine options and key-handler configuration.
+Write-ProfileTime 'After PSReadLine configuration'
 
 #endregion
 
@@ -394,20 +413,41 @@ function Get-PythonVenvPromptText {
 }
 
 function Test-GitDirectory {
-	# Check if current directory is a git repository
-	$gitCommand = Get-Command -Name git.exe -CommandType Application -ErrorAction SilentlyContinue
-	if ($gitCommand) {
-		try {
-			$gitStatus = git status 2>&1
-			if (-not ($gitStatus -match 'fatal: not a git repository')) {
-				return $true
-			}
-		}
-		catch {
-			# Ignore errors from git command
-		}
+	# Check the current directory without scanning the working tree.
+	if (-not $script:GitCommandChecked) {
+		$script:GitCommand = Get-Command -Name git.exe -CommandType Application -ErrorAction SilentlyContinue
+		$script:GitCommandChecked = $true
 	}
-	return $false
+
+	if (-not $script:GitCommand) {
+		return $false
+	}
+
+	try {
+		$insideWorkTree = & $script:GitCommand.Path rev-parse --is-inside-work-tree 2>$null
+		return $LASTEXITCODE -eq 0 -and $insideWorkTree -contains 'true'
+	}
+	catch {
+		# Ignore errors from Git when the location is not a file-system repository.
+		return $false
+	}
+}
+
+function Initialize-PromptPoshGit {
+	# Load Posh-Git only after entering a repository that has not been checked.
+	if ($script:PoshGitLoaded -or $PSVersionTable.PSEdition -ne 'Core') {
+		return
+	}
+
+	$locationPath = (Get-Location).Path
+	if ($script:GitProbePath -eq $locationPath) {
+		return
+	}
+
+	$script:GitProbePath = $locationPath
+	if (Test-GitDirectory) {
+		$script:PoshGitLoaded = Initialize-PoshGit
+	}
 }
 
 function Get-GitPromptStatusText {
@@ -655,14 +695,9 @@ function Get-MyPromptPath {
 
 function Initialize-PoshGit {
 	# Initialize Posh-Git module and settings
-	# Only loads in PowerShell Core when in a Git directory
-	# Should be called once during profile load, not in the prompt function
+	# Called only after the prompt has confirmed the current directory is a Git repository.
 
 	if ($PSVersionTable.PSEdition -ne 'Core') {
-		return $false
-	}
-
-	if (-not (Test-GitDirectory)) {
 		return $false
 	}
 
@@ -688,17 +723,6 @@ function Initialize-PoshGit {
 		# Posh-Git not available, continue without it
 		return $false
 	}
-}
-
-#endregion
-
-#region INITIALIZE POSH-GIT
-
-# Try to initialize Posh-Git once during profile load if in PowerShell Core and in a git directory
-# Store result in script-scoped variable to avoid Get-Module calls in prompt
-$script:PoshGitLoaded = $false
-if ($PSVersionTable.PSEdition -eq 'Core') {
-	$script:PoshGitLoaded = Initialize-PoshGit
 }
 
 #endregion
