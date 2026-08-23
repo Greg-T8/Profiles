@@ -109,6 +109,13 @@
                 "action": "prevTab"
             },
             "id": "User.prevTab"
+        },
+        {
+            "command": {
+                "action": "sendInput",
+                "input": "\u001b\r"
+            },
+            "keys": "shift+enter"
         }
     ],
     "alwaysShowNotificationIcon": false,
