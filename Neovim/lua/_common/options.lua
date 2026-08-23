@@ -25,3 +25,16 @@ vim.opt.smartcase = true
 
 -- Clear search highlighting with leader+space
 vim.api.nvim_set_keymap('n', '<leader><space>', ':nohlsearch<CR>', { noremap = true, silent = true })
+
+-- ==============================================================================
+-- GIT COMMIT MESSAGE EDITING
+-- ==============================================================================
+-- Wrap commit-message text at word boundaries when editing .git/COMMIT_EDITMSG.
+-- Neovim detects this file as the 'gitcommit' filetype.
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "gitcommit",
+    callback = function()
+        vim.opt_local.wrap = true
+        vim.opt_local.linebreak = true
+    end,
+})
