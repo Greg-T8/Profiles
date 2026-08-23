@@ -587,7 +587,11 @@
   "git.openRepositoryInParentFolders": "always",
   "github.copilot.chat.agent.temperature": 0,
   "github.copilot.chat.claudeAgent.enabled": true, //Disables auto-insertion of instruction files
-  "github.copilot.chat.commitMessageGeneration.instructions": [],
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "file": "~/LocalCode/Agent-Toolkit/Commit_Instructions.md"
+    }
+  ],
   "github.copilot.chat.searchSubagent.enabled": true,
   "github.copilot.editor.enableCodeActions": true,
   "github.copilot.enable": {
