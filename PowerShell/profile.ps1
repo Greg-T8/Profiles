@@ -1,4 +1,4 @@
-﻿<#
+<#
     Program: profile.ps1
     Description: Configures the interactive PowerShell environment and prompt.
     Context: Personal cross-host PowerShell profile.
@@ -181,7 +181,7 @@ if (Test-Path -Path $workConfigPath) {
 }
 
 # Import Microsoft cloud profile management after configuration data is available.
-$msCloudProfileManifest = Join-Path $profileDir 'Modules/MSCloudProfile/MSCloudProfile.psd1'
+$msCloudProfileManifest = Join-Path $profileDir 'Modules/MSCloudProfile.psd1'
 if ($PSVersionTable.PSEdition -eq 'Core' -and (Test-Path -Path $msCloudProfileManifest)) {
 	try {
 		Import-Module -Name $msCloudProfileManifest -Force -ErrorAction Stop

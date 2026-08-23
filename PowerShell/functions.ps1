@@ -633,7 +633,7 @@ function Measure-ProfileLoad {
                                 else { [TimeSpan]::Zero }
 
                             [pscustomobject]@{
-                                Line        = $_.Line
+                                Line        = ([string]$_.Line).TrimStart()
                                 'Time Taken' = $timeSpan.ToString("mm':'ss'.'fffffff")
                                 Source      = if ($_.Source) { $_.Source } else { $root }
                             }
