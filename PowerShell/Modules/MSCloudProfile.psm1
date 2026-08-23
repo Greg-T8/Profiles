@@ -326,43 +326,45 @@ function Sync-AzModuleContext {
 #region SOURCE: Private/MgProfileStore.ps1
 # -------------------------------------------------------------------------
 # Program: MgProfileStore.ps1
-# Description: Defines private Microsoft Graph legacy cache and session-state helpers.
+# Description: Defines private Microsoft Graph profile metadata and session-state helpers.
 # Context: Personal cross-host PowerShell profile.
 # Author: Greg Tate
 # -------------------------------------------------------------------------
 
 #region PRIVATE MG PROFILE STORE
-# Defines private Microsoft Graph legacy cache and session-state helpers.
-
-$script:MgGraphProfileFiles = @('mg.authrecord.json', 'mg.context.json', 'mg.graphoptions.json')
+# Defines private Microsoft Graph profile metadata and session-state helpers.
 
 function Get-MgGraphProfileRoot {
-    # Returns the live ~/.mg directory path.
+    # Return the live Microsoft Graph SDK configuration directory.
     $userHome = if ($env:HOME) { $env:HOME } else { $env:USERPROFILE }
     return (Join-Path $userHome '.mg')
 }
 
 function Get-MgGraphProfilesRoot {
-    # Returns the parent directory that holds all per-profile caches.
+    # Return the directory that holds logical Microsoft Graph profiles.
     return (Join-Path (Get-MgGraphProfileRoot) 'profiles')
 }
 
 function Get-MgGraphProfileDir {
+    # Return the metadata directory for one logical Microsoft Graph profile.
     param([Parameter(Mandatory)][string]$ProfileName)
-    return (Join-Path (Get-MgGraphProfilesRoot) $ProfileName)
+
+    $normalizedName = if ($ProfileName -ieq '(default)') { 'default' } else { $ProfileName }
+    return (Join-Path (Get-MgGraphProfilesRoot) $normalizedName)
 }
 
 function Get-MgActiveProfileName {
-    # Reads the process-local active profile name, defaulting to '(default)'.
+    # Read the process-local active profile name, defaulting to the hidden-label default profile.
     $stateVariable = Get-Variable -Name MSCloudMgProfileName -Scope Global -ErrorAction SilentlyContinue
     if ($stateVariable -and -not [string]::IsNullOrWhiteSpace([string]$stateVariable.Value)) {
         return [string]$stateVariable.Value
     }
 
-    return '(default)'
+    return 'default'
 }
 
 function Set-MgActiveProfileName {
+    # Set the process-local prompt state without coupling it to authentication persistence.
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'None')]
     param([Parameter(Mandatory)][string]$ProfileName)
 
@@ -371,7 +373,7 @@ function Set-MgActiveProfileName {
         return
     }
 
-    # Remove named-profile state when returning to the default CurrentUser context.
+    # Keep the prompt unlabelled while the reserved default profile is active.
     if ($ProfileName -ieq '(default)' -or $ProfileName -ieq 'default') {
         Remove-Variable -Name MSCloudMgProfileName -Scope Global -ErrorAction SilentlyContinue
         return
@@ -380,86 +382,69 @@ function Set-MgActiveProfileName {
     Set-Variable -Name MSCloudMgProfileName -Scope Global -Value $ProfileName
 }
 
-function Save-MgProfileCache {
-    # Copies the live ~/.mg/mg.*.json files into the per-profile cache directory.
+function Save-MgProfileContext {
+    # Persist non-secret routing metadata while leaving WAM/MSAL token files untouched.
     [CmdletBinding()]
-    param([Parameter(Mandatory)][string]$ProfileName)
+    param(
+        [Parameter(Mandatory)]
+        [string]$ProfileName,
 
-    $mgRoot = Get-MgGraphProfileRoot
-    if (-not (Test-Path -LiteralPath $mgRoot)) { return }
+        [Parameter(Mandatory)]
+        [PSCustomObject]$Context,
 
-    $destDir = Get-MgGraphProfileDir -ProfileName $ProfileName
-    if (-not (Test-Path -LiteralPath $destDir)) {
-        New-Item -Path $destDir -ItemType Directory -Force | Out-Null
+        [Parameter()]
+        [string]$Description
+    )
+
+    $profileDir = Get-MgGraphProfileDir -ProfileName $ProfileName
+    if (-not (Test-Path -LiteralPath $profileDir)) {
+        New-Item -Path $profileDir -ItemType Directory -Force | Out-Null
     }
 
-    foreach ($file in $script:MgGraphProfileFiles) {
-        $src = Join-Path $mgRoot $file
-        if (Test-Path -LiteralPath $src) {
-            Copy-Item -LiteralPath $src -Destination (Join-Path $destDir $file) -Force
-        }
-    }
-}
-
-function Restore-MgProfileCache {
-    # Copies a profile's cached files into ~/.mg/. Returns $true if any were copied.
-    [CmdletBinding()]
-    [OutputType([bool])]
-    param([Parameter(Mandatory)][string]$ProfileName)
-
-    $srcDir = Get-MgGraphProfileDir -ProfileName $ProfileName
-    if (-not (Test-Path -LiteralPath $srcDir)) { return $false }
-
-    $mgRoot = Get-MgGraphProfileRoot
-    if (-not (Test-Path -LiteralPath $mgRoot)) {
-        New-Item -Path $mgRoot -ItemType Directory -Force | Out-Null
+    # Store only values needed to route and validate a future cached connection.
+    $profileContext = [ordered]@{
+        Account     = $Context.Account
+        TenantId    = $Context.TenantId
+        Scopes      = @($Context.Scopes)
+        ClientId    = $Context.ClientId
+        AuthType    = $Context.AuthType
+        Description = $Description
+        UpdatedAt   = (Get-Date).ToString('o')
     }
 
-    $restored = $false
-    foreach ($file in $script:MgGraphProfileFiles) {
-        $src = Join-Path $srcDir $file
-        if (Test-Path -LiteralPath $src) {
-            Copy-Item -LiteralPath $src -Destination (Join-Path $mgRoot $file) -Force
-            $restored = $true
-        }
-    }
-    return $restored
-}
-
-function Clear-MgGraphLiveCache {
-    # Removes the live ~/.mg/mg.*.json files so cached state doesn't bleed between profiles.
-    $mgRoot = Get-MgGraphProfileRoot
-    if (-not (Test-Path -LiteralPath $mgRoot)) { return }
-    foreach ($file in $script:MgGraphProfileFiles) {
-        $live = Join-Path $mgRoot $file
-        if (Test-Path -LiteralPath $live) {
-            Remove-Item -LiteralPath $live -Force -ErrorAction SilentlyContinue
-        }
-    }
+    $contextPath = Join-Path $profileDir 'mg.context.json'
+    $profileContext |
+        ConvertTo-Json -Depth 4 |
+        Set-Content -LiteralPath $contextPath -Encoding utf8
 }
 
 function Get-MgProfileCachedContext {
-    # Reads a profile's cached mg.context.json without touching the live session.
+    # Read a profile's non-secret routing metadata without touching the live Graph session.
     [CmdletBinding()]
     [OutputType([PSCustomObject])]
     param([Parameter(Mandatory)][string]$ProfileName)
 
     $contextFile = Join-Path (Get-MgGraphProfileDir -ProfileName $ProfileName) 'mg.context.json'
-    if (-not (Test-Path -LiteralPath $contextFile)) { return $null }
+    if (-not (Test-Path -LiteralPath $contextFile)) {
+        return $null
+    }
 
     try {
-        $data = Get-Content -LiteralPath $contextFile -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+        $data = Get-Content -LiteralPath $contextFile -Raw -ErrorAction Stop |
+            ConvertFrom-Json -ErrorAction Stop
     }
     catch {
         return $null
     }
 
     [PSCustomObject][ordered]@{
-        Account  = $data.Account
-        TenantId = $data.TenantId
-        Scopes   = $data.Scopes
-        ClientId = $data.ClientId
-        AuthType = $data.AuthType
+        Account     = $data.Account
+        TenantId    = $data.TenantId
+        Scopes      = $data.Scopes
+        ClientId    = $data.ClientId
+        AuthType    = $data.AuthType
+        Description = $data.Description
+        UpdatedAt   = $data.UpdatedAt
     }
 }
 
@@ -1926,11 +1911,12 @@ Register-ArgumentCompleter -CommandName Remove-AzProfile -ParameterName Name -Sc
 function Get-MgProfiles {
     <#
     .SYNOPSIS
-        Lists Microsoft Graph / Entra profiles from configs and from the on-disk profile cache.
+        Lists Microsoft Graph profiles from configuration and on-disk routing metadata.
     .DESCRIPTION
-        Returns one record per known profile, combining entries from PersonalConfig.psd1,
-        WorkConfig.psd1, and any cached profile directories under ~/.mg/profiles/.
-        ConfigSource is one of: PersonalConfig, WorkConfig, Both, DiskOnly.
+        Returns the reserved default profile plus one record per known named profile,
+        combining entries from PersonalConfig.psd1, WorkConfig.psd1, and profile
+        metadata directories under ~/.mg/profiles/. ConfigSource is one of:
+        Default, PersonalConfig, WorkConfig, Both, or DiskOnly.
     .EXAMPLE
         Get-MgProfiles
     #>
@@ -1945,11 +1931,22 @@ function Get-MgProfiles {
 
     $combined = @{}
 
+    # Always expose the reserved unlabelled default Graph profile.
+    $combined['default'] = @{ Config = $null; Source = 'Default' }
+
+    # Add personal named profiles while preserving the reserved default entry.
     foreach ($entry in $personalProfiles.GetEnumerator()) {
-        $combined[$entry.Key] = @{ Config = $entry.Value; Source = 'PersonalConfig' }
+        if ($entry.Key -ine 'default') {
+            $combined[$entry.Key] = @{ Config = $entry.Value; Source = 'PersonalConfig' }
+        }
     }
 
+    # Merge work named profiles while preserving personal precedence.
     foreach ($entry in $workProfiles.GetEnumerator()) {
+        if ($entry.Key -ieq 'default') {
+            continue
+        }
+
         if ($combined.ContainsKey($entry.Key)) {
             $combined[$entry.Key].Source = 'Both'
         }
@@ -1985,7 +1982,7 @@ function Get-MgProfiles {
             TenantId     = if ($cfg) { $cfg.TenantId } else { $cached.TenantId }
             MgClientId   = if ($cfg -and $cfg.ContainsKey('MgClientId')) { $cfg.MgClientId } else { $cached.ClientId }
             MgScopes     = if ($cfg -and $cfg.ContainsKey('MgScopes')) { $cfg.MgScopes } else { $cached.Scopes }
-            Description  = if ($cfg) { $cfg.Description } else { $null }
+            Description  = if ($cfg) { $cfg.Description } else { $cached.Description }
             HasCache     = ($null -ne $cached)
         }
     }
@@ -2063,31 +2060,33 @@ function Get-CurrentMgProfile {
 function Use-MgProfile {
     <#
     .SYNOPSIS
-        Switches the active Microsoft Graph / Entra profile.
+        Switches the active Microsoft Graph profile.
     .DESCRIPTION
-        Connects named profiles with process-scoped Microsoft.Graph and Microsoft.Entra
-        contexts so they do not replace the persistent CurrentUser context. Use
-        '(default)' to return to the CurrentUser context. Named-profile state exists
-        only in the current PowerShell process.
+        Connects Microsoft Graph profiles with a persistent CurrentUser context so
+        WAM/MSAL can silently reuse cached credentials. The configured account is
+        passed as a login hint, and the resulting account and tenant are validated
+        before the prompt is updated. Use default or (default) to activate the
+        reserved default profile without displaying an Mg prompt moniker.
     .PARAMETER Name
-        Profile name defined as a top-level key in PersonalConfig.psd1 or WorkConfig.psd1,
-        or '(default)' for the persistent CurrentUser context.
+        Profile name defined in PersonalConfig.psd1 or WorkConfig.psd1, or default.
     .PARAMETER Scopes
-        Optional delegated scopes for Connect-MgGraph. Falls back to the profile's
-        MgScopes field; if neither is supplied, Connect-MgGraph uses its default scopes.
+        Optional delegated scopes. Falls back to MgScopes or cached profile metadata.
     .PARAMETER ClientId
-        Optional client (application) ID for app-only auth. Falls back to MgClientId.
+        Optional public-client application ID. Falls back to MgClientId or cached metadata.
+    .PARAMETER LoginHint
+        Optional account hint. Falls back to the profile's configured or cached Account.
     .PARAMETER NoWelcome
         Suppresses the Connect-MgGraph welcome banner.
     .PARAMETER Force
-        Forces disconnect/reconnect even when the live context already matches.
+        Re-runs Connect-MgGraph even when the current live context already matches.
+        This does not sign out or clear the shared WAM/MSAL token cache.
     .EXAMPLE
         Use-MgProfile qu
     .EXAMPLE
         ugp lab -Scopes 'User.Read.All','Group.Read.All'
     .EXAMPLE
         ugp default
-        Returns to the persistent CurrentUser Microsoft Graph / Entra context.
+        Activates the persistent default profile without displaying an Mg moniker.
     #>
     [CmdletBinding()]
     [OutputType([PSCustomObject])]
@@ -2102,12 +2101,14 @@ function Use-MgProfile {
         [string]$ClientId,
 
         [Parameter()]
+        [string]$LoginHint,
+
+        [Parameter()]
         [switch]$NoWelcome,
 
         [Parameter()]
         [switch]$Force
     )
-
 
     $overallTimer = [System.Diagnostics.Stopwatch]::StartNew()
     $stepTimer = [System.Diagnostics.Stopwatch]::StartNew()
@@ -2115,16 +2116,18 @@ function Use-MgProfile {
     $slowestStepMs = 0.0
     $writeStepTiming = {
         param([string]$Step)
+
         $elapsedMs = $stepTimer.Elapsed.TotalMilliseconds
         if ($elapsedMs -gt $slowestStepMs) {
             $slowestStepMs = $elapsedMs
             $slowestStepName = $Step
         }
+
         Write-Verbose ("{0,-50} {1,8:N1} ms (total {2,8:N1} ms)" -f $Step, $elapsedMs, $overallTimer.Elapsed.TotalMilliseconds)
         $stepTimer.Restart()
     }
 
-    # Require Graph SDK support for process-scoped named contexts.
+    # Require persistent context support and account-targeting support when a hint is available.
     $connectMgCommand = Get-Command -Name Connect-MgGraph -ErrorAction SilentlyContinue
     if (-not $connectMgCommand) {
         throw "Microsoft.Graph.Authentication module is not available. Install-Module Microsoft.Graph.Authentication."
@@ -2133,204 +2136,146 @@ function Use-MgProfile {
         throw "Connect-MgGraph does not support ContextScope. Upgrade Microsoft.Graph.Authentication."
     }
 
-    # Use Entra only when its installed command also supports context isolation.
-    $connectEntraCommand = Get-Command -Name Connect-Entra -ErrorAction SilentlyContinue
-    if ($connectEntraCommand -and -not $connectEntraCommand.Parameters.ContainsKey('ContextScope')) {
-        Write-Warning "Connect-Entra does not support ContextScope. Upgrade Microsoft.Entra.Authentication."
-        $connectEntraCommand = $null
+    $supportsLoginHint = $connectMgCommand.Parameters.ContainsKey('LoginHint')
+    $normalizedName = if ($Name -ieq '(default)' -or $Name -ieq 'default') { 'default' } else { $Name }
+    $isDefaultProfile = $normalizedName -ieq 'default'
+    $allProfiles = Get-AllAzureProfileConfigs
+    $currentMg = Get-MgModuleCurrentContext
+    $activeName = Get-MgActiveProfileName
+    $defaultContext = Get-MgProfileCachedContext -ProfileName 'default'
+    & $writeStepTiming "Loaded Graph profile state"
+
+    # Capture an existing unlabelled CurrentUser context as default only when it is not a configured named identity.
+    if (-not $defaultContext -and $currentMg.LoggedIn -and $activeName -ieq 'default') {
+        $matchesNamedProfile = $false
+        foreach ($configuredProfile in $allProfiles.Values) {
+            if (Resolve-MgProfileMatch -ProfileConfig $configuredProfile -Context $currentMg) {
+                $matchesNamedProfile = $true
+                break
+            }
+        }
+
+        if (-not $matchesNamedProfile) {
+            Save-MgProfileContext -ProfileName 'default' -Context $currentMg -Description 'Default Microsoft Graph profile'
+            $defaultContext = Get-MgProfileCachedContext -ProfileName 'default'
+            & $writeStepTiming "Captured existing default Graph context"
+        }
     }
 
-    # Handle the persistent CurrentUser context separately from configured named profiles.
-    $isDefaultProfile = $Name -ieq '(default)' -or $Name -ieq 'default'
+    # Resolve the requested profile into a common routing contract.
     if ($isDefaultProfile) {
-        $currentMg = Get-MgModuleCurrentContext
-        $currentEntra = Get-EntraModuleCurrentContext
-        $activeName = Get-MgActiveProfileName
-        $mgIsDefault = $currentMg.LoggedIn -and [string]$currentMg.ContextScope -ieq 'CurrentUser'
-        $entraIsDefault = (
-            -not $connectEntraCommand -or
-            ($currentEntra.LoggedIn -and [string]$currentEntra.ContextScope -ieq 'CurrentUser')
-        )
-        & $writeStepTiming "Inspected current default contexts"
-
-        # Reuse an already-active CurrentUser context unless reconnection was requested.
-        if ($activeName -ieq '(default)' -and $mgIsDefault -and $entraIsDefault -and -not $Force.IsPresent) {
-            Write-Host "Already on Mg profile '(default)'. Use -Force to reconnect." -ForegroundColor Yellow
-            return Get-CurrentMgProfile
+        if (-not $defaultContext -and $currentMg.LoggedIn) {
+            throw "The default Mg profile is not initialized. Run New-MgProfile -Name default -TenantId <tenant-id> -Account <account>."
         }
 
-        Write-Host "Switching to Mg profile: " -NoNewline
-        Write-Host "(default)" -ForegroundColor Cyan
-
-        # Disconnect the current process contexts before restoring CurrentUser contexts.
-        if (
-            $currentMg.LoggedIn -and
-            ([string]$currentMg.ContextScope -ieq 'Process' -or $Force.IsPresent)
-        ) {
-            try { Disconnect-MgGraph -ErrorAction Stop | Out-Null } catch { Write-Verbose "Disconnect-MgGraph failed: $_" }
-            & $writeStepTiming "Disconnected previous Mg session"
-        }
-        if (
-            $currentEntra.LoggedIn -and
-            ([string]$currentEntra.ContextScope -ieq 'Process' -or $Force.IsPresent)
-        ) {
-            $disconnectEntraCommand = Get-Command -Name Disconnect-Entra -ErrorAction SilentlyContinue
-            if ($disconnectEntraCommand) {
-                try { Disconnect-Entra -ErrorAction Stop | Out-Null } catch { Write-Verbose "Disconnect-Entra failed: $_" }
-                & $writeStepTiming "Disconnected previous Entra session"
-            }
-        }
-        Set-MgActiveProfileName -ProfileName '(default)'
-
-        # Reconnect the persistent Microsoft.Graph CurrentUser context.
-        $connectParams = @{
-            ContextScope = 'CurrentUser'
-            ErrorAction  = 'Stop'
-        }
-        if ($Scopes) { $connectParams.Scopes = $Scopes }
-        if ($ClientId) { $connectParams.ClientId = $ClientId }
-        if ($NoWelcome.IsPresent) { $connectParams.NoWelcome = $true }
-
-        try {
-            Connect-MgGraph @connectParams | Out-Null
-            & $writeStepTiming "Connected default Microsoft.Graph context"
-        }
-        catch {
-            Write-Error "Connect-MgGraph failed for profile '(default)': $_"
-            throw
-        }
-
-        # Reconnect the optional Microsoft.Entra CurrentUser context.
-        if ($connectEntraCommand) {
-            $entraParams = @{
-                ContextScope = 'CurrentUser'
-                ErrorAction  = 'Stop'
-            }
-            if ($Scopes) { $entraParams.Scopes = $Scopes }
-            if ($ClientId) { $entraParams.ClientId = $ClientId }
-            if ($NoWelcome.IsPresent) { $entraParams.NoWelcome = $true }
-
-            try {
-                Connect-Entra @entraParams | Out-Null
-                & $writeStepTiming "Connected default Microsoft.Entra context"
-            }
-            catch {
-                Write-Warning "Connect-Entra failed for profile '(default)': $_"
-            }
+        $targetTenantId = if ($defaultContext) { [string]$defaultContext.TenantId } else { $null }
+        $targetAccount = if ($LoginHint) { $LoginHint } elseif ($defaultContext) { [string]$defaultContext.Account } else { $null }
+        $effectiveScopes = if ($Scopes) { $Scopes } elseif ($defaultContext) { @($defaultContext.Scopes) } else { $null }
+        $effectiveClientId = if ($ClientId) { $ClientId } elseif ($defaultContext) { [string]$defaultContext.ClientId } else { $null }
+        $profileDescription = if ($defaultContext -and $defaultContext.Description) {
+            [string]$defaultContext.Description
         }
         else {
-            Write-Warning "Microsoft.Entra module not found. Install-Module Microsoft.Entra to enable Entra cmdlets."
+            'Default Microsoft Graph profile'
+        }
+    }
+    else {
+        if (-not $allProfiles.ContainsKey($normalizedName)) {
+            throw "Profile '$normalizedName' not found in PersonalConfig.psd1 or WorkConfig.psd1."
         }
 
-        if ($slowestStepName) {
-            Write-Verbose ("Use-MgProfile slowest step: {0} ({1:N1} ms)" -f $slowestStepName, $slowestStepMs)
+        $profileConfig = $allProfiles[$normalizedName]
+        if (-not $profileConfig.TenantId) {
+            throw "Profile '$normalizedName' is missing a TenantId."
         }
-        Write-Verbose ("Use-MgProfile total duration: {0:N1} ms" -f $overallTimer.Elapsed.TotalMilliseconds)
-        return Get-CurrentMgProfile
+
+        $targetTenantId = [string]$profileConfig.TenantId
+        $targetAccount = if ($LoginHint) { $LoginHint } else { [string]$profileConfig.Account }
+        $effectiveScopes = if ($Scopes) {
+            $Scopes
+        }
+        elseif ($profileConfig.ContainsKey('MgScopes')) {
+            $profileConfig.MgScopes
+        }
+        else {
+            $null
+        }
+        $effectiveClientId = if ($ClientId) {
+            $ClientId
+        }
+        elseif ($profileConfig.ContainsKey('MgClientId')) {
+            $profileConfig.MgClientId
+        }
+        else {
+            $null
+        }
+        $profileDescription = [string]$profileConfig.Description
+    }
+    & $writeStepTiming "Resolved requested Graph profile"
+
+    # Require LoginHint support whenever the profile identifies a specific delegated account.
+    if ($targetAccount -and -not $supportsLoginHint) {
+        throw "Connect-MgGraph does not support LoginHint. Upgrade Microsoft.Graph.Authentication to 2.39.0 or later."
     }
 
-    # Resolve named profile configuration.
-    $allProfiles = Get-AllAzureProfileConfigs
-    if (-not $allProfiles.ContainsKey($Name)) {
-        throw "Profile '$Name' not found in PersonalConfig.psd1 or WorkConfig.psd1."
+    # Reuse a matching persistent live context unless the caller requested a reconnect.
+    $targetProfileConfig = @{
+        TenantId = $targetTenantId
+        Account  = $targetAccount
     }
-    $profileConfig = $allProfiles[$Name]
-    & $writeStepTiming "Resolved profile config"
-
-    if (-not $profileConfig.TenantId) {
-        throw "Profile '$Name' is missing a TenantId."
+    if ($effectiveClientId) {
+        $targetProfileConfig.MgClientId = $effectiveClientId
     }
 
-    # Determine effective Connect-MgGraph parameters from explicit args + config.
-    $effectiveScopes = $Scopes
-    if (-not $effectiveScopes -and $profileConfig.ContainsKey('MgScopes')) {
-        $effectiveScopes = $profileConfig.MgScopes
-    }
-    $effectiveClientId = $ClientId
-    if (-not $effectiveClientId -and $profileConfig.ContainsKey('MgClientId')) {
-        $effectiveClientId = $profileConfig.MgClientId
-    }
-
-    # Check current live Mg context to decide whether reconnect is needed.
-    $currentMg = Get-MgModuleCurrentContext
-    $currentEntra = Get-EntraModuleCurrentContext
     $alreadyMatches = (
-        (Resolve-MgProfileMatch -ProfileConfig $profileConfig -Context $currentMg) -and
-        [string]$currentMg.ContextScope -ieq 'Process'
+        $targetTenantId -and
+        (Resolve-MgProfileMatch -ProfileConfig $targetProfileConfig -Context $currentMg) -and
+        [string]$currentMg.ContextScope -ieq 'CurrentUser'
     )
-    & $writeStepTiming "Inspected current Mg context"
-
-    $previousActive = Get-MgActiveProfileName
-
-    if ($alreadyMatches -and -not $Force.IsPresent -and $previousActive -ieq $Name) {
-        Write-Host "Already on Mg profile '$Name'. Use -Force to reconnect." -ForegroundColor Yellow
-        if ($slowestStepName) {
-            Write-Verbose ("Use-MgProfile slowest step: {0} ({1:N1} ms)" -f $slowestStepName, $slowestStepMs)
-        }
-        Write-Verbose ("Use-MgProfile total duration: {0:N1} ms" -f $overallTimer.Elapsed.TotalMilliseconds)
+    if ($alreadyMatches -and $activeName -ieq $normalizedName -and -not $Force.IsPresent) {
+        Write-Host "Already on Mg profile '$normalizedName'. Use -Force to reconnect." -ForegroundColor Yellow
         return Get-CurrentMgProfile
     }
 
     Write-Host "Switching to Mg profile: " -NoNewline
-    Write-Host $Name -ForegroundColor Cyan
+    Write-Host $normalizedName -ForegroundColor Cyan
 
-    # Disconnect active process contexts before connecting the requested profile.
-    if ($currentMg.LoggedIn -and [string]$currentMg.ContextScope -ieq 'Process') {
-        try { Disconnect-MgGraph -ErrorAction Stop | Out-Null } catch { Write-Verbose "Disconnect-MgGraph failed: $_" }
-        & $writeStepTiming "Disconnected previous Mg session"
-    }
-    if ($currentEntra.LoggedIn -and [string]$currentEntra.ContextScope -ieq 'Process') {
-        $disconnectEntraCommand = Get-Command -Name Disconnect-Entra -ErrorAction SilentlyContinue
-        if ($disconnectEntraCommand) {
-            try { Disconnect-Entra -ErrorAction Stop | Out-Null } catch { Write-Verbose "Disconnect-Entra failed: $_" }
-            & $writeStepTiming "Disconnected previous Entra session"
-        }
-    }
+    # Clear the prompt marker until the requested cached connection is validated.
+    Set-MgActiveProfileName -ProfileName 'default'
 
-    # Clear the marker until the requested Graph connection succeeds.
-    Set-MgActiveProfileName -ProfileName '(default)'
-
-    # Build Connect-MgGraph parameter set.
+    # Connect directly without Disconnect-MgGraph so the shared persistent token cache survives.
     $connectParams = @{
-        TenantId     = $profileConfig.TenantId
-        ContextScope = 'Process'
+        ContextScope = 'CurrentUser'
         ErrorAction  = 'Stop'
     }
-    if ($effectiveScopes)   { $connectParams.Scopes   = $effectiveScopes }
+    if ($targetTenantId) { $connectParams.TenantId = $targetTenantId }
+    if ($effectiveScopes) { $connectParams.Scopes = $effectiveScopes }
     if ($effectiveClientId) { $connectParams.ClientId = $effectiveClientId }
+    if ($targetAccount) { $connectParams.LoginHint = $targetAccount }
     if ($NoWelcome.IsPresent) { $connectParams.NoWelcome = $true }
 
     try {
         Connect-MgGraph @connectParams | Out-Null
-        Set-MgActiveProfileName -ProfileName $Name
-        & $writeStepTiming "Connected Microsoft.Graph"
+        & $writeStepTiming "Connected Microsoft Graph with persistent cache"
+
+        $connectedContext = Get-MgModuleCurrentContext
+        if (-not $connectedContext.LoggedIn) {
+            throw "Connect-MgGraph returned without a live context."
+        }
+        if ($targetTenantId -and $connectedContext.TenantId -ne $targetTenantId) {
+            throw "Tenant mismatch. Expected '$targetTenantId', connected '$($connectedContext.TenantId)'."
+        }
+        if ($targetAccount -and $connectedContext.Account -ine $targetAccount) {
+            throw "Account mismatch. Expected '$targetAccount', connected '$($connectedContext.Account)'."
+        }
+
+        Save-MgProfileContext -ProfileName $normalizedName -Context $connectedContext -Description $profileDescription
+        Set-MgActiveProfileName -ProfileName $normalizedName
+        & $writeStepTiming "Validated and saved Graph profile metadata"
     }
     catch {
-        Write-Error "Connect-MgGraph failed for profile '$Name': $_"
+        Write-Error "Connect-MgGraph failed for profile '$normalizedName': $_"
         throw
-    }
-
-    # Connect Microsoft.Entra against the same tenant (optional module).
-    if ($connectEntraCommand) {
-        $entraParams = @{
-            TenantId     = $profileConfig.TenantId
-            ContextScope = 'Process'
-            ErrorAction  = 'Stop'
-        }
-        if ($effectiveScopes)   { $entraParams.Scopes   = $effectiveScopes }
-        if ($effectiveClientId) { $entraParams.ClientId = $effectiveClientId }
-        if ($NoWelcome.IsPresent) { $entraParams.NoWelcome = $true }
-
-        try {
-            Connect-Entra @entraParams | Out-Null
-            & $writeStepTiming "Connected Microsoft.Entra"
-        }
-        catch {
-            Write-Warning "Connect-Entra failed for profile '$Name': $_"
-        }
-    }
-    else {
-        Write-Warning "Microsoft.Entra module not found. Install-Module Microsoft.Entra to enable Entra cmdlets."
     }
 
     if ($slowestStepName) {
@@ -2357,34 +2302,37 @@ function Use-MgProfile {
 function New-MgProfile {
     <#
     .SYNOPSIS
-        Creates a new Microsoft Graph / Entra profile or initializes an existing config entry.
+        Creates or initializes a persistent Microsoft Graph profile.
     .DESCRIPTION
-        In NewProfile mode, prompts for tenant/account details, runs Connect-MgGraph (and
-        Connect-Entra if available) with process-scoped contexts, captures the resulting
-        context, and optionally saves the entry to PersonalConfig.psd1 or WorkConfig.psd1.
-        In FromConfig mode, activates an existing config entry via Use-MgProfile.
+        Connects with a CurrentUser context, optionally targets the configured account
+        through LoginHint, validates the resulting context, and stores non-secret
+        routing metadata. WAM/MSAL owns the shared protected credential cache.
+        The reserved default profile is stored only as Graph metadata and never adds
+        an Azure profile entry.
     .PARAMETER Name
-        Profile name (top-level key in the config psd1).
+        Profile name, including the reserved name default.
     .PARAMETER TenantId
-        Target tenant ID (NewProfile mode).
+        Target tenant ID.
     .PARAMETER Account
-        Optional account UPN/email to record on the profile (NewProfile mode).
+        Optional account UPN/email used as the login hint and validation target.
     .PARAMETER Scopes
         Optional delegated scopes for Connect-MgGraph.
     .PARAMETER ClientId
-        Optional client (application) ID for app-only auth.
+        Optional public-client application ID.
     .PARAMETER Description
         Free-form description for the profile.
     .PARAMETER Save
-        Prompts to save the profile to a config psd1 (NewProfile mode).
+        Prompts to save a named profile to a config psd1. Default is stored only in the Graph cache.
     .PARAMETER FromConfig
-        Activates a profile already defined in config.
+        Activates an existing config entry through Use-MgProfile.
     .EXAMPLE
-        New-MgProfile -Name lab -TenantId <guid> -Save
+        New-MgProfile -Name default -TenantId <guid> -Account user@contoso.com
+    .EXAMPLE
+        New-MgProfile -Name lab -TenantId <guid> -Account user@contoso.com -Save
     .EXAMPLE
         New-MgProfile -Name qu -FromConfig
     #>
-    [CmdletBinding(DefaultParameterSetName = 'NewProfile')]
+    [CmdletBinding(DefaultParameterSetName = 'NewProfile', SupportsShouldProcess)]
     [OutputType([PSCustomObject])]
     param(
         [Parameter(Mandatory, Position = 0, ParameterSetName = 'NewProfile')]
@@ -2413,18 +2361,24 @@ function New-MgProfile {
         [switch]$FromConfig
     )
 
+    $normalizedName = if ($Name -ieq '(default)' -or $Name -ieq 'default') { 'default' } else { $Name }
 
+    # Delegate configured activation to the common persistent switching flow.
     if ($FromConfig.IsPresent) {
-        # Delegate to Use-MgProfile to perform process-scoped activation.
-        $allProfiles = Get-AllAzureProfileConfigs
-        if (-not $allProfiles.ContainsKey($Name)) {
-            throw "Profile '$Name' not found in any config."
+        if ($normalizedName -ne 'default') {
+            $allProfiles = Get-AllAzureProfileConfigs
+            if (-not $allProfiles.ContainsKey($normalizedName)) {
+                throw "Profile '$normalizedName' not found in any config."
+            }
         }
-        Use-MgProfile -Name $Name
+
+        if ($PSCmdlet.ShouldProcess("Mg profile '$normalizedName'", 'Activate configured profile')) {
+            Use-MgProfile -Name $normalizedName | Out-Null
+        }
         return Get-CurrentMgProfile
     }
 
-    # Require Graph SDK support for process-scoped profile activation.
+    # Require the Graph authentication capabilities used for persistent account targeting.
     $connectMgCommand = Get-Command -Name Connect-MgGraph -ErrorAction SilentlyContinue
     if (-not $connectMgCommand) {
         throw "Microsoft.Graph.Authentication module is not available."
@@ -2432,56 +2386,73 @@ function New-MgProfile {
     if (-not $connectMgCommand.Parameters.ContainsKey('ContextScope')) {
         throw "Connect-MgGraph does not support ContextScope. Upgrade Microsoft.Graph.Authentication."
     }
-
-    # Disconnect only prior process contexts so the persistent CurrentUser default remains intact.
-    $currentMg = Get-MgModuleCurrentContext
-    $currentEntra = Get-EntraModuleCurrentContext
-    if ($currentMg.LoggedIn -and [string]$currentMg.ContextScope -ieq 'Process') {
-        try { Disconnect-MgGraph -ErrorAction Stop | Out-Null } catch { Write-Verbose "Disconnect-MgGraph failed: $_" }
+    if ($Account -and -not $connectMgCommand.Parameters.ContainsKey('LoginHint')) {
+        throw "Connect-MgGraph does not support LoginHint. Upgrade Microsoft.Graph.Authentication to 2.39.0 or later."
     }
-    if ($currentEntra.LoggedIn -and [string]$currentEntra.ContextScope -ieq 'Process') {
-        $disconnectEntraCommand = Get-Command -Name Disconnect-Entra -ErrorAction SilentlyContinue
-        if ($disconnectEntraCommand) {
-            try { Disconnect-Entra -ErrorAction Stop | Out-Null } catch { Write-Verbose "Disconnect-Entra failed: $_" }
-        }
-    }
-    Set-MgActiveProfileName -ProfileName '(default)'
 
+    Write-Host "Creating Mg profile: " -NoNewline
+    Write-Host $normalizedName -ForegroundColor Cyan
+
+    # Honor WhatIf and confirmation before connecting or writing profile metadata.
+    if (-not $PSCmdlet.ShouldProcess("Mg profile '$normalizedName'", 'Connect and save persistent profile metadata')) {
+        return
+    }
+
+    # Clear the prompt marker until the requested identity is connected and validated.
+    Set-MgActiveProfileName -ProfileName 'default'
+
+    # Connect without signing out so existing WAM/MSAL credentials remain reusable.
     $connectParams = @{
         TenantId     = $TenantId
-        ContextScope = 'Process'
+        ContextScope = 'CurrentUser'
         ErrorAction  = 'Stop'
     }
-    if ($Scopes)   { $connectParams.Scopes   = $Scopes }
+    if ($Scopes) { $connectParams.Scopes = $Scopes }
     if ($ClientId) { $connectParams.ClientId = $ClientId }
+    if ($Account) { $connectParams.LoginHint = $Account }
 
-    Connect-MgGraph @connectParams | Out-Null
-    Set-MgActiveProfileName -ProfileName $Name
+    try {
+        Connect-MgGraph @connectParams | Out-Null
 
-    $connectEntraCommand = Get-Command -Name Connect-Entra -ErrorAction SilentlyContinue
-    if ($connectEntraCommand -and $connectEntraCommand.Parameters.ContainsKey('ContextScope')) {
-        $entraParams = @{
-            TenantId     = $TenantId
-            ContextScope = 'Process'
-            ErrorAction  = 'Continue'
+        $newContext = Get-MgModuleCurrentContext
+        if (-not $newContext.LoggedIn) {
+            throw "Connect-MgGraph returned without a live context."
         }
-        if ($Scopes)   { $entraParams.Scopes   = $Scopes }
-        if ($ClientId) { $entraParams.ClientId = $ClientId }
-        try { Connect-Entra @entraParams | Out-Null } catch { Write-Warning "Connect-Entra failed: $_" }
+        if ($newContext.TenantId -ne $TenantId) {
+            throw "Tenant mismatch. Expected '$TenantId', connected '$($newContext.TenantId)'."
+        }
+        if ($Account -and $newContext.Account -ine $Account) {
+            throw "Account mismatch. Expected '$Account', connected '$($newContext.Account)'."
+        }
+
+        $effectiveDescription = if ($Description) {
+            $Description
+        }
+        elseif ($normalizedName -ieq 'default') {
+            'Default Microsoft Graph profile'
+        }
+        else {
+            ''
+        }
+
+        Save-MgProfileContext -ProfileName $normalizedName -Context $newContext -Description $effectiveDescription
+        Set-MgActiveProfileName -ProfileName $normalizedName
     }
-    elseif ($connectEntraCommand) {
-        Write-Warning "Connect-Entra does not support ContextScope. Upgrade Microsoft.Entra.Authentication."
+    catch {
+        Write-Error "Could not create Mg profile '$normalizedName': $_"
+        throw
     }
 
-    $newContext = Get-MgModuleCurrentContext
-    $effectiveAccount = if ($Account) { $Account } else { $newContext.Account }
-
-    if ($Save.IsPresent) {
-        # Resolve writable config files (mirror New-AzProfile prompt flow).
+    # Save only named profiles to the shared Azure/Mg configuration files.
+    if ($Save.IsPresent -and $normalizedName -ieq 'default') {
+        Write-Host "Default Mg profile metadata saved under ~/.mg/profiles/default." -ForegroundColor Green
+    }
+    elseif ($Save.IsPresent) {
+        $effectiveAccount = if ($Account) { $Account } else { $newContext.Account }
         $personalConfigPath = Join-Path $HOME 'OneDrive\Apps\PowerShell\PersonalConfig.psd1'
         $workConfigPath = Join-Path $HOME 'OneDrive - Quisitive\Code\PowerShell\Config\WorkConfig.psd1'
 
-        Write-Host "`nSave Mg profile '$Name' to which config?"
+        Write-Host "`nSave Mg profile '$normalizedName' to which config?"
         Write-Host "  [1] PersonalConfig.psd1"
         Write-Host "  [2] WorkConfig.psd1"
         Write-Host "  [N] Don't save"
@@ -2493,20 +2464,19 @@ function New-MgProfile {
             default { $null }
         }
 
-        if ($configPath -and (Test-Path $configPath)) {
-            $content = Get-Content $configPath -Raw
-
-            # Build profile entry body conditionally so optional fields are omitted when empty.
+        # Insert the new named profile before the existing configuration template.
+        if ($configPath -and (Test-Path -LiteralPath $configPath)) {
+            $content = Get-Content -LiteralPath $configPath -Raw
             $lines = @()
             $lines += "        Account        = '$effectiveAccount'"
             $lines += "        TenantId       = '$TenantId'"
             $lines += "        Description    = '$Description'"
-            if ($Scopes)   { $lines += "        MgScopes       = @('" + ($Scopes -join "','") + "')" }
+            if ($Scopes) { $lines += "        MgScopes       = @('" + ($Scopes -join "','") + "')" }
             if ($ClientId) { $lines += "        MgClientId     = '$ClientId'" }
 
             $profileEntry = @"
 
-    '$Name' = @{
+    '$normalizedName' = @{
 $($lines -join "`n")
     }
 "@
@@ -2514,11 +2484,11 @@ $($lines -join "`n")
             $insertPattern = "# Template for adding new"
             if ($content -match [regex]::Escape($insertPattern)) {
                 $content = $content -replace [regex]::Escape($insertPattern), "$profileEntry`n`n    # Template for adding new"
-                Set-Content -Path $configPath -Value $content -NoNewline
+                Set-Content -LiteralPath $configPath -Value $content -NoNewline
                 Write-Host "Mg profile saved to config file" -ForegroundColor Green
             }
             else {
-                Write-Warning "Could not auto-insert. Please add manually."
+                Write-Warning "Could not auto-insert. Please add the profile manually."
             }
         }
     }
@@ -2542,20 +2512,24 @@ $($lines -join "`n")
 function Remove-MgProfile {
     <#
     .SYNOPSIS
-        Removes a Microsoft Graph / Entra profile and optionally its legacy cache.
+        Removes Microsoft Graph profile metadata and optionally its config entry.
     .DESCRIPTION
-        Deletes any legacy on-disk cache directory under ~/.mg/profiles/<name>/ and,
-        unless -KeepConfig is specified, removes the matching in-memory entries from
-        $Personal and $Work. The config psd1 files are NOT edited. If the profile is
-        active in this process, its process-scoped Mg/Entra sessions are disconnected.
+        Deletes non-secret metadata under ~/.mg/profiles/<name>/ and, unless
+        KeepConfig is specified, removes matching in-memory Personal and Work entries.
+        The config psd1 files and shared WAM/MSAL credential cache are not modified.
+        Removing the reserved default profile resets its metadata but does not remove
+        default from profile discovery.
     .PARAMETER Name
-        Profile name to remove.
+        Profile name to remove or reset.
     .PARAMETER KeepConfig
         Leaves the in-memory config entries intact.
     .PARAMETER KeepCache
         Leaves the on-disk ~/.mg/profiles/<name>/ directory intact.
     .EXAMPLE
         Remove-MgProfile lab
+    .EXAMPLE
+        Remove-MgProfile default
+        Resets the captured default-profile metadata without signing out.
     #>
     [CmdletBinding(SupportsShouldProcess)]
     param(
@@ -2569,98 +2543,93 @@ function Remove-MgProfile {
         [switch]$KeepCache
     )
 
-
+    $normalizedName = if ($Name -ieq '(default)' -or $Name -ieq 'default') { 'default' } else { $Name }
     $activeName = Get-MgActiveProfileName
 
-    # If the target is the active profile, disconnect live sessions first.
-    if ($Name -ieq $activeName) {
-        if (-not $PSCmdlet.ShouldProcess("active Mg/Entra session for '$Name'", 'Disconnect')) { return }
-
-        $currentMg = Get-MgModuleCurrentContext
-        if ($currentMg.LoggedIn -and [string]$currentMg.ContextScope -ieq 'Process') {
-            $disconnectMgCommand = Get-Command -Name Disconnect-MgGraph -ErrorAction SilentlyContinue
-            if ($disconnectMgCommand) {
-                try { Disconnect-MgGraph -ErrorAction Stop | Out-Null } catch { Write-Verbose "Disconnect-MgGraph failed: $_" }
-            }
+    # Move an active named profile to default without clearing the shared credential cache.
+    if ($normalizedName -ne 'default' -and $normalizedName -ieq $activeName) {
+        if (-not $PSCmdlet.ShouldProcess("active Mg profile '$normalizedName'", 'Switch to default profile')) {
+            return
         }
 
-        $currentEntra = Get-EntraModuleCurrentContext
-        if ($currentEntra.LoggedIn -and [string]$currentEntra.ContextScope -ieq 'Process') {
-            $disconnectEntraCommand = Get-Command -Name Disconnect-Entra -ErrorAction SilentlyContinue
-            if ($disconnectEntraCommand) {
-                try { Disconnect-Entra -ErrorAction Stop | Out-Null } catch { Write-Verbose "Disconnect-Entra failed: $_" }
-            }
-        }
-
-        Set-MgActiveProfileName -ProfileName '(default)'
+        Use-MgProfile -Name default -NoWelcome | Out-Null
     }
 
-    # Remove on-disk cache directory unless told otherwise.
+    # Remove the profile metadata directory unless explicitly preserved.
     if (-not $KeepCache.IsPresent) {
-        $cacheDir = Get-MgGraphProfileDir -ProfileName $Name
+        $cacheDir = Get-MgGraphProfileDir -ProfileName $normalizedName
         if (Test-Path -LiteralPath $cacheDir) {
-            if ($PSCmdlet.ShouldProcess($cacheDir, 'Remove profile cache directory')) {
+            if ($PSCmdlet.ShouldProcess($cacheDir, 'Remove profile metadata directory')) {
                 Remove-Item -LiteralPath $cacheDir -Recurse -Force
-                Write-Host "Removed cache: $cacheDir" -ForegroundColor Green
+                Write-Host "Removed profile metadata: $cacheDir" -ForegroundColor Green
             }
         }
     }
 
-    # Remove from in-memory configs unless told otherwise.
-    if (-not $KeepConfig.IsPresent) {
+    # Remove named profiles from loaded configuration without editing their source files.
+    if (-not $KeepConfig.IsPresent -and $normalizedName -ne 'default') {
         $removed = $false
-        foreach ($varName in @('Personal','Work')) {
+        foreach ($varName in @('Personal', 'Work')) {
             $configVar = Get-Variable -Name $varName -Scope Global -ErrorAction SilentlyContinue
-            if ($configVar -and $configVar.Value -is [hashtable] -and $configVar.Value.ContainsKey($Name)) {
-                if ($PSCmdlet.ShouldProcess("`$$varName[$Name]", 'Remove in-memory profile entry')) {
-                    $configVar.Value.Remove($Name)
-                    Write-Host "Removed in-memory entry: `$$varName[$Name]" -ForegroundColor Green
+            if ($configVar -and $configVar.Value -is [hashtable] -and $configVar.Value.ContainsKey($normalizedName)) {
+                if ($PSCmdlet.ShouldProcess("`$$varName[$normalizedName]", 'Remove in-memory profile entry')) {
+                    $configVar.Value.Remove($normalizedName)
+                    Write-Host "Removed in-memory entry: `$$varName[$normalizedName]" -ForegroundColor Green
                     $removed = $true
                 }
             }
         }
+
         if (-not $removed) {
-            Write-Host "Profile '$Name' not found in any in-memory configuration" -ForegroundColor Yellow
+            Write-Host "Profile '$normalizedName' not found in any in-memory configuration" -ForegroundColor Yellow
         }
     }
 }
 
-# Register argument completer for Mg profile names (shared across commands).
+# Register argument completion for the reserved default and all configured or cached profiles.
 $mgProfileCompleter = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
 
-
-    $results = @()
-
-    # Offer the persistent CurrentUser context when completing Use-MgProfile.
-    if ($commandName -in @('Use-MgProfile', 'ugp')) {
-        $results += [System.Management.Automation.CompletionResult]::new(
-            '(default)',
-            '(default)',
+    $results = @(
+        [System.Management.Automation.CompletionResult]::new(
+            'default',
+            'default',
             'ParameterValue',
-            'Default CurrentUser Microsoft Graph / Entra context'
+            'Default Microsoft Graph profile'
         )
-    }
-
+    )
     $allProfiles = Get-AllAzureProfileConfigs
-    if ($allProfiles.Count -gt 0) {
-        $results += $allProfiles.Keys | Where-Object { $_ -like "$wordToComplete*" } | ForEach-Object {
-            $description = $allProfiles[$_].Description
-            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $description)
-        }
-    }
 
-    # Also include disk-only profiles for completion.
-    $profilesRoot = Get-MgGraphProfilesRoot
-    if (Test-Path -LiteralPath $profilesRoot) {
-        Get-ChildItem -LiteralPath $profilesRoot -Directory -ErrorAction SilentlyContinue |
-            Where-Object { $_.Name -like "$wordToComplete*" -and -not $allProfiles.ContainsKey($_.Name) } |
+    # Add configured named profiles without shadowing the reserved default.
+    if ($allProfiles.Count -gt 0) {
+        $results += $allProfiles.Keys |
+            Where-Object { $_ -ine 'default' -and $_ -like "$wordToComplete*" } |
             ForEach-Object {
-                [System.Management.Automation.CompletionResult]::new($_.Name, $_.Name, 'ParameterValue', 'Disk-only Mg profile cache')
+                $description = $allProfiles[$_].Description
+                [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $description)
             }
     }
 
-    $results
+    # Add disk-only profile metadata directories without duplicating known names.
+    $profilesRoot = Get-MgGraphProfilesRoot
+    if (Test-Path -LiteralPath $profilesRoot) {
+        Get-ChildItem -LiteralPath $profilesRoot -Directory -ErrorAction SilentlyContinue |
+            Where-Object {
+                $_.Name -ine 'default' -and
+                $_.Name -like "$wordToComplete*" -and
+                -not $allProfiles.ContainsKey($_.Name)
+            } |
+            ForEach-Object {
+                [System.Management.Automation.CompletionResult]::new(
+                    $_.Name,
+                    $_.Name,
+                    'ParameterValue',
+                    'Disk-only Mg profile metadata'
+                )
+            }
+    }
+
+    $results | Where-Object { $_.CompletionText -like "$wordToComplete*" }
 }
 
 Register-ArgumentCompleter -CommandName Use-MgProfile, ugp -ParameterName Name -ScriptBlock $mgProfileCompleter

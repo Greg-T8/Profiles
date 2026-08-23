@@ -235,6 +235,9 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 			[string]$ClientId,
 
 			[Parameter()]
+			[string]$LoginHint,
+
+			[Parameter()]
 			[switch]$NoWelcome,
 
 			[Parameter()]
@@ -243,6 +246,76 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 
 		Import-MSCloudProfile
 		& MSCloudProfile\Use-MgProfile @PSBoundParameters
+	}
+
+	function Get-MgProfiles {
+		# Import and invoke Microsoft Graph profile discovery on first use.
+		[CmdletBinding()]
+		param()
+
+		Import-MSCloudProfile
+		& MSCloudProfile\Get-MgProfiles @PSBoundParameters
+	}
+
+	function Get-CurrentMgProfile {
+		# Import and invoke Microsoft Graph current-profile inspection on first use.
+		[CmdletBinding()]
+		param()
+
+		Import-MSCloudProfile
+		& MSCloudProfile\Get-CurrentMgProfile @PSBoundParameters
+	}
+
+	function New-MgProfile {
+		# Import and invoke Microsoft Graph profile creation on first use.
+		[CmdletBinding(DefaultParameterSetName = 'NewProfile', SupportsShouldProcess)]
+		param(
+			[Parameter(Mandatory, Position = 0, ParameterSetName = 'NewProfile')]
+			[Parameter(Mandatory, Position = 0, ParameterSetName = 'FromConfig')]
+			[string]$Name,
+
+			[Parameter(Mandatory, ParameterSetName = 'NewProfile')]
+			[string]$TenantId,
+
+			[Parameter(ParameterSetName = 'NewProfile')]
+			[string]$Account,
+
+			[Parameter(ParameterSetName = 'NewProfile')]
+			[string[]]$Scopes,
+
+			[Parameter(ParameterSetName = 'NewProfile')]
+			[string]$ClientId,
+
+			[Parameter(ParameterSetName = 'NewProfile')]
+			[string]$Description = '',
+
+			[Parameter(ParameterSetName = 'NewProfile')]
+			[switch]$Save,
+
+			[Parameter(Mandatory, ParameterSetName = 'FromConfig')]
+			[switch]$FromConfig
+		)
+
+		Import-MSCloudProfile
+		& MSCloudProfile\New-MgProfile @PSBoundParameters
+	}
+
+	function Remove-MgProfile {
+		# Import and invoke Microsoft Graph profile removal on first use.
+		[CmdletBinding(SupportsShouldProcess)]
+		param(
+			[Parameter(Mandatory, Position = 0)]
+			[string]$Name,
+
+			[Parameter()]
+			[switch]$KeepConfig,
+
+			[Parameter()]
+			[switch]$KeepCache
+		)
+
+		Import-MSCloudProfile
+		& MSCloudProfile\Remove-MgProfile @PSBoundParameters
 	}
 }
 #endregion
@@ -397,7 +470,11 @@ function Get-MgProfilePromptText {
 		}
 
 		$profileName = [string]$stateVariable.Value
-		if ([string]::IsNullOrWhiteSpace($profileName) -or $profileName -ieq '(default)') {
+		if (
+			[string]::IsNullOrWhiteSpace($profileName) -or
+			$profileName -ieq '(default)' -or
+			$profileName -ieq 'default'
+		) {
 			return ''
 		}
 

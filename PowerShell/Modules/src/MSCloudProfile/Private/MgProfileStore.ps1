@@ -1,42 +1,44 @@
 # -------------------------------------------------------------------------
 # Program: MgProfileStore.ps1
-# Description: Defines private Microsoft Graph legacy cache and session-state helpers.
+# Description: Defines private Microsoft Graph profile metadata and session-state helpers.
 # Context: Personal cross-host PowerShell profile.
 # Author: Greg Tate
 # -------------------------------------------------------------------------
 
 #region PRIVATE MG PROFILE STORE
-# Defines private Microsoft Graph legacy cache and session-state helpers.
-
-$script:MgGraphProfileFiles = @('mg.authrecord.json', 'mg.context.json', 'mg.graphoptions.json')
+# Defines private Microsoft Graph profile metadata and session-state helpers.
 
 function Get-MgGraphProfileRoot {
-    # Returns the live ~/.mg directory path.
+    # Return the live Microsoft Graph SDK configuration directory.
     $userHome = if ($env:HOME) { $env:HOME } else { $env:USERPROFILE }
     return (Join-Path $userHome '.mg')
 }
 
 function Get-MgGraphProfilesRoot {
-    # Returns the parent directory that holds all per-profile caches.
+    # Return the directory that holds logical Microsoft Graph profiles.
     return (Join-Path (Get-MgGraphProfileRoot) 'profiles')
 }
 
 function Get-MgGraphProfileDir {
+    # Return the metadata directory for one logical Microsoft Graph profile.
     param([Parameter(Mandatory)][string]$ProfileName)
-    return (Join-Path (Get-MgGraphProfilesRoot) $ProfileName)
+
+    $normalizedName = if ($ProfileName -ieq '(default)') { 'default' } else { $ProfileName }
+    return (Join-Path (Get-MgGraphProfilesRoot) $normalizedName)
 }
 
 function Get-MgActiveProfileName {
-    # Reads the process-local active profile name, defaulting to '(default)'.
+    # Read the process-local active profile name, defaulting to the hidden-label default profile.
     $stateVariable = Get-Variable -Name MSCloudMgProfileName -Scope Global -ErrorAction SilentlyContinue
     if ($stateVariable -and -not [string]::IsNullOrWhiteSpace([string]$stateVariable.Value)) {
         return [string]$stateVariable.Value
     }
 
-    return '(default)'
+    return 'default'
 }
 
 function Set-MgActiveProfileName {
+    # Set the process-local prompt state without coupling it to authentication persistence.
     [CmdletBinding(SupportsShouldProcess, ConfirmImpact = 'None')]
     param([Parameter(Mandatory)][string]$ProfileName)
 
@@ -45,7 +47,7 @@ function Set-MgActiveProfileName {
         return
     }
 
-    # Remove named-profile state when returning to the default CurrentUser context.
+    # Keep the prompt unlabelled while the reserved default profile is active.
     if ($ProfileName -ieq '(default)' -or $ProfileName -ieq 'default') {
         Remove-Variable -Name MSCloudMgProfileName -Scope Global -ErrorAction SilentlyContinue
         return
@@ -54,86 +56,69 @@ function Set-MgActiveProfileName {
     Set-Variable -Name MSCloudMgProfileName -Scope Global -Value $ProfileName
 }
 
-function Save-MgProfileCache {
-    # Copies the live ~/.mg/mg.*.json files into the per-profile cache directory.
+function Save-MgProfileContext {
+    # Persist non-secret routing metadata while leaving WAM/MSAL token files untouched.
     [CmdletBinding()]
-    param([Parameter(Mandatory)][string]$ProfileName)
+    param(
+        [Parameter(Mandatory)]
+        [string]$ProfileName,
 
-    $mgRoot = Get-MgGraphProfileRoot
-    if (-not (Test-Path -LiteralPath $mgRoot)) { return }
+        [Parameter(Mandatory)]
+        [PSCustomObject]$Context,
 
-    $destDir = Get-MgGraphProfileDir -ProfileName $ProfileName
-    if (-not (Test-Path -LiteralPath $destDir)) {
-        New-Item -Path $destDir -ItemType Directory -Force | Out-Null
+        [Parameter()]
+        [string]$Description
+    )
+
+    $profileDir = Get-MgGraphProfileDir -ProfileName $ProfileName
+    if (-not (Test-Path -LiteralPath $profileDir)) {
+        New-Item -Path $profileDir -ItemType Directory -Force | Out-Null
     }
 
-    foreach ($file in $script:MgGraphProfileFiles) {
-        $src = Join-Path $mgRoot $file
-        if (Test-Path -LiteralPath $src) {
-            Copy-Item -LiteralPath $src -Destination (Join-Path $destDir $file) -Force
-        }
-    }
-}
-
-function Restore-MgProfileCache {
-    # Copies a profile's cached files into ~/.mg/. Returns $true if any were copied.
-    [CmdletBinding()]
-    [OutputType([bool])]
-    param([Parameter(Mandatory)][string]$ProfileName)
-
-    $srcDir = Get-MgGraphProfileDir -ProfileName $ProfileName
-    if (-not (Test-Path -LiteralPath $srcDir)) { return $false }
-
-    $mgRoot = Get-MgGraphProfileRoot
-    if (-not (Test-Path -LiteralPath $mgRoot)) {
-        New-Item -Path $mgRoot -ItemType Directory -Force | Out-Null
+    # Store only values needed to route and validate a future cached connection.
+    $profileContext = [ordered]@{
+        Account     = $Context.Account
+        TenantId    = $Context.TenantId
+        Scopes      = @($Context.Scopes)
+        ClientId    = $Context.ClientId
+        AuthType    = $Context.AuthType
+        Description = $Description
+        UpdatedAt   = (Get-Date).ToString('o')
     }
 
-    $restored = $false
-    foreach ($file in $script:MgGraphProfileFiles) {
-        $src = Join-Path $srcDir $file
-        if (Test-Path -LiteralPath $src) {
-            Copy-Item -LiteralPath $src -Destination (Join-Path $mgRoot $file) -Force
-            $restored = $true
-        }
-    }
-    return $restored
-}
-
-function Clear-MgGraphLiveCache {
-    # Removes the live ~/.mg/mg.*.json files so cached state doesn't bleed between profiles.
-    $mgRoot = Get-MgGraphProfileRoot
-    if (-not (Test-Path -LiteralPath $mgRoot)) { return }
-    foreach ($file in $script:MgGraphProfileFiles) {
-        $live = Join-Path $mgRoot $file
-        if (Test-Path -LiteralPath $live) {
-            Remove-Item -LiteralPath $live -Force -ErrorAction SilentlyContinue
-        }
-    }
+    $contextPath = Join-Path $profileDir 'mg.context.json'
+    $profileContext |
+        ConvertTo-Json -Depth 4 |
+        Set-Content -LiteralPath $contextPath -Encoding utf8
 }
 
 function Get-MgProfileCachedContext {
-    # Reads a profile's cached mg.context.json without touching the live session.
+    # Read a profile's non-secret routing metadata without touching the live Graph session.
     [CmdletBinding()]
     [OutputType([PSCustomObject])]
     param([Parameter(Mandatory)][string]$ProfileName)
 
     $contextFile = Join-Path (Get-MgGraphProfileDir -ProfileName $ProfileName) 'mg.context.json'
-    if (-not (Test-Path -LiteralPath $contextFile)) { return $null }
+    if (-not (Test-Path -LiteralPath $contextFile)) {
+        return $null
+    }
 
     try {
-        $data = Get-Content -LiteralPath $contextFile -Raw -ErrorAction Stop | ConvertFrom-Json -ErrorAction Stop
+        $data = Get-Content -LiteralPath $contextFile -Raw -ErrorAction Stop |
+            ConvertFrom-Json -ErrorAction Stop
     }
     catch {
         return $null
     }
 
     [PSCustomObject][ordered]@{
-        Account  = $data.Account
-        TenantId = $data.TenantId
-        Scopes   = $data.Scopes
-        ClientId = $data.ClientId
-        AuthType = $data.AuthType
+        Account     = $data.Account
+        TenantId    = $data.TenantId
+        Scopes      = $data.Scopes
+        ClientId    = $data.ClientId
+        AuthType    = $data.AuthType
+        Description = $data.Description
+        UpdatedAt   = $data.UpdatedAt
     }
 }
 

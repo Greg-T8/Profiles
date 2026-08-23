@@ -11,11 +11,12 @@
 function Get-MgProfiles {
     <#
     .SYNOPSIS
-        Lists Microsoft Graph / Entra profiles from configs and from the on-disk profile cache.
+        Lists Microsoft Graph profiles from configuration and on-disk routing metadata.
     .DESCRIPTION
-        Returns one record per known profile, combining entries from PersonalConfig.psd1,
-        WorkConfig.psd1, and any cached profile directories under ~/.mg/profiles/.
-        ConfigSource is one of: PersonalConfig, WorkConfig, Both, DiskOnly.
+        Returns the reserved default profile plus one record per known named profile,
+        combining entries from PersonalConfig.psd1, WorkConfig.psd1, and profile
+        metadata directories under ~/.mg/profiles/. ConfigSource is one of:
+        Default, PersonalConfig, WorkConfig, Both, or DiskOnly.
     .EXAMPLE
         Get-MgProfiles
     #>
@@ -30,11 +31,22 @@ function Get-MgProfiles {
 
     $combined = @{}
 
+    # Always expose the reserved unlabelled default Graph profile.
+    $combined['default'] = @{ Config = $null; Source = 'Default' }
+
+    # Add personal named profiles while preserving the reserved default entry.
     foreach ($entry in $personalProfiles.GetEnumerator()) {
-        $combined[$entry.Key] = @{ Config = $entry.Value; Source = 'PersonalConfig' }
+        if ($entry.Key -ine 'default') {
+            $combined[$entry.Key] = @{ Config = $entry.Value; Source = 'PersonalConfig' }
+        }
     }
 
+    # Merge work named profiles while preserving personal precedence.
     foreach ($entry in $workProfiles.GetEnumerator()) {
+        if ($entry.Key -ieq 'default') {
+            continue
+        }
+
         if ($combined.ContainsKey($entry.Key)) {
             $combined[$entry.Key].Source = 'Both'
         }
@@ -70,7 +82,7 @@ function Get-MgProfiles {
             TenantId     = if ($cfg) { $cfg.TenantId } else { $cached.TenantId }
             MgClientId   = if ($cfg -and $cfg.ContainsKey('MgClientId')) { $cfg.MgClientId } else { $cached.ClientId }
             MgScopes     = if ($cfg -and $cfg.ContainsKey('MgScopes')) { $cfg.MgScopes } else { $cached.Scopes }
-            Description  = if ($cfg) { $cfg.Description } else { $null }
+            Description  = if ($cfg) { $cfg.Description } else { $cached.Description }
             HasCache     = ($null -ne $cached)
         }
     }

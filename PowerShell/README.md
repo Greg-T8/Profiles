@@ -149,6 +149,26 @@ imports the `MSCloudProfile` manifest by its relative path.
 - `Get-MgProfiles` - List configured and cached Microsoft Graph profiles
 - And many more! (See `functions.ps1` and `Modules/MSCloudProfile` for the full list.)
 
+### Microsoft Graph Profile Caching
+
+Microsoft Graph profiles use the SDK's persistent `CurrentUser` WAM/MSAL
+credential cache. Named profiles supply their configured account through
+`LoginHint`, then validate both account and tenant before updating the prompt.
+Normal profile switches do not call `Disconnect-MgGraph`, so switching does not
+clear cached credentials.
+
+The reserved `default` profile stores non-secret routing metadata under
+`~/.mg/profiles/default` and never displays an Mg prompt moniker. Initialize it
+explicitly when no existing unlabelled Graph context is available:
+
+```powershell
+New-MgProfile -Name default -TenantId '<tenant-id>' -Account 'user@contoso.com'
+Use-MgProfile default
+```
+
+Named profiles display `[mg:<name>]` only after the connected account and tenant
+match the requested profile.
+
 ## ⚙️ Advanced Installation Options
 
 For more control, download the installer manually:

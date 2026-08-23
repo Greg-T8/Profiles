@@ -11,20 +11,24 @@
 function Remove-MgProfile {
     <#
     .SYNOPSIS
-        Removes a Microsoft Graph / Entra profile and optionally its legacy cache.
+        Removes Microsoft Graph profile metadata and optionally its config entry.
     .DESCRIPTION
-        Deletes any legacy on-disk cache directory under ~/.mg/profiles/<name>/ and,
-        unless -KeepConfig is specified, removes the matching in-memory entries from
-        $Personal and $Work. The config psd1 files are NOT edited. If the profile is
-        active in this process, its process-scoped Mg/Entra sessions are disconnected.
+        Deletes non-secret metadata under ~/.mg/profiles/<name>/ and, unless
+        KeepConfig is specified, removes matching in-memory Personal and Work entries.
+        The config psd1 files and shared WAM/MSAL credential cache are not modified.
+        Removing the reserved default profile resets its metadata but does not remove
+        default from profile discovery.
     .PARAMETER Name
-        Profile name to remove.
+        Profile name to remove or reset.
     .PARAMETER KeepConfig
         Leaves the in-memory config entries intact.
     .PARAMETER KeepCache
         Leaves the on-disk ~/.mg/profiles/<name>/ directory intact.
     .EXAMPLE
         Remove-MgProfile lab
+    .EXAMPLE
+        Remove-MgProfile default
+        Resets the captured default-profile metadata without signing out.
     #>
     [CmdletBinding(SupportsShouldProcess)]
     param(
@@ -38,98 +42,93 @@ function Remove-MgProfile {
         [switch]$KeepCache
     )
 
-
+    $normalizedName = if ($Name -ieq '(default)' -or $Name -ieq 'default') { 'default' } else { $Name }
     $activeName = Get-MgActiveProfileName
 
-    # If the target is the active profile, disconnect live sessions first.
-    if ($Name -ieq $activeName) {
-        if (-not $PSCmdlet.ShouldProcess("active Mg/Entra session for '$Name'", 'Disconnect')) { return }
-
-        $currentMg = Get-MgModuleCurrentContext
-        if ($currentMg.LoggedIn -and [string]$currentMg.ContextScope -ieq 'Process') {
-            $disconnectMgCommand = Get-Command -Name Disconnect-MgGraph -ErrorAction SilentlyContinue
-            if ($disconnectMgCommand) {
-                try { Disconnect-MgGraph -ErrorAction Stop | Out-Null } catch { Write-Verbose "Disconnect-MgGraph failed: $_" }
-            }
+    # Move an active named profile to default without clearing the shared credential cache.
+    if ($normalizedName -ne 'default' -and $normalizedName -ieq $activeName) {
+        if (-not $PSCmdlet.ShouldProcess("active Mg profile '$normalizedName'", 'Switch to default profile')) {
+            return
         }
 
-        $currentEntra = Get-EntraModuleCurrentContext
-        if ($currentEntra.LoggedIn -and [string]$currentEntra.ContextScope -ieq 'Process') {
-            $disconnectEntraCommand = Get-Command -Name Disconnect-Entra -ErrorAction SilentlyContinue
-            if ($disconnectEntraCommand) {
-                try { Disconnect-Entra -ErrorAction Stop | Out-Null } catch { Write-Verbose "Disconnect-Entra failed: $_" }
-            }
-        }
-
-        Set-MgActiveProfileName -ProfileName '(default)'
+        Use-MgProfile -Name default -NoWelcome | Out-Null
     }
 
-    # Remove on-disk cache directory unless told otherwise.
+    # Remove the profile metadata directory unless explicitly preserved.
     if (-not $KeepCache.IsPresent) {
-        $cacheDir = Get-MgGraphProfileDir -ProfileName $Name
+        $cacheDir = Get-MgGraphProfileDir -ProfileName $normalizedName
         if (Test-Path -LiteralPath $cacheDir) {
-            if ($PSCmdlet.ShouldProcess($cacheDir, 'Remove profile cache directory')) {
+            if ($PSCmdlet.ShouldProcess($cacheDir, 'Remove profile metadata directory')) {
                 Remove-Item -LiteralPath $cacheDir -Recurse -Force
-                Write-Host "Removed cache: $cacheDir" -ForegroundColor Green
+                Write-Host "Removed profile metadata: $cacheDir" -ForegroundColor Green
             }
         }
     }
 
-    # Remove from in-memory configs unless told otherwise.
-    if (-not $KeepConfig.IsPresent) {
+    # Remove named profiles from loaded configuration without editing their source files.
+    if (-not $KeepConfig.IsPresent -and $normalizedName -ne 'default') {
         $removed = $false
-        foreach ($varName in @('Personal','Work')) {
+        foreach ($varName in @('Personal', 'Work')) {
             $configVar = Get-Variable -Name $varName -Scope Global -ErrorAction SilentlyContinue
-            if ($configVar -and $configVar.Value -is [hashtable] -and $configVar.Value.ContainsKey($Name)) {
-                if ($PSCmdlet.ShouldProcess("`$$varName[$Name]", 'Remove in-memory profile entry')) {
-                    $configVar.Value.Remove($Name)
-                    Write-Host "Removed in-memory entry: `$$varName[$Name]" -ForegroundColor Green
+            if ($configVar -and $configVar.Value -is [hashtable] -and $configVar.Value.ContainsKey($normalizedName)) {
+                if ($PSCmdlet.ShouldProcess("`$$varName[$normalizedName]", 'Remove in-memory profile entry')) {
+                    $configVar.Value.Remove($normalizedName)
+                    Write-Host "Removed in-memory entry: `$$varName[$normalizedName]" -ForegroundColor Green
                     $removed = $true
                 }
             }
         }
+
         if (-not $removed) {
-            Write-Host "Profile '$Name' not found in any in-memory configuration" -ForegroundColor Yellow
+            Write-Host "Profile '$normalizedName' not found in any in-memory configuration" -ForegroundColor Yellow
         }
     }
 }
 
-# Register argument completer for Mg profile names (shared across commands).
+# Register argument completion for the reserved default and all configured or cached profiles.
 $mgProfileCompleter = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
 
-
-    $results = @()
-
-    # Offer the persistent CurrentUser context when completing Use-MgProfile.
-    if ($commandName -in @('Use-MgProfile', 'ugp')) {
-        $results += [System.Management.Automation.CompletionResult]::new(
-            '(default)',
-            '(default)',
+    $results = @(
+        [System.Management.Automation.CompletionResult]::new(
+            'default',
+            'default',
             'ParameterValue',
-            'Default CurrentUser Microsoft Graph / Entra context'
+            'Default Microsoft Graph profile'
         )
-    }
-
+    )
     $allProfiles = Get-AllAzureProfileConfigs
-    if ($allProfiles.Count -gt 0) {
-        $results += $allProfiles.Keys | Where-Object { $_ -like "$wordToComplete*" } | ForEach-Object {
-            $description = $allProfiles[$_].Description
-            [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $description)
-        }
-    }
 
-    # Also include disk-only profiles for completion.
-    $profilesRoot = Get-MgGraphProfilesRoot
-    if (Test-Path -LiteralPath $profilesRoot) {
-        Get-ChildItem -LiteralPath $profilesRoot -Directory -ErrorAction SilentlyContinue |
-            Where-Object { $_.Name -like "$wordToComplete*" -and -not $allProfiles.ContainsKey($_.Name) } |
+    # Add configured named profiles without shadowing the reserved default.
+    if ($allProfiles.Count -gt 0) {
+        $results += $allProfiles.Keys |
+            Where-Object { $_ -ine 'default' -and $_ -like "$wordToComplete*" } |
             ForEach-Object {
-                [System.Management.Automation.CompletionResult]::new($_.Name, $_.Name, 'ParameterValue', 'Disk-only Mg profile cache')
+                $description = $allProfiles[$_].Description
+                [System.Management.Automation.CompletionResult]::new($_, $_, 'ParameterValue', $description)
             }
     }
 
-    $results
+    # Add disk-only profile metadata directories without duplicating known names.
+    $profilesRoot = Get-MgGraphProfilesRoot
+    if (Test-Path -LiteralPath $profilesRoot) {
+        Get-ChildItem -LiteralPath $profilesRoot -Directory -ErrorAction SilentlyContinue |
+            Where-Object {
+                $_.Name -ine 'default' -and
+                $_.Name -like "$wordToComplete*" -and
+                -not $allProfiles.ContainsKey($_.Name)
+            } |
+            ForEach-Object {
+                [System.Management.Automation.CompletionResult]::new(
+                    $_.Name,
+                    $_.Name,
+                    'ParameterValue',
+                    'Disk-only Mg profile metadata'
+                )
+            }
+    }
+
+    $results | Where-Object { $_.CompletionText -like "$wordToComplete*" }
 }
 
 Register-ArgumentCompleter -CommandName Use-MgProfile, ugp -ParameterName Name -ScriptBlock $mgProfileCompleter
