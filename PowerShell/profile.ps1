@@ -1,4 +1,4 @@
-<#
+﻿<#
     Program: profile.ps1
     Description: Configures the interactive PowerShell environment and prompt.
     Context: Personal cross-host PowerShell profile.
