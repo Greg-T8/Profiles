@@ -289,6 +289,58 @@ function dir {
 function Get-ClipboardExcel {
     Get-Clipboard | ConvertFrom-Csv -Delimiter "`t"
 }
+# Retrieves the installed Windows edition, release version, build, and architecture.
+function Get-WindowsVersion {
+    [CmdletBinding()]
+    [OutputType([PSCustomObject])]
+    param()
+
+    # Read the Windows version values maintained by the operating system.
+    try {
+        $windowsVersion = Get-ItemProperty `
+            -Path 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion' `
+            -ErrorAction Stop
+    }
+    catch {
+        throw "Unable to read Windows version information. $($_.Exception.Message)"
+    }
+
+    # Prefer the modern display version while retaining compatibility with older releases.
+    $version = if ($windowsVersion.DisplayVersion) {
+        $windowsVersion.DisplayVersion
+    }
+    elseif ($windowsVersion.ReleaseId) {
+        $windowsVersion.ReleaseId
+    }
+    else {
+        $windowsVersion.CurrentVersion
+    }
+
+    # Correct the legacy Windows 10 product name retained by some Windows 11 installations.
+    $friendlyName = $windowsVersion.ProductName
+    $buildNumber = [int]$windowsVersion.CurrentBuildNumber
+    if (
+        $windowsVersion.InstallationType -eq 'Client' -and
+        $buildNumber -ge 22000 -and
+        $friendlyName -match '^Windows 10(?<Edition>.*)$'
+    ) {
+        $friendlyName = "Windows 11$($matches.Edition)"
+    }
+
+    # Include the servicing revision only when the operating system provides one.
+    $build = [string]$windowsVersion.CurrentBuildNumber
+    if ($null -ne $windowsVersion.UBR) {
+        $build = "$build.$($windowsVersion.UBR)"
+    }
+
+    # Return a compact, pipeline-friendly version summary.
+    [PSCustomObject][ordered]@{
+        Name         = $friendlyName
+        Version      = $version
+        Build        = $build
+        Architecture = if ([Environment]::Is64BitOperatingSystem) { '64-bit' } else { '32-bit' }
+    }
+}
 
 # Opens VSCode with a temporary user data directory, or cleans up the temp directory if -Clean is specified.
 function tempcode {
