@@ -15,17 +15,17 @@
     CompatiblePSEditions = @('Core')
 
     FunctionsToExport = @(
-        'Get-AzProfiles'
-        'Get-CurrentAzProfile'
         'Use-AzProfile'
-        'Use-AzProfileSubscription'
-        'New-AzProfile'
-        'Remove-AzProfile'
-        'Get-MgProfiles'
-        'Get-CurrentMgProfile'
         'Use-MgProfile'
+        'Get-CurrentAzProfile'
+        'Get-CurrentMgProfile'
+        'Get-AzProfiles'
+        'Get-MgProfiles'
+        'New-AzProfile'
         'New-MgProfile'
+        'Remove-AzProfile'
         'Remove-MgProfile'
+        'Use-AzProfileSubscription'
     )
     CmdletsToExport   = @()
     VariablesToExport = @()
