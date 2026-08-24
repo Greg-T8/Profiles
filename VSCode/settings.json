@@ -820,7 +820,7 @@
   "powershell.helpCompletion": "BlockComment",
   "powershell.integratedConsole.focusConsoleOnExecute": true,
   "powershell.integratedConsole.showOnStartup": false,
-  "powershell.integratedConsole.startInBackground": true,
+  "powershell.integratedConsole.startInBackground": false,
   "powershell.powerShellDefaultVersion": "PowerShell (x64)",
   "powershell.promptToUpdatePowerShell": false,
   "powershell.scriptAnalysis.enable": true,

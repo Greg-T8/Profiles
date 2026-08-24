@@ -1,4 +1,4 @@
-﻿<#
+<#
     Program: profile.ps1
     Description: Configures the interactive PowerShell environment and prompt.
     Context: Personal cross-host PowerShell profile.
@@ -63,6 +63,7 @@ Set-Alias -Name ugp -Value Use-MgProfile
 Set-Alias -Name gcap -Value Get-CurrentAzProfile
 Set-Alias -Name gcgp -Value Get-CurrentMgProfile
 Set-Alias -Name uas -Value Use-AzProfileSubscription
+Set-Alias -Name uaps -Value Use-AzureProfileSubscription
 Set-Alias -Name gbs -Value Get-BillingSubscriptions
 Set-Alias -Name td -Value Get-TimeDifference
 Set-Alias -Name tf -Value terraform
