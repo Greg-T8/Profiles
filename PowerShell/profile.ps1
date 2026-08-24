@@ -221,6 +221,24 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 		& MSCloudProfile\Use-AzProfile @PSBoundParameters
 	}
 
+	function Get-AzProfiles {
+		# Import and invoke Azure profile discovery on first use.
+		[CmdletBinding()]
+		param()
+
+		Import-MSCloudProfile
+		& MSCloudProfile\Get-AzProfiles @PSBoundParameters
+	}
+
+	function Get-CurrentAzProfile {
+		# Import and invoke Azure current-profile inspection on first use.
+		[CmdletBinding()]
+		param()
+
+		Import-MSCloudProfile
+		& MSCloudProfile\Get-CurrentAzProfile @PSBoundParameters
+	}
+
 	function Use-MgProfile {
 		# Import and invoke the Microsoft Graph profile-switching command on first use.
 		[CmdletBinding()]
@@ -266,57 +284,6 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 		& MSCloudProfile\Get-CurrentMgProfile @PSBoundParameters
 	}
 
-	function New-MgProfile {
-		# Import and invoke Microsoft Graph profile creation on first use.
-		[CmdletBinding(DefaultParameterSetName = 'NewProfile', SupportsShouldProcess)]
-		param(
-			[Parameter(Mandatory, Position = 0, ParameterSetName = 'NewProfile')]
-			[Parameter(Mandatory, Position = 0, ParameterSetName = 'FromConfig')]
-			[string]$Name,
-
-			[Parameter(Mandatory, ParameterSetName = 'NewProfile')]
-			[string]$TenantId,
-
-			[Parameter(ParameterSetName = 'NewProfile')]
-			[string]$Account,
-
-			[Parameter(ParameterSetName = 'NewProfile')]
-			[string[]]$Scopes,
-
-			[Parameter(ParameterSetName = 'NewProfile')]
-			[string]$ClientId,
-
-			[Parameter(ParameterSetName = 'NewProfile')]
-			[string]$Description = '',
-
-			[Parameter(ParameterSetName = 'NewProfile')]
-			[switch]$Save,
-
-			[Parameter(Mandatory, ParameterSetName = 'FromConfig')]
-			[switch]$FromConfig
-		)
-
-		Import-MSCloudProfile
-		& MSCloudProfile\New-MgProfile @PSBoundParameters
-	}
-
-	function Remove-MgProfile {
-		# Import and invoke Microsoft Graph profile removal on first use.
-		[CmdletBinding(SupportsShouldProcess)]
-		param(
-			[Parameter(Mandatory, Position = 0)]
-			[string]$Name,
-
-			[Parameter()]
-			[switch]$KeepConfig,
-
-			[Parameter()]
-			[switch]$KeepCache
-		)
-
-		Import-MSCloudProfile
-		& MSCloudProfile\Remove-MgProfile @PSBoundParameters
-	}
 }
 #endregion
 
