@@ -221,13 +221,13 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 		& MSCloudProfile\Use-AzProfile @PSBoundParameters
 	}
 
-	function Get-AzProfiles {
+	function Get-AllAzProfiles {
 		# Import and invoke Azure profile discovery on first use.
 		[CmdletBinding()]
 		param()
 
 		Import-MSCloudProfile
-		& MSCloudProfile\Get-AzProfiles @PSBoundParameters
+		& MSCloudProfile\Get-AllAzProfiles @PSBoundParameters
 	}
 
 	function Get-CurrentAzProfile {
@@ -266,13 +266,13 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 		& MSCloudProfile\Use-MgProfile @PSBoundParameters
 	}
 
-	function Get-MgProfiles {
+	function Get-AllMgProfiles {
 		# Import and invoke Microsoft Graph profile discovery on first use.
 		[CmdletBinding()]
 		param()
 
 		Import-MSCloudProfile
-		& MSCloudProfile\Get-MgProfiles @PSBoundParameters
+		& MSCloudProfile\Get-AllMgProfiles @PSBoundParameters
 	}
 
 	function Get-CurrentMgProfile {

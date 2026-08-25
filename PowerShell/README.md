@@ -92,13 +92,13 @@ PowerShell/
 │       ├── MSCloudProfile.psd1
 │       └── MSCloudProfile.psm1
 │       ├── Public/
-│       │   ├── Get-AzProfiles.ps1
+│       │   ├── Get-AllAzProfiles.ps1
 │       │   ├── Get-CurrentAzProfile.ps1
 │       │   ├── Use-AzProfile.ps1
 │       │   ├── Use-AzProfileSubscription.ps1
 │       │   ├── New-AzProfile.ps1
 │       │   ├── Remove-AzProfile.ps1
-│       │   ├── Get-MgProfiles.ps1
+│       │   ├── Get-AllMgProfiles.ps1
 │       │   ├── Get-CurrentMgProfile.ps1
 │       │   ├── Use-MgProfile.ps1
 │       │   ├── New-MgProfile.ps1
@@ -145,8 +145,8 @@ imports the `MSCloudProfile` manifest by its relative path.
 - `Update-AllInstalledModules` - Update all PowerShell modules
 - `Remove-OldModuleVersions` - Clean up old module versions
 - `Measure-ProfileLoad` - Analyze profile loading performance
-- `Get-AzProfiles` - List configured and discovered Azure profiles
-- `Get-MgProfiles` - List configured and cached Microsoft Graph profiles
+- `Get-AllAzProfiles` - List configured and discovered Azure profiles
+- `Get-AllMgProfiles` - List configured and cached Microsoft Graph profiles
 - And many more! (See `functions.ps1` and `Modules/MSCloudProfile` for the full list.)
 
 ### Microsoft Graph Profile Caching

@@ -21,13 +21,13 @@
     - functions.ps1
     - Modules/MSCloudProfile/MSCloudProfile.psd1
     - Modules/MSCloudProfile/MSCloudProfile.psm1
-    - Modules/MSCloudProfile/Public/Get-AzProfiles.ps1
+    - Modules/MSCloudProfile/Public/Get-AllAzProfiles.ps1
     - Modules/MSCloudProfile/Public/Get-CurrentAzProfile.ps1
     - Modules/MSCloudProfile/Public/Use-AzProfile.ps1
     - Modules/MSCloudProfile/Public/Use-AzProfileSubscription.ps1
     - Modules/MSCloudProfile/Public/New-AzProfile.ps1
     - Modules/MSCloudProfile/Public/Remove-AzProfile.ps1
-    - Modules/MSCloudProfile/Public/Get-MgProfiles.ps1
+    - Modules/MSCloudProfile/Public/Get-AllMgProfiles.ps1
     - Modules/MSCloudProfile/Public/Get-CurrentMgProfile.ps1
     - Modules/MSCloudProfile/Public/Use-MgProfile.ps1
     - Modules/MSCloudProfile/Public/New-MgProfile.ps1
@@ -277,13 +277,13 @@ $Helpers = {
             'functions.ps1'
             'Modules/MSCloudProfile/MSCloudProfile.psd1'
             'Modules/MSCloudProfile/MSCloudProfile.psm1'
-            'Modules/MSCloudProfile/Public/Get-AzProfiles.ps1'
+            'Modules/MSCloudProfile/Public/Get-AllAzProfiles.ps1'
             'Modules/MSCloudProfile/Public/Get-CurrentAzProfile.ps1'
             'Modules/MSCloudProfile/Public/Use-AzProfile.ps1'
             'Modules/MSCloudProfile/Public/Use-AzProfileSubscription.ps1'
             'Modules/MSCloudProfile/Public/New-AzProfile.ps1'
             'Modules/MSCloudProfile/Public/Remove-AzProfile.ps1'
-            'Modules/MSCloudProfile/Public/Get-MgProfiles.ps1'
+            'Modules/MSCloudProfile/Public/Get-AllMgProfiles.ps1'
             'Modules/MSCloudProfile/Public/Get-CurrentMgProfile.ps1'
             'Modules/MSCloudProfile/Public/Use-MgProfile.ps1'
             'Modules/MSCloudProfile/Public/New-MgProfile.ps1'

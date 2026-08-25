@@ -669,7 +669,7 @@ function Get-CurrentMgProfile {
 
 
 
-function Get-AzProfiles {
+function Get-AllAzProfiles {
     <#
     .SYNOPSIS
         Lists Azure CLI profiles from both PersonalConfig and WorkConfig and the profiles directory.
@@ -688,10 +688,10 @@ function Get-AzProfiles {
     .PARAMETER DiscoveredOnly
         Shows only profiles found in ~/.azure/profiles directory without config.
     .EXAMPLE
-        Get-AzProfiles
+        Get-AllAzProfiles
         Lists all profiles from both sources.
     .EXAMPLE
-        Get-AzProfiles -ConfiguredOnly
+        Get-AllAzProfiles -ConfiguredOnly
         Shows only profiles defined in config files.
     #>
     [CmdletBinding()]
@@ -1062,7 +1062,7 @@ function Get-AzProfiles {
 
 
 
-function Get-MgProfiles {
+function Get-AllMgProfiles {
     <#
     .SYNOPSIS
         Lists Microsoft Graph profiles from configuration and on-disk routing metadata.
@@ -1072,7 +1072,7 @@ function Get-MgProfiles {
         metadata directories under ~/.mg/profiles/. ConfigSource is one of:
         Default, PersonalConfig, WorkConfig, Both, or DiskOnly.
     .EXAMPLE
-        Get-MgProfiles
+        Get-AllMgProfiles
     #>
     [CmdletBinding()]
     [OutputType([PSCustomObject[]])]
@@ -2498,8 +2498,8 @@ Export-ModuleMember -Function @(
  'Use-MgProfile',
  'Get-CurrentAzProfile',
  'Get-CurrentMgProfile',
- 'Get-AzProfiles',
- 'Get-MgProfiles',
+ 'Get-AllAzProfiles',
+ 'Get-AllMgProfiles',
  'New-AzProfile',
  'New-MgProfile',
  'Remove-AzProfile',
