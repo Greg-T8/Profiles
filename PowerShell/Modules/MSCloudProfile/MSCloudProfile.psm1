@@ -621,6 +621,7 @@ function Get-CurrentAzProfile {
         ConfigDir      = $currentConfigDir
         LoggedIn       = ($null -ne $cliAccountInfo)
         User           = $cliAccountInfo.user.name
+        TenantName     = $cliAccountInfo.tenantDisplayName
         TenantId       = $cliAccountInfo.tenantId
         Subscription   = $cliAccountInfo.name
         SubscriptionId = $cliAccountInfo.id

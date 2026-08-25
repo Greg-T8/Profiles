@@ -17,6 +17,7 @@ Author: Greg Tate
           <TableColumnHeader><Label>User</Label></TableColumnHeader>
           <TableColumnHeader><Label>Subscription</Label></TableColumnHeader>
           <TableColumnHeader><Label>Tenant</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Tenant ID</Label></TableColumnHeader>
           <TableColumnHeader><Label>Synchronized</Label></TableColumnHeader>
         </TableHeaders>
         <TableRowEntries><TableRowEntry><TableColumnItems>
@@ -24,6 +25,7 @@ Author: Greg Tate
           <TableColumnItem><PropertyName>LoggedIn</PropertyName></TableColumnItem>
           <TableColumnItem><PropertyName>User</PropertyName></TableColumnItem>
           <TableColumnItem><PropertyName>Subscription</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>TenantName</PropertyName></TableColumnItem>
           <TableColumnItem><PropertyName>TenantId</PropertyName></TableColumnItem>
           <TableColumnItem><PropertyName>ContextSynchronized</PropertyName></TableColumnItem>
         </TableColumnItems></TableRowEntry></TableRowEntries>
