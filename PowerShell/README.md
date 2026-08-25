@@ -75,9 +75,8 @@ The installer copies these files to your system:
 | `profile.ps1` | Root profile configuration, aliases, PSReadLine settings, and prompt |
 | `functions.ps1` | Custom PowerShell functions for productivity |
 | `Modules/MSCloudProfile/MSCloudProfile.psd1` | Module manifest and public command contract |
-| `Modules/MSCloudProfile/MSCloudProfile.psm1` | Deterministic module loader and public export boundary |
-| `Modules/MSCloudProfile/Public/*.ps1` | One file per exported Az, Graph, or Entra profile command |
-| `Modules/MSCloudProfile/Private/*.ps1` | Themed configuration, context, and profile-cache helper groups |
+| `Modules/MSCloudProfile/MSCloudProfile.psm1` | Bundled Az, Graph, and Entra profile implementation |
+| `Modules/MSCloudProfile/README.md` | MSCloudProfile configuration and usage guide |
 
 **Installation Location:** `$HOME\Documents\PowerShell\`
 
@@ -90,24 +89,9 @@ PowerShell/
 ├── Modules/
 │   └── MSCloudProfile/
 │       ├── MSCloudProfile.psd1
-│       └── MSCloudProfile.psm1
-│       ├── Public/
-│       │   ├── Get-AllAzProfiles.ps1
-│       │   ├── Get-CurrentAzProfile.ps1
-│       │   ├── Use-AzProfile.ps1
-│       │   ├── Use-AzProfileSubscription.ps1
-│       │   ├── New-AzProfile.ps1
-│       │   ├── Remove-AzProfile.ps1
-│       │   ├── Get-AllMgProfiles.ps1
-│       │   ├── Get-CurrentMgProfile.ps1
-│       │   ├── Use-MgProfile.ps1
-│       │   ├── New-MgProfile.ps1
-│       │   └── Remove-MgProfile.ps1
-│       └── Private/
-│           ├── ProfileConfiguration.ps1
-│           ├── AzModuleContext.ps1
-│           ├── MgProfileStore.ps1
-│           └── MgModuleContext.ps1
+│       ├── MSCloudProfile.psm1
+│       ├── MSCloudProfile.format.ps1xml
+│       └── README.md
 ├── RemoteProfile/
 │   ├── bootstrap.ps1
 │   └── Install-RemoteProfile.ps1
@@ -116,8 +100,8 @@ PowerShell/
 ```
 
 `profile.ps1` remains the root entrypoint. PowerShell 7 dot-sources
-`functions.ps1`, loads personal and work configuration when available, and then
-imports the `MSCloudProfile` manifest by its relative path.
+`functions.ps1`, resolves personal and work configuration paths, and then lazily
+imports the `MSCloudProfile` manifest by its relative path. See [Modules/MSCloudProfile/README.md](Modules/MSCloudProfile/README.md) for configuration and command guidance.
 
 ### Profile Features
 

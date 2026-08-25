@@ -21,21 +21,8 @@
     - functions.ps1
     - Modules/MSCloudProfile/MSCloudProfile.psd1
     - Modules/MSCloudProfile/MSCloudProfile.psm1
-    - Modules/MSCloudProfile/Public/Get-AllAzProfiles.ps1
-    - Modules/MSCloudProfile/Public/Get-CurrentAzProfile.ps1
-    - Modules/MSCloudProfile/Public/Use-AzProfile.ps1
-    - Modules/MSCloudProfile/Public/Use-AzProfileSubscription.ps1
-    - Modules/MSCloudProfile/Public/New-AzProfile.ps1
-    - Modules/MSCloudProfile/Public/Remove-AzProfile.ps1
-    - Modules/MSCloudProfile/Public/Get-AllMgProfiles.ps1
-    - Modules/MSCloudProfile/Public/Get-CurrentMgProfile.ps1
-    - Modules/MSCloudProfile/Public/Use-MgProfile.ps1
-    - Modules/MSCloudProfile/Public/New-MgProfile.ps1
-    - Modules/MSCloudProfile/Public/Remove-MgProfile.ps1
-    - Modules/MSCloudProfile/Private/ProfileConfiguration.ps1
-    - Modules/MSCloudProfile/Private/AzModuleContext.ps1
-    - Modules/MSCloudProfile/Private/MgProfileStore.ps1
-    - Modules/MSCloudProfile/Private/MgModuleContext.ps1
+    - Modules/MSCloudProfile/MSCloudProfile.format.ps1xml
+    - Modules/MSCloudProfile/README.md
 
 .PARAMETER GitHubRepo
     The GitHub repository in the format 'owner/repo'. Defaults to 'Greg-T8/Profiles'.
@@ -277,21 +264,8 @@ $Helpers = {
             'functions.ps1'
             'Modules/MSCloudProfile/MSCloudProfile.psd1'
             'Modules/MSCloudProfile/MSCloudProfile.psm1'
-            'Modules/MSCloudProfile/Public/Get-AllAzProfiles.ps1'
-            'Modules/MSCloudProfile/Public/Get-CurrentAzProfile.ps1'
-            'Modules/MSCloudProfile/Public/Use-AzProfile.ps1'
-            'Modules/MSCloudProfile/Public/Use-AzProfileSubscription.ps1'
-            'Modules/MSCloudProfile/Public/New-AzProfile.ps1'
-            'Modules/MSCloudProfile/Public/Remove-AzProfile.ps1'
-            'Modules/MSCloudProfile/Public/Get-AllMgProfiles.ps1'
-            'Modules/MSCloudProfile/Public/Get-CurrentMgProfile.ps1'
-            'Modules/MSCloudProfile/Public/Use-MgProfile.ps1'
-            'Modules/MSCloudProfile/Public/New-MgProfile.ps1'
-            'Modules/MSCloudProfile/Public/Remove-MgProfile.ps1'
-            'Modules/MSCloudProfile/Private/ProfileConfiguration.ps1'
-            'Modules/MSCloudProfile/Private/AzModuleContext.ps1'
-            'Modules/MSCloudProfile/Private/MgProfileStore.ps1'
-            'Modules/MSCloudProfile/Private/MgModuleContext.ps1'
+            'Modules/MSCloudProfile/MSCloudProfile.format.ps1xml'
+            'Modules/MSCloudProfile/README.md'
         )
     }
 

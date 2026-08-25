@@ -174,17 +174,27 @@ if ($PSVersionTable.PSEdition -eq 'Core' -and [System.IO.File]::Exists("$profile
 }
 Write-ProfileTime 'After custom functions'
 
-# Load personal configuration
-$personalConfigPath = "$env:OneDriveConsumer/Apps/PowerShell/PersonalConfig.psd1"
-if ([System.IO.File]::Exists($personalConfigPath)) {
-	$Personal = Import-PowerShellDataFile -Path $personalConfigPath
+# Resolve profile-owned configuration paths for lazy module registration.
+$personalConfigPath = if ($env:MSCLOUDPROFILE_PERSONAL_CONFIG_PATH) {
+	$env:MSCLOUDPROFILE_PERSONAL_CONFIG_PATH
+}
+elseif ($env:OneDriveConsumer) {
+	Join-Path $env:OneDriveConsumer 'Apps\PowerShell\PersonalConfig.psd1'
+}
+else {
+	Join-Path $HOME 'OneDrive\Apps\PowerShell\PersonalConfig.psd1'
 }
 
-# Load work configuration
-$workConfigPath = "$env:OneDriveCommercial/Code/PowerShell/Config/WorkConfig.psd1"
-if ([System.IO.File]::Exists($workConfigPath)) {
-	$Work = Import-PowerShellDataFile -Path $workConfigPath
+$workConfigPath = if ($env:MSCLOUDPROFILE_WORK_CONFIG_PATH) {
+	$env:MSCLOUDPROFILE_WORK_CONFIG_PATH
 }
+elseif ($env:OneDriveCommercial) {
+	Join-Path $env:OneDriveCommercial 'Code\PowerShell\Config\WorkConfig.psd1'
+}
+else {
+	Join-Path $HOME 'OneDrive - Quisitive\Code\PowerShell\Config\WorkConfig.psd1'
+}
+
 Write-ProfileTime 'After profile configuration'
 
 # Define immediate-use profile commands while deferring the complete MSCloudProfile module import.
@@ -195,12 +205,13 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 			return
 		}
 
-		$msCloudProfileManifest = "$profileDir/Modules/MSCloudProfile.psd1"
+		$msCloudProfileManifest = "$profileDir/Modules/MSCloudProfile/MSCloudProfile.psd1"
 		if (-not [System.IO.File]::Exists($msCloudProfileManifest)) {
 			throw "MSCloudProfile module manifest was not found: $msCloudProfileManifest"
 		}
 
 		Import-Module -Name $msCloudProfileManifest -Global -ErrorAction Stop
+		& MSCloudProfile\Set-MSCloudProfileConfiguration -PersonalPath $personalConfigPath -WorkPath $workConfigPath | Out-Null
 	}
 
 	function Use-AzProfile {
