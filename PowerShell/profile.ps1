@@ -94,6 +94,10 @@ $PSDefaultParameterValues['Use-AzProfile:Name'] = 'Lab'
 #   ╭─( [az:Lab] [mg:Lab] (venv) ~/path/to/directory [git-status]
 #   ╰╴>
 function prompt {
+	# Restore the PSReadLine Vi insert cursor after terminal applications exit.
+	if ($PSVersionTable.PSEdition -eq 'Core') {
+        Write-Host -NoNewline "`e[5 q"
+	}
 	Initialize-PromptPoshGit
 
 	$pythonVenvPromptText = Get-PythonVenvPromptText
