@@ -222,6 +222,13 @@
           "isGitRepo": true,
           "name": "Azure Naming Tool",
           "path": "c:\\Users\\gregt\\LocalCode\\Projects\\Azure_Naming_Tool\\github_action_logs\\Azure_Naming_Tool.code-workspace"
+        },
+        {
+          "isGitRepo": true,
+          "id": "prodev9urrgm7bumt8eyyqr",
+          "name": "ProDev",
+          "path": "c:\\Users\\gregt\\LocalCode\\Learning\\ProDev\\ProDev.code-workspace",
+          "color": "#97CD2D"
         }
       ]
     },
@@ -436,6 +443,34 @@
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
     [
+      "#97CD2D",
+      "Atlantis"
+    ],
+    [
+      "#163531",
+      "Gable Green"
+    ],
+    [
+      "#FF00FF",
+      "Magenta / Fuchsia"
+    ],
+    [
+      "#65869F",
+      "Hoki"
+    ],
+    [
+      "#3F2109",
+      "Bronze"
+    ],
+    [
+      "#010D1A",
+      "Blue Charcoal"
+    ],
+    [
+      "#03163C",
+      "Tangaroa"
+    ],
+    [
       "#026395",
       "Bahama Blue"
     ],
@@ -466,34 +501,6 @@
     [
       "#b2e8f6",
       "Charlotte"
-    ],
-    [
-      "#e5f7fc",
-      "Foam"
-    ],
-    [
-      "#1B51A3",
-      "Fun Blue"
-    ],
-    [
-      "#2F5D3A",
-      "Killarney"
-    ],
-    [
-      "#282961",
-      "Jacarta"
-    ],
-    [
-      "#00a3ad",
-      "Bondi Blue"
-    ],
-    [
-      "#00b3e2",
-      "Cerulean"
-    ],
-    [
-      "#3e3e4b",
-      "Tuna"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
