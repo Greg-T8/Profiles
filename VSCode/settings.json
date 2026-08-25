@@ -238,6 +238,13 @@
       "id": "clientsacck9xha7mm66b5q8",
       "projects": [
         {
+          "isGitRepo": true,
+          "id": "quisitivetemplatesxypt88f08mt8jgi1q",
+          "name": "Quisitive Templates",
+          "path": "c:\\Users\\gregt\\OneDrive - Quisitive\\Templates\\QuisitiveTemplates.code-workspace",
+          "color": "#00b3e2"
+        },
+        {
           "color": "#041C2C",
           "id": "bart6dyuv0k58mscyxp05",
           "isGitRepo": false,
@@ -443,6 +450,18 @@
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
     [
+      "#00b3e2",
+      "Cerulean"
+    ],
+    [
+      "#003eb2",
+      "Cobalt"
+    ],
+    [
+      "#77DD77",
+      "Pastel Green"
+    ],
+    [
       "#97CD2D",
       "Atlantis"
     ],
@@ -489,18 +508,6 @@
     [
       "#ABA0D9",
       "Cold Purple"
-    ],
-    [
-      "#B7410E",
-      "Rust"
-    ],
-    [
-      "#410056",
-      "Ripe Plum"
-    ],
-    [
-      "#b2e8f6",
-      "Charlotte"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
