@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 Program: MSCloudProfile.format.ps1xml
-Description: Defines list-format default console views for MSCloudProfile Get commands.
+Description: Defines compact default console views for MSCloudProfile Get commands.
 Context: Personal cross-host PowerShell profile.
 Author: Greg Tate
 -->
@@ -10,73 +10,114 @@ Author: Greg Tate
     <View>
       <Name>MSCloudProfile.CurrentAzProfile</Name>
       <ViewSelectedBy><TypeName>MSCloudProfile.CurrentAzProfile</TypeName></ViewSelectedBy>
-      <ListControl>
-        <ListEntries><ListEntry><ListItems>
-          <ListItem><Label>Profile</Label><PropertyName>ProfileName</PropertyName></ListItem>
-          <ListItem><Label>Logged In</Label><PropertyName>LoggedIn</PropertyName></ListItem>
-          <ListItem><Label>User</Label><PropertyName>User</PropertyName></ListItem>
-          <ListItem><Label>Subscription</Label><PropertyName>Subscription</PropertyName></ListItem>
-          <ListItem><Label>Tenant</Label><PropertyName>TenantId</PropertyName></ListItem>
-          <ListItem><Label>Synchronized</Label><PropertyName>ContextSynchronized</PropertyName></ListItem>
-        </ListItems></ListEntry></ListEntries>
-      </ListControl>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Profile</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Logged In</Label></TableColumnHeader>
+          <TableColumnHeader><Label>User</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Subscription</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Tenant</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Synchronized</Label></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>ProfileName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>LoggedIn</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>User</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Subscription</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>TenantId</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>ContextSynchronized</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
     </View>
     <View>
       <Name>MSCloudProfile.CurrentMgProfile</Name>
       <ViewSelectedBy><TypeName>MSCloudProfile.CurrentMgProfile</TypeName></ViewSelectedBy>
-      <ListControl>
-        <ListEntries><ListEntry><ListItems>
-          <ListItem><Label>Profile</Label><PropertyName>ProfileName</PropertyName></ListItem>
-          <ListItem><Label>Logged In</Label><PropertyName>MgLoggedIn</PropertyName></ListItem>
-          <ListItem><Label>Account</Label><PropertyName>MgAccount</PropertyName></ListItem>
-          <ListItem><Label>Tenant</Label><PropertyName>MgTenantId</PropertyName></ListItem>
-          <ListItem><Label>Auth Type</Label><PropertyName>MgAuthType</PropertyName></ListItem>
-          <ListItem><Label>Synchronized</Label><PropertyName>ContextSynchronized</PropertyName></ListItem>
-        </ListItems></ListEntry></ListEntries>
-      </ListControl>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Profile</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Logged In</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Account</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Tenant</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Auth Type</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Synchronized</Label></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>ProfileName</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>MgLoggedIn</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>MgAccount</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>MgTenantId</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>MgAuthType</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>ContextSynchronized</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
     </View>
     <View>
       <Name>MSCloudProfile.AzProfile</Name>
       <ViewSelectedBy><TypeName>MSCloudProfile.AzProfile</TypeName></ViewSelectedBy>
-      <ListControl>
-        <ListEntries><ListEntry><ListItems>
-          <ListItem><Label>Name</Label><PropertyName>Name</PropertyName></ListItem>
-          <ListItem><Label>Description</Label><PropertyName>Description</PropertyName></ListItem>
-          <ListItem><Label>Account</Label><PropertyName>Account</PropertyName></ListItem>
-          <ListItem><Label>Source</Label><PropertyName>ConfigSource</PropertyName></ListItem>
-          <ListItem><Label>Logged In</Label><PropertyName>LoggedIn</PropertyName></ListItem>
-          <ListItem><Label>Tenant</Label><PropertyName>TenantId</PropertyName></ListItem>
-          <ListItem><Label>Subscription ID</Label><PropertyName>SubscriptionId</PropertyName></ListItem>
-        </ListItems></ListEntry></ListEntries>
-      </ListControl>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Name</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Description</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Account</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Source</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Logged In</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Tenant</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Subscription ID</Label></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>Name</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Description</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Account</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>ConfigSource</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>LoggedIn</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>TenantId</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>SubscriptionId</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
     </View>
     <View>
       <Name>MSCloudProfile.MgProfile</Name>
       <ViewSelectedBy><TypeName>MSCloudProfile.MgProfile</TypeName></ViewSelectedBy>
-      <ListControl>
-        <ListEntries><ListEntry><ListItems>
-          <ListItem><Label>Name</Label><PropertyName>Name</PropertyName></ListItem>
-          <ListItem><Label>Active</Label><PropertyName>IsActive</PropertyName></ListItem>
-          <ListItem><Label>Account</Label><PropertyName>Account</PropertyName></ListItem>
-          <ListItem><Label>Source</Label><PropertyName>ConfigSource</PropertyName></ListItem>
-          <ListItem><Label>Tenant</Label><PropertyName>TenantId</PropertyName></ListItem>
-          <ListItem><Label>Cached</Label><PropertyName>HasCache</PropertyName></ListItem>
-        </ListItems></ListEntry></ListEntries>
-      </ListControl>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Name</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Active</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Account</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Source</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Tenant</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Cached</Label></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>Name</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>IsActive</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Account</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>ConfigSource</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>TenantId</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>HasCache</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
     </View>
     <View>
       <Name>MSCloudProfile.Configuration</Name>
       <ViewSelectedBy><TypeName>MSCloudProfile.Configuration</TypeName></ViewSelectedBy>
-      <ListControl>
-        <ListEntries><ListEntry><ListItems>
-          <ListItem><Label>Source</Label><PropertyName>Name</PropertyName></ListItem>
-          <ListItem><Label>Path</Label><PropertyName>Path</PropertyName></ListItem>
-          <ListItem><Label>Exists</Label><PropertyName>Exists</PropertyName></ListItem>
-          <ListItem><Label>Loaded</Label><PropertyName>Loaded</PropertyName></ListItem>
-          <ListItem><Label>Profiles</Label><PropertyName>ProfileCount</PropertyName></ListItem>
-          <ListItem><Label>Precedence</Label><PropertyName>Precedence</PropertyName></ListItem>
-        </ListItems></ListEntry></ListEntries>
-      </ListControl>
+      <TableControl>
+        <TableHeaders>
+          <TableColumnHeader><Label>Source</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Path</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Exists</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Loaded</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Profiles</Label></TableColumnHeader>
+          <TableColumnHeader><Label>Precedence</Label></TableColumnHeader>
+        </TableHeaders>
+        <TableRowEntries><TableRowEntry><TableColumnItems>
+          <TableColumnItem><PropertyName>Name</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Path</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Exists</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Loaded</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>ProfileCount</PropertyName></TableColumnItem>
+          <TableColumnItem><PropertyName>Precedence</PropertyName></TableColumnItem>
+        </TableColumnItems></TableRowEntry></TableRowEntries>
+      </TableControl>
     </View>
   </ViewDefinitions>
 </Configuration>
