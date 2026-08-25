@@ -62,7 +62,6 @@ Set-Alias -Name uap -Value Use-AzProfile
 Set-Alias -Name ugp -Value Use-MgProfile
 Set-Alias -Name gcap -Value Get-CurrentAzProfile
 Set-Alias -Name gcgp -Value Get-CurrentMgProfile
-Set-Alias -Name uas -Value Use-AzProfileSubscription
 Set-Alias -Name uaps -Value Use-AzProfileSubscription
 Set-Alias -Name gbs -Value Get-BillingSubscriptions
 Set-Alias -Name td -Value Get-TimeDifference
