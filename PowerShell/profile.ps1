@@ -69,6 +69,11 @@ Set-Alias -Name tf -Value terraform
 
 
 # Git aliases
+# Forward the Git status shortcut to git.exe while preserving optional arguments.
+function Invoke-GitStatus {
+	git status @args
+}
+Set-Alias -Name gs -Value Invoke-GitStatus
 Set-Alias -Name sgr -Value Set-GitRepoRoot
 Set-Alias -Name ghel -Value Show-GhFailedRunLog
 
