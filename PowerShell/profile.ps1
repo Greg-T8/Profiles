@@ -178,7 +178,7 @@ if ($PSVersionTable.PSEdition -eq 'Core' -and [System.IO.File]::Exists("$profile
 }
 Write-ProfileTime 'After custom functions'
 
-# Resolve profile-owned configuration paths for lazy module registration.
+# Resolve profile-owned configuration paths for profile configuration loading.
 $personalConfigPath = if ($env:MSCLOUDPROFILE_PERSONAL_CONFIG_PATH) {
 	$env:MSCLOUDPROFILE_PERSONAL_CONFIG_PATH
 }
@@ -189,6 +189,11 @@ else {
 	Join-Path $HOME 'OneDrive\Apps\PowerShell\PersonalConfig.psd1'
 }
 
+# Load personal configuration into the global profile variable when available.
+if ([System.IO.File]::Exists($personalConfigPath)) {
+	$Personal = $Per = Import-PowerShellDataFile -Path $personalConfigPath
+}
+
 $workConfigPath = if ($env:MSCLOUDPROFILE_WORK_CONFIG_PATH) {
 	$env:MSCLOUDPROFILE_WORK_CONFIG_PATH
 }
@@ -197,6 +202,11 @@ elseif ($env:OneDriveCommercial) {
 }
 else {
 	Join-Path $HOME 'OneDrive - Quisitive\Code\PowerShell\Config\WorkConfig.psd1'
+}
+
+# Load work configuration into the global profile variable when available.
+if ([System.IO.File]::Exists($workConfigPath)) {
+	$Work = Import-PowerShellDataFile -Path $workConfigPath
 }
 
 Write-ProfileTime 'After profile configuration'
