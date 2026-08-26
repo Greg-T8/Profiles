@@ -16,6 +16,7 @@
     path = "~/OneDrive - Quisitive/Apps/Git/.gitconfig-work"
 [core]
 	hooksPath = ~/.git-hooks
+	safecrlf = false
 [alias]
 	st = status
 	co = commit
