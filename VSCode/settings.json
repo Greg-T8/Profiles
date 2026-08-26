@@ -1079,7 +1079,8 @@
   "workbench.editor.useModal": "off",
   "workbench.editor.wrapTabs": true,
   "workbench.editorAssociations": {
-    "*.md": "vscode.markdown.preview.editor",
+    "*.copilotmd": "vscode.markdown.preview.editor",
+    "*.md": "vscode.markdown.editor",
     "*.svg": "hediet.vscode-drawio-text"
   },
   "workbench.iconTheme": "material-icon-theme",
