@@ -92,6 +92,12 @@ function Invoke-GitCommit {
 	git commit @args
 }
 Set-Alias -Name gco -Value Invoke-GitCommit
+
+# Forward the Git push shortcut to git.exe while preserving optional arguments.
+function Invoke-GitPush {
+	git push @args
+}
+Set-Alias -Name gpu -Value Invoke-GitPush
 Set-Alias -Name sgr -Value Set-GitRepoRoot
 Set-Alias -Name ghel -Value Show-GhFailedRunLog
 
