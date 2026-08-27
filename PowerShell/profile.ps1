@@ -74,6 +74,24 @@ function Invoke-GitStatus {
 	git status @args
 }
 Set-Alias -Name gs -Value Invoke-GitStatus
+
+# Forward the Git add shortcut to git.exe while preserving optional arguments.
+function Invoke-GitAdd {
+	git add @args
+}
+Set-Alias -Name ga -Value Invoke-GitAdd
+
+# Forward the Git diff shortcut to git.exe while preserving optional arguments.
+function Invoke-GitDiff {
+	git diff @args
+}
+Set-Alias -Name gd -Value Invoke-GitDiff
+
+# Forward the Git commit shortcut to git.exe while preserving optional arguments.
+function Invoke-GitCommit {
+	git commit @args
+}
+Set-Alias -Name gco -Value Invoke-GitCommit
 Set-Alias -Name sgr -Value Set-GitRepoRoot
 Set-Alias -Name ghel -Value Show-GhFailedRunLog
 
