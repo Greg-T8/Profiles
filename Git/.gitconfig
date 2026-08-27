@@ -23,3 +23,5 @@
 	br = branch
 	pu = push
 	last = log -1 HEAD
+[diff "docx"]
+	textconv = pandoc --to=plain --wrap=none
