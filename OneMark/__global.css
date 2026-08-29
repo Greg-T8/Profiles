@@ -2,13 +2,3 @@
 	--font-family: 'Calibri';
 	--monospace  : "Cascadia Mono";
 }
-
-/* Monocolor Highlight.js */
-.hljs {
-    background: #002451;
-    color: #AAAAAA;
-}
-
-.hljs * {
-    color: #AAAAAA;
-}
