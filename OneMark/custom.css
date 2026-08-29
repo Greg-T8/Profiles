@@ -40,6 +40,12 @@ blockquote {
   background-color: #E2F5FE;
 }
 
+/* Keep consecutive rendered Markdown lines from receiving paragraph gaps. */
+#write p {
+  margin: 0;
+  line-height: 1.2;
+}
+
 /* Tomorrow Night Blue Theme */
 /* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
 /* Original theme - https://github.com/chriskempson/tomorrow-theme */
