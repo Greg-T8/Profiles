@@ -85,11 +85,5 @@ blockquote {
 .hljs-template-variable,
 .hljs-addition,
 .hljs-deletion {
-    color: #ffeead;
-}
-
-.hljs-emphasis,
-.hljs-strong {
-    font-style: normal;
-    font-weight: normal;
+    color: #DDDDDD;
 }
