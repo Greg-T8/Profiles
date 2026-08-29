@@ -33,3 +33,6 @@ TokenCache.dat
 
 # Workspace file
 *.code-workspace
+
+# OneMark Config File
+OneMark/settings.config
