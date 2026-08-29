@@ -40,50 +40,74 @@ blockquote {
   background-color: #E2F5FE;
 }
 
-/* Monocolor terminal-style code blocks */
-.hljs {
-    background-color: #002451;
-    color: #DDDDDD;
+/* Tomorrow Night Blue Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+  color: #7285b7;
 }
 
-.hljs-subst,
-.hljs-comment,
-.hljs-quote,
-.hljs-keyword,
-.hljs-built_in,
-.hljs-type,
-.hljs-literal,
-.hljs-number,
-.hljs-operator,
-.hljs-punctuation,
-.hljs-property,
-.hljs-regexp,
-.hljs-string,
-.hljs-symbol,
+/* Tomorrow Red */
 .hljs-variable,
-.hljs-title,
-.hljs-params,
-.hljs-doctag,
-.hljs-meta,
-.hljs-section,
+.hljs-template-variable,
 .hljs-tag,
 .hljs-name,
-.hljs-attr,
-.hljs-attribute,
-.hljs-bullet,
-.hljs-code,
-.hljs-emphasis,
-.hljs-strong,
-.hljs-formula,
-.hljs-link,
-.hljs-selector-tag,
 .hljs-selector-id,
 .hljs-selector-class,
-.hljs-selector-attr,
-.hljs-selector-pseudo,
-.hljs-template-tag,
-.hljs-template-variable,
-.hljs-addition,
+.hljs-regexp,
 .hljs-deletion {
-    color: #DDDDDD;
+  color: #ff9da4;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+  color: #ffc58f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+  color: #ffeead;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+  color: #d1f1a9;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+  color: #bbdaff;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+  color: #ebbbff;
+}
+
+.hljs {
+  background: #002451;
+  color: white;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
 }
