@@ -3,26 +3,39 @@
     --select-text-font-color: #767676;
 }
 h1, h2, h3, h4, h5, h6 {
-    line-height:1.2;
-    font-weight: bold;
+    font-family: 'Calibri';
+    font-weight: normal;
+    line-height: 1.2;
 }
 h1 {
-    font-size: 2em;
+    color: #1E4E79;
+    font-size: 20.5pt;
+}
+.page-title {
+    font-family: 'Calibri Light';
 }
 h2 {
-    font-size: 1.75em;
+    color: #2E75B5;
+    font-size: 18pt;
 }
 h3 {
-    font-size: 1.5em;
+    color: #5B9BD5;
+    font-size: 15.5pt;
 }
 h4 {
-    font-size: 1.25em;
+    color: #5B9BD5;
+    font-size: 15.5pt;
+    font-style: italic;
 }
 h5 {
-    font-size: 1em;
+    color: #2E75B5;
+    font-size: 14pt;
+    font-style: italic;
 }
 h6 {
-    font-size: 0.9em;
+    color: #2E75B5;
+    font-size: 14pt;
+    font-style: italic;
 }
 code {
     background-color:#f9f2f4;
@@ -40,14 +53,10 @@ blockquote {
   background-color: #E2F5FE;
 }
 
-/* Keep consecutive rendered Markdown lines compact while preserving blank lines. */
+/* Keep consecutive rendered Markdown lines compact. */
 #write p {
   margin: 0;
   line-height: 1.2;
-}
-
-#write p:empty {
-  min-height: 1.2em;
 }
 
 /* Tomorrow Night Blue Theme */
