@@ -41,7 +41,7 @@ h6 {
 }
 code {
     background-color:#f9f2f4;
-    color:#d98a87;
+    color:#7FDBFF;
     font-size:0.9em;
 }
 th, tr {
@@ -138,8 +138,13 @@ blockquote {
   color: #eeeeee;
 }
 
-/* Tone down JSON property names in Highlight.js output. */
+/* Use cyan for JSON property names and amber for string values. */
 .hljs-attr,
-.hljs-attribute {
-  color: #d98a87;
+.hljs-attribute,
+.hljs-property {
+  color: #7FDBFF;
+}
+
+.hljs-string {
+  color: #FFD166;
 }
