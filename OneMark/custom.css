@@ -121,3 +121,8 @@ blockquote {
 .hljs-strong {
   font-weight: bold;
 }
+
+/* Make Highlight.js punctuation visible in mixed terminal and JSON blocks. */
+.hljs-punctuation {
+  color: #eeeeee;
+}
