@@ -474,7 +474,23 @@ function Get-AzProfilePromptText {
 			return ''
 		}
 
-		return "[az:$profileName] "
+		# Read the Azure CLI's active subscription from the named profile's local state.
+		$subscriptionSuffix = ''
+		$azureProfilePath = Join-Path $trimmedConfigDir 'azureProfile.json'
+		if ([System.IO.File]::Exists($azureProfilePath)) {
+			try {
+				$azureProfile = [System.IO.File]::ReadAllText($azureProfilePath) | ConvertFrom-Json
+				$currentSubscription = @($azureProfile.subscriptions | Where-Object { $_.isDefault })[0]
+				if ($currentSubscription -and -not [string]::IsNullOrWhiteSpace($currentSubscription.name)) {
+					$subscriptionSuffix = " - $($currentSubscription.name)"
+				}
+			}
+			catch {
+				# Keep unavailable local Azure CLI state from interrupting prompt rendering.
+			}
+		}
+
+		return "[az:$profileName$subscriptionSuffix] "
 	}
 	catch {
 		# Keep invalid profile paths from interrupting prompt rendering.
