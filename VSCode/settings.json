@@ -1080,7 +1080,7 @@
   "workbench.editor.wrapTabs": true,
   "workbench.editorAssociations": {
     "*.copilotmd": "vscode.markdown.preview.editor",
-    "*.md": "vscode.markdown.editor",
+    // "*.md": "vscode.markdown.editor",
     "*.svg": "hediet.vscode-drawio-text"
   },
   "workbench.iconTheme": "material-icon-theme",
