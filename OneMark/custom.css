@@ -41,7 +41,7 @@ h6 {
 }
 code {
     background-color:#f9f2f4;
-    color:#c7254e;
+    color:#d98a87;
     font-size:0.9em;
 }
 th, tr {
@@ -136,4 +136,10 @@ blockquote {
 /* Make Highlight.js punctuation visible in mixed terminal and JSON blocks. */
 .hljs-punctuation {
   color: #eeeeee;
+}
+
+/* Tone down JSON property names in Highlight.js output. */
+.hljs-attr,
+.hljs-attribute {
+  color: #d98a87;
 }
