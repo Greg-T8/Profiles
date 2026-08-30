@@ -40,10 +40,14 @@ blockquote {
   background-color: #E2F5FE;
 }
 
-/* Keep consecutive rendered Markdown lines from receiving paragraph gaps. */
+/* Keep consecutive rendered Markdown lines compact while preserving blank lines. */
 #write p {
   margin: 0;
   line-height: 1.2;
+}
+
+#write p:empty {
+  min-height: 1.2em;
 }
 
 /* Tomorrow Night Blue Theme */
