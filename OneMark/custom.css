@@ -1,6 +1,8 @@
 :root {
     --select-text-bg-color: #eeeeee;
     --select-text-font-color: #767676;
+    --paragraph-margin: 0;
+    --block-margin: 0;
 }
 h1, h2, h3, h4, h5, h6 {
     font-family: 'Calibri';
