@@ -29,6 +29,7 @@
         'Remove-AzProfile'
         'Remove-MgProfile'
         'Use-AzProfileSubscription'
+        'Update-AzProfileContext'
     )
     CmdletsToExport   = @()
     VariablesToExport = @()

@@ -302,6 +302,138 @@ function Use-AzProfile {
     }
 }
 
+function Update-AzProfileContext {
+    <#
+    .SYNOPSIS
+        Refreshes the current Azure CLI and Az PowerShell profile context.
+    .DESCRIPTION
+        Refreshes Azure CLI subscription metadata, reloads the matching Az
+        subscription object, updates the Az context name, and persists the
+        current subscription name as the profile description.
+    .EXAMPLE
+        Update-AzProfileContext
+        Refreshes the currently selected Azure profile context.
+    .EXAMPLE
+        Update-AzProfileContext -WhatIf
+        Previews the context and profile-description updates.
+    #>
+    [CmdletBinding(SupportsShouldProcess)]
+    [OutputType([PSCustomObject])]
+    param()
+
+    # Confirm the Azure CLI is available before attempting the refresh.
+    if (-not (Get-Command -Name az -ErrorAction SilentlyContinue)) {
+        throw "Azure CLI was not found. Install Azure CLI before refreshing the Azure profile context."
+    }
+
+    # Resolve the active profile and its effective configuration source.
+    $profileName = (Get-CurrentAzProfile).ProfileName
+    if ($profileName -eq '(default)') {
+        throw "The default Azure CLI profile is not backed by PersonalConfig.psd1 or WorkConfig.psd1 and cannot receive a persisted description update."
+    }
+
+    $configurationSource = $null
+    $profileConfig = $null
+    foreach ($sourceName in @('Personal', 'Work')) {
+        $source = $script:ConfigurationSources[$sourceName]
+        $profiles = Get-AzureProfilesFromConfig -Config $source.Config
+        if ($profiles.ContainsKey($profileName)) {
+            $configurationSource = $source
+            $profileConfig = $profiles[$profileName]
+            break
+        }
+    }
+
+    if (-not $configurationSource -or -not $profileConfig) {
+        throw "The active Azure profile '$profileName' is not mapped to PersonalConfig.psd1 or WorkConfig.psd1."
+    }
+
+    # Refresh the Azure CLI subscription catalog and read the selected account.
+    $null = az account list --refresh --only-show-errors --output json 2>&1
+    if ($LASTEXITCODE -ne 0) {
+        throw "Azure CLI subscription refresh failed for profile '$profileName'."
+    }
+
+    $accountJson = az account show --only-show-errors --output json 2>$null
+    if ($LASTEXITCODE -ne 0 -or -not $accountJson) {
+        throw "Azure CLI is not authenticated for profile '$profileName'. Run Use-AzProfile '$profileName' first."
+    }
+
+    try {
+        $accountInfo = $accountJson | ConvertFrom-Json -ErrorAction Stop
+    }
+    catch {
+        throw "Azure CLI returned invalid account information for profile '$profileName': $($_.Exception.Message)"
+    }
+
+    if (-not $accountInfo.id -or -not $accountInfo.tenantId -or -not $accountInfo.user.name -or -not $accountInfo.name) {
+        throw "Azure CLI account information is incomplete for profile '$profileName'."
+    }
+
+    # Require Az.Accounts and retrieve the renamed subscription from Azure.
+    $getAzSubscriptionCommand = Get-Command -Name Get-AzSubscription -ErrorAction SilentlyContinue
+    $setAzContextCommand = Get-Command -Name Set-AzContext -ErrorAction SilentlyContinue
+    if (-not $getAzSubscriptionCommand -or -not $setAzContextCommand) {
+        throw "Az.Accounts is required. Install or import the Az.Accounts module before refreshing the Azure profile context."
+    }
+
+    try {
+        $subscription = Get-AzSubscription `
+            -SubscriptionId $accountInfo.id `
+            -TenantId $accountInfo.tenantId `
+            -ErrorAction Stop |
+            Select-Object -First 1
+    }
+    catch {
+        throw "Could not retrieve refreshed Az subscription '$($accountInfo.id)': $($_.Exception.Message)"
+    }
+
+    if (-not $subscription -or -not $subscription.Name) {
+        throw "Could not retrieve a named Az subscription for '$($accountInfo.id)'."
+    }
+
+    $contextName = "{0} ({1}) - {2} - {3}" -f `
+        $subscription.Name,
+        $subscription.Id,
+        $accountInfo.tenantId,
+        $accountInfo.user.name
+
+    # Update the Az context only when the caller accepts the change.
+    if ($PSCmdlet.ShouldProcess($contextName, 'Set current Az context')) {
+        try {
+            $subscription | Set-AzContext -Name $contextName -Force -ErrorAction Stop | Out-Null
+        }
+        catch {
+            throw "Could not update the Az context '$contextName': $($_.Exception.Message)"
+        }
+    }
+
+    # Persist the refreshed subscription name and update the module's live configuration.
+    $description = [string]$subscription.Name
+    if ($PSCmdlet.ShouldProcess($configurationSource.Path, "Update description for Azure profile '$profileName'")) {
+        Set-AzureProfileDescription -Source $configurationSource -ProfileName $profileName -Description $description
+        $profileConfig.Description = $description
+    }
+
+    # Read the resulting Az context and return the standard current-context contract.
+    $moduleContext = Get-AzModuleCurrentContext
+    [PSCustomObject][ordered]@{
+        AzCliIsLoggedIn        = $true
+        AzCliUser              = $accountInfo.user.name
+        AzCliTenantId          = $accountInfo.tenantId
+        AzCliSubscription      = $accountInfo.name
+        AzCliSubscriptionId    = $accountInfo.id
+        HasAzModule            = $moduleContext.HasAzModule
+        AzModuleLoggedIn       = $moduleContext.LoggedIn
+        AzModuleContextName    = $moduleContext.ContextName
+        AzModuleUser           = $moduleContext.Account
+        AzModuleTenantId       = $moduleContext.TenantId
+        AzModuleSubscription   = $moduleContext.Subscription
+        AzModuleSubscriptionId = $moduleContext.SubscriptionId
+        Description            = $description
+    }
+}
+
 # Register argument completer for Use-AzProfile profile names (for both function and alias)
 $azProfileCompleter = {
     param($commandName, $parameterName, $wordToComplete, $commandAst, $fakeBoundParameters)
@@ -2097,6 +2229,94 @@ function Use-AzProfileSubscription {
 #region PRIVATE PROFILE CONFIGURATION
 # Defines shared Personal and Work Azure profile configuration helpers.
 
+function Set-AzureProfileDescription {
+    <#
+    .SYNOPSIS
+        Persists a description for one Azure profile configuration entry.
+    #>
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [hashtable]$Source,
+
+        [Parameter(Mandatory)]
+        [string]$ProfileName,
+
+        [Parameter(Mandatory)]
+        [string]$Description
+    )
+
+    if (-not $Source.Exists -or -not (Test-Path -LiteralPath $Source.Path)) {
+        throw "The configuration file '$($Source.Path)' does not exist."
+    }
+
+    $content = Get-Content -LiteralPath $Source.Path -Raw
+    $tokens = $null
+    $parseErrors = $null
+    $ast = [System.Management.Automation.Language.Parser]::ParseInput(
+        $content,
+        [ref]$tokens,
+        [ref]$parseErrors
+    )
+
+    if ($parseErrors.Count -gt 0) {
+        throw "The configuration file '$($Source.Path)' contains syntax errors and was not modified."
+    }
+
+    $profileTable = $ast.FindAll({
+        param($node)
+
+        if ($node -isnot [System.Management.Automation.Language.HashtableAst]) {
+            return $false
+        }
+
+        @($node.KeyValuePairs | Where-Object {
+            $_.Item1 -is [System.Management.Automation.Language.StringConstantExpressionAst] -and
+            $_.Item1.Value -eq $ProfileName
+        }).Count -gt 0
+    }, $true) | Select-Object -First 1
+
+    if (-not $profileTable) {
+        throw "Could not locate Azure profile '$ProfileName' in '$($Source.Path)'."
+    }
+
+    $profilePair = $profileTable.KeyValuePairs | Where-Object {
+        $_.Item1 -is [System.Management.Automation.Language.StringConstantExpressionAst] -and
+        $_.Item1.Value -eq $ProfileName
+    } | Select-Object -First 1
+
+    $profileAst = $profilePair.Item2.FindAll({
+        param($node)
+        $node -is [System.Management.Automation.Language.HashtableAst]
+    }, $true) | Select-Object -First 1
+    if (-not $profileAst) {
+        throw "Could not locate the settings block for Azure profile '$ProfileName' in '$($Source.Path)'."
+    }
+    $descriptionPair = $profileAst.KeyValuePairs | Where-Object {
+        $_.Item1 -is [System.Management.Automation.Language.StringConstantExpressionAst] -and
+        $_.Item1.Value -eq 'Description'
+    } | Select-Object -First 1
+
+    $escapedDescription = $Description.Replace("'", "''")
+    $replacement = "'$escapedDescription'"
+    if ($descriptionPair) {
+        $start = $descriptionPair.Item2.Extent.StartOffset
+        $length = $descriptionPair.Item2.Extent.EndOffset - $start
+        $content = $content.Remove($start, $length).Insert($start, $replacement)
+    }
+    else {
+        $lineBreak = if ($content.Contains([Environment]::NewLine)) { [Environment]::NewLine } else { [char]10 }
+        $insertAt = $profileAst.Extent.EndOffset - 1
+        $content = $content.Insert(
+            $insertAt,
+            "$lineBreak        Description    = $replacement$lineBreak    "
+        )
+    }
+
+    Set-Content -LiteralPath $Source.Path -Value $content -NoNewline -Encoding utf8
+}
+
+
 function Get-AzureProfilesFromConfig {
     <#
     .SYNOPSIS
@@ -2681,6 +2901,7 @@ function Resolve-MgProfileMatch {
 # Export only the commands declared in the module manifest.
 Export-ModuleMember -Function @(
  'Use-AzProfile',
+ 'Update-AzProfileContext',
  'Use-MgProfile',
  'Get-CurrentAzProfile',
  'Get-CurrentMgProfile',

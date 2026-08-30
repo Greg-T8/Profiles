@@ -51,6 +51,20 @@ Get-MSCloudProfileConfiguration | Export-Csv ./configuration.csv -NoTypeInformat
 ```
 
 Use `Format-Table` or `Format-List` explicitly whenever you need a different display. The module does not serialize profile results with CLIXML.
+
+## Refreshing a renamed subscription
+
+After an Azure subscription is renamed, refresh the active profile with:
+
+```powershell
+Update-AzProfileContext
+```
+
+The command runs `az account list --refresh`, reloads the subscription through
+Az PowerShell, updates the current Az context name, and persists the refreshed
+subscription name as the profile description. Use `-WhatIf` to preview the
+context and configuration updates.
+
 ## PSD1 format
 
 Use one top-level hashtable entry per named profile. The module also supports the legacy `AzureProfiles` wrapper. `TenantId`, `Account`, `PrimarySub` (or `SubscriptionId`), and `Description` are recognized profile fields. `Subs` is optional.
