@@ -5,7 +5,7 @@ Installs the Critical Event Alert scheduled task for the current user.
 .DESCRIPTION
 Registers the dedicated Application event-log source, copies maintained monitor
 files to LocalAppData, establishes an event baseline, and creates or updates the
-current user's event-triggered and logon-triggered monitoring task.
+current user's logon-triggered monitoring task.
 
 .CONTEXT
 Personal PowerShell profile - Windows reliability monitoring
@@ -101,7 +101,7 @@ $Helpers = {
         }
     }
 
-    # Create the task folder and register the focused event and logon triggers.
+    # Create the task folder and register the login status trigger.
     function Register-CriticalEventAlertTask {
         # Build the current user's SID and PowerShell executable path for task registration.
         $currentUserSid = [Security.Principal.WindowsIdentity]::GetCurrent().User.Value
@@ -123,15 +123,6 @@ $Helpers = {
             $null = $schedulerService.GetFolder('\').CreateFolder('GregTate', $null)
         }
 
-        # Select all Critical System events plus precise storage and fatal hardware signatures.
-        $eventSubscription = @'
-<QueryList>
-  <Query Id="0" Path="System">
-    <Select Path="System">*[System[(Level=1) or (Provider[@Name='Disk'] and (EventID=7 or EventID=11 or EventID=15 or EventID=51 or EventID=153 or EventID=157)) or ((Provider[@Name='storahci'] or Provider[@Name='storport']) and (EventID=11 or EventID=129 or EventID=153 or EventID=157)) or (Provider[@Name='Ntfs'] and EventID=55) or (Provider[@Name='Microsoft-Windows-WHEA-Logger'] and (EventID=1 or EventID=18))]]</Select>
-  </Query>
-</QueryList>
-'@
-
         # Escape machine-specific values before inserting them into Task Scheduler XML.
         $escapedUserSid = [Security.SecurityElement]::Escape($currentUserSid)
         $escapedPowerShellPath = [Security.SecurityElement]::Escape($powerShellPath)
@@ -142,17 +133,13 @@ $Helpers = {
 <Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
   <RegistrationInfo>
     <Author>Greg Tate</Author>
-    <Description>Alerts the signed-in user about focused Windows reliability events.</Description>
+    <Description>Checks focused Windows reliability signals and reports status at user sign-in.</Description>
   </RegistrationInfo>
   <Triggers>
     <LogonTrigger>
       <Enabled>true</Enabled>
       <Delay>PT30S</Delay>
     </LogonTrigger>
-    <EventTrigger>
-      <Enabled>true</Enabled>
-      <Subscription><![CDATA[$eventSubscription]]></Subscription>
-    </EventTrigger>
   </Triggers>
   <Principals>
     <Principal id="Author">
@@ -179,7 +166,7 @@ $Helpers = {
   <Actions Context="Author">
     <Exec>
       <Command>$escapedPowerShellPath</Command>
-      <Arguments>-NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$escapedMonitorPath&quot;</Arguments>
+      <Arguments>-NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$escapedMonitorPath&quot; -LoginCheck</Arguments>
       <WorkingDirectory>$escapedInstallationPath</WorkingDirectory>
     </Exec>
   </Actions>

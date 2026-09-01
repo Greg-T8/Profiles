@@ -238,6 +238,36 @@ function Set-CriticalEventAlertSuppression {
 
 #region ALERT DELIVERY
 # Functions that persist alert history and display native Windows notifications.
+# Write a durable diagnostic entry without allowing logging failure to stop monitoring.
+function Write-CriticalEventAlertLog {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [string]$Path,
+
+        [ValidateSet('Information', 'Warning', 'Error')]
+        [string]$Level = 'Information',
+
+        [Parameter(Mandatory)]
+        [string]$Message
+    )
+
+    $entry = '{0} [{1}] {2}' -f `
+        [datetime]::Now.ToString('o'), `
+        $Level, `
+        ($Message -replace '[\r\n]+', ' ')
+
+    try {
+        $logDirectory = Split-Path -Path $Path -Parent
+        New-Item -ItemType Directory -Path $logDirectory -Force |
+            Out-Null
+        Add-Content -LiteralPath $Path -Value $entry -Encoding utf8
+    }
+    catch {
+        Write-Verbose "Unable to write CriticalEventAlert log: $($_.Exception.Message)"
+    }
+}
+
 function Write-CriticalEventAlertEventLog {
     [CmdletBinding()]
     param(
@@ -271,23 +301,44 @@ function Show-CriticalEventAlertToast {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory)]
-        [psobject]$Candidate
+        [psobject]$Candidate,
+
+        [ref]$FailureReason,
+
+        [string]$LogPath
     )
 
     # Skip toast delivery when the task runs outside an interactive user session.
     if (-not [Environment]::UserInteractive) {
+        if ($PSBoundParameters.ContainsKey('FailureReason')) {
+            $FailureReason.Value = 'The PowerShell process is not running in an interactive user session.'
+        }
+
         return $false
     }
 
     # Escape event text before inserting it into the toast XML document.
     $title = [Security.SecurityElement]::Escape('Critical Windows reliability event')
     $detail = [Security.SecurityElement]::Escape(
-        '{0}: {1}' -f $Candidate.Classification, $Candidate.Device
+        ('{0}: {1}' -f $Candidate.Classification, $Candidate.Device)
     )
     $reference = [Security.SecurityElement]::Escape(
-        'Event Viewer - System / {0} / ID {1}' -f `
+        ('Event Viewer - System / {0} / ID {1}' -f `
             $Candidate.ProviderName, $Candidate.EventId
+        )
     )
+    $logAction = ''
+
+    if ($LogPath) {
+        $logUri = 'file:///' + ($LogPath -replace '\\', '/')
+        $escapedLogUri = [Security.SecurityElement]::Escape($logUri)
+        $logAction = @"
+  <actions>
+    <action content="Open alert log" activationType="protocol" arguments="$escapedLogUri" />
+  </actions>
+"@
+    }
+
     $toastMarkup = @"
 <toast scenario="reminder">
   <visual>
@@ -297,22 +348,64 @@ function Show-CriticalEventAlertToast {
       <text>$reference</text>
     </binding>
   </visual>
+  $logAction
 </toast>
 "@
 
-    # Use the Windows Runtime toast APIs available on supported desktop Windows versions.
+    # Use Windows PowerShell 5.1 as the WinRT bridge because PowerShell 7 does not
+    # project the built-in Windows.Data and Windows.UI.Notifications types.
     try {
-        Add-Type -AssemblyName System.Runtime.WindowsRuntime -ErrorAction Stop
-        $toastXml = New-Object -TypeName Windows.Data.Xml.Dom.XmlDocument
-        $toastXml.LoadXml($toastMarkup)
-        $toast = New-Object -TypeName Windows.UI.Notifications.ToastNotification -ArgumentList $toastXml
-        $notifier = [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier(
-            'Microsoft.WindowsPowerShell'
+        $windowsPowerShellPath = Join-Path -Path $env:SystemRoot -ChildPath 'System32\WindowsPowerShell\v1.0\powershell.exe'
+
+        if (-not (Test-Path -LiteralPath $windowsPowerShellPath -PathType Leaf)) {
+            throw "Windows PowerShell 5.1 was not found: $windowsPowerShellPath"
+        }
+
+        $encodedMarkup = [Convert]::ToBase64String(
+            [Text.Encoding]::UTF8.GetBytes($toastMarkup)
         )
-        $notifier.Show($toast)
+        $appId = '{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}\WindowsPowerShell\v1.0\powershell.exe'
+        $toastScript = @'
+$ErrorActionPreference = 'Stop'
+$toastMarkup = [Text.Encoding]::UTF8.GetString(
+    [Convert]::FromBase64String('__TOAST_MARKUP__')
+)
+$appId = '__APP_ID__'
+$null = [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime]
+$null = [Windows.Data.Xml.Dom.XmlDocument, Windows.Data, ContentType = WindowsRuntime]
+$toastXml = [Windows.Data.Xml.Dom.XmlDocument]::new()
+$toastXml.LoadXml($toastMarkup)
+$toast = [Windows.UI.Notifications.ToastNotification]::new($toastXml)
+[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier($appId).Show($toast)
+'@
+        $toastScript = $toastScript.Replace('__TOAST_MARKUP__', $encodedMarkup)
+        $toastScript = $toastScript.Replace('__APP_ID__', $appId)
+        $encodedCommand = [Convert]::ToBase64String(
+            [Text.Encoding]::Unicode.GetBytes($toastScript)
+        )
+        $processArguments = @(
+            '-NoLogo'
+            '-NoProfile'
+            '-WindowStyle'
+            'Hidden'
+            '-ExecutionPolicy'
+            'Bypass'
+            '-EncodedCommand'
+            $encodedCommand
+        )
+        $childOutput = & $windowsPowerShellPath @processArguments 2>&1
+
+        if ($LASTEXITCODE -ne 0) {
+            throw (($childOutput | Out-String).Trim())
+        }
+
         return $true
     }
     catch {
+        if ($PSBoundParameters.ContainsKey('FailureReason')) {
+            $FailureReason.Value = $_.Exception.Message
+        }
+
         return $false
     }
 }
@@ -363,4 +456,5 @@ Export-ModuleMember -Function `
     Set-CriticalEventAlertSuppression, `
     Show-CriticalEventAlertToast, `
     Test-CriticalEventAlertSuppression, `
+    Write-CriticalEventAlertLog, `
     Write-CriticalEventAlertEventLog
