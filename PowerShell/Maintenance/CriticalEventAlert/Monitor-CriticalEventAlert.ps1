@@ -194,6 +194,19 @@ $Helpers = {
                 -Message "Login reliability scan failed: $($_.Exception.Message)"
         }
 
+        # Combine Kernel-Power, EventLog, and WER records that represent one reboot.
+        if (@($issueCandidates).Count -gt 0) {
+            $candidateCountBeforeCorrelation = @($issueCandidates).Count
+            $issueCandidates = @(Get-CriticalEventAlertIncidentCandidate -Candidate $issueCandidates)
+            $candidateCountAfterCorrelation = @($issueCandidates).Count
+
+            if ($candidateCountAfterCorrelation -lt $candidateCountBeforeCorrelation) {
+                Write-CriticalEventAlertLog `
+                    -Path $LogPath `
+                    -Message "Reboot records correlated. CandidatesBefore=$candidateCountBeforeCorrelation; CandidatesAfter=$candidateCountAfterCorrelation."
+            }
+        }
+
         $issueCount = @($issueCandidates).Count
         if (-not $scanCompleted) {
             $classification = 'Reliability check incomplete'

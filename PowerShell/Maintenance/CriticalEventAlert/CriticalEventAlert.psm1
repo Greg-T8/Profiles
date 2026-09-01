@@ -36,6 +36,7 @@ function ConvertTo-CriticalEventAlertCandidate {
                     15 { 'Disk device not ready' }
                     51 { 'Disk paging I/O failure' }
                     153 { 'Disk I/O operation retried' }
+                    154 { 'Disk I/O operation failed due to hardware error' }
                     157 { 'Disk unexpectedly removed' }
                 }
             }
@@ -55,6 +56,14 @@ function ConvertTo-CriticalEventAlertCandidate {
                     157 { 'Storage device unexpectedly removed' }
                 }
             }
+            'stornvme' {
+                $classification = switch ($eventId) {
+                    11 { 'NVMe storage controller error' }
+                    129 { 'NVMe storage device reset' }
+                    153 { 'NVMe storage I/O operation retried' }
+                    157 { 'NVMe storage device unexpectedly removed' }
+                }
+            }
             'Ntfs' {
                 if ($eventId -eq 55) {
                     $classification = 'NTFS file-system corruption detected'
@@ -64,6 +73,27 @@ function ConvertTo-CriticalEventAlertCandidate {
                 $classification = switch ($eventId) {
                     1 { 'Fatal hardware error reported by WHEA' }
                     18 { 'Fatal hardware error reported by WHEA' }
+                    20 { 'Uncorrectable hardware error reported by WHEA' }
+                }
+            }
+            'Microsoft-Windows-Kernel-Power' {
+                if ($eventId -eq 41) {
+                    $classification = 'Unexpected system reboot detected'
+                }
+            }
+            'EventLog' {
+                if ($eventId -eq 6008) {
+                    $classification = 'Unexpected system shutdown detected'
+                }
+            }
+            'Microsoft-Windows-WER-SystemErrorReporting' {
+                if ($eventId -eq 1001) {
+                    $classification = 'System bugcheck recorded'
+                }
+            }
+            'Microsoft-Windows-Resource-Exhaustion-Detector' {
+                if ($eventId -eq 2004) {
+                    $classification = 'Low virtual memory condition detected'
                 }
             }
         }
@@ -78,6 +108,14 @@ function ConvertTo-CriticalEventAlertCandidate {
             return
         }
 
+        # Mark only retry and reset conditions as warnings; these additions alert on one event.
+        $severity = if ($eventId -in @(129, 153, 41, 6008, 2004)) {
+            'Warning'
+        }
+        else {
+            'Critical'
+        }
+
         # Extract a stable device identity when the event description contains one.
         $device = Get-CriticalEventAlertDeviceIdentity -Description $description
 
@@ -87,6 +125,7 @@ function ConvertTo-CriticalEventAlertCandidate {
             Device          = $device
             EventId         = $eventId
             ProviderName    = $providerName
+            Severity        = $severity
             TimeCreated     = $EventRecord.TimeCreated
             RecordId        = $EventRecord.RecordId
         }
@@ -126,6 +165,77 @@ function Get-CriticalEventAlertSignature {
         $Candidate.ProviderName, `
         $Candidate.EventId, `
         $Candidate.Device).ToLowerInvariant()
+}
+
+# Collapse matching reboot records into one incident while preserving their source events in the log.
+function Get-CriticalEventAlertIncidentCandidate {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)]
+        [object[]]$Candidate
+    )
+
+    $rebootCandidates = @($Candidate |
+        Where-Object {
+            ($_.ProviderName -eq 'Microsoft-Windows-Kernel-Power' -and $_.EventId -eq 41) -or
+            ($_.ProviderName -eq 'EventLog' -and $_.EventId -eq 6008) -or
+            ($_.ProviderName -eq 'Microsoft-Windows-WER-SystemErrorReporting' -and $_.EventId -eq 1001)
+        } |
+        Sort-Object -Property TimeCreated, RecordId)
+    $otherCandidates = @($Candidate |
+        Where-Object {
+            -not (
+                ($_.ProviderName -eq 'Microsoft-Windows-Kernel-Power' -and $_.EventId -eq 41) -or
+                ($_.ProviderName -eq 'EventLog' -and $_.EventId -eq 6008) -or
+                ($_.ProviderName -eq 'Microsoft-Windows-WER-SystemErrorReporting' -and $_.EventId -eq 1001)
+            )
+        })
+    $rebootGroups = @()
+
+    # Group reboot records that occur within five minutes of one another.
+    foreach ($candidateItem in $rebootCandidates) {
+        $eventTime = ([datetime]$candidateItem.TimeCreated).ToUniversalTime()
+        $matchingGroup = @($rebootGroups |
+            Where-Object { $eventTime -le $_.EndTime.AddMinutes(5) } |
+            Select-Object -First 1)
+
+        if ($matchingGroup.Count -gt 0) {
+            $group = $matchingGroup[0]
+            $group.Candidates = @($group.Candidates) + $candidateItem
+            if ($eventTime -gt $group.EndTime) {
+                $group.EndTime = $eventTime
+            }
+        }
+        else {
+            $rebootGroups += [pscustomobject]@{
+                Candidates = @($candidateItem)
+                EndTime    = $eventTime
+            }
+        }
+    }
+
+    $mergedCandidates = @($otherCandidates)
+
+    # Emit one synthetic reboot incident while retaining each original event for diagnostics.
+    foreach ($group in $rebootGroups) {
+        $groupCandidates = @($group.Candidates |
+            Sort-Object -Property TimeCreated, RecordId)
+        $relatedEvents = ($groupCandidates |
+            ForEach-Object { '{0}/{1}' -f $_.ProviderName, $_.EventId }) -join ', '
+        $mergedCandidates += [pscustomobject]@{
+            Classification = 'Unexpected reboot incident'
+            Description    = 'Matching reboot records: {0}' -f $relatedEvents
+            Device         = 'System reboot'
+            EventId        = 0
+            ProviderName   = 'CriticalEventAlert.Reboot'
+            Severity       = 'Critical'
+            TimeCreated    = $groupCandidates[0].TimeCreated
+            RecordId       = $groupCandidates[0].RecordId
+        }
+    }
+
+    return $mergedCandidates |
+        Sort-Object -Property TimeCreated, RecordId
 }
 #endregion
 
@@ -284,6 +394,7 @@ function Write-CriticalEventAlertEventLog {
         "Provider: $($Candidate.ProviderName)",
         "Event ID: $($Candidate.EventId)",
         "Device: $($Candidate.Device)",
+        "Severity: $($Candidate.Severity)",
         "Observed: $($Candidate.TimeCreated)",
         "Description: $($Candidate.Description)"
     ) -join [Environment]::NewLine
@@ -440,6 +551,7 @@ function Get-CriticalEventAlertDiskHealthCandidate {
             Device         = if ($disk.FriendlyName) { $disk.FriendlyName } else { $disk.UniqueId }
             EventId        = 0
             ProviderName   = 'WindowsStorageHealth'
+            Severity       = 'Critical'
             TimeCreated    = Get-Date
             RecordId       = 0
         }
@@ -449,6 +561,7 @@ function Get-CriticalEventAlertDiskHealthCandidate {
 
 Export-ModuleMember -Function `
     ConvertTo-CriticalEventAlertCandidate, `
+    Get-CriticalEventAlertIncidentCandidate, `
     Get-CriticalEventAlertDiskHealthCandidate, `
     Get-CriticalEventAlertSignature, `
     Get-CriticalEventAlertState, `
