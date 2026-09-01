@@ -1,61 +1,69 @@
 :root {
-    --select-text-bg-color: #eeeeee;
-    --select-text-font-color: #767676;
-    --paragraph-margin: 0;
-    --block-margin: 0;
+  --select-text-bg-color: #eeeeee;
+  --select-text-font-color: #767676;
+  --paragraph-margin: 0;
+  --block-margin: 0;
 }
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Calibri';
-    font-weight: normal;
-    line-height: 1.2;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Calibri";
+  font-weight: normal;
+  line-height: 1.2;
 }
 h1 {
-    color: #1E4E79;
-    font-size: 20.5pt;
+  color: #1e4e79;
+  font-size: 20.5pt;
 }
 .page-title {
-    font-family: 'Calibri Light';
+  font-family: "Calibri Light";
 }
 h2 {
-    color: #2E75B5;
-    font-size: 18pt;
+  color: #2e75b5;
+  font-size: 18pt;
 }
 h3 {
-    color: #5B9BD5;
-    font-size: 15.5pt;
+  color: #5b9bd5;
+  font-size: 15.5pt;
 }
 h4 {
-    color: #5B9BD5;
-    font-size: 15.5pt;
-    font-style: italic;
+  color: #5b9bd5;
+  font-size: 15.5pt;
+  font-style: italic;
 }
 h5 {
-    color: #2E75B5;
-    font-size: 14pt;
-    font-style: italic;
+  color: #2e75b5;
+  font-size: 14pt;
+  font-style: italic;
 }
 h6 {
-    color: #2E75B5;
-    font-size: 14pt;
-    font-style: italic;
+  color: #2e75b5;
+  font-size: 14pt;
+  font-style: italic;
 }
 /* Inline code only */
 :not(pre) > code {
-    background-color: #E5EEF5;
-    color: #173B5E;
-    font-size: 0.9em;
-    padding: 0.08em 0.22em;
-    border-radius: 2px;
+  background-color: #e5eef5;
+  color: #173b5e;
+  font-size: 0.9em;
+  padding: 0.08em 0.22em;
+  border-radius: 2px;
 }
-th, tr {
+th,
+tr {
   border: 1px solid black;
 }
 hr {
   margin: 0;
   width: 100%;
+  border: 0;
+  border-top: 2px solid #1E4E79;
 }
 blockquote {
-  background-color: #E2F5FE;
+  background-color: #e2f5fe;
 }
 
 /* Keep consecutive rendered Markdown lines compact. */
@@ -145,9 +153,9 @@ blockquote {
 .hljs-attr,
 .hljs-attribute,
 .hljs-property {
-  color: #7FDBFF;
+  color: #7fdbff;
 }
 
 .hljs-string {
-  color: #FFD166;
+  color: #ffd166;
 }
