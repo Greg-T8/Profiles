@@ -1,32 +1,29 @@
 # -------------------------------------------------------------------------
 # Program: Register-ProfileMaintenanceLogonTask.ps1
-# Description: Creates a logon scheduled task that runs WinGet app, PowerShell module, and Snagit capture cleanup updates with no profile in a hidden console.
+# Description: Creates separate logon scheduled tasks for WinGet, PowerShell module, and Snagit capture cleanup updates.
 # Context: User login maintenance automation (Windows Task Scheduler)
 # Author: Greg Tate
 # ------------------------------------------------------------------------
 
 <#
 .SYNOPSIS
-Creates or updates a Windows Scheduled Task for profile maintenance scripts at user logon.
+Creates or updates Windows Scheduled Tasks for profile maintenance scripts at user logon.
 
 .DESCRIPTION
-Registers a scheduled task that runs maintenance scripts at logon using PowerShell with -NoProfile in a hidden window:
+Registers separate scheduled tasks that run maintenance scripts at logon using PowerShell with -NoProfile in a hidden window:
 - Invoke-PowerShellModuleUpdates.ps1
 - Invoke-WingetUpdates.ps1
 - Invoke-SnagitCaptureFolderCleanup.ps1
 
-The task runs with highest privileges for the current user.
+Each task runs with highest privileges for the current user and preserves the existing logon task settings.
 
-Use -Unregister to remove the scheduled task instead of creating or updating it.
-
-.PARAMETER TaskName
-Name of the scheduled task. Defaults to WinGet Apps and PowerShell Modules Updates At Logon.
+Use -Unregister to remove the maintenance tasks instead of creating or updating them.
 
 .PARAMETER TaskPath
-Task Scheduler folder path for the task. Defaults to \Greg\.
+Task Scheduler folder path for the tasks. Defaults to \Custom Tasks\.
 
 .PARAMETER Unregister
-Removes the scheduled task with the specified name.
+Removes the three maintenance tasks and the retired combined task.
 
 .EXAMPLE
 .\Maintenance\Register-ProfileMaintenanceLogonTask.ps1
@@ -41,10 +38,7 @@ Program: Register-ProfileMaintenanceLogonTask.ps1
 [CmdletBinding()]
 param(
     [ValidateNotNullOrEmpty()]
-    [string]$TaskName = 'WinGet Apps and PowerShell Modules Updates At Logon',
-
-    [ValidateNotNullOrEmpty()]
-    [string]$TaskPath = '\Greg\',
+    [string]$TaskPath = '\Custom Tasks\',
 
     [switch]$Unregister
 )
@@ -57,19 +51,20 @@ $Main = {
 
     # Remove the scheduled task and stop when unregister mode is requested.
     if ($Unregister) {
-        Unregister-ProfileMaintenanceTask -TaskName $TaskName -TaskPath $TaskPath
+        Unregister-ProfileMaintenanceTaskSet -TaskPath $TaskPath
         return
     }
 
     # Resolve required paths and validate prerequisites before task registration.
     $context = Get-TaskRegistrationContext
-    Confirm-TaskRegistrationPrerequisites -Context $context
+    Confirm-TaskRegistrationPrerequisite -Context $context
 
-    # Register or update the scheduled task with all logon actions.
+    # Register or update the three independent logon tasks.
     Register-ProfileMaintenanceTask -Context $context
 
-    # Show the resulting task details for quick verification.
-    Show-TaskRegistrationResult -TaskName $TaskName -TaskPath $TaskPath
+    # Verify every replacement before removing the former combined task.
+    Confirm-ProfileMaintenanceTask -Context $context
+    Unregister-ProfileMaintenanceTask -TaskName 'WinGet Apps and PowerShell Modules Updates At Logon' -TaskPath '\Greg\'
 }
 
 $Helpers = {
@@ -97,8 +92,24 @@ $Helpers = {
             SnagitCleanupScriptPath = $snagitCleanupScriptPath
             CurrentUser            = $currentUser
             PwshPath               = if ($pwshCommand) { $pwshCommand.Source } else { $null }
-            TaskName               = $TaskName
             TaskPath               = $normalizedTaskPath
+            Tasks                  = @(
+                [PSCustomObject]@{
+                    TaskName        = 'Update PowerShell Modules At Logon'
+                    ScriptPath      = $moduleUpdateScriptPath
+                    ScriptArguments = '-AllModules'
+                },
+                [PSCustomObject]@{
+                    TaskName        = 'Update WinGet Apps At Logon'
+                    ScriptPath      = $wingetUpdateScriptPath
+                    ScriptArguments = ''
+                },
+                [PSCustomObject]@{
+                    TaskName        = 'Clean Up Snagit Capture Folder At Logon'
+                    ScriptPath      = $snagitCleanupScriptPath
+                    ScriptArguments = ''
+                }
+            )
         }
     }
 
@@ -122,7 +133,7 @@ $Helpers = {
         return $normalizedTaskPath
     }
 
-    function Confirm-TaskRegistrationPrerequisites {
+    function Confirm-TaskRegistrationPrerequisite {
         param(
             [Parameter(Mandatory)]
             [pscustomobject]$Context
@@ -170,7 +181,9 @@ $Helpers = {
         Write-Host "Task unregistered: $normalizedTaskPath$TaskName" -ForegroundColor Yellow
     }
 
-    function Ensure-ScheduledTaskFolder {
+    # Create the requested Task Scheduler folder when it does not already exist.
+    function New-ScheduledTaskFolder {
+        [CmdletBinding(SupportsShouldProcess)]
         param(
             [Parameter(Mandatory)]
             [ValidateNotNullOrEmpty()]
@@ -191,45 +204,110 @@ $Helpers = {
             $null = $scheduleService.GetFolder("\$folderName")
         }
         catch {
-            try {
-                $null = $scheduleService.GetFolder('\').CreateFolder($folderName)
-            }
-            catch {
-                if ($_.Exception.Message -match '0x800700B7') {
-                    return
+            if ($PSCmdlet.ShouldProcess($normalizedTaskPath, 'Create Task Scheduler folder')) {
+                try {
+                    $null = $scheduleService.GetFolder('\').CreateFolder($folderName)
                 }
+                catch {
+                    if ($_.Exception.Message -match '0x800700B7') {
+                        return
+                    }
 
-                throw
+                    throw
+                }
             }
         }
     }
 
+    # Register each maintenance script as its own scheduled task.
     function Register-ProfileMaintenanceTask {
         param(
             [Parameter(Mandatory)]
             [pscustomobject]$Context
         )
 
-        # Create actions so all maintenance scripts run at each user logon.
-        $action1 = New-ScheduledTaskAction -Execute $Context.PwshPath -Argument "-NoProfile -WindowStyle Hidden -File `"$($Context.ModuleUpdateScriptPath)`" -AllModules" -WorkingDirectory $Context.ScriptRoot
-        $action2 = New-ScheduledTaskAction -Execute $Context.PwshPath -Argument "-NoProfile -WindowStyle Hidden -File `"$($Context.WingetUpdateScriptPath)`"" -WorkingDirectory $Context.ScriptRoot
-        $action3 = New-ScheduledTaskAction -Execute $Context.PwshPath -Argument "-NoProfile -WindowStyle Hidden -File `"$($Context.SnagitCleanupScriptPath)`"" -WorkingDirectory $Context.ScriptRoot
-
-        # Trigger task at logon for the current user account.
+        # Create the shared trigger, principal, and settings used by each task.
         $trigger = New-ScheduledTaskTrigger -AtLogOn -User $Context.CurrentUser
-
-        # Run task with highest privileges using current user's interactive logon token.
         $principal = New-ScheduledTaskPrincipal -UserId $Context.CurrentUser -LogonType Interactive -RunLevel Highest
+        $settings = New-ScheduledTaskSettingsSet -Compatibility Win8 -AllowStartIfOnBatteries -StartWhenAvailable -IdleDuration (New-TimeSpan -Minutes 10) -IdleWaitTimeout (New-TimeSpan -Hours 1) -MultipleInstances IgnoreNew -Priority 7 -ExecutionTimeLimit (New-TimeSpan -Hours 72)
 
-        # Configure basic task behavior for logon automation.
-        $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -StartWhenAvailable
+        # Ensure the requested Task Scheduler folder exists before registering tasks.
+        New-ScheduledTaskFolder -TaskPath $Context.TaskPath
 
-        # Ensure the requested Task Scheduler folder exists before registration.
-        Ensure-ScheduledTaskFolder -TaskPath $Context.TaskPath
+        # Register each maintenance script as an independent task with one action.
+        foreach ($task in $Context.Tasks) {
+            $arguments = '-NoProfile -WindowStyle Hidden -File "{0}"' -f $task.ScriptPath
+            if (-not [string]::IsNullOrWhiteSpace($task.ScriptArguments)) {
+                $arguments = '{0} {1}' -f $arguments, $task.ScriptArguments
+            }
 
-        # Register or replace the task definition.
-        $taskDefinition = New-ScheduledTask -Action @($action1, $action2, $action3) -Principal $principal -Trigger $trigger -Settings $settings
-        Register-ScheduledTask -TaskPath $Context.TaskPath -TaskName $Context.TaskName -InputObject $taskDefinition -Force | Out-Null
+            $action = New-ScheduledTaskAction -Execute $Context.PwshPath -Argument $arguments -WorkingDirectory $Context.ScriptRoot
+            $taskDefinition = New-ScheduledTask -Action $action -Principal $principal -Trigger $trigger -Settings $settings
+            Register-ScheduledTask -TaskPath $Context.TaskPath -TaskName $task.TaskName -InputObject $taskDefinition -Force | Out-Null
+        }
+    }
+
+    # Check each replacement task before the combined task is removed.
+    function Confirm-ProfileMaintenanceTask {
+        param(
+            [Parameter(Mandatory)]
+            [pscustomobject]$Context
+        )
+
+        # Confirm each replacement has its intended single action and logon trigger.
+        foreach ($taskDefinition in $Context.Tasks) {
+            $registeredTask = Get-ScheduledTask -TaskPath $Context.TaskPath -TaskName $taskDefinition.TaskName -ErrorAction Stop
+            if ($registeredTask.Actions.Count -ne 1) {
+                throw "Task does not have exactly one action: $($registeredTask.TaskPath)$($registeredTask.TaskName)"
+            }
+
+            $expectedArguments = '-NoProfile -WindowStyle Hidden -File "{0}"' -f $taskDefinition.ScriptPath
+            if (-not [string]::IsNullOrWhiteSpace($taskDefinition.ScriptArguments)) {
+                $expectedArguments = '{0} {1}' -f $expectedArguments, $taskDefinition.ScriptArguments
+            }
+
+            if ($registeredTask.Actions[0].Execute -ne $Context.PwshPath -or $registeredTask.Actions[0].Arguments -ne $expectedArguments) {
+                throw "Task action does not match the requested script: $($registeredTask.TaskPath)$($registeredTask.TaskName)"
+            }
+
+            if (-not $registeredTask.Triggers -or $registeredTask.Triggers[0].CimClass.CimClassName -ne 'MSFT_TaskLogonTrigger') {
+                throw "Task does not have the expected logon trigger: $($registeredTask.TaskPath)$($registeredTask.TaskName)"
+            }
+
+            if ($registeredTask.Triggers.Count -ne 1 -or -not $registeredTask.Triggers[0].Enabled -or $registeredTask.Triggers[0].UserId -ne $Context.CurrentUser) {
+                throw "Task logon trigger does not match the current user: $($registeredTask.TaskPath)$($registeredTask.TaskName)"
+            }
+
+            if (-not $registeredTask.Settings.Enabled -or $registeredTask.Principal.RunLevel -ne 'Highest' -or $registeredTask.Principal.LogonType -ne 'Interactive') {
+                throw "Task enabled state or principal differs from the existing task: $($registeredTask.TaskPath)$($registeredTask.TaskName)"
+            }
+
+            $settings = $registeredTask.Settings
+            if ($settings.DisallowStartIfOnBatteries -or -not $settings.StopIfGoingOnBatteries -or -not $settings.StartWhenAvailable -or $settings.MultipleInstances -ne 'IgnoreNew' -or -not $settings.UseUnifiedSchedulingEngine -or $settings.IdleSettings.IdleDuration -ne 'PT10M' -or $settings.IdleSettings.WaitTimeout -ne 'PT1H' -or -not $settings.IdleSettings.StopOnIdleEnd -or $settings.IdleSettings.RestartOnIdle) {
+                throw "Task settings differ from the existing combined task: $($registeredTask.TaskPath)$($registeredTask.TaskName)"
+            }
+        }
+    }
+
+    # Remove all split task names and the retired combined registration.
+    function Unregister-ProfileMaintenanceTaskSet {
+        param(
+            [Parameter(Mandatory)]
+            [ValidateNotNullOrEmpty()]
+            [string]$TaskPath
+        )
+
+        # Remove each split task and the original combined registration when present.
+        foreach ($taskName in @(
+            'Update PowerShell Modules At Logon',
+            'Update WinGet Apps At Logon',
+            'Clean Up Snagit Capture Folder At Logon',
+            'WinGet Apps and PowerShell Modules Updates At Logon'
+        )) {
+            Unregister-ProfileMaintenanceTask -TaskName $taskName -TaskPath $TaskPath
+        }
+
+        Unregister-ProfileMaintenanceTask -TaskName 'WinGet Apps and PowerShell Modules Updates At Logon' -TaskPath 'Greg'
     }
 
     function Show-TaskRegistrationResult {

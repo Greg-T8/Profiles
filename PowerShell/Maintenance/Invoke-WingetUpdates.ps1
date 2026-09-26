@@ -14,6 +14,10 @@
     existing logs before the current run) through 3650. A value of -1 (the
     default) uses the retention period defined in $LogRetentionConfig (30 days).
 
+.PARAMETER TestToast
+    Displays a sample WinGet failure toast without running WinGet or changing
+    the 24-hour failure-notification suppression state.
+
 .EXAMPLE
     .\Invoke-WingetUpdates.ps1
     Runs WinGet updates using the default 30-day log retention policy.
@@ -25,6 +29,10 @@
 .EXAMPLE
     .\Invoke-WingetUpdates.ps1 -RetentionDays 0
     Runs WinGet updates and deletes all existing logs before the run.
+
+.EXAMPLE
+    .\Invoke-WingetUpdates.ps1 -TestToast
+    Displays a sample failure toast without running WinGet.
 
 .CONTEXT
     User login maintenance automation (Windows Task Scheduler)
@@ -39,7 +47,9 @@
 [CmdletBinding()]
 param(
     [ValidateRange(0, 3650)]
-    [int]$RetentionDays = -1
+    [int]$RetentionDays = -1,
+
+    [switch]$TestToast
 )
 
 # Configure log retention for indexed update log files.
@@ -47,15 +57,26 @@ $LogRetentionConfig = @{
     Enabled       = $true
     RetentionDays = 30
 }
+$WinGetToastModulePath = Join-Path -Path $PSScriptRoot -ChildPath 'CriticalEventAlert\CriticalEventAlert.psm1'
+$WinGetToastStatePath = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'GregTate\WinGetUpdateAlert\state.json'
+
+# Capture input values for the Main orchestration block.
+$ConfiguredRetentionDays = $RetentionDays
+$RunToastTest = $TestToast.IsPresent
 
 $Main = {
     . $Helpers
 
-    $wingetChanged = $false
-    $logContext = New-UpdateLogContext -LogRetentionConfig $LogRetentionConfig -RetentionDaysOverride $RetentionDays
+    $logContext = New-UpdateLogContext -LogRetentionConfig $LogRetentionConfig -RetentionDaysOverride $ConfiguredRetentionDays
 
-    $wingetChanged = Invoke-WinGetUpdate -WinGetLogPath $logContext.WinGetLogPath
-    Open-UpdateLog -WinGetLogPath $logContext.WinGetLogPath -WingetChanged:$wingetChanged
+    # Run a delivery-only sample when requested; normal invocations continue to update packages.
+    if ($RunToastTest) {
+        Invoke-WinGetToastTest -WinGetLogPath $logContext.WinGetLogPath
+    }
+    else {
+        $wingetChanged = Invoke-WinGetUpdate -WinGetLogPath $logContext.WinGetLogPath
+        Open-UpdateLog -WinGetLogPath $logContext.WinGetLogPath -WingetChanged:$wingetChanged
+    }
 }
 
 $Helpers = {
@@ -165,6 +186,117 @@ $Helpers = {
                 Remove-Item -Path $logFile.FullName -Force -ErrorAction SilentlyContinue
             }
         }
+    }
+
+    # Display a WinGet failure toast and suppress repeats for 24 hours after successful delivery.
+    function Show-WinGetFailureToast {
+        [CmdletBinding()]
+        param(
+            [Parameter(Mandatory)]
+            [string]$FailureSummary,
+
+            [Parameter(Mandatory)]
+            [string]$WinGetLogPath,
+
+            [switch]$Force
+        )
+
+        # Suppress repeated failure notifications while the prior alert is less than 24 hours old.
+        if (-not $Force -and (Test-Path -LiteralPath $WinGetToastStatePath -PathType Leaf)) {
+            try {
+                $toastState = Get-Content -LiteralPath $WinGetToastStatePath -Raw | ConvertFrom-Json -ErrorAction Stop
+                $lastToastUtc = [datetime]::new(
+                    [long]$toastState.LastFailureToastUtcTicks,
+                    [DateTimeKind]::Utc
+                )
+
+                $hoursSinceLastToast = ([datetime]::UtcNow - $lastToastUtc).TotalHours
+
+                # Suppress only timestamps within the cooldown window, not future clock values.
+                if ($hoursSinceLastToast -ge 0 -and $hoursSinceLastToast -lt 24) {
+                    "WinGet failure toast suppressed; previous toast was displayed at $($lastToastUtc.ToString('o'))." | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                    return $false
+                }
+            }
+            catch {
+                "WinGet failure toast suppression state could not be read; notification will be attempted. Reason=$($_.Exception.Message)" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+            }
+        }
+
+        # Keep long exception text out of the toast while preserving the complete error in the run log.
+        if ($FailureSummary.Length -gt 180) {
+            $FailureSummary = $FailureSummary.Substring(0, 177) + '...'
+        }
+
+        # Load the existing toast transport and provide WinGet-specific title and repair guidance.
+        try {
+            Import-Module -Name $WinGetToastModulePath -ErrorAction Stop
+            $candidate = [pscustomobject]@{
+                Classification = 'WinGet update failed'
+                Device         = $FailureSummary
+            }
+            $failureReason = $null
+            $toastParameters = @{
+                Candidate     = $candidate
+                FailureReason = [ref]$failureReason
+                LogPath       = $WinGetLogPath
+                Title         = 'WinGet update needs attention'
+                Reference     = 'Suggested repair: Repair-WinGetPackageManager -Force -Latest'
+            }
+            $toastShown = Show-CriticalEventAlertToast @toastParameters
+
+            if (-not $toastShown) {
+                "WinGet failure toast was not displayed. Reason=$failureReason" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                return $false
+            }
+        }
+        catch {
+            "WinGet failure toast delivery failed. Reason=$($_.Exception.Message)" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+            return $false
+        }
+
+        # Persist the cooldown only after Windows reports that the toast was displayed.
+        if (-not $Force) {
+            try {
+                $stateDirectory = Split-Path -Path $WinGetToastStatePath -Parent
+                if (-not (Test-Path -LiteralPath $stateDirectory -PathType Container)) {
+                    New-Item -Path $stateDirectory -ItemType Directory -Force | Out-Null
+                }
+
+                @{
+                    LastFailureToastUtcTicks = [datetime]::UtcNow.Ticks
+                } | ConvertTo-Json | Set-Content -LiteralPath $WinGetToastStatePath -Encoding UTF8
+            }
+            catch {
+                "WinGet failure toast was displayed, but suppression state could not be saved. Reason=$($_.Exception.Message)" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+            }
+        }
+
+        'WinGet failure toast displayed.' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+        return $true
+    }
+
+    # Display a sample WinGet failure toast without invoking WinGet or changing suppression state.
+    function Invoke-WinGetToastTest {
+        param(
+            [Parameter(Mandatory)]
+            [string]$WinGetLogPath
+        )
+
+        'WinGet toast test started; WinGet package operations were skipped.' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+        $toastParameters = @{
+            FailureSummary = 'Manual toast test; no WinGet operation was attempted.'
+            WinGetLogPath  = $WinGetLogPath
+            Force          = $true
+        }
+        $toastShown = Show-WinGetFailureToast @toastParameters
+
+        # Fail explicit toast tests when Windows could not display the notification.
+        if (-not $toastShown) {
+            throw 'The WinGet toast test did not display a notification.'
+        }
+
+        'WinGet toast test completed.' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
     }
 
     function Invoke-WinGetUpdate {
@@ -288,7 +420,9 @@ $Helpers = {
                 return ($successfulUpdates -gt 0)
             }
             catch {
-                "WinGet module update failed: $($_.Exception.Message)" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                $failureSummary = $_.Exception.Message
+                "WinGet module update failed: $failureSummary" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+                Show-WinGetFailureToast -FailureSummary $failureSummary -WinGetLogPath $WinGetLogPath | Out-Null
                 "===== WinGet update completed: $(Get-Date -Format s) =====" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
                 return $false
             }
@@ -297,7 +431,9 @@ $Helpers = {
             }
         }
 
-        'Microsoft.WinGet.Client module was not found.' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+        $failureSummary = 'Microsoft.WinGet.Client module was not found.'
+        $failureSummary | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+        Show-WinGetFailureToast -FailureSummary $failureSummary -WinGetLogPath $WinGetLogPath | Out-Null
         "===== WinGet update completed: $(Get-Date -Format s) =====" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
         return $false
     }

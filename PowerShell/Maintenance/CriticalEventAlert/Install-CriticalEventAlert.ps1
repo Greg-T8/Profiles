@@ -25,7 +25,7 @@ $ApplicationName = 'GregTate\CriticalEventAlert'
 $EventSource = 'CriticalEventAlert'
 $InstallationPath = Join-Path $env:LOCALAPPDATA $ApplicationName
 $TaskName = 'CriticalEventAlert'
-$TaskPath = '\GregTate\'
+$TaskPath = '\Custom Tasks\'
 
 $Main = {
     . $Helpers
@@ -120,7 +120,8 @@ $Helpers = {
             $null = $schedulerService.GetFolder($TaskPath.TrimEnd('\\'))
         }
         catch {
-            $null = $schedulerService.GetFolder('\').CreateFolder('GregTate', $null)
+            $folderName = $TaskPath.Trim('\')
+            $null = $schedulerService.GetFolder('\').CreateFolder($folderName, $null)
         }
 
         # Escape machine-specific values before inserting them into Task Scheduler XML.

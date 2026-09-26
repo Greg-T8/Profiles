@@ -416,7 +416,11 @@ function Show-CriticalEventAlertToast {
 
         [ref]$FailureReason,
 
-        [string]$LogPath
+        [string]$LogPath,
+
+        [string]$Title = 'Critical Windows reliability event',
+
+        [string]$Reference
     )
 
     # Skip toast delivery when the task runs outside an interactive user session.
@@ -429,15 +433,17 @@ function Show-CriticalEventAlertToast {
     }
 
     # Escape event text before inserting it into the toast XML document.
-    $title = [Security.SecurityElement]::Escape('Critical Windows reliability event')
+    $title = [Security.SecurityElement]::Escape($Title)
     $detail = [Security.SecurityElement]::Escape(
         ('{0}: {1}' -f $Candidate.Classification, $Candidate.Device)
     )
-    $reference = [Security.SecurityElement]::Escape(
-        ('Event Viewer - System / {0} / ID {1}' -f `
-            $Candidate.ProviderName, $Candidate.EventId
-        )
-    )
+    if ($PSBoundParameters.ContainsKey('Reference')) {
+        $referenceText = $Reference
+    }
+    else {
+        $referenceText = 'Event Viewer - System / {0} / ID {1}' -f $Candidate.ProviderName, $Candidate.EventId
+    }
+    $reference = [Security.SecurityElement]::Escape($referenceText)
     $logAction = ''
 
     if ($LogPath) {
