@@ -8,7 +8,7 @@ A collection of configuration files and profiles for various development tools a
 
 ```powershell
 # One-liner to install PowerShell profile from GitHub
-irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/bootstrap.ps1 | iex
+irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/RemoteProfile/bootstrap.ps1 | iex
 ```
 
 ### Linux/Docker Container Setup
