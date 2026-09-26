@@ -1,11 +1,15 @@
+# -------------------------------------------------------------------------
+# Program: Register-CriticalEventAlertTask.ps1
+# Description: Registers the CriticalEventAlert Windows scheduled task for the current user
+# Context: Personal PowerShell profile - Windows reliability monitoring
+# Author: Greg Tate
+# ------------------------------------------------------------------------
 <#
 .SYNOPSIS
-Installs the Critical Event Alert scheduled task for the current user.
+Registers the Critical Event Alert scheduled task for the current user.
 
 .DESCRIPTION
-Registers the dedicated Application event-log source, copies maintained monitor
-files to LocalAppData, establishes an event baseline, and creates or updates the
-current user's logon-triggered monitoring task.
+Registers the dedicated Application event-log source, copies the standalone monitor to LocalAppData, establishes an event baseline, and creates or updates the current user's logon-triggered monitoring task.
 
 .CONTEXT
 Personal PowerShell profile - Windows reliability monitoring
@@ -14,7 +18,7 @@ Personal PowerShell profile - Windows reliability monitoring
 Greg Tate
 
 .NOTES
-Program: Install-CriticalEventAlert.ps1
+Program: Register-CriticalEventAlertTask.ps1
 #>
 
 [CmdletBinding()]
@@ -45,7 +49,7 @@ $Helpers = {
         $currentPrincipal = New-Object Security.Principal.WindowsPrincipal($currentIdentity)
 
         if (-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-            throw 'Run Install-CriticalEventAlert.ps1 from an elevated PowerShell session.'
+            throw 'Run Register-CriticalEventAlertTask.ps1 from an elevated PowerShell session.'
         }
     }
 
@@ -56,7 +60,7 @@ $Helpers = {
             Out-Null
 
         # Copy only the task payload files so the task does not depend on the repository path.
-        foreach ($fileName in @('CriticalEventAlert.psm1', 'Monitor-CriticalEventAlert.ps1')) {
+        foreach ($fileName in @('Monitor-CriticalEventAlert.ps1')) {
             $sourcePath = Join-Path $PSScriptRoot $fileName
             $destinationPath = Join-Path $InstallationPath $fileName
 
@@ -65,6 +69,11 @@ $Helpers = {
             }
 
             Copy-Item -LiteralPath $sourcePath -Destination $destinationPath -Force
+        }
+        # Remove the retired module from prior installations so the runtime payload stays standalone.
+        $legacyModulePath = Join-Path $InstallationPath 'CriticalEventAlert.psm1'
+        if (Test-Path -LiteralPath $legacyModulePath -PathType Leaf) {
+            Remove-Item -LiteralPath $legacyModulePath -Force
         }
     }
 

@@ -57,7 +57,6 @@ $LogRetentionConfig = @{
     Enabled       = $true
     RetentionDays = 30
 }
-$WinGetToastModulePath = Join-Path -Path $PSScriptRoot -ChildPath 'CriticalEventAlert\CriticalEventAlert.psm1'
 $WinGetToastStatePath = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'GregTate\WinGetUpdateAlert\state.json'
 
 # Capture input values for the Main orchestration block.
@@ -188,6 +187,126 @@ $Helpers = {
         }
     }
 
+    # Show an in-session toast without requiring a third-party PowerShell module.
+    function Show-WinGetFailureNotification {
+        [CmdletBinding()]
+        param(
+            [Parameter(Mandatory)]
+            [psobject]$Candidate,
+
+            [ref]$FailureReason,
+
+            [string]$LogPath,
+
+            [string]$Title = 'Critical Windows reliability event',
+
+            [string]$Reference
+        )
+
+        # Skip toast delivery when the task runs outside an interactive user session.
+        if (-not [Environment]::UserInteractive) {
+            if ($PSBoundParameters.ContainsKey('FailureReason')) {
+                $FailureReason.Value = 'The PowerShell process is not running in an interactive user session.'
+            }
+
+            return $false
+        }
+
+        # Escape event text before inserting it into the toast XML document.
+        $title = [Security.SecurityElement]::Escape($Title)
+        $detail = [Security.SecurityElement]::Escape(
+            ('{0}: {1}' -f $Candidate.Classification, $Candidate.Device)
+        )
+        if ($PSBoundParameters.ContainsKey('Reference')) {
+            $referenceText = $Reference
+        }
+        else {
+            $referenceText = 'Event Viewer - System / {0} / ID {1}' -f $Candidate.ProviderName, $Candidate.EventId
+        }
+        $reference = [Security.SecurityElement]::Escape($referenceText)
+        $logAction = ''
+
+        if ($LogPath) {
+            $logUri = 'file:///' + ($LogPath -replace '\\', '/')
+            $escapedLogUri = [Security.SecurityElement]::Escape($logUri)
+            $logAction = @"
+  <actions>
+    <action content="Open alert log" activationType="protocol" arguments="$escapedLogUri" />
+  </actions>
+"@
+        }
+
+        $toastMarkup = @"
+<toast scenario="reminder">
+  <visual>
+    <binding template="ToastGeneric">
+      <text>$title</text>
+      <text>$detail</text>
+      <text>$reference</text>
+    </binding>
+  </visual>
+  $logAction
+</toast>
+"@
+
+        # Use Windows PowerShell 5.1 as the WinRT bridge because PowerShell 7 does not
+        # project the built-in Windows.Data and Windows.UI.Notifications types.
+        try {
+            $windowsPowerShellPath = Join-Path -Path $env:SystemRoot -ChildPath 'System32\WindowsPowerShell\v1.0\powershell.exe'
+
+            if (-not (Test-Path -LiteralPath $windowsPowerShellPath -PathType Leaf)) {
+                throw "Windows PowerShell 5.1 was not found: $windowsPowerShellPath"
+            }
+
+            $encodedMarkup = [Convert]::ToBase64String(
+                [Text.Encoding]::UTF8.GetBytes($toastMarkup)
+            )
+            $appId = '{1AC14E77-02E7-4E5D-B744-2EB1AE5198B7}\WindowsPowerShell\v1.0\powershell.exe'
+            $toastScript = @'
+$ErrorActionPreference = 'Stop'
+$toastMarkup = [Text.Encoding]::UTF8.GetString(
+    [Convert]::FromBase64String('__TOAST_MARKUP__')
+)
+$appId = '__APP_ID__'
+$null = [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime]
+$null = [Windows.Data.Xml.Dom.XmlDocument, Windows.Data, ContentType = WindowsRuntime]
+$toastXml = [Windows.Data.Xml.Dom.XmlDocument]::new()
+$toastXml.LoadXml($toastMarkup)
+$toast = [Windows.UI.Notifications.ToastNotification]::new($toastXml)
+[Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier($appId).Show($toast)
+'@
+            $toastScript = $toastScript.Replace('__TOAST_MARKUP__', $encodedMarkup)
+            $toastScript = $toastScript.Replace('__APP_ID__', $appId)
+            $encodedCommand = [Convert]::ToBase64String(
+                [Text.Encoding]::Unicode.GetBytes($toastScript)
+            )
+            $processArguments = @(
+                '-NoLogo'
+                '-NoProfile'
+                '-WindowStyle'
+                'Hidden'
+                '-ExecutionPolicy'
+                'Bypass'
+                '-EncodedCommand'
+                $encodedCommand
+            )
+            $childOutput = & $windowsPowerShellPath @processArguments 2>&1
+
+            if ($LASTEXITCODE -ne 0) {
+                throw (($childOutput | Out-String).Trim())
+            }
+
+            return $true
+        }
+        catch {
+            if ($PSBoundParameters.ContainsKey('FailureReason')) {
+                $FailureReason.Value = $_.Exception.Message
+            }
+
+            return $false
+        }
+    }
+
     # Display a WinGet failure toast and suppress repeats for 24 hours after successful delivery.
     function Show-WinGetFailureToast {
         [CmdletBinding()]
@@ -228,9 +347,8 @@ $Helpers = {
             $FailureSummary = $FailureSummary.Substring(0, 177) + '...'
         }
 
-        # Load the existing toast transport and provide WinGet-specific title and repair guidance.
+        # Use the self-contained toast transport with WinGet-specific title and repair guidance.
         try {
-            Import-Module -Name $WinGetToastModulePath -ErrorAction Stop
             $candidate = [pscustomobject]@{
                 Classification = 'WinGet update failed'
                 Device         = $FailureSummary
@@ -243,7 +361,7 @@ $Helpers = {
                 Title         = 'WinGet update needs attention'
                 Reference     = 'Suggested repair: Repair-WinGetPackageManager -Force -Latest'
             }
-            $toastShown = Show-CriticalEventAlertToast @toastParameters
+            $toastShown = Show-WinGetFailureNotification @toastParameters
 
             if (-not $toastShown) {
                 "WinGet failure toast was not displayed. Reason=$failureReason" | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
