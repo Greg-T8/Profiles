@@ -199,7 +199,7 @@
           "color": "#1ca5eb",
           "id": "hypervoh8xrbq98mm6av71w",
           "isGitRepo": true,
-          "name": "Hyper-V",
+          "name": "Hyper-V Lab",
           "path": "c:\\Users\\gregt\\LocalCode\\Projects\\Hyper-V\\Hyper-V.code-workspace"
         },
         {
@@ -238,10 +238,10 @@
       "id": "clientsacck9xha7mm66b5q8",
       "projects": [
         {
-          "isGitRepo": true,
+          "isGitRepo": false,
           "id": "quisitivetemplatesxypt88f08mt8jgi1q",
           "name": "Quisitive Templates",
-          "path": "c:\\Users\\gregt\\LocalCode\\Quisitive\\Quisitive_Templates\\QuisitiveTemplates.code-workspace",
+          "path": "c:\\Users\\gregt\\OneDrive - Quisitive\\Quisitive_Templates\\QuisitiveTemplates.code-workspace",
           "color": "#00b3e2"
         },
         {
@@ -450,6 +450,10 @@
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
     [
+      "#1ca5eb",
+      "Picton Blue"
+    ],
+    [
       "#00b3e2",
       "Cerulean"
     ],
@@ -504,10 +508,6 @@
     [
       "#041C2C",
       "Black Pearl"
-    ],
-    [
-      "#ABA0D9",
-      "Cold Purple"
     ]
   ],
   "dashboard.storeProjectsInSettings": true,
