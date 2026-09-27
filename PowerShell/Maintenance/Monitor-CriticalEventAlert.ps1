@@ -5,7 +5,23 @@ Monitors focused Windows reliability events and notifies the signed-in user.
 .DESCRIPTION
 Reads new qualifying System events and current physical-disk health, writes an
 Application event-log record for every detected issue, and suppresses repeated
-toast notifications for 24 hours.
+toast notifications for 24 hours. Use -Register from an elevated session to
+install the monitor and register its logon task.
+
+.PARAMETER Baseline
+Establishes the initial event checkpoint.
+
+.PARAMETER TestToast
+Displays a sample toast without running the monitor.
+
+.PARAMETER LoginCheck
+Runs the sign-in summary check used by the scheduled task.
+
+.PARAMETER Register
+Installs the standalone monitor payload and creates or updates its logon task.
+
+.EXAMPLE
+.\Monitor-CriticalEventAlert.ps1 -Register
 
 .CONTEXT
 Personal PowerShell profile - Windows reliability monitoring
@@ -17,23 +33,44 @@ Greg Tate
 Program: Monitor-CriticalEventAlert.ps1
 #>
 
-[CmdletBinding()]
+[CmdletBinding(DefaultParameterSetName = 'Monitor')]
 param(
+    [Parameter(ParameterSetName = 'Monitor')]
     [switch]$Baseline,
 
+    [Parameter(ParameterSetName = 'Monitor')]
     [switch]$TestToast,
 
-    [switch]$LoginCheck
+    [Parameter(ParameterSetName = 'Monitor')]
+    [switch]$LoginCheck,
+
+    [Parameter(Mandatory, ParameterSetName = 'Register')]
+    [switch]$Register
 )
 
 # Monitoring configuration
 $ApplicationName = 'GregTate\CriticalEventAlert'
 $EventSource = 'CriticalEventAlert'
+$InstallationPath = Join-Path $env:LOCALAPPDATA $ApplicationName
+$TaskName = 'CriticalEventAlert'
+$TaskPath = '\Custom Tasks\'
+$RegisterTask = $Register.IsPresent
 $StatePath = Join-Path $env:LOCALAPPDATA "$ApplicationName\state.json"
 $LogPath = Join-Path $env:LOCALAPPDATA "$ApplicationName\CriticalEventAlert.log"
 
 $Main = {
     . $Helpers
+
+    # Install the standalone monitor payload and task only when requested.
+    if ($RegisterTask) {
+        . $RegistrationHelpers
+        Confirm-CriticalEventAlertAdministrator
+        Initialize-CriticalEventAlertInstallation
+        Register-CriticalEventAlertEventSource
+        Initialize-CriticalEventAlertBaseline
+        Register-CriticalEventAlertTask
+        return
+    }
 
     # Record each invocation and route manual toast tests away from monitoring.
     Write-CriticalEventAlertLog `
@@ -937,6 +974,159 @@ $toast = [Windows.UI.Notifications.ToastNotification]::new($toastXml)
     }
     #endregion
 }
+
+$RegistrationHelpers = {
+    # Ensure event-log source registration occurs only from an elevated session.
+    function Confirm-CriticalEventAlertAdministrator {
+        # Stop before making partial changes when the installer is not elevated.
+        $currentIdentity = [Security.Principal.WindowsIdentity]::GetCurrent()
+        $currentPrincipal = New-Object Security.Principal.WindowsPrincipal($currentIdentity)
+
+        if (-not $currentPrincipal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+            throw 'Run Monitor-CriticalEventAlert.ps1 -Register from an elevated PowerShell session.'
+        }
+    }
+
+    # Copy the maintained monitor implementation into its stable task execution location.
+    function Initialize-CriticalEventAlertInstallation {
+        # Create the application folder before copying task dependencies.
+        New-Item -ItemType Directory -Path $InstallationPath -Force |
+            Out-Null
+
+        # Copy only the task payload files so the task does not depend on the repository path.
+        foreach ($fileName in @('Monitor-CriticalEventAlert.ps1')) {
+            $sourcePath = Join-Path $PSScriptRoot $fileName
+            $destinationPath = Join-Path $InstallationPath $fileName
+
+            if (-not (Test-Path -LiteralPath $sourcePath -PathType Leaf)) {
+                throw "Required task payload file was not found: $sourcePath"
+            }
+
+            Copy-Item -LiteralPath $sourcePath -Destination $destinationPath -Force
+        }
+        # Remove the retired module from prior installations so the runtime payload stays standalone.
+        $legacyModulePath = Join-Path $InstallationPath 'CriticalEventAlert.psm1'
+        if (Test-Path -LiteralPath $legacyModulePath -PathType Leaf) {
+            Remove-Item -LiteralPath $legacyModulePath -Force
+        }
+    }
+
+    # Create the Application event-log source used for durable alert history.
+    function Register-CriticalEventAlertEventSource {
+        # Preserve an existing source while preventing accidental use of a different log.
+        if ([Diagnostics.EventLog]::SourceExists($EventSource)) {
+            $existingLog = [Diagnostics.EventLog]::LogNameFromSourceName($EventSource, '.')
+
+            if ($existingLog -ne 'Application') {
+                throw "The $EventSource event source already belongs to the $existingLog log."
+            }
+
+            return
+        }
+
+        New-EventLog -LogName Application -Source $EventSource
+    }
+
+    # Create the event-log checkpoint before task registration can trigger the monitor.
+    function Initialize-CriticalEventAlertBaseline {
+        # Use the installed monitor so the task and installer share the same state contract.
+        $powerShellPath = Join-Path $PSHOME 'pwsh.exe'
+        $monitorPath = Join-Path $InstallationPath 'Monitor-CriticalEventAlert.ps1'
+        & $powerShellPath `
+            -NoLogo `
+            -NoProfile `
+            -ExecutionPolicy Bypass `
+            -File $monitorPath `
+            -Baseline
+
+        if ($LASTEXITCODE -ne 0) {
+            throw "The monitor baseline failed with exit code $LASTEXITCODE."
+        }
+    }
+
+    # Create the task folder and register the login status trigger.
+    function Register-CriticalEventAlertTask {
+        # Build the current user's SID and PowerShell executable path for task registration.
+        $currentUserSid = [Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+        $powerShellPath = Join-Path $PSHOME 'pwsh.exe'
+        $monitorPath = Join-Path $InstallationPath 'Monitor-CriticalEventAlert.ps1'
+
+        if (-not (Test-Path -LiteralPath $powerShellPath -PathType Leaf)) {
+            throw "PowerShell executable was not found: $powerShellPath"
+        }
+
+        # Ensure the purpose-named Task Scheduler folder exists without modifying other tasks.
+        $schedulerService = New-Object -ComObject 'Schedule.Service'
+        $schedulerService.Connect()
+
+        try {
+            $null = $schedulerService.GetFolder($TaskPath.TrimEnd('\\'))
+        }
+        catch {
+            $folderName = $TaskPath.Trim('\')
+            $null = $schedulerService.GetFolder('\').CreateFolder($folderName, $null)
+        }
+
+        # Escape machine-specific values before inserting them into Task Scheduler XML.
+        $escapedUserSid = [Security.SecurityElement]::Escape($currentUserSid)
+        $escapedPowerShellPath = [Security.SecurityElement]::Escape($powerShellPath)
+        $escapedMonitorPath = [Security.SecurityElement]::Escape($monitorPath)
+        $escapedInstallationPath = [Security.SecurityElement]::Escape($InstallationPath)
+        $taskXml = @"
+<?xml version="1.0" encoding="UTF-16"?>
+<Task version="1.4" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo>
+    <Author>Greg Tate</Author>
+    <Description>Checks focused Windows reliability signals and reports status at user sign-in.</Description>
+  </RegistrationInfo>
+  <Triggers>
+    <LogonTrigger>
+      <Enabled>true</Enabled>
+      <Delay>PT30S</Delay>
+    </LogonTrigger>
+  </Triggers>
+  <Principals>
+    <Principal id="Author">
+      <UserId>$escapedUserSid</UserId>
+      <LogonType>InteractiveToken</LogonType>
+      <RunLevel>LeastPrivilege</RunLevel>
+    </Principal>
+  </Principals>
+  <Settings>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <AllowHardTerminate>true</AllowHardTerminate>
+    <StartWhenAvailable>true</StartWhenAvailable>
+    <RunOnlyIfNetworkAvailable>false</RunOnlyIfNetworkAvailable>
+    <AllowStartOnDemand>true</AllowStartOnDemand>
+    <Enabled>true</Enabled>
+    <Hidden>false</Hidden>
+    <RunOnlyIfIdle>false</RunOnlyIfIdle>
+    <WakeToRun>false</WakeToRun>
+    <ExecutionTimeLimit>PT5M</ExecutionTimeLimit>
+    <Priority>7</Priority>
+  </Settings>
+  <Actions Context="Author">
+    <Exec>
+      <Command>$escapedPowerShellPath</Command>
+      <Arguments>-NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$escapedMonitorPath&quot; -LoginCheck</Arguments>
+      <WorkingDirectory>$escapedInstallationPath</WorkingDirectory>
+    </Exec>
+  </Actions>
+</Task>
+"@
+
+        # Update only the named task so unrelated scheduled tasks remain untouched.
+        Register-ScheduledTask `
+            -TaskName $TaskName `
+            -TaskPath $TaskPath `
+            -Xml $taskXml `
+            -Force |
+            Out-Null
+    }
+}
+
 
 try {
     Push-Location -Path $PSScriptRoot
