@@ -1110,7 +1110,7 @@ $RegistrationHelpers = {
   <Actions Context="Author">
     <Exec>
       <Command>$escapedPowerShellPath</Command>
-      <Arguments>-NoLogo -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$escapedMonitorPath&quot; -LoginCheck</Arguments>
+      <Arguments>-NoLogo -NoProfile -NonInteractive -WindowStyle Minimized -ExecutionPolicy Bypass -File &quot;$escapedMonitorPath&quot; -LoginCheck</Arguments>
       <WorkingDirectory>$escapedInstallationPath</WorkingDirectory>
     </Exec>
   </Actions>
