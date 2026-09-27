@@ -49,14 +49,14 @@ param(
 )
 
 # Monitoring configuration
-$ApplicationName = 'GregTate\CriticalEventAlert'
-$EventSource = 'CriticalEventAlert'
+$ApplicationName  = 'GregTate\CriticalEventAlert'
+$EventSource      = 'CriticalEventAlert'
 $InstallationPath = Join-Path $env:LOCALAPPDATA $ApplicationName
-$TaskName = 'CriticalEventAlert'
-$TaskPath = '\Custom Tasks\'
+$TaskName         = 'CriticalEventAlert'
+$TaskPath         = '\Custom Tasks\'
 $RegisterTask = $Register.IsPresent
-$StatePath = Join-Path $env:LOCALAPPDATA "$ApplicationName\state.json"
-$LogPath = Join-Path $env:LOCALAPPDATA "$ApplicationName\CriticalEventAlert.log"
+$StatePath    = Join-Path $env:LOCALAPPDATA "$ApplicationName\state.json"
+$LogPath      = Join-Path $env:LOCALAPPDATA "$ApplicationName\CriticalEventAlert.log"
 
 $Main = {
     . $Helpers
