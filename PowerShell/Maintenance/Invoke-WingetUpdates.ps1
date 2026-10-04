@@ -24,6 +24,14 @@
 .PARAMETER Unregister
     Removes only this maintenance task.
 
+.PARAMETER PinWinGetClient
+    Downgrades the WinGet utility and Microsoft.WinGet.Client module to 1.29.280,
+    then pins both maintenance paths without updating other packages.
+
+.PARAMETER UnpinWinGetClient
+    Removes the WinGet utility pin and allows future PowerShell module
+    maintenance to update Microsoft.WinGet.Client again.
+
 .PARAMETER TaskPath
     Task Scheduler folder path used with -Register or -Unregister. Defaults to \Custom Tasks\.
 
@@ -49,6 +57,14 @@
     .\Invoke-WingetUpdates.ps1 -TestToast
     Displays a sample failure toast without running WinGet.
 
+.EXAMPLE
+    .\Invoke-WingetUpdates.ps1 -PinWinGetClient
+    Downgrades and pins the WinGet utility and PowerShell client at 1.29.280.
+
+.EXAMPLE
+    .\Invoke-WingetUpdates.ps1 -UnpinWinGetClient
+    Removes the temporary WinGet pins after a verified upstream fix.
+
 .CONTEXT
     User login maintenance automation (Windows Task Scheduler)
 
@@ -68,6 +84,12 @@ param(
     [Parameter(ParameterSetName = 'Maintenance')]
     [switch]$TestToast,
 
+    [Parameter(Mandatory, ParameterSetName = 'PinWinGetClient')]
+    [switch]$PinWinGetClient,
+
+    [Parameter(Mandatory, ParameterSetName = 'UnpinWinGetClient')]
+    [switch]$UnpinWinGetClient,
+
     [Parameter(Mandatory, ParameterSetName = 'Register')]
     [switch]$Register,
 
@@ -86,10 +108,21 @@ $LogRetentionConfig = @{
     RetentionDays = 30
 }
 $WinGetToastStatePath = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'GregTate\WinGetUpdateAlert\state.json'
+$WinGetClientConfig = @{
+    ModuleName      = 'Microsoft.WinGet.Client'
+    PackageId       = 'Microsoft.AppInstaller'
+    AppxPackageName = 'Microsoft.DesktopAppInstaller'
+    RequiredVersion = '1.29.280'
+    InstallerUrl    = 'https://github.com/microsoft/winget-cli/releases/download/v1.29.280/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle'
+    InstallerSha256 = '0809FA9F52E395D6E7DE692331DCE847AC991952675116BB4D8AAE2DDCC20946'
+    PinStatePath    = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'GregTate\WinGetClientPin\state.json'
+}
 
 # Capture input values for the Main orchestration block.
 $ConfiguredRetentionDays = $RetentionDays
 $RunToastTest = $TestToast.IsPresent
+$SetWinGetClientPin = $PinWinGetClient.IsPresent
+$RemoveWinGetClientPin = $UnpinWinGetClient.IsPresent
 
 # Task identity and parameters used only when registering or unregistering this maintenance task.
 $TaskName = 'Update WinGet Apps At Logon'
@@ -119,6 +152,17 @@ $Main = {
     }
 
     $logContext = New-UpdateLogContext -LogRetentionConfig $LogRetentionConfig -RetentionDaysOverride $ConfiguredRetentionDays
+
+    # Apply an explicit pin or recovery request without updating unrelated packages.
+    if ($SetWinGetClientPin) {
+        Set-WinGetClientPin -WinGetLogPath $logContext.WinGetLogPath
+        return
+    }
+
+    if ($RemoveWinGetClientPin) {
+        Remove-WinGetClientPin -WinGetLogPath $logContext.WinGetLogPath
+        return
+    }
 
     # Run a delivery-only sample when requested; normal invocations continue to update packages.
     if ($RunToastTest) {
@@ -469,6 +513,369 @@ $toast = [Windows.UI.Notifications.ToastNotification]::new($toastXml)
         'WinGet toast test completed.' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
     }
 
+    function Get-WinGetClientPinState {
+        # Read the durable recovery state; an absent state defaults to the temporary safety pin.
+        $defaultState = [pscustomobject]@{
+            PinEnabled      = $true
+            RequiredVersion = $WinGetClientConfig.RequiredVersion
+        }
+
+        if (-not (Test-Path -LiteralPath $WinGetClientConfig.PinStatePath -PathType Leaf)) {
+            return $defaultState
+        }
+
+        try {
+            $state = Get-Content -LiteralPath $WinGetClientConfig.PinStatePath -Raw -ErrorAction Stop |
+                ConvertFrom-Json -ErrorAction Stop
+
+            if ($null -eq $state.PSObject.Properties['PinEnabled']) {
+                throw 'The PinEnabled property is missing.'
+            }
+
+            return $state
+        }
+        catch {
+            throw "WinGet client pin state could not be read: $($_.Exception.Message)"
+        }
+    }
+
+    function Set-WinGetClientPinState {
+        param(
+            [Parameter(Mandatory)]
+            [bool]$PinEnabled
+        )
+
+        # Persist the selected pin mode so the separate module maintenance task honors recovery.
+        $stateDirectory = Split-Path -Path $WinGetClientConfig.PinStatePath -Parent
+        if (-not (Test-Path -LiteralPath $stateDirectory -PathType Container)) {
+            New-Item -Path $stateDirectory -ItemType Directory -Force -ErrorAction Stop | Out-Null
+        }
+
+        [pscustomobject]@{
+            PinEnabled      = $PinEnabled
+            RequiredVersion = $WinGetClientConfig.RequiredVersion
+            UpdatedAtUtc    = [datetime]::UtcNow.ToString('o')
+        } |
+            ConvertTo-Json |
+            Set-Content -LiteralPath $WinGetClientConfig.PinStatePath -Encoding UTF8 -ErrorAction Stop
+    }
+
+    function Set-MaintenanceClientPinCatalogEntry {
+        param(
+            [Parameter(Mandatory)]
+            [bool]$PinEnabled
+        )
+
+        # Keep the generic pin catalog aligned so the separate module updater honors this client pin.
+        $catalogPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'GregTate\MaintenancePins\pins.json'
+        $catalogDirectory = Split-Path -Path $catalogPath -Parent
+        if (-not (Test-Path -LiteralPath $catalogDirectory -PathType Container)) {
+            New-Item -Path $catalogDirectory -ItemType Directory -Force -ErrorAction Stop | Out-Null
+        }
+
+        if (Test-Path -LiteralPath $catalogPath -PathType Leaf) {
+            $catalog = Get-Content -LiteralPath $catalogPath -Raw -ErrorAction Stop |
+                ConvertFrom-Json -ErrorAction Stop
+        }
+        else {
+            $catalog = [pscustomobject]@{
+                ModulePins  = @()
+                PackagePins = @()
+            }
+        }
+
+        $catalog.ModulePins = @($catalog.ModulePins |
+                Where-Object { $_.Name -ne $WinGetClientConfig.ModuleName })
+        $catalog.PackagePins = @($catalog.PackagePins |
+                Where-Object { $_.Id -ne $WinGetClientConfig.PackageId })
+        if ($PinEnabled) {
+            $catalog.ModulePins += [pscustomobject]@{
+                Name    = $WinGetClientConfig.ModuleName
+                Version = $WinGetClientConfig.RequiredVersion
+            }
+            $catalog.PackagePins += [pscustomobject]@{
+                Id      = $WinGetClientConfig.PackageId
+                Version = '{0}.0' -f $WinGetClientConfig.RequiredVersion
+                Source  = 'winget'
+            }
+        }
+
+        [pscustomobject]@{
+            ModulePins   = @($catalog.ModulePins)
+            PackagePins  = @($catalog.PackagePins)
+            UpdatedAtUtc = [datetime]::UtcNow.ToString('o')
+        } |
+            ConvertTo-Json -Depth 4 |
+            Set-Content -LiteralPath $catalogPath -Encoding UTF8 -ErrorAction Stop
+    }
+
+    function Get-InstalledWinGetUtility {
+        # Return the current App Installer package, which supplies winget.exe.
+        return Get-AppxPackage -Name $WinGetClientConfig.AppxPackageName -ErrorAction SilentlyContinue |
+            Sort-Object -Property Version -Descending |
+            Select-Object -First 1
+    }
+
+    function Confirm-WinGetUtilityVersion {
+        # Verify that App Installer resolves to the required 1.29.280 servicing version.
+        $package = Get-InstalledWinGetUtility
+        $expectedVersion = '{0}.0' -f $WinGetClientConfig.RequiredVersion
+
+        if (-not $package -or "$($package.Version)" -ne $expectedVersion) {
+            $actualVersion = if ($package) { "$($package.Version)" } else { 'not installed' }
+            throw "WinGet utility version is '$actualVersion'; required version is '$expectedVersion'."
+        }
+    }
+
+    function Install-RequiredWinGetUtility {
+        param(
+            [Parameter(Mandatory)]
+            [string]$WinGetLogPath
+        )
+
+        # Install the source-verified App Installer release only when the current package differs.
+        $package = Get-InstalledWinGetUtility
+        $expectedVersion = '{0}.0' -f $WinGetClientConfig.RequiredVersion
+        if ($package -and "$($package.Version)" -eq $expectedVersion) {
+            "WinGet utility already uses required version $expectedVersion." |
+                Tee-Object -FilePath $WinGetLogPath -Append |
+                Out-Null
+            return
+        }
+
+        $wingetCommand = Get-Command -Name 'winget.exe' -ErrorAction SilentlyContinue
+        if (-not $wingetCommand) {
+            throw 'winget.exe was not found; the App Installer package cannot be downgraded automatically.'
+        }
+
+        "Installing WinGet utility version $expectedVersion." |
+            Tee-Object -FilePath $WinGetLogPath -Append |
+            Out-Null
+        $wingetArguments = @(
+            'install'
+            '--id'
+            $WinGetClientConfig.PackageId
+            '--version'
+            $expectedVersion
+            '--exact'
+            '--source'
+            'winget'
+            '--force'
+            '--accept-package-agreements'
+            '--accept-source-agreements'
+            '--disable-interactivity'
+        )
+        $installOutput = & $wingetCommand.Source @wingetArguments 2>&1
+        $installOutput |
+            Tee-Object -FilePath $WinGetLogPath -Append |
+            Out-Null
+
+        if ($LASTEXITCODE -ne 0) {
+            "WinGet utility installation returned exit code $LASTEXITCODE; using the verified bundle fallback." |
+                Tee-Object -FilePath $WinGetLogPath -Append |
+                Out-Null
+            Install-RequiredWinGetUtilityFromBundle -WinGetLogPath $WinGetLogPath
+        }
+
+        Confirm-WinGetUtilityVersion
+    }
+
+    function Install-RequiredWinGetUtilityFromBundle {
+        param(
+            [Parameter(Mandatory)]
+            [string]$WinGetLogPath
+        )
+
+        # Stage and hash the official release before replacing the installed App Installer package.
+        $bundlePath = Join-Path -Path $env:TEMP -ChildPath 'Microsoft.DesktopAppInstaller_1.29.280.0.msixbundle'
+        Invoke-WebRequest `
+            -Uri $WinGetClientConfig.InstallerUrl `
+            -OutFile $bundlePath `
+            -ErrorAction Stop
+        $actualHash = (Get-FileHash -LiteralPath $bundlePath -Algorithm SHA256 -ErrorAction Stop).Hash
+        if ($actualHash -ne $WinGetClientConfig.InstallerSha256) {
+            throw "Downloaded App Installer bundle hash did not match the WinGet manifest. Actual=$actualHash"
+        }
+
+        $currentPackage = Get-InstalledWinGetUtility
+        $currentVersion = if ($currentPackage) { "$($currentPackage.Version)" } else { 'not installed' }
+        "Replacing App Installer $currentVersion with the verified 1.29.280.0 bundle." |
+            Tee-Object -FilePath $WinGetLogPath -Append |
+            Out-Null
+        Add-AppxPackage `
+            -Path $bundlePath `
+            -ForceTargetApplicationShutdown `
+            -ForceUpdateFromAnyVersion `
+            -ErrorAction Stop
+    }
+
+    function Install-RequiredWinGetClientModule {
+        param(
+            [Parameter(Mandatory)]
+            [string]$WinGetLogPath
+        )
+
+        # Install the required client release into the CurrentUser module scope used by maintenance.
+        $requiredVersion = [version]$WinGetClientConfig.RequiredVersion
+        $installedModule = Get-Module -ListAvailable -Name $WinGetClientConfig.ModuleName -ErrorAction SilentlyContinue |
+            Where-Object { $_.Version -eq $requiredVersion } |
+            Select-Object -First 1
+
+        if (-not $installedModule) {
+            "Installing PowerShell module $($WinGetClientConfig.ModuleName) $requiredVersion." |
+                Tee-Object -FilePath $WinGetLogPath -Append |
+                Out-Null
+            Install-Module `
+                -Name $WinGetClientConfig.ModuleName `
+                -RequiredVersion $WinGetClientConfig.RequiredVersion `
+                -Scope CurrentUser `
+                -Force `
+                -AllowClobber `
+                -ErrorAction Stop
+        }
+
+        $userModuleRoots = @(
+            (Join-Path -Path $HOME -ChildPath 'Documents\PowerShell\Modules'),
+            (Join-Path -Path $HOME -ChildPath 'Documents\WindowsPowerShell\Modules')
+        )
+        $unwantedModules = Get-Module -ListAvailable -Name $WinGetClientConfig.ModuleName -ErrorAction SilentlyContinue |
+            Where-Object {
+                $module = $_
+                $moduleBase = "$($module.ModuleBase)"
+                $isCurrentUserModule = $false
+                foreach ($userModuleRoot in $userModuleRoots) {
+                    if ($moduleBase -like "$userModuleRoot*") {
+                        $isCurrentUserModule = $true
+                        break
+                    }
+                }
+
+                $module.Version -ne $requiredVersion -and $isCurrentUserModule
+            } |
+            Sort-Object -Property Version -Descending
+
+        # Remove other CurrentUser client releases so implicit module discovery cannot select the regression.
+        foreach ($module in $unwantedModules) {
+            "Removing PowerShell module $($WinGetClientConfig.ModuleName) $($module.Version)." |
+                Tee-Object -FilePath $WinGetLogPath -Append |
+                Out-Null
+            Uninstall-Module `
+                -Name $WinGetClientConfig.ModuleName `
+                -RequiredVersion $module.Version `
+                -Force `
+                -ErrorAction Stop
+        }
+
+        $verifiedModule = Get-Module -ListAvailable -Name $WinGetClientConfig.ModuleName -ErrorAction SilentlyContinue |
+            Where-Object { $_.Version -eq $requiredVersion } |
+            Select-Object -First 1
+        if (-not $verifiedModule) {
+            throw "PowerShell module $($WinGetClientConfig.ModuleName) $requiredVersion was not found after installation."
+        }
+    }
+
+    function Add-WinGetUtilityPin {
+        param(
+            [Parameter(Mandatory)]
+            [string]$WinGetLogPath
+        )
+
+        # Replace any prior App Installer pin with the exact required servicing version.
+        $wingetCommand = Get-Command -Name 'winget.exe' -ErrorAction SilentlyContinue
+        if (-not $wingetCommand) {
+            throw 'winget.exe was not found; the App Installer package cannot be pinned.'
+        }
+
+        $removeArguments = @(
+            'pin'
+            'remove'
+            '--id'
+            $WinGetClientConfig.PackageId
+            '--exact'
+            '--disable-interactivity'
+        )
+        $null = & $wingetCommand.Source @removeArguments 2>$null
+
+        $pinVersion = '{0}.0' -f $WinGetClientConfig.RequiredVersion
+        $addArguments = @(
+            'pin'
+            'add'
+            '--id'
+            $WinGetClientConfig.PackageId
+            '--version'
+            $pinVersion
+            '--exact'
+            '--source'
+            'winget'
+            '--accept-source-agreements'
+            '--disable-interactivity'
+            '--force'
+        )
+        $pinOutput = & $wingetCommand.Source @addArguments 2>&1
+        $pinOutput |
+            Tee-Object -FilePath $WinGetLogPath -Append |
+            Out-Null
+        if ($LASTEXITCODE -ne 0) {
+            throw "WinGet utility pinning failed with exit code $LASTEXITCODE."
+        }
+
+        $pinListOutput = & $wingetCommand.Source pin list --disable-interactivity 2>&1
+        $pinIsPresent = @($pinListOutput | Where-Object {
+                "$_" -match [regex]::Escape($WinGetClientConfig.PackageId) -and
+                "$_" -match [regex]::Escape($pinVersion)
+            }).Count -gt 0
+        if (-not $pinIsPresent) {
+            throw "WinGet utility pin for $($WinGetClientConfig.PackageId) $pinVersion was not found after creation."
+        }
+    }
+
+    function Set-WinGetClientPin {
+        param(
+            [Parameter(Mandatory)]
+            [string]$WinGetLogPath
+        )
+
+        # Establish both client-version controls before package maintenance starts.
+        "Applying WinGet client pin $($WinGetClientConfig.RequiredVersion)." |
+            Tee-Object -FilePath $WinGetLogPath -Append |
+            Out-Null
+        Install-RequiredWinGetUtility -WinGetLogPath $WinGetLogPath
+        Install-RequiredWinGetClientModule -WinGetLogPath $WinGetLogPath
+        Add-WinGetUtilityPin -WinGetLogPath $WinGetLogPath
+        Set-WinGetClientPinState -PinEnabled $true
+        Set-MaintenanceClientPinCatalogEntry -PinEnabled $true
+        "WinGet client pin $($WinGetClientConfig.RequiredVersion) is active." |
+            Tee-Object -FilePath $WinGetLogPath -Append |
+            Out-Null
+    }
+
+    function Remove-WinGetClientPin {
+        param(
+            [Parameter(Mandatory)]
+            [string]$WinGetLogPath
+        )
+
+        # Remove the temporary App Installer pin and allow module maintenance to resume normal updates.
+        $wingetCommand = Get-Command -Name 'winget.exe' -ErrorAction SilentlyContinue
+        if (-not $wingetCommand) {
+            throw 'winget.exe was not found; the App Installer pin cannot be removed.'
+        }
+
+        $removeOutput = & $wingetCommand.Source pin remove --id $WinGetClientConfig.PackageId --exact --disable-interactivity 2>&1
+        $removeOutput |
+            Tee-Object -FilePath $WinGetLogPath -Append |
+            Out-Null
+        if ($LASTEXITCODE -ne 0 -and "$removeOutput" -notmatch 'No pins found') {
+            throw "WinGet utility unpinning failed with exit code $LASTEXITCODE."
+        }
+
+        Set-WinGetClientPinState -PinEnabled $false
+        Set-MaintenanceClientPinCatalogEntry -PinEnabled $false
+        'WinGet client pins are removed; the next module maintenance run may update Microsoft.WinGet.Client.' |
+            Tee-Object -FilePath $WinGetLogPath -Append |
+            Out-Null
+    }
+
     function Invoke-WinGetUpdate {
         <#
         .SYNOPSIS
@@ -496,8 +903,7 @@ $toast = [Windows.UI.Notifications.ToastNotification]::new($toastXml)
         $runHeader | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
         'Scope: All installed WinGet packages' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
 
-        # Execute WinGet updates via Microsoft.WinGet.Client and emit text-first log lines.
-        if (Get-Module -ListAvailable -Name 'Microsoft.WinGet.Client') {
+        # Enforce the temporary client pin before attempting any package discovery or update.
             $originalProgressPreference = $ProgressPreference
             $successfulUpdates = 0
             $installedPackageCount = 0
@@ -508,8 +914,19 @@ $toast = [Windows.UI.Notifications.ToastNotification]::new($toastXml)
                 # Suppress progress records so logs remain text/object focused.
                 $ProgressPreference = 'SilentlyContinue'
 
-                # Load WinGet cmdlets and verify the package manager is ready.
-                Import-Module -Name Microsoft.WinGet.Client -ErrorAction Stop
+                # Apply the requested pin unless the explicit recovery mode has disabled it.
+                $pinState = Get-WinGetClientPinState
+                $importParameters = @{
+                    Name        = $WinGetClientConfig.ModuleName
+                    ErrorAction = 'Stop'
+                }
+                if ($pinState.PinEnabled) {
+                    Set-WinGetClientPin -WinGetLogPath $WinGetLogPath
+                    $importParameters.RequiredVersion = $WinGetClientConfig.RequiredVersion
+                }
+
+                # Load the pinned client when active, then verify the package manager is ready.
+                Import-Module @importParameters
                 Assert-WinGetPackageManager -ErrorAction Stop | Out-Null
 
                 # Discover all installed packages and compute pending updates from that set.
@@ -599,7 +1016,6 @@ $toast = [Windows.UI.Notifications.ToastNotification]::new($toastXml)
             finally {
                 $ProgressPreference = $originalProgressPreference
             }
-        }
 
         $failureSummary = 'Microsoft.WinGet.Client module was not found.'
         $failureSummary | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null

@@ -204,9 +204,7 @@ $Helpers = {
 
         # Build a lookup of modules installed in CurrentUser scope only.
         $currentUserModules = Get-CurrentUserInstalledModuleNames
-        $ignoredModules = @($ModuleUpdateConfig.IgnoreModules |
-                Where-Object { -not [string]::IsNullOrWhiteSpace("$_") } |
-                Select-Object -Unique)
+        $ignoredModules = Get-ConfiguredIgnoredModuleName -ModuleUpdateConfig $ModuleUpdateConfig
 
         # Return all user-scoped modules.
         if ($ScopeMode -eq 'AllUserScoped') {
@@ -229,7 +227,9 @@ $Helpers = {
                 throw '-ModuleName is required when ScopeMode is ModuleNameList.'
             }
 
-            $matchedModules = @($requestedModules | Where-Object { $currentUserModules -contains $_ })
+            $matchedModules = @($requestedModules |
+                    Where-Object { $currentUserModules -contains $_ } |
+                    Where-Object { $ignoredModules -notcontains $_ })
             if (-not $matchedModules) {
                 throw '-ModuleName values were not found in CurrentUser scope.'
             }
@@ -253,6 +253,37 @@ $Helpers = {
         }
 
         throw "Invalid scope mode '$ScopeMode'. Use 'Common', 'AllUserScoped', or 'ModuleNameList'."
+    }
+
+    function Get-ConfiguredIgnoredModuleName {
+        param(
+            [Parameter(Mandatory)]
+            [hashtable]$ModuleUpdateConfig
+        )
+
+        # Combine configured exclusions with module pins recorded by maintenance pin management.
+        $ignoredModules = @($ModuleUpdateConfig.IgnoreModules |
+                Where-Object { -not [string]::IsNullOrWhiteSpace("$_") } |
+                Select-Object -Unique)
+        $pinStatePath = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'GregTate\MaintenancePins\pins.json'
+
+        if (-not (Test-Path -LiteralPath $pinStatePath -PathType Leaf)) {
+            return $ignoredModules
+        }
+
+        try {
+            $pinState = Get-Content -LiteralPath $pinStatePath -Raw -ErrorAction Stop |
+                ConvertFrom-Json -ErrorAction Stop
+            $pinnedModuleNames = @($pinState.ModulePins |
+                    ForEach-Object { "$($_.Name)" } |
+                    Where-Object { -not [string]::IsNullOrWhiteSpace("$_") })
+            return @($ignoredModules + $pinnedModuleNames | Select-Object -Unique)
+        }
+        catch {
+            Write-Warning "Maintenance pin state could not be read; only configured module exclusions apply. Reason=$($_.Exception.Message)"
+        }
+
+        return $ignoredModules
     }
 
     function Get-CurrentUserInstalledModuleNames {
