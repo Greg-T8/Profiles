@@ -128,6 +128,7 @@ function prompt {
         Write-Host -NoNewline "`e[5 q"
 	}
 	Initialize-PromptPoshGit
+	Initialize-AICommitEnvironment
 
 	$pythonVenvPromptText = Get-PythonVenvPromptText
 
@@ -584,6 +585,44 @@ function Test-GitDirectory {
 		# Ignore errors from Git when the location is not a file-system repository.
 		return $false
 	}
+}
+
+function Initialize-AICommitEnvironment {
+	# Load the commit-hook key once when entering a Git worktree and clear it on exit.
+	$locationPath = (Get-Location).Path
+	if ($script:AICommitProbePath -eq $locationPath) {
+		return
+	}
+
+	$script:AICommitProbePath = $locationPath
+	$insideGitWorktree = Test-GitDirectory
+	if (-not $insideGitWorktree) {
+		Remove-Item Env:AI_COMMIT_BASE_URL -ErrorAction SilentlyContinue
+		Remove-Item Env:AI_COMMIT_MODEL -ErrorAction SilentlyContinue
+		Remove-Item Env:AI_COMMIT_API_KEY -ErrorAction SilentlyContinue
+		return
+	}
+
+	$env:AI_COMMIT_BASE_URL = 'https://openrouter.ai/api/v1'
+	$env:AI_COMMIT_MODEL = 'google/gemini-2.5-flash'
+
+	if (-not $script:AICommitKeyLoadAttempted) {
+		$script:AICommitKeyLoadAttempted = $true
+		try {
+			$script:AICommitApiKey = Get-Secret -Name AI_COMMIT_API_KEY -AsPlainText -ErrorAction Stop
+		}
+		catch {
+			$script:AICommitApiKey = $null
+		}
+	}
+
+	if ([string]::IsNullOrWhiteSpace($script:AICommitApiKey)) {
+		Remove-Item Env:AI_COMMIT_API_KEY -ErrorAction SilentlyContinue
+		Write-Warning 'Git commit message key unavailable; unlock SecretStore or verify AI_COMMIT_API_KEY.'
+		return
+	}
+
+	$env:AI_COMMIT_API_KEY = $script:AICommitApiKey
 }
 
 function Initialize-PromptPoshGit {
