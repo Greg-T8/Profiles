@@ -1,6 +1,6 @@
 <#
 .SYNOPSIS
-Generates a Git commit message from staged changes with GitHub Copilot.
+Generates a Git commit message from staged changes with an AI API.
 
 .DESCRIPTION
 Uses the complete staged diff for small commits and a bounded metadata summary
@@ -8,13 +8,13 @@ for large commits. The script emits only the generated commit message to
 standard output.
 
 .CONTEXT
-Personal Git workflow - bounded Copilot commit-message generation.
+Personal Git workflow - bounded API commit-message generation.
 
 .AUTHOR
 Greg Tate
 
 .NOTES
-Program: Get-CopilotCommitMessage.ps1
+Program: Get-AICommitMessage.ps1
 #>
 
 [CmdletBinding()]
@@ -23,8 +23,11 @@ param(
     [ValidateNotNullOrEmpty()]
     [string]$RepositoryPath,
 
-    [ValidateNotNullOrEmpty()]
-    [string]$Model = 'mai-code-1.1-flash'
+    [string]$Model = $env:AI_COMMIT_MODEL,
+
+    [string]$BaseUrl = $env:AI_COMMIT_BASE_URL,
+
+    [string]$ApiKey = $env:AI_COMMIT_API_KEY
 )
 
 #region CONFIGURATION
@@ -34,13 +37,14 @@ $SummaryMaxChars = 16000
 #endregion
 
 #region MAIN WORKFLOW
-# Orchestrates staged-change collection, prompt selection, and Copilot output.
+# Orchestrates staged-change collection, prompt selection, and API output.
 $Main = {
     . $Helpers
 
+    Confirm-ApiConfiguration
     Get-StagedDiff
     New-CommitPrompt
-    Get-CopilotMessage
+    Get-AIMessage
 }
 #endregion
 
@@ -62,7 +66,7 @@ $Helpers = {
     }
 
     function New-CommitPrompt {
-        # Use the complete diff when it remains within the Windows command-line budget.
+        # Use the complete diff when it remains within the configured disclosure and usage budget.
         $directPrompt = @"
 
 Write only a Git commit message for the staged diff below.
@@ -79,14 +83,12 @@ $script:StagedDiff
         if ($directPrompt.Length -le $DirectPromptMaxChars) {
             $script:Prompt = $directPrompt
             $script:PromptMode = 'full diff'
-            $script:ReasoningEffort = 'low'
             return
         }
 
         # Use bounded staged-change metadata for large commits.
         $script:Prompt = Get-StagedSummary
         $script:PromptMode = 'bounded summary'
-        $script:ReasoningEffort = 'medium'
     }
 
     function Get-StagedSummary {
@@ -160,57 +162,93 @@ Staged-change summary:
         ) + $omissionMarker
     }
 
-    function Get-CopilotMessage {
-        # Parse structured CLI output while retaining only a redacted diagnostic count.
-        $diagnostics = [System.Collections.Generic.List[string]]::new()
-        $messages = @(
-            & copilot `
-                -p $script:Prompt `
-                --model $Model `
-                --effort $script:ReasoningEffort `
-                --no-auto-update `
-                --no-ask-user `
-                --no-custom-instructions `
-                --disable-builtin-mcps `
-                --deny-tool=shell `
-                --excluded-tools="bash,powershell,list_bash,list_powershell,read_bash,read_powershell,stop_bash,stop_powershell,write_bash,write_powershell" `
-                --output-format=json `
-                2>&1 |
-                ForEach-Object {
-                    try {
-                        $event = $_ | ConvertFrom-Json
+    function Confirm-ApiConfiguration {
+        # Require explicit model selection before reading staged content.
+        if ([string]::IsNullOrWhiteSpace($Model)) {
+            throw 'Set AI_COMMIT_MODEL to a model ID supported by your provider.'
+        }
 
-                        if (
-                            $event.type -eq 'assistant.message' -and
-                            $event.data.content
-                        ) {
-                            $event.data.content
-                        }
-                    }
-                    catch {
-                        [void]$diagnostics.Add('unparseable output')
-                    }
+        # Keep credentials outside the tracked hook files.
+        if ([string]::IsNullOrWhiteSpace($ApiKey)) {
+            throw 'Set AI_COMMIT_API_KEY outside the repository before generating a message.'
+        }
+
+        # Default to OpenRouter while allowing compatible hosted providers.
+        if ([string]::IsNullOrWhiteSpace($BaseUrl)) {
+            $script:BaseUrl = 'https://openrouter.ai/api/v1'
+        }
+
+        # Require HTTPS and reject credentials or query strings in the endpoint.
+        $baseUri = $null
+        if (
+            -not [Uri]::TryCreate($BaseUrl, [UriKind]::Absolute, [ref]$baseUri) -or
+            $baseUri.Scheme -ne 'https' -or
+            $baseUri.UserInfo -or $baseUri.Query -or $baseUri.Fragment
+        ) {
+            throw 'AI_COMMIT_BASE_URL must be an HTTPS base URL without credentials, a query, or a fragment.'
+        }
+
+        # Append the Chat Completions route to the configured base URL.
+        $script:CompletionUri = $BaseUrl.TrimEnd('/') + '/chat/completions'
+    }
+
+    function Get-AIMessage {
+        # Serialize a minimal compatible request without provider-specific reasoning options.
+        $requestBody = @{
+            model    = $Model
+            stream   = $false
+            messages = @(
+                @{
+                    role    = 'user'
+                    content = $script:Prompt
                 }
-        )
-        $copilotStatus = $LASTEXITCODE
-
-        if ($copilotStatus -ne 0) {
-            [Console]::Error.WriteLine(
-                "Copilot CLI exited with status $copilotStatus while using " +
-                "$script:PromptMode reasoning."
             )
-            exit $copilotStatus
+        } | ConvertTo-Json -Depth 5 -Compress
+
+        # Bound the wait and disable retries so a commit makes only one API attempt.
+        $request = @{
+            Uri                = $script:CompletionUri
+            Method             = 'Post'
+            Headers            = @{ Authorization = "Bearer $ApiKey" }
+            ContentType        = 'application/json; charset=utf-8'
+            Body               = [Text.Encoding]::UTF8.GetBytes($requestBody)
+            TimeoutSec         = 60
+            MaximumRetryCount  = 0
+            MaximumRedirection = 0
+            ErrorAction        = 'Stop'
         }
 
-        if ($messages.Count -eq 0) {
-            [Console]::Error.WriteLine(
-                "Copilot returned no commit message while using $script:PromptMode " +
-                "reasoning. Unparseable output events: $($diagnostics.Count)."
-            )
-            exit 1
+        # Bound response I/O separately on PowerShell versions that expose an operation timeout.
+        if ('OperationTimeoutSeconds' -in (Get-Command Invoke-RestMethod).Parameters.Keys) {
+            $request.OperationTimeoutSeconds = 60
         }
 
-        return $messages[-1]
+        # Replace HTTP exception details with diagnostics that cannot expose response bodies.
+        try {
+            $response = Invoke-RestMethod @request
+        }
+        catch {
+            $statusCode = $_.Exception.Response.StatusCode
+
+            # Report only the status code when the service supplied one.
+            if ($null -ne $statusCode) {
+                throw "AI API request failed (HTTP $([int]$statusCode))."
+            }
+
+            throw 'AI API request failed or timed out; no commit message was written.'
+        }
+
+        # Reject missing, non-text, or blank message content before the hook writes anything.
+        $choices = @($response.choices)
+        $message = $null
+        if ($choices.Count -gt 0) {
+            $message = $choices[0].message.content
+        }
+        if ($message -isnot [string] -or [string]::IsNullOrWhiteSpace($message)) {
+            throw 'AI API returned no usable commit message.'
+        }
+
+        return $message.Trim()
     }
 }
 #endregion
@@ -220,6 +258,11 @@ Staged-change summary:
 try {
     Push-Location -Path $PSScriptRoot
     & $Main
+}
+catch {
+    # Emit concise errors after HTTP details have been sanitized.
+    [Console]::Error.WriteLine($_.Exception.Message)
+    exit 1
 }
 finally {
     Pop-Location
