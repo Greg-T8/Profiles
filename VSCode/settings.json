@@ -177,7 +177,6 @@
     }
   },
   "chat.viewProgressBadge.enabled": true,
-  "chat.viewSessions.orientation": "stacked",
   "chatgpt.followUpQueueMode": "steer",
   "claudeCode.preferredLocation": "panel",
   "dashboard.displayProjectPath": true,
@@ -362,6 +361,13 @@
       "id": "profiles2ce7zszmvmaipjlz7",
       "projects": [
         {
+          "color": "#012456",
+          "id": "powershellz7gs6blw9maiqej5p",
+          "isGitRepo": true,
+          "name": "PowerShell",
+          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/PowerShell/PowerShell.code-workspace"
+        },
+        {
           "color": "#DCB20C",
           "id": "vscodeoodjqtkzxmaiqetz9",
           "isGitRepo": true,
@@ -374,13 +380,6 @@
           "isGitRepo": true,
           "name": "Agent-Toolkit",
           "path": "c:\\Users\\gregt\\LocalCode\\Agent-Toolkit\\Agent-Toolkit.code-workspace"
-        },
-        {
-          "color": "#012456",
-          "id": "powershellz7gs6blw9maiqej5p",
-          "isGitRepo": true,
-          "name": "PowerShell",
-          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/PowerShell/PowerShell.code-workspace"
         },
         {
           "color": "#8EABC1",
@@ -1341,7 +1340,8 @@
     "workbench.startupEditor",
     "workbench.view.showQuietly",
     "terminal.integrated.tabs.title",
-    "workbench.sash.size"
+    "workbench.sash.size",
+    "explorer.incrementalNaming"
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
@@ -1351,5 +1351,8 @@
     "workbench.panel.output": true
   },
   "workbench.secondarySideBar.defaultVisibility": "hidden",
-  "chat.titleBar.openInAgentsWindow.enabled": false
+  "chat.titleBar.openInAgentsWindow.enabled": false,
+  "chat.agentSessions.showExternal": "recent",
+  "chat.viewSessions.orientation": "stacked",
+  "explorer.incrementalNaming": "disabled"
 }
