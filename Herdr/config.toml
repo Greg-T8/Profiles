@@ -1,3 +1,9 @@
+# -------------------------------------------------------------------------
+# Program: config.toml
+# Description: Configure Herdr appearance and keyboard shortcuts
+# Context: Herdr terminal pane keybindings
+# Author: Greg Tate
+# ------------------------------------------------------------------------
 onboarding = false
 
 [theme]
@@ -8,3 +14,8 @@ auto_switch = false
 host_cursor = "native"
 sidebar_collapsed_mode = "hidden"
 sidebar_start_collapsed = true
+
+# Configure Herdr's prefix and vertical pane split shortcut.
+[keys]
+prefix = "ctrl+`"
+split_vertical = "prefix+|"
