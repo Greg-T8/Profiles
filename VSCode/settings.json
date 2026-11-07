@@ -1351,7 +1351,7 @@
     "workbench.panel.output": true
   },
   "workbench.secondarySideBar.defaultVisibility": "hidden",
-  "chat.titleBar.openInAgentsWindow.enabled": false,
+  "chat.titleBar.openInAgentsWindow.enabled": true,
   "chat.agentSessions.showExternal": "recent",
   "chat.viewSessions.orientation": "stacked",
   "explorer.incrementalNaming": "disabled"
