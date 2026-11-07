@@ -741,5 +741,13 @@
     "key": "alt+r",
     "command": "workbench.action.terminal.rename",
     "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+[Backquote]",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+      "text": "\u0002"
+    },
+    "when": "terminalFocus"
   }
 ]

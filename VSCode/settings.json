@@ -232,6 +232,82 @@
       ]
     },
     {
+      "groupName": "Profile and App Configurations",
+      "id": "profiles2ce7zszmvmaipjlz7",
+      "projects": [
+        {
+          "color": "#026395",
+          "id": "profilesekzwdssqzmpwntozn",
+          "isGitRepo": true,
+          "name": "Profiles",
+          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\Profiles.code-workspace"
+        },
+        {
+          "color": "#012456",
+          "id": "powershellz7gs6blw9maiqej5p",
+          "isGitRepo": true,
+          "name": "PowerShell",
+          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/PowerShell/PowerShell.code-workspace"
+        },
+        {
+          "color": "#DCB20C",
+          "id": "vscodeoodjqtkzxmaiqetz9",
+          "isGitRepo": true,
+          "name": "VSCode",
+          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/VSCode"
+        },
+        {
+          "color": "#1E90FF",
+          "id": "agenttoolkit4ymzfdlrtmm67907i",
+          "isGitRepo": true,
+          "name": "Agent-Toolkit",
+          "path": "c:\\Users\\gregt\\LocalCode\\Agent-Toolkit\\Agent-Toolkit.code-workspace"
+        },
+        {
+          "color": "#8EABC1",
+          "id": "neovim4vkv167demaiqe71b",
+          "isGitRepo": true,
+          "name": "Neovim",
+          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\Neovim"
+        },
+        {
+          "color": "#E7CD8C",
+          "id": "sshuvtn5lsdumak0ocp9",
+          "isGitRepo": false,
+          "name": "SSH",
+          "path": "c:/Users/gregt/OneDrive/Apps/ssh/ssh.code-workspace"
+        },
+        {
+          "color": "#863c3c",
+          "id": "kinesisadv360propzyl5z5ldmaiqdlui",
+          "isGitRepo": true,
+          "name": "KinesisAdv360Pro",
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\KinesisAdv360Pro\\KinesisAdv360Pro.code-workspace"
+        },
+        {
+          "color": "#C1BAB0",
+          "id": "linux74t6w9m8lmhkdene8",
+          "isGitRepo": true,
+          "name": "Linux",
+          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\Linux"
+        },
+        {
+          "color": "#0290fd",
+          "id": "windowsterminalgumg8ku9kmaiqf605",
+          "isGitRepo": true,
+          "name": "Windows Terminal",
+          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/Windows Terminal"
+        },
+        {
+          "color": "#e916a0",
+          "id": "githubprofilehmhoxw6k5maiqd6ny",
+          "isGitRepo": true,
+          "name": "GitHub Profile",
+          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\GitHubProfile"
+        }
+      ]
+    },
+    {
       "collapsed": false,
       "groupName": "Clients and Work Projects",
       "id": "clientsacck9xha7mm66b5q8",
@@ -353,82 +429,6 @@
           "isGitRepo": true,
           "name": "DocumentWriter",
           "path": "c:\\Users\\gregt\\LocalCode\\Projects\\DocumentWriter\\DocumentWriter.code-workspace"
-        }
-      ]
-    },
-    {
-      "groupName": "Profile and App Configurations",
-      "id": "profiles2ce7zszmvmaipjlz7",
-      "projects": [
-        {
-          "color": "#012456",
-          "id": "powershellz7gs6blw9maiqej5p",
-          "isGitRepo": true,
-          "name": "PowerShell",
-          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/PowerShell/PowerShell.code-workspace"
-        },
-        {
-          "color": "#DCB20C",
-          "id": "vscodeoodjqtkzxmaiqetz9",
-          "isGitRepo": true,
-          "name": "VSCode",
-          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/VSCode"
-        },
-        {
-          "color": "#1E90FF",
-          "id": "agenttoolkit4ymzfdlrtmm67907i",
-          "isGitRepo": true,
-          "name": "Agent-Toolkit",
-          "path": "c:\\Users\\gregt\\LocalCode\\Agent-Toolkit\\Agent-Toolkit.code-workspace"
-        },
-        {
-          "color": "#8EABC1",
-          "id": "neovim4vkv167demaiqe71b",
-          "isGitRepo": true,
-          "name": "Neovim",
-          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\Neovim"
-        },
-        {
-          "color": "#E7CD8C",
-          "id": "sshuvtn5lsdumak0ocp9",
-          "isGitRepo": false,
-          "name": "SSH",
-          "path": "c:/Users/gregt/OneDrive/Apps/ssh/ssh.code-workspace"
-        },
-        {
-          "color": "#e916a0",
-          "id": "githubprofilehmhoxw6k5maiqd6ny",
-          "isGitRepo": true,
-          "name": "GitHub Profile",
-          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\GitHubProfile"
-        },
-        {
-          "color": "#863c3c",
-          "id": "kinesisadv360propzyl5z5ldmaiqdlui",
-          "isGitRepo": true,
-          "name": "KinesisAdv360Pro",
-          "path": "c:\\Users\\gregt\\LocalCode\\Projects\\KinesisAdv360Pro\\KinesisAdv360Pro.code-workspace"
-        },
-        {
-          "color": "#C1BAB0",
-          "id": "linux74t6w9m8lmhkdene8",
-          "isGitRepo": true,
-          "name": "Linux",
-          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\Linux"
-        },
-        {
-          "color": "#0290fd",
-          "id": "windowsterminalgumg8ku9kmaiqf605",
-          "isGitRepo": true,
-          "name": "Windows Terminal",
-          "path": "c:/Users/gregt/OneDrive/Apps/Profiles/Windows Terminal"
-        },
-        {
-          "color": "#026395",
-          "id": "profilesekzwdssqzmpwntozn",
-          "isGitRepo": true,
-          "name": "Profiles",
-          "path": "c:\\Users\\gregt\\OneDrive\\Apps\\Profiles\\Profiles.code-workspace"
         }
       ]
     },
@@ -906,6 +906,7 @@
   "terminal.integrated.commandsToSkipShell": [
     "workbench.action.toggleAuxiliaryBar",
     "workbench.action.toggleSidebarVisibility",
+    "-workbench.action.terminal.toggleTerminal",
     "workbench.action.focusActiveEditorGroup",
     "workbench.action.focusSideBar",
     "workbench.action.focusAuxiliaryBar",
