@@ -66,6 +66,7 @@ Set-Alias -Name uaps -Value Use-AzProfileSubscription
 Set-Alias -Name gbs -Value Get-BillingSubscriptions
 Set-Alias -Name td -Value Get-TimeDifference
 Set-Alias -Name tf -Value terraform
+Set-Alias -Name he -Value herdr
 
 
 # Git aliases

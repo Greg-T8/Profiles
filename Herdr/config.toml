@@ -6,3 +6,5 @@ auto_switch = false
 
 [ui]
 host_cursor = "native"
+sidebar_collapsed_mode = "hidden"
+sidebar_start_collapsed = true
