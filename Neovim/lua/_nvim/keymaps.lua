@@ -1,4 +1,12 @@
--- ==============================================================================
+-- ---------------------------------------------------------------------------
+-- Description   : Define native Neovim keybindings, including file explorer access
+-- Context       : Neovim profile — native Neovim navigation
+-- Author        : Greg Tate & coding agent
+-- Last Modified : 2026-11-08
+-- Revision History:
+--   2026-11-08 - Add native file explorer toggle and project-root mappings
+-- ---------------------------------------------------------------------------
+-- ===============================================================================
 -- NEOVIM KEYMAPS (Native Neovim only, not VSCode)
 -- ==============================================================================
 -- Additional keybindings specific to native Neovim environment
@@ -32,8 +40,9 @@ vim.keymap.set("n", "<S-h>", ":bprevious<CR>", { desc = "Previous buffer", norem
 -- ==============================================================================
 -- FILE EXPLORER
 -- ==============================================================================
--- Open Neo-tree file explorer
-vim.keymap.set("n", "<leader>e", ":Neotree<CR>", { desc = "Open Neotree", noremap = true, silent = true })
+-- Toggle the VS Code-style tree and open the current project root in Neo-tree.
+vim.keymap.set("n", "<leader>e", "<Cmd>Neotree toggle<CR>", { desc = "Toggle file explorer", noremap = true, silent = true })
+vim.keymap.set("n", "<leader>pv", "<Cmd>Neotree filesystem reveal toggle<CR>", { desc = "Project explorer", noremap = true, silent = true })
 
 -- ==============================================================================
 -- TERMINAL MODE NAVIGATION

@@ -1,3 +1,11 @@
+-- ---------------------------------------------------------------------------
+-- Description   : Configure Neo-tree as the native Neovim filesystem explorer
+-- Context       : Neovim profile — native Neovim plugin setup
+-- Author        : Greg Tate & coding agent
+-- Last Modified : 2026-11-08
+-- Revision History:
+--   2026-11-08 - Keep explorer keybindings in native keymap configuration
+-- ---------------------------------------------------------------------------
 return {
     -- If you want neo-tree's file operations to work with LSP (updating imports, etc.), you can use a plugin like
     -- https://github.com/antosha417/nvim-lsp-file-operations:
@@ -365,7 +373,6 @@ return {
           },
         })
 
-        vim.keymap.set("n", "<leader>e", "<Cmd>Neotree reveal<CR>")
       end,
     },
   }
