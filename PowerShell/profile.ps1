@@ -3,6 +3,10 @@
     Description: Configures the interactive PowerShell environment and prompt.
     Context: Personal cross-host PowerShell profile.
     Author: Greg Tate
+    Coding Agent: Assisted with this change.
+    Last Modified: 2026-11-08
+    Revision History:
+    - 2026-11-08: Added Neovim alias and updated Git add shortcut.
 
     This is my PowerShell profile script I use in the context of $Profile.CurrentUserAllHosts.
 
@@ -69,6 +73,7 @@ Set-Alias -Name gbs -Value Get-BillingSubscriptions
 Set-Alias -Name td -Value Get-TimeDifference
 Set-Alias -Name tf -Value terraform
 Set-Alias -Name he -Value herdr
+Set-Alias -Name nm -Value nvim
 
 
 # Git aliases
@@ -78,9 +83,9 @@ function Invoke-GitStatus {
 }
 Set-Alias -Name gs -Value Invoke-GitStatus
 
-# Forward the Git add shortcut to git.exe while preserving optional arguments.
+# Stage the current directory with the Git add shortcut.
 function Invoke-GitAdd {
-	git add @args
+	git add .
 }
 Set-Alias -Name ga -Value Invoke-GitAdd
 
