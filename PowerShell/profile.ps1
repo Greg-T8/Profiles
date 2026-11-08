@@ -37,7 +37,7 @@ function script:Write-ProfileTime {
 Write-ProfileTime 'Profile start'
 
 # Enable or disable Herdr startup and managed-pane integration.
-$script:HerdrIntegrationEnabled = $true
+$script:HerdrIntegrationEnabled = $false
 
 # Keep Python venv activation from replacing the custom prompt function.
 $env:VIRTUAL_ENV_DISABLE_PROMPT = '1'
