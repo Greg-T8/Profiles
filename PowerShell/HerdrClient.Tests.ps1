@@ -1,25 +1,19 @@
-<#
-.SYNOPSIS
-Validates the Herdr client integration in a disposable named session.
-
-.DESCRIPTION
-Checks empty-session protection, restored sessions, recursion prevention,
-trusted project paths, and the deferred prompt without touching production.
-
-.CONTEXT
-Personal Windows PowerShell profile integration with Herdr.
-
-.AUTHOR
-Greg Tate
-
-.NOTES
-Program: HerdrClient.Tests.ps1
-#>
+﻿# ---------------------------------------------------------------------------
+# Description   : Validate Herdr client integration in a disposable session.
+# Context       : Personal Windows PowerShell profile integration with Herdr.
+# Author        : Greg Tate, with help from a coding agent
+# Last Modified : 2026-11-08
+# Revision History:
+#   2026-11-08 - Align test script formatting and section organization.
+# ---------------------------------------------------------------------------
 
 [CmdletBinding()]
-param([switch]$UnitOnly)
+param(
+    [switch]$UnitOnly
+)
 
-# Use a unique test session and preserve the caller's environment.
+#region TEST CONFIGURATION
+# Create a unique test session and preserve the caller's environment.
 $TestSession = 'profile-v3-' + [Guid]::NewGuid().ToString('N').Substring(0, 12)
 $TestRoot = Join-Path $env:TEMP ('herdr-v3-' + [Guid]::NewGuid().ToString('N'))
 $ModulePath = Join-Path $PSScriptRoot 'HerdrClient.psm1'
@@ -28,6 +22,9 @@ $OldSocket = $env:HERDR_SOCKET_PATH
 $OldHerdr = $env:HERDR_ENV
 $OldUserProfile = $env:USERPROFILE
 
+#endregion
+
+#region TEST ORCHESTRATION
 # Run the isolated lifecycle and trusted-path checks.
 $Main = {
     . $Helpers
@@ -47,12 +44,17 @@ $Main = {
     Write-Host 'All isolated Herdr client checks passed.'
 }
 
+#endregion
+
+#region TEST HELPERS
 # Define independent assertions and test scenarios.
 $Helpers = {
     function Assert-Condition {
         # Stop immediately when an expected condition is not satisfied.
         param([bool]$Condition, [string]$Message)
-        if (-not $Condition) { throw $Message }
+        if (-not $Condition) {
+            throw $Message
+        }
         Write-Host "PASS: $Message"
     }
 
@@ -123,7 +125,9 @@ $Helpers = {
             & ([scriptblock]::Create($command))
             Assert-Condition ((Get-Location).ProviderPath -eq $directory) 'VS Code location command preserves spaces and apostrophes'
         }
-        finally { Pop-Location }
+        finally {
+            Pop-Location
+        }
     }
 
     function Confirm-ProjectProfile {
@@ -139,11 +143,19 @@ $Helpers = {
         # Compare a trusted descendant with a similarly named sibling directory.
         $env:HERDR_ENV = '1'
         Push-Location $child
-        try { $selected = Get-HerdrTrustedProjectProfile }
-        finally { Pop-Location }
+        try {
+            $selected = Get-HerdrTrustedProjectProfile
+        }
+        finally {
+            Pop-Location
+        }
         Push-Location $sibling
-        try { $other = Get-HerdrTrustedProjectProfile }
-        finally { Pop-Location }
+        try {
+            $other = Get-HerdrTrustedProjectProfile
+        }
+        finally {
+            Pop-Location
+        }
         Assert-Condition ($selected -eq $loader -and $null -eq $other) 'Trusted initializer respects directory boundaries'
 
         # Restore the user profile environment for subsequent checks.
@@ -164,8 +176,12 @@ $Helpers = {
             $global:HerdrOriginalPrompt = { 'original prompt' }
             $global:HerdrAttachPending = $true
             $global:HerdrTestCount = 0
-            function global:Test-HerdrAutostartEligibility { return $true }
-            function global:Start-HerdrClient { $global:HerdrTestCount++ }
+            function global:Test-HerdrAutostartEligibility {
+                return $true
+            }
+            function global:Start-HerdrClient {
+                $global:HerdrTestCount++
+            }
             $scriptBlock = $hook.Body.GetScriptBlock()
             $first = $scriptBlock.Invoke()
             $second = $scriptBlock.Invoke()
@@ -277,20 +293,29 @@ $Helpers = {
         }
 
         # Restore the original module implementation after the simulated failure.
-        finally { Import-Module $ModulePath -Force }
+        finally {
+            Import-Module $ModulePath -Force
+        }
     }
 }
 
+#endregion
+
+#region SCRIPT EXECUTION AND CLEANUP
+# Run the selected checks and restore the caller's environment.
 try {
     Push-Location -Path $PSScriptRoot
     & $Main
 }
 finally {
     # Stop only this invocation's disposable server and restore the environment.
-    if (-not $UnitOnly -and $env:HERDR_SESSION -eq $TestSession) { & herdr.exe --session $TestSession server stop 2>$null | Out-Null }
+    if (-not $UnitOnly -and $env:HERDR_SESSION -eq $TestSession) {
+        & herdr.exe --session $TestSession server stop 2>$null | Out-Null
+    }
     $env:HERDR_SESSION = $OldSession
     $env:HERDR_SOCKET_PATH = $OldSocket
     $env:HERDR_ENV = $OldHerdr
     $env:USERPROFILE = $OldUserProfile
     Pop-Location
 }
+#endregion
