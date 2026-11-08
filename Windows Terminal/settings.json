@@ -1,10 +1,10 @@
 {
     "$help": "https://aka.ms/terminal-documentation",
     "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions": 
+    "actions":
     [
         {
-            "command": 
+            "command":
             {
                 "action": "copy",
                 "singleLine": false
@@ -12,7 +12,14 @@
             "id": "User.copy.644BA8F2"
         },
         {
-            "command": 
+            "command":
+            {
+                "action": "newTab"
+            },
+            "id": "User.newTab"
+        },
+        {
+            "command":
             {
                 "action": "moveFocus",
                 "direction": "right"
@@ -20,22 +27,11 @@
             "id": "User.moveFocus.right"
         },
         {
-            "command": 
-            {
-                "action": "newTab"
-            },
-            "id": "User.newTab"
-        },
-        {
             "command": "paste",
             "id": "User.paste"
         },
         {
-            "command": "find",
-            "id": "User.find"
-        },
-        {
-            "command": 
+            "command":
             {
                 "action": "splitPane",
                 "split": "auto",
@@ -44,7 +40,19 @@
             "id": "User.splitPane.A6751878"
         },
         {
-            "command": 
+            "command": "find",
+            "id": "User.find"
+        },
+        {
+            "command":
+            {
+                "action": "moveFocus",
+                "direction": "up"
+            },
+            "id": "User.moveFocus.up"
+        },
+        {
+            "command":
             {
                 "action": "splitPane",
                 "split": "right",
@@ -53,15 +61,7 @@
             "id": "User.splitPane.right"
         },
         {
-            "command": 
-            {
-                "action": "moveFocus",
-                "direction": "up"
-            },
-            "id": "User.moveFocus.up"
-        },
-        {
-            "command": 
+            "command":
             {
                 "action": "splitPane",
                 "split": "down",
@@ -74,14 +74,7 @@
             "id": "User.closePane"
         },
         {
-            "command": 
-            {
-                "action": "nextTab"
-            },
-            "id": "User.nextTab"
-        },
-        {
-            "command": 
+            "command":
             {
                 "action": "moveFocus",
                 "direction": "left"
@@ -89,14 +82,14 @@
             "id": "User.moveFocus.left"
         },
         {
-            "command": 
+            "command":
             {
-                "action": "closeTab"
+                "action": "nextTab"
             },
-            "id": "User.closeTab"
+            "id": "User.nextTab"
         },
         {
-            "command": 
+            "command":
             {
                 "action": "moveFocus",
                 "direction": "down"
@@ -104,14 +97,21 @@
             "id": "User.moveFocus.down"
         },
         {
-            "command": 
+            "command":
+            {
+                "action": "closeTab"
+            },
+            "id": "User.closeTab"
+        },
+        {
+            "command":
             {
                 "action": "prevTab"
             },
             "id": "User.prevTab"
         },
         {
-            "command": 
+            "command":
             {
                 "action": "sendInput",
                 "input": "\u001b\r"
@@ -128,27 +128,27 @@
     "focusFollowMouse": true,
     "initialCols": 180,
     "initialRows": 50,
-    "keybindings": 
+    "keybindings":
     [
         {
             "id": "User.sendInput.8F63D3A9",
             "keys": "shift+enter"
         },
         {
-            "id": "User.copy.644BA8F2",
-            "keys": "ctrl+c"
-        },
-        {
             "id": "User.nextTab",
             "keys": "shift+right"
         },
         {
-            "id": "User.paste",
-            "keys": "ctrl+v"
+            "id": "User.copy.644BA8F2",
+            "keys": "ctrl+c"
         },
         {
             "id": "User.find",
             "keys": "ctrl+shift+f"
+        },
+        {
+            "id": "User.paste",
+            "keys": "ctrl+v"
         },
         {
             "id": "User.splitPane.right",
@@ -192,7 +192,7 @@
         }
     ],
     "minimizeToNotificationArea": true,
-    "newTabMenu": 
+    "newTabMenu":
     [
         {
             "icon": null,
@@ -206,14 +206,14 @@
             "type": "remainingProfiles"
         }
     ],
-    "profiles": 
+    "profiles":
     {
-        "defaults": 
+        "defaults":
         {
             "adjustIndistinguishableColors": "always",
             "colorScheme": "CGA",
             "experimental.repositionCursorWithMouse": false,
-            "font": 
+            "font":
             {
                 "face": "Cascadia Mono"
             },
@@ -222,7 +222,7 @@
             "snapOnInput": true,
             "useAcrylic": true
         },
-        "list": 
+        "list":
         [
             {
                 "colorScheme": "CGA",
@@ -278,36 +278,6 @@
                 "hidden": false,
                 "icon": "D:/WSL/Assembly/Assembly.png",
                 "name": "Assembly"
-            },
-            {
-                "guid": "{3a557f19-837e-5e81-8f87-a62528bfcba6}",
-                "hidden": false,
-                "name": "HandsOnLLM",
-                "source": "Microsoft.WSL"
-            },
-            {
-                "guid": "{8a3ed809-7af2-5dd6-809d-1e2dc6235e87}",
-                "hidden": false,
-                "name": "PyTorch",
-                "source": "Microsoft.WSL"
-            },
-            {
-                "guid": "{45393c34-bf61-5295-8c48-38fb71f5610a}",
-                "hidden": false,
-                "name": "PyTorch",
-                "source": "Microsoft.WSL"
-            },
-            {
-                "guid": "{9361c9f5-c388-551e-ab72-c5526dae44d2}",
-                "hidden": false,
-                "name": "PyTorch",
-                "source": "Microsoft.WSL"
-            },
-            {
-                "guid": "{4fee78de-7337-5b3b-b820-9d18edda5410}",
-                "hidden": false,
-                "name": "PyTorch",
-                "source": "Microsoft.WSL"
             }
         ]
     },
