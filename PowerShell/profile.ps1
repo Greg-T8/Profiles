@@ -73,7 +73,7 @@ Set-Alias -Name gbs -Value Get-BillingSubscriptions
 Set-Alias -Name td -Value Get-TimeDifference
 Set-Alias -Name tf -Value terraform
 Set-Alias -Name he -Value herdr
-Set-Alias -Name nm -Value nvim
+Set-Alias -Name nv -Value nvim -Force
 
 
 # Git aliases
