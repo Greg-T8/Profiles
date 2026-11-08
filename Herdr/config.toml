@@ -16,6 +16,7 @@ sidebar_collapsed_mode = "hidden"
 sidebar_start_collapsed = true
 
 # Configure Herdr's prefix and vertical pane split shortcut.
+status_indicators = "symbols"
 [keys]
 prefix = ["ctrl+b", "ctrl+backtick"]
 split_vertical = "prefix+|"
@@ -23,3 +24,6 @@ split_vertical = "prefix+|"
 # Terminal settings
 [terminal]
 new_cwd = "follow"
+
+[ui.toast]
+delivery = "off"
