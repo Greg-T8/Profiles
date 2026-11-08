@@ -1,27 +1,16 @@
-﻿<#
-    Program: profile.ps1
-    Description: Configures the interactive PowerShell environment and prompt.
-    Context: Personal cross-host PowerShell profile.
-    Author: Greg Tate
-    Coding Agent: Assisted with this change.
-    Last Modified: 2026-11-08
-    Revision History:
-    - 2026-11-08: Added Neovim alias and updated Git add shortcut.
-
-    This is my PowerShell profile script I use in the context of $Profile.CurrentUserAllHosts.
-
-    The prompt function mimmics the behavior of the Oh-My-Posh prompt for PowerShell, but without requiring the
-    additional overhead and loading time of Oh-My-Posh.
-
-    The profile script does the following:
-    - Configures VI mode for PSReadline
-    - Sets the prompt to display the current directory in a shortened format
-    - Enables Posh-Git when using VSCode or when in a git repository
-    - Imports a configuration file for work-related settings
-
-    See the following link for optimizing your PowerShell profile:
-    - https://devblogs.microsoft.com/powershell/optimizing-your-profile/
-#>
+﻿# ---------------------------------------------------------------------------
+# Description   : Configure the interactive PowerShell environment and prompt.
+# Context       : Personal cross-host profile ($Profile.CurrentUserAllHosts).
+# Author        : Greg Tate, with help from a coding agent
+# Last Modified : 2026-11-08
+# Revision History:
+#   2026-11-08 - Clarify profile sections and navigation for readability.
+#   2026-11-08 - Added Neovim alias and updated Git add shortcut.
+# ---------------------------------------------------------------------------
+# The prompt mimics Oh-My-Posh without its additional startup overhead. This
+# profile configures Vi mode, shortens the displayed path, loads Posh-Git in
+# Git repositories, and imports personal and work configuration when available.
+# See https://devblogs.microsoft.com/powershell/optimizing-your-profile/.
 
 #region INITIAL CONFIGURATION
 
@@ -120,7 +109,7 @@ Set-Alias -Name regctl -Value RegCtlCmd
 
 #endregion
 
-#region Default Parameter Values
+#region DEFAULT PARAMETER VALUES
 $PSDefaultParameterValues['Use-AzProfile:Name'] = 'Lab'
 
 #endregion
@@ -251,6 +240,8 @@ Write-ProfileTime 'After profile configuration'
 
 # Define immediate-use profile commands while deferring the complete MSCloudProfile module import.
 if ($PSVersionTable.PSEdition -eq 'Core') {
+	#region DEFERRED CLOUD PROFILE COMMANDS
+	# Expose profile switching and discovery commands without importing the full module at startup.
 	function Import-MSCloudProfile {
 		# Load the complete module the first time a profile-switching command is invoked.
 		if (Get-Module -Name MSCloudProfile) {
@@ -346,6 +337,7 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 		Import-MSCloudProfile
 		& MSCloudProfile\Get-CurrentMgProfile @PSBoundParameters
 	}
+	#endregion
 
 }
 #endregion
@@ -456,7 +448,7 @@ Write-ProfileTime 'After PSReadLine key handlers'
 
 #endregion
 
-#region PROMPT HELPER FUNCTIONS
+#region PROMPT AND GIT SUPPORT FUNCTIONS
 
 function Get-AzProfilePromptText {
 	# Resolve the active named Azure CLI profile without invoking Azure commands.
