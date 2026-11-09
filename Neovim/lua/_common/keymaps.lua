@@ -18,12 +18,8 @@
 vim.keymap.set('n', '<leader>w', ':w<CR>', { desc = 'Save file', noremap = true, silent = true })
 vim.keymap.set('n', '<leader>wq', ':wq<CR>', { desc = 'Save and quit', noremap = true, silent = true })
 vim.keymap.set('n', '<leader>!', ':wq<CR>', { desc = 'Save and quit', noremap = true, silent = true })
-vim.keymap.set('n', '<leader>q', ':q!<CR>', { desc = 'Force quit without saving', noremap = true, silent = true })
-
--- Make :q always force quit without confirmation
-vim.api.nvim_create_user_command('Q', 'q!', {})
-vim.cmd('cnoreabbrev q Q')
-vim.cmd('cnoreabbrev wq wq!')
+-- vim.keymap.set('n', '<leader>q', ':q!<CR>', { desc = 'Force quit without saving', noremap = true, silent = true })
+vim.keymap.set('n', '<leader>q', '<Cmd>bdelete!<CR>', { desc = 'Close current buffer without saving', noremap = true, silent = true })
 
 -- ==============================================================================
 -- VISUAL BLOCK MODE

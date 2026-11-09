@@ -2,8 +2,9 @@
 -- Description   : Configure Neo-tree as the native Neovim filesystem explorer
 -- Context       : Neovim profile — native Neovim plugin setup
 -- Author        : Greg Tate & coding agent
--- Last Modified : 2026-11-08
+-- Last Modified : 2026-11-09
 -- Revision History:
+--   2026-11-09 - Make the Neo-tree Space action immediate
 --   2026-11-08 - Keep explorer keybindings in native keymap configuration
 -- ---------------------------------------------------------------------------
 return {
@@ -176,7 +177,7 @@ return {
             mappings = {
               ["<space>"] = {
                 "toggle_node",
-                nowait = false, -- disable `nowait` if you have existing combos starting with this char that you want to use
+                nowait = true, -- execute the folder toggle immediately instead of waiting for a leader sequence
               },
               ["<2-LeftMouse>"] = "open",
               ["<cr>"] = "open",
