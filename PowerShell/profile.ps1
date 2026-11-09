@@ -2,8 +2,9 @@
 # Description   : Configure the interactive PowerShell environment and prompt.
 # Context       : Personal cross-host profile ($Profile.CurrentUserAllHosts).
 # Author        : Greg Tate, with help from a coding agent
-# Last Modified : 2026-11-08
+# Last Modified : 2026-11-09
 # Revision History:
+#   2026-11-09 - Preserve AllScope when setting the Neovim alias.
 #   2026-11-08 - Clarify profile sections and navigation for readability.
 #   2026-11-08 - Added Neovim alias and updated Git add shortcut.
 # ---------------------------------------------------------------------------
@@ -62,7 +63,7 @@ Set-Alias -Name gbs -Value Get-BillingSubscriptions
 Set-Alias -Name td -Value Get-TimeDifference
 Set-Alias -Name tf -Value terraform
 Set-Alias -Name he -Value herdr
-Set-Alias -Name nv -Value nvim -Force
+Set-Alias -Name nv -Value nvim -Option AllScope -Force
 
 
 # Git aliases
