@@ -26,4 +26,4 @@ split_vertical = "prefix+|"
 new_cwd = "follow"
 
 [ui.toast]
-delivery = "off"
+delivery = "herdr"
