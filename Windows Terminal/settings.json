@@ -12,6 +12,10 @@
             "id": "User.copy.644BA8F2"
         },
         {
+            "command": "paste",
+            "id": "User.paste"
+        },
+        {
             "command":
             {
                 "action": "newTab"
@@ -27,8 +31,8 @@
             "id": "User.moveFocus.right"
         },
         {
-            "command": "paste",
-            "id": "User.paste"
+            "command": "find",
+            "id": "User.find"
         },
         {
             "command":
@@ -38,10 +42,6 @@
                 "splitMode": "duplicate"
             },
             "id": "User.splitPane.A6751878"
-        },
-        {
-            "command": "find",
-            "id": "User.find"
         },
         {
             "command":
@@ -61,6 +61,10 @@
             "id": "User.splitPane.right"
         },
         {
+            "command": "closePane",
+            "id": "User.closePane"
+        },
+        {
             "command":
             {
                 "action": "splitPane",
@@ -68,10 +72,6 @@
                 "splitMode": "duplicate"
             },
             "id": "User.splitPane.down"
-        },
-        {
-            "command": "closePane",
-            "id": "User.closePane"
         },
         {
             "command":
@@ -130,6 +130,10 @@
     "initialRows": 50,
     "keybindings":
     [
+        {
+            "id": null,
+            "keys": "alt+shift+plus"
+        },
         {
             "id": "User.sendInput.8F63D3A9",
             "keys": "shift+enter"
