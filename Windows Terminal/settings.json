@@ -219,7 +219,7 @@
             "experimental.repositionCursorWithMouse": false,
             "font":
             {
-                "face": "Cascadia Mono"
+                "face": "CaskaydiaMono Nerd Font Mono"
             },
             "intenseTextStyle": "all",
             "opacity": 100,
