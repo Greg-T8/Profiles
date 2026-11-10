@@ -313,10 +313,10 @@
       "id": "clientsacck9xha7mm66b5q8",
       "projects": [
         {
-          "isGitRepo": false,
+          "isGitRepo": true,
           "id": "quisitivetemplatesxypt88f08mt8jgi1q",
-          "name": "Quisitive Templates",
-          "path": "c:\\Users\\gregt\\OneDrive - Quisitive\\Quisitive_Templates\\QuisitiveTemplates.code-workspace",
+          "name": "Deliverable Accelerator",
+          "path": "c:\\Users\\gregt\\OneDrive - Quisitive\\Deliverable_Accelerator\\Deliverable_Accelerator.code-workspace",
           "color": "#00b3e2"
         },
         {
@@ -449,12 +449,12 @@
   "dashboard.projectTileWidth": 350,
   "dashboard.recentColors": [
     [
-      "#1ca5eb",
-      "Picton Blue"
-    ],
-    [
       "#00b3e2",
       "Cerulean"
+    ],
+    [
+      "#1ca5eb",
+      "Picton Blue"
     ],
     [
       "#003eb2",
