@@ -18,7 +18,7 @@ sidebar_start_collapsed = true
 # Configure Herdr's prefix and vertical pane split shortcut.
 status_indicators = "symbols"
 [keys]
-prefix = ["ctrl+b", "ctrl+backtick"]
+prefix = "ctrl+backtick"
 split_vertical = "prefix+|"
 
 # Terminal settings
