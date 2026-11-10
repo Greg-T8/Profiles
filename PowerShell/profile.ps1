@@ -2,8 +2,9 @@
 # Description   : Configure the interactive PowerShell environment and prompt.
 # Context       : Personal cross-host profile ($Profile.CurrentUserAllHosts).
 # Author        : Greg Tate, with help from a coding agent
-# Last Modified : 2026-11-09
+# Last Modified : 2026-11-10
 # Revision History:
+#   2026-11-10 - Show Tab completions in a selectable menu.
 #   2026-11-09 - Preserve AllScope when setting the Neovim alias.
 #   2026-11-08 - Clarify profile sections and navigation for readability.
 #   2026-11-08 - Added Neovim alias and updated Git add shortcut.
@@ -388,17 +389,17 @@ $tabKeyHandler = {
 		[Microsoft.PowerShell.PSConsoleReadLine]::Insert('    ')
 	}
 	else {
-		[Microsoft.PowerShell.PSConsoleReadLine]::Complete()
+		[Microsoft.PowerShell.PSConsoleReadLine]::MenuComplete()
 	}
 }
 Set-PSReadLineKeyHandler -ViMode Insert  -Key Tab -ScriptBlock $tabKeyHandler
-Set-PSReadLineKeyHandler -ViMode Command -Key Tab -Function Complete
+Set-PSReadLineKeyHandler -ViMode Command -Key Tab -Function MenuComplete
 Set-PSReadLineKeyHandler -ViMode Insert  -Chord Shift+Tab -Function TabCompletePrevious
 Set-PSReadLineKeyHandler -ViMode Command -Chord Shift+Tab -Function TabCompletePrevious
 
 Set-PSReadLineKeyHandler -Chord Ctrl+V -Function Paste
 
-# Accept menu selection with Tab (after menu is open, use arrows to navigate then Tab to accept)
+# Use the arrow keys to choose a completion and Enter to accept it.
 Set-PSReadLineKeyHandler -Key Enter -Function AcceptLine
 
 # Prediction navigation (PowerShell Core with newer PSReadLine)
