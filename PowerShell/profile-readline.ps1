@@ -1,9 +1,14 @@
 ﻿# ---------------------------------------------------------------------------
 # Description   : Configure interactive line editing and fuzzy finding.
 # Context       : Personal PowerShell profile feature initialization.
-# Author        : Greg Tate, with help from a coding agent
+# Author        : Greg Tate & coding agent
 # Last Modified : 2026-11-11
 # Revision History:
+#   2026-11-11 - Write Vi cursor sequences without loading Utility.
+#   2026-11-11 - Trace Utility module state around initial cursor output.
+#   2026-11-11 - Trace Vi cursor handler setup and initial cursor output.
+#   2026-11-11 - Add checkpoints within PSReadLine key setup.
+#   2026-11-11 - Defer PSFzf loading until a shortcut is used.
 #   2026-11-11 - Extract feature from the PowerShell profile.
 # ---------------------------------------------------------------------------
 
@@ -67,10 +72,13 @@ if ($profileShouldConfigurePSReadLine) {
 			[Microsoft.PowerShell.PSConsoleReadLine]::MenuComplete()
 		}
 	}
+	Write-ProfileTime 'After Tab handler definition'
 	Set-PSReadLineKeyHandler -ViMode Insert  -Key Tab -ScriptBlock $tabKeyHandler
+	Write-ProfileTime 'After first PSReadLine key handler'
 	Set-PSReadLineKeyHandler -ViMode Command -Key Tab -Function MenuComplete
 	Set-PSReadLineKeyHandler -ViMode Insert  -Chord Shift+Tab -Function TabCompletePrevious
 	Set-PSReadLineKeyHandler -ViMode Command -Chord Shift+Tab -Function TabCompletePrevious
+	Write-ProfileTime 'After Tab key handlers'
 
 	Set-PSReadLineKeyHandler -Chord Ctrl+V -Function Paste
 
@@ -82,11 +90,13 @@ if ($profileShouldConfigurePSReadLine) {
 	if ($PSVersionTable.PSEdition -eq 'Core') {
 		Set-PSReadLineKeyHandler -Key Ctrl+RightArrow -Function AcceptSuggestion -ErrorAction SilentlyContinue
 	}
+	Write-ProfileTime 'After general and prediction key handlers'
 
 	# Vi mode configuration
 	if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
 		Set-PSReadLineOption -ViModeIndicator 'Cursor'
 		$env:EDITOR = 'nvim'
+		Write-ProfileTime 'After Vi mode option and editor setting'
 
 		# Vi mode key handlers for both Command and Insert modes
 		foreach ($mode in 'Command', 'Insert') {
@@ -100,37 +110,75 @@ if ($profileShouldConfigurePSReadLine) {
 			Set-PSReadLineKeyHandler -Chord Ctrl+u -Function BackwardKillInput -ViMode $mode
 			Set-PSReadLineKeyHandler -Chord Ctrl+w -Function BackwardKillWord -ViMode $mode
 			Set-PSReadLineKeyHandler -Chord Shift+Enter -Function AddLine -ViMode $mode
+			Write-ProfileTime "After Vi $mode key handlers"
 		}
 
 		# Custom cursor styles (PowerShell Core only - uses VT100 escape sequences)
 		if ($PSVersionTable.PSEdition -eq 'Core') {
+			Write-ProfileTime 'Before Vi cursor handler definition'
 			function OnViModeChange {
 				if ($args[0] -eq 'Command') {
 					# Set the cursor to a blinking block
-					Write-Host -NoNewline "`e[1 q"
+					$Host.UI.Write("`e[1 q")
 				}
 				else {
 					# Set the cursor to a blinking line
-					Write-Host -NoNewline "`e[5 q"
+					$Host.UI.Write("`e[5 q")
 				}
 			}
+			Write-ProfileTime 'After Vi cursor handler definition'
 			Set-PSReadLineOption -ViModeIndicator Script -ViModeChangeHandler $Function:OnViModeChange
+			Write-ProfileTime 'After Vi cursor handler registration'
 
 			# Set initial cursor to blinking line for Insert mode
-			Write-Host -NoNewline "`e[5 q"
+			Write-ProfileTime 'Before initial Vi cursor output'
+			if ($env:PROFILE_TIMING) {
+				Write-ProfileTime ('Before initial Vi cursor write (Utility loaded: {0})' -f [bool](Get-Module -Name Microsoft.PowerShell.Utility))
+			}
+			$Host.UI.Write("`e[5 q")
+			Write-ProfileTime 'After Vi cursor configuration'
+			if ($env:PROFILE_TIMING) {
+				Write-ProfileTime ('After initial Vi cursor write (Utility loaded: {0})' -f [bool](Get-Module -Name Microsoft.PowerShell.Utility))
+			}
 		}
 
 	}
 	Write-ProfileTime 'After PSReadLine key handlers'
 
-	# Load PSFzf after Vi mode and custom key handlers are configured.
-	Write-ProfileTime 'Before PSFzf import'
-	Import-Module PSFzf
-	Write-ProfileTime 'After PSFzf import'
-	Set-PsFzfOption `
-		-PSReadlineChordProvider 'Ctrl+t' `
-		-PSReadlineChordReverseHistory 'Ctrl+r'
-	Write-ProfileTime 'After PSFzf configuration'
+    # Load and configure PSFzf in the session when a deferred shortcut is used.
+    $script:ProfilePSFzfInitialized = $false
+    function Initialize-ProfilePSFzf {
+        # Initialize once and expose the module commands to the session.
+        if (-not $script:ProfilePSFzfInitialized) {
+            Import-Module PSFzf -Global -ErrorAction Stop
+            Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
+            $script:ProfilePSFzfInitialized = $true
+        }
+    }
+
+    # Register the configured shortcuts in both Vi modes without importing PSFzf.
+    Write-ProfileTime 'Before deferred PSFzf shortcut registration'
+    $profileFzfProvider = { Initialize-ProfilePSFzf; Invoke-FzfPsReadlineHandlerProvider }
+    $profileFzfHistory = { Initialize-ProfilePSFzf; Invoke-FzfPsReadlineHandlerHistory }
+    foreach ($mode in 'Insert', 'Command') {
+        Set-PSReadLineKeyHandler -ViMode $mode -Chord 'Ctrl+t' -ScriptBlock $profileFzfProvider
+        Set-PSReadLineKeyHandler -ViMode $mode -Chord 'Ctrl+r' -ScriptBlock $profileFzfHistory
+    }
+
+    # Preserve PSFzf's optional shortcuts only when their keys are unbound.
+    $profileFzfOptional = @(
+        @{ Chord = 'Alt+c'; Handler = { Initialize-ProfilePSFzf; Invoke-FzfPsReadlineHandlerSetLocation } }
+        @{ Chord = 'Alt+a'; Handler = { Initialize-ProfilePSFzf; Invoke-FzfPsReadlineHandlerHistoryArgs } }
+    )
+    foreach ($shortcut in $profileFzfOptional) {
+        $boundHandler = Get-PSReadLineKeyHandler -Bound | Where-Object { $_.Key -eq $shortcut.Chord }
+        if (-not $boundHandler) {
+            foreach ($mode in 'Insert', 'Command') {
+                Set-PSReadLineKeyHandler -ViMode $mode -Chord $shortcut.Chord -ScriptBlock $shortcut.Handler
+            }
+        }
+    }
+    Write-ProfileTime 'After deferred PSFzf shortcut registration'
 }
 else {
     # Avoid loading interactive editing modules for command-only PowerShell processes.

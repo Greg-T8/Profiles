@@ -4,6 +4,8 @@
 # Author        : Greg Tate, with help from a coding agent
 # Last Modified : 2026-11-11
 # Revision History:
+#   2026-11-11 - Show elapsed time between profile timing checkpoints.
+#   2026-11-11 - Sample functions file read and parsing during timing runs.
 #   2026-11-11 - Split profile features into dot-sourced scripts.
 #   2026-11-11 - Create profile aliases without importing Utility.
 #   2026-11-11 - Add checkpoints across profile setup before function import.
@@ -30,16 +32,19 @@
 
 $ErrorActionPreference = 'Stop'
 
-# Record profile timing only when PROFILE_TIMING is enabled.
+# Track elapsed time from profile startup and between timing checkpoints.
 $script:ProfileTimer = [System.Diagnostics.Stopwatch]::StartNew()
+$script:ProfilePreviousElapsed = 0.0
 function script:Write-ProfileTime {
-	param([string]$Label)
+    param([string]$Label)
 
-	# Emit elapsed profile time without affecting normal startup output.
-	if ($env:PROFILE_TIMING) {
-		$elapsed = $script:ProfileTimer.Elapsed.TotalMilliseconds
-		$Host.UI.WriteLine(('  [{0,6:N1}ms] {1}' -f $elapsed, $Label))
-	}
+    # Show cumulative and checkpoint elapsed times only during timing runs.
+    if ($env:PROFILE_TIMING) {
+        $elapsed = $script:ProfileTimer.Elapsed.TotalMilliseconds
+        $stepElapsed = $elapsed - $script:ProfilePreviousElapsed
+        $script:ProfilePreviousElapsed = $elapsed
+        $Host.UI.WriteLine(('  [{0,6:N1}ms total | +{1,6:N1}ms step] {2}' -f $elapsed, $stepElapsed, $Label))
+    }
 }
 Write-ProfileTime 'Profile start'
 
@@ -125,6 +130,31 @@ Write-ProfileTime 'After profile directory resolution'
 # Load custom functions
 if ($PSVersionTable.PSEdition -eq 'Core' -and [System.IO.File]::Exists("$profileDir/functions.ps1")) {
 	try {
+        # Sample reading and parsing separately without changing the dot-sourced script.
+        if ($env:PROFILE_TIMING) {
+            try {
+                Write-ProfileTime 'Diagnostic sample: before functions.ps1 file read'
+                $functionsTimingText = [System.IO.File]::ReadAllText("$profileDir/functions.ps1")
+                Write-ProfileTime 'Diagnostic sample: after functions.ps1 file read'
+                $functionsTimingTokens = $null
+                $functionsTimingErrors = $null
+                Write-ProfileTime 'Diagnostic sample: before functions.ps1 text parse'
+                $null = [System.Management.Automation.Language.Parser]::ParseInput(
+                    $functionsTimingText,
+                    "$profileDir/functions.ps1",
+                    [ref]$functionsTimingTokens,
+                    [ref]$functionsTimingErrors
+                )
+                Write-ProfileTime ('Diagnostic sample: after functions.ps1 text parse (errors: {0})' -f $functionsTimingErrors.Count)
+            }
+            catch {
+                # Continue with the normal import if the diagnostic sample fails.
+                Write-ProfileTime 'Diagnostic sample failed; continuing with functions.ps1 import'
+            }
+            $functionsTimingText = $null
+            $functionsTimingTokens = $null
+            $functionsTimingErrors = $null
+        }
 		Write-ProfileTime 'Before functions.ps1 import'
 		. "$profileDir/functions.ps1"
 	}

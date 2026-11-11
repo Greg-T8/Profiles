@@ -1,9 +1,15 @@
 ﻿# ---------------------------------------------------------------------------
 # Description   : Provide prompt, Git, and environment support functions.
 # Context       : Personal PowerShell profile feature initialization.
-# Author        : Greg Tate, with help from a coding agent
+# Author        : Greg Tate & coding agent
 # Last Modified : 2026-11-11
 # Revision History:
+#   2026-11-11 - Share each prompt's Git worktree check across initializers.
+#   2026-11-11 - Resolve prompt variables without importing Utility.
+#   2026-11-11 - Trace Python environment label resolution.
+#   2026-11-11 - Resolve prompt locations without importing Management.
+#   2026-11-11 - Trace Management module state around prompt location lookup.
+#   2026-11-11 - Trace Git discovery and Posh-Git initialization during first prompt.
 #   2026-11-11 - Extract feature from the PowerShell profile.
 # ---------------------------------------------------------------------------
 
@@ -63,7 +69,7 @@ function Get-AzProfilePromptText {
 function Get-MgProfilePromptText {
 	# Resolve the active named Microsoft Graph profile from process-local session state.
 	try {
-		$stateVariable = Get-Variable -Name MSCloudMgProfileName -Scope Global -ErrorAction SilentlyContinue
+		$stateVariable = $ExecutionContext.SessionState.PSVariable.Get('global:MSCloudMgProfileName')
 		if (-not $stateVariable) {
 			return ''
 		}
@@ -86,19 +92,33 @@ function Get-MgProfilePromptText {
 }
 
 function Get-PythonVenvPromptText {
+	param([switch]$TraceTiming)
 	# Resolve active Python venv label exactly as set by Activate.ps1 when present.
 	$venvPrompt = $null
 	$promptLabels = @()
 
-	if (Get-Variable -Name '_PYTHON_VENV_PROMPT_PREFIX' -Scope Global -ErrorAction SilentlyContinue) {
-		$venvPrompt = (Get-Variable -Name '_PYTHON_VENV_PROMPT_PREFIX' -Scope Global -ValueOnly)
+	# Isolate the first global variable lookup and any Utility module import.
+	if ($TraceTiming) {
+		Write-ProfileTime ('First prompt: before Python prefix lookup (Utility loaded: {0})' -f [bool](Get-Module -Name Microsoft.PowerShell.Utility))
+	}
+	$venvPrefixVariable = $ExecutionContext.SessionState.PSVariable.Get('global:_PYTHON_VENV_PROMPT_PREFIX')
+	if ($TraceTiming) { Write-ProfileTime 'First prompt: after Python prefix lookup' }
+	if ($TraceTiming) {
+		Write-ProfileTime ('First prompt: after Python prefix module check (Utility loaded: {0})' -f [bool](Get-Module -Name Microsoft.PowerShell.Utility))
+	}
+	if ($venvPrefixVariable) {
+		$venvPrompt = $venvPrefixVariable.Value
+		if ($TraceTiming) { Write-ProfileTime 'First prompt: after Python prefix value lookup' }
 	}
 	elseif (-not [string]::IsNullOrWhiteSpace($env:VIRTUAL_ENV_PROMPT)) {
 		$venvPrompt = $env:VIRTUAL_ENV_PROMPT
 	}
 	elseif (-not [string]::IsNullOrWhiteSpace($env:VIRTUAL_ENV)) {
+		if ($TraceTiming) { Write-ProfileTime 'First prompt: before Python environment path lookup' }
 		$venvPrompt = Split-Path -Path $env:VIRTUAL_ENV -Leaf
+		if ($TraceTiming) { Write-ProfileTime 'First prompt: after Python environment path lookup' }
 	}
+	if ($TraceTiming) { Write-ProfileTime 'First prompt: after Python environment selection' }
 
 	if ([string]::IsNullOrWhiteSpace($venvPrompt)) {
 		$venvPrompt = $null
@@ -115,6 +135,7 @@ function Get-PythonVenvPromptText {
 	elseif (-not [string]::IsNullOrWhiteSpace($env:CONDA_DEFAULT_ENV)) {
 		$condaPrompt = "($($env:CONDA_DEFAULT_ENV))"
 	}
+	if ($TraceTiming) { Write-ProfileTime 'First prompt: after Conda environment selection' }
 
 	if (-not [string]::IsNullOrWhiteSpace($condaPrompt)) {
 		$promptLabels += $condaPrompt
@@ -128,39 +149,57 @@ function Get-PythonVenvPromptText {
 }
 
 function Test-GitDirectory {
+	param([switch]$TraceTiming, [hashtable]$ProbeCache)
 	# Check the current directory without scanning the working tree.
+	$probeLocation = $ExecutionContext.SessionState.Path.CurrentLocation.Path
+	if ($null -ne $ProbeCache -and $ProbeCache.ContainsKey('IsWorkTree') -and $ProbeCache.Location -eq $probeLocation) {
+		if ($TraceTiming) { Write-ProfileTime 'First prompt: reused Git worktree check' }
+		return $ProbeCache.IsWorkTree
+	}
 	if (-not $script:GitCommandChecked) {
+		if ($TraceTiming) { Write-ProfileTime 'First prompt: before Git command discovery' }
 		$script:GitCommand = Get-Command -Name git.exe -CommandType Application -ErrorAction SilentlyContinue
 		$script:GitCommandChecked = $true
+		if ($TraceTiming) { Write-ProfileTime 'First prompt: after Git command discovery' }
 	}
 
 	if (-not $script:GitCommand) {
-		return $false
+		$isWorkTree = $false
 	}
-
-	try {
-		$insideWorkTree = & $script:GitCommand.Path rev-parse --is-inside-work-tree 2>$null
-		return $LASTEXITCODE -eq 0 -and $insideWorkTree -contains 'true'
+	else {
+		try {
+			if ($TraceTiming) { Write-ProfileTime 'First prompt: before Git worktree check' }
+			$insideWorkTree = & $script:GitCommand.Path rev-parse --is-inside-work-tree 2>$null
+			$isWorkTree = $LASTEXITCODE -eq 0 -and $insideWorkTree -contains 'true'
+			if ($TraceTiming) { Write-ProfileTime 'First prompt: after Git worktree check' }
+		}
+		catch {
+			# Ignore errors from Git when the location is not a file-system repository.
+			$isWorkTree = $false
+		}
 	}
-	catch {
-		# Ignore errors from Git when the location is not a file-system repository.
-		return $false
+	# Share the result only within this prompt and only for the same location.
+	if ($null -ne $ProbeCache) {
+		$ProbeCache.Location = $probeLocation
+		$ProbeCache.IsWorkTree = $isWorkTree
 	}
+	return $isWorkTree
 }
 
 function Initialize-AICommitEnvironment {
+	param([switch]$TraceTiming, [hashtable]$ProbeCache)
 	# Load the commit-hook key once when entering a Git worktree and clear it on exit.
-	$locationPath = (Get-Location).Path
+	$locationPath = $ExecutionContext.SessionState.Path.CurrentLocation.Path
 	if ($script:AICommitProbePath -eq $locationPath) {
 		return
 	}
 
 	$script:AICommitProbePath = $locationPath
-	$insideGitWorktree = Test-GitDirectory
+	$insideGitWorktree = Test-GitDirectory -TraceTiming:$TraceTiming -ProbeCache $ProbeCache
 	if (-not $insideGitWorktree) {
-		Remove-Item Env:AI_COMMIT_BASE_URL -ErrorAction SilentlyContinue
-		Remove-Item Env:AI_COMMIT_MODEL -ErrorAction SilentlyContinue
-		Remove-Item Env:AI_COMMIT_API_KEY -ErrorAction SilentlyContinue
+		[Environment]::SetEnvironmentVariable('AI_COMMIT_BASE_URL', $null, 'Process')
+		[Environment]::SetEnvironmentVariable('AI_COMMIT_MODEL', $null, 'Process')
+		[Environment]::SetEnvironmentVariable('AI_COMMIT_API_KEY', $null, 'Process')
 		return
 	}
 
@@ -178,7 +217,7 @@ function Initialize-AICommitEnvironment {
 	}
 
 	if ([string]::IsNullOrWhiteSpace($script:AICommitApiKey)) {
-		Remove-Item Env:AI_COMMIT_API_KEY -ErrorAction SilentlyContinue
+		[Environment]::SetEnvironmentVariable('AI_COMMIT_API_KEY', $null, 'Process')
 		Write-Warning 'Git commit message key unavailable; unlock SecretStore or verify AI_COMMIT_API_KEY.'
 		return
 	}
@@ -187,19 +226,33 @@ function Initialize-AICommitEnvironment {
 }
 
 function Initialize-PromptPoshGit {
+	param([switch]$TraceTiming, [hashtable]$ProbeCache)
 	# Load Posh-Git only after entering a repository that has not been checked.
+	if ($TraceTiming) { Write-ProfileTime 'First prompt: Posh-Git initialization started' }
 	if ($script:PoshGitLoaded -or $PSVersionTable.PSEdition -ne 'Core') {
 		return
 	}
 
-	$locationPath = (Get-Location).Path
+	# Identify whether resolving the current location loads the Management module.
+	if ($TraceTiming) {
+		Write-ProfileTime ('First prompt: before Posh-Git location lookup (Management loaded: {0})' -f [bool](Get-Module -Name Microsoft.PowerShell.Management))
+	}
+	$locationPath = $ExecutionContext.SessionState.Path.CurrentLocation.Path
+	if ($TraceTiming) { Write-ProfileTime 'First prompt: after Posh-Git location lookup' }
+	if ($TraceTiming) {
+		Write-ProfileTime ('First prompt: after Posh-Git location check (Management loaded: {0})' -f [bool](Get-Module -Name Microsoft.PowerShell.Management))
+	}
 	if ($script:GitProbePath -eq $locationPath) {
 		return
 	}
 
 	$script:GitProbePath = $locationPath
-	if (Test-GitDirectory) {
-		$script:PoshGitLoaded = Initialize-PoshGit
+	if (Test-GitDirectory -TraceTiming:$TraceTiming -ProbeCache $ProbeCache) {
+		if ($TraceTiming) { Write-ProfileTime 'First prompt: Git worktree detected' }
+		$script:PoshGitLoaded = Initialize-PoshGit -TraceTiming:$TraceTiming
+	}
+	elseif ($TraceTiming) {
+		Write-ProfileTime 'First prompt: no Git worktree detected'
 	}
 }
 
@@ -214,7 +267,7 @@ function Get-GitPromptStatusText {
 		$script:GitPromptMetaCache = @{}
 	}
 
-	$cacheKey = "$(Get-Location)"
+	$cacheKey = $ExecutionContext.SessionState.Path.CurrentLocation.Path
 	$cacheNow = [datetime]::UtcNow
 	$cacheTtlSeconds = 5
 	$cache = if ($script:GitPromptMetaCache.ContainsKey($cacheKey)) { $script:GitPromptMetaCache[$cacheKey] } else { $null }
@@ -313,7 +366,7 @@ function Get-MyPromptPath {
 
 	# Detect OS and set path separator
 	$onWindows = if ($PSVersionTable.PSEdition -eq 'Core') {
-		(Get-Variable -Name 'IsWindows' -ValueOnly -ErrorAction SilentlyContinue) -ne $false
+		$ExecutionContext.SessionState.PSVariable.GetValue('IsWindows') -ne $false
 	}
 	else {
 		$true  # Windows PowerShell 5.1 is always Windows
@@ -322,7 +375,7 @@ function Get-MyPromptPath {
 	$pathSepRegex = if ($onWindows) { '\\' } else { '/' }
 
 	# Get shortened path for prompt display
-	$location = "$(Get-Location)"
+	$location = $ExecutionContext.SessionState.Path.CurrentLocation.Path
 
 	if ($DebugPrompt) {
 		Write-Host "[DEBUG] location: $location" -ForegroundColor Magenta
@@ -452,6 +505,7 @@ function Get-MyPromptPath {
 }
 
 function Initialize-PoshGit {
+	param([switch]$TraceTiming)
 	# Initialize Posh-Git module and settings
 	# Called only after the prompt has confirmed the current directory is a Git repository.
 
@@ -460,7 +514,9 @@ function Initialize-PoshGit {
 	}
 
 	try {
+		if ($TraceTiming) { Write-ProfileTime 'First prompt: before Posh-Git import' }
 		Import-Module Posh-Git -ErrorAction Stop
+		if ($TraceTiming) { Write-ProfileTime 'First prompt: after Posh-Git import' }
 
 		# Configure Posh-Git settings
 		$GitPromptSettings.DefaultPromptPath            = ''
@@ -474,11 +530,13 @@ function Initialize-PoshGit {
 		$GitPromptSettings.StashColor.ForegroundColor   = $StashColor
 		$GitPromptSettings.BeforeStash.ForegroundColor  = $StashColor
 		$GitPromptSettings.AfterStash.ForegroundColor   = $StashColor
+		if ($TraceTiming) { Write-ProfileTime 'First prompt: after Posh-Git settings' }
 
 		return $true
 	}
 	catch {
 		# Posh-Git not available, continue without it
+		if ($TraceTiming) { Write-ProfileTime 'First prompt: Posh-Git initialization failed' }
 		return $false
 	}
 }

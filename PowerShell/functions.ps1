@@ -4,6 +4,7 @@
 # Author        : Greg Tate & coding agent
 # Last Modified : 2026-11-11
 # Revision History:
+#   2026-11-11 - Measure console-attached startup and first prompt calculation.
 #   2026-11-11 - Add per-function profile load timing checkpoints.
 # ---------------------------------------------------------------------------
 
@@ -541,8 +542,9 @@ function Measure-ProfileLoad {
         Measures PowerShell profile loading time with detailed metrics.
 
     .DESCRIPTION
-        Measures baseline PowerShell startup vs. profile load time and uses
-        Measure-Script to identify the slowest operations in the profile.
+        Measures console-attached PowerShell startup and the first prompt
+        calculation, with and without profiles, and uses Measure-Script to
+        identify the slowest operations in the profile.
 
         With -ShowTiming, displays section-by-section timing checkpoints to help
         identify which parts of your profile are slow (module imports, PSReadLine
@@ -552,8 +554,8 @@ function Measure-ProfileLoad {
         Number of iterations to run for averaging. Default is 3.
 
     .PARAMETER ShowTiming
-        Shows detailed timing checkpoints for each profile section. Requires adding
-        timing instrumentation to your profile.ps1 (see NOTES).
+        Shows detailed timing checkpoints for each profile section and the
+        first prompt calculation.
 
     .EXAMPLE
         Measure-ProfileLoad
@@ -565,20 +567,8 @@ function Measure-ProfileLoad {
         Measure-ProfileLoad -ShowTiming -Iterations 1
 
     .NOTES
-        To enable -ShowTiming, add this to the top of your profile.ps1:
-
-        $script:ProfileTimer = [System.Diagnostics.Stopwatch]::StartNew()
-        function script:Write-ProfileTime($label) {
-            if ($env:PROFILE_TIMING) {
-                $elapsed = $script:ProfileTimer.Elapsed.TotalMilliseconds
-                Write-Host ("  [{0,6:N1}ms] {1}" -f $elapsed, $label) -ForegroundColor DarkGray
-            }
-        }
-
-        Then add checkpoints throughout:
-        Write-ProfileTime "After PSReadLine import"
-        Write-ProfileTime "After PSReadLine config"
-        etc.
+        Run from an interactive console. Each child calculates its prompt once
+        and exits; the total includes process startup and shutdown.
     #>
     [CmdletBinding()]
     param(
@@ -598,40 +588,63 @@ function Measure-ProfileLoad {
     }
     Write-Host "Running $Iterations iterations...`n" -ForegroundColor Gray
 
-    # Enable timing flag if requested
-    if ($ShowTiming) {
-        $env:PROFILE_TIMING = "1"
+    # Require a console so the child uses the interactive profile path.
+    if ($Host.Name -ne 'ConsoleHost' -or [Console]::IsInputRedirected) {
+        throw 'Measure-ProfileLoad requires an interactive console with input attached.'
     }
 
-    # Measure baseline (no profile)
-    $baselineTimes = 1..$Iterations | ForEach-Object {
-        Write-Host "  Baseline $_/$Iterations..." -NoNewline
-        $ms = (Measure-Command { pwsh -NoProfile -Command "exit" }).TotalMilliseconds
-        Write-Host " $([math]::Round($ms, 2))ms" -ForegroundColor Gray
-        $ms
+    # Use the same console-attached startup and prompt calculation for each sample.
+    $baselineCommand = '$null = prompt; exit'
+    $profileCommand = if ($ShowTiming) {
+        "Write-ProfileTime 'Before first prompt calculation'; `$null = prompt; Write-ProfileTime 'After first prompt calculation'; exit"
     }
+    else {
+        $baselineCommand
+    }
+    $baselineEncoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($baselineCommand))
+    $profileEncoded = [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($profileCommand))
+    $previousTiming = $env:PROFILE_TIMING
 
-    # Measure with profile
-    $profileTimes = 1..$Iterations | ForEach-Object {
-        if ($ShowTiming) {
-            Write-Host "`n  Profile $_/$Iterations with section timing:" -ForegroundColor Yellow
-            # Preserve the interactive console required by PSReadLine while the child profile emits checkpoints.
+    try {
+        # Keep timing output out of baseline and ordinary profile samples.
+        $env:PROFILE_TIMING = $null
+        $baselineTimes = 1..$Iterations | ForEach-Object {
+            Write-Host "  Baseline $_/$Iterations..." -NoNewline
             $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
-            Start-Process -FilePath pwsh -ArgumentList @('-Command', 'exit') -NoNewWindow -Wait
+            $process = Start-Process -FilePath pwsh -ArgumentList @('-NoProfile', '-NoExit', '-EncodedCommand', $baselineEncoded) -NoNewWindow -Wait -PassThru
             $stopwatch.Stop()
+            if ($process.ExitCode -ne 0) { throw "Baseline PowerShell exited with code $($process.ExitCode)." }
             $ms = $stopwatch.Elapsed.TotalMilliseconds
-            Write-Host ("  Total: {0}ms`n" -f [math]::Round($ms, 2)) -ForegroundColor Gray
-        } else {
-            Write-Host "  Profile $_/$Iterations..." -NoNewline
-            $ms = (Measure-Command { pwsh -Command "exit" }).TotalMilliseconds
             Write-Host " $([math]::Round($ms, 2))ms" -ForegroundColor Gray
+            $ms
         }
-        $ms
-    }
 
-    # Clean up timing flag
-    if ($ShowTiming) {
-        Remove-Item Env:\PROFILE_TIMING -ErrorAction SilentlyContinue
+        # Include interactive profile setup and one prompt calculation in each sample.
+        if ($ShowTiming) { $env:PROFILE_TIMING = '1' }
+        $profileTimes = 1..$Iterations | ForEach-Object {
+            if ($ShowTiming) {
+                Write-Host "`n  Profile $_/$Iterations with section timing:" -ForegroundColor Yellow
+            }
+            else {
+                Write-Host "  Profile $_/$Iterations..." -NoNewline
+            }
+            $stopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+            $process = Start-Process -FilePath pwsh -ArgumentList @('-NoExit', '-EncodedCommand', $profileEncoded) -NoNewWindow -Wait -PassThru
+            $stopwatch.Stop()
+            if ($process.ExitCode -ne 0) { throw "Profile PowerShell exited with code $($process.ExitCode)." }
+            $ms = $stopwatch.Elapsed.TotalMilliseconds
+            if ($ShowTiming) {
+                Write-Host ("  Total (startup, prompt, and exit): {0}ms`n" -f [math]::Round($ms, 2)) -ForegroundColor Gray
+            }
+            else {
+                Write-Host " $([math]::Round($ms, 2))ms" -ForegroundColor Gray
+            }
+            $ms
+        }
+    }
+    finally {
+        # Preserve the caller's timing setting even when a child process fails.
+        $env:PROFILE_TIMING = $previousTiming
     }
 
     $avgBaseline = ($baselineTimes | Measure-Object -Average).Average

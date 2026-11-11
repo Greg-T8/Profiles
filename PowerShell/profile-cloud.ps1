@@ -4,10 +4,41 @@
 # Author        : Greg Tate, with help from a coding agent
 # Last Modified : 2026-11-11
 # Revision History:
+#   2026-11-11 - Read profile data files without importing Utility.
 #   2026-11-11 - Separate Utility module and personal data-file timings.
 #   2026-11-11 - Add timings around personal configuration file loading.
 #   2026-11-11 - Extract feature from the PowerShell profile.
 # ---------------------------------------------------------------------------
+
+# Read a PowerShell data file through the engine's safe syntax evaluator.
+function Import-ProfileDataFile {
+    param(
+        [Parameter(Mandatory)]
+        [string]$Path
+    )
+
+    # Parse the file and reject invalid PowerShell syntax.
+    $profileDataTokens = $null
+    $profileDataErrors = $null
+    $profileDataScript = [System.Management.Automation.Language.Parser]::ParseFile(
+        $Path,
+        [ref]$profileDataTokens,
+        [ref]$profileDataErrors
+    )
+    if ($profileDataErrors.Count -gt 0) {
+        throw "Unable to parse profile data file: $Path"
+    }
+
+    # Locate the data table and evaluate only its safe, supported values.
+    $profileDataAst = $profileDataScript.Find({
+            param($Node)
+            $Node -is [System.Management.Automation.Language.HashtableAst]
+        }, $false)
+    if ($null -eq $profileDataAst) {
+        throw "Profile data file does not contain a hashtable: $Path"
+    }
+    return $profileDataAst.SafeGetValue()
+}
 
 # Resolve profile-owned configuration paths for profile configuration loading.
 Write-ProfileTime 'Before personal configuration path resolution'
@@ -34,16 +65,9 @@ Write-ProfileTime ('After personal configuration file existence check (exists: {
 if ($personalConfigExists) {
     if ($env:PROFILE_TIMING) {
         Write-ProfileTime ('Before personal data-file import (Utility loaded: {0}; Management loaded: {1})' -f [bool](Get-Module -Name Microsoft.PowerShell.Utility), [bool](Get-Module -Name Microsoft.PowerShell.Management))
-
-        # Separate the Utility module's first load from data-file processing.
-        if (-not (Get-Module -Name Microsoft.PowerShell.Utility)) {
-            Write-ProfileTime 'Before Utility module import for personal configuration'
-            Import-Module -Name Microsoft.PowerShell.Utility -ErrorAction Stop
-            Write-ProfileTime 'After Utility module import for personal configuration'
-        }
         Write-ProfileTime 'Before personal data-file processing'
     }
-    $Personal = $Per = Import-PowerShellDataFile -Path $personalConfigPath
+    $Personal = $Per = Import-ProfileDataFile -Path $personalConfigPath
     if ($env:PROFILE_TIMING) {
         Write-ProfileTime ('After personal data-file import (Utility loaded: {0}; Management loaded: {1})' -f [bool](Get-Module -Name Microsoft.PowerShell.Utility), [bool](Get-Module -Name Microsoft.PowerShell.Management))
     }
@@ -66,7 +90,7 @@ Write-ProfileTime 'After work configuration path'
 
 # Load work configuration into the global profile variable when available.
 if ([System.IO.File]::Exists($workConfigPath)) {
-	$Work = Import-PowerShellDataFile -Path $workConfigPath
+	$Work = Import-ProfileDataFile -Path $workConfigPath
 }
 Write-ProfileTime 'After work configuration import'
 
