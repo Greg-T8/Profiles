@@ -749,5 +749,10 @@
       "text": "\u0002"
     },
     "when": "terminalFocus"
+  },
+  {
+    "key": "alt+e",
+    "command": "revealFileInOS",
+    "when": "explorerViewletFocus"
   }
 ]
