@@ -4,6 +4,10 @@
 # Author        : Greg Tate, with help from a coding agent
 # Last Modified : 2026-11-11
 # Revision History:
+#   2026-11-11 - Split profile features into dot-sourced scripts.
+#   2026-11-11 - Create profile aliases without importing Utility.
+#   2026-11-11 - Add checkpoints across profile setup before function import.
+#   2026-11-11 - Write timing markers directly through the host UI.
 #   2026-11-11 - Skip PSReadLine and PSFzf setup for non-interactive commands.
 #   2026-11-11 - Replace Join-Path calls with System.IO.Path.Combine.
 #   2026-11-11 - Show Management module state around personal path resolution.
@@ -34,7 +38,7 @@ function script:Write-ProfileTime {
 	# Emit elapsed profile time without affecting normal startup output.
 	if ($env:PROFILE_TIMING) {
 		$elapsed = $script:ProfileTimer.Elapsed.TotalMilliseconds
-		Write-Host ('  [{0,6:N1}ms] {1}' -f $elapsed, $Label) -ForegroundColor DarkGray
+		$Host.UI.WriteLine(('  [{0,6:N1}ms] {1}' -f $elapsed, $Label))
 	}
 }
 Write-ProfileTime 'Profile start'
@@ -61,150 +65,62 @@ Write-ProfileTime 'After startup initialization'
 
 #endregion
 
-#region ALIASES
-Set-Alias -Name ll -Value Get-ChildItem -Force
-Set-Alias -Name cfj -Value ConvertFrom-Json
-Set-Alias -Name gim -Value Get-InstalledModule
-Set-Alias -Name rdn -Value Resolve-DNSName
-Set-Alias -Name uap -Value Use-AzProfile
-Set-Alias -Name ugp -Value Use-MgProfile
-Set-Alias -Name gcap -Value Get-CurrentAzProfile
-Set-Alias -Name gcgp -Value Get-CurrentMgProfile
-Set-Alias -Name uaps -Value Use-AzProfileSubscription
-Set-Alias -Name gbs -Value Get-BillingSubscriptions
-Set-Alias -Name td -Value Get-TimeDifference
-Set-Alias -Name tf -Value terraform
-Set-Alias -Name he -Value herdr
-Set-Alias -Name nv -Value nvim -Option AllScope -Force
-
-
-# Git aliases
-# Forward the Git status shortcut to git.exe while preserving optional arguments.
-function Invoke-GitStatus {
-	git status @args
+# Resolve feature scripts beside the profile or its OneDrive-backed target.
+$profileEntryDir = [System.IO.Path]::GetDirectoryName($PSCommandPath)
+$profileOneDriveDir = if (-not [string]::IsNullOrWhiteSpace($env:OneDriveConsumer)) {
+    "$env:OneDriveConsumer/Apps/Profiles/PowerShell"
 }
-Set-Alias -Name gs -Value Invoke-GitStatus
-
-# Stage the current directory with the Git add shortcut.
-function Invoke-GitAdd {
-	git add .
+else {
+    $null
 }
-Set-Alias -Name ga -Value Invoke-GitAdd
-
-# Forward the Git diff shortcut to git.exe while preserving optional arguments.
-function Invoke-GitDiff {
-	git diff @args
+$profileFeatureDir = if ($profileOneDriveDir -and [System.IO.File]::Exists("$profileOneDriveDir/profile-aliases.ps1")) {
+    $profileOneDriveDir
 }
-Set-Alias -Name gd -Value Invoke-GitDiff
-
-# Forward the Git commit shortcut to git.exe while preserving optional arguments.
-function Invoke-GitCommit {
-	git commit @args
+elseif ([System.IO.File]::Exists("$profileEntryDir/profile-aliases.ps1")) {
+    $profileEntryDir
 }
-Set-Alias -Name gco -Value Invoke-GitCommit
-
-# Forward the Git push shortcut to git.exe while preserving optional arguments.
-function Invoke-GitPush {
-	git push @args
+else {
+    # Resolve a linked profile when its feature files are not beside the link.
+    $profileLinkTarget = (Get-Item -LiteralPath $PSCommandPath -Force).Target
+    if ($profileLinkTarget) {
+        [System.IO.Path]::GetDirectoryName([System.IO.Path]::GetFullPath(
+                [System.IO.Path]::Combine($profileEntryDir, [string]$profileLinkTarget)
+            ))
+    }
+    else {
+        $profileEntryDir
+    }
 }
-Set-Alias -Name gpu -Value Invoke-GitPush
-Set-Alias -Name sgr -Value Set-GitRepoRoot
-Set-Alias -Name ghel -Value Show-GhFailedRunLog
 
-# Azure DevOps aliases
-Set-Alias -Name adel -Value Show-AdoFailedRunLog
+# Load profile aliases into the current profile scope.
+Write-ProfileTime 'Before profile aliases import'
+. "$profileFeatureDir/profile-aliases.ps1"
+Write-ProfileTime 'After profile aliases import'
 
-# Docker aliases
-Set-Alias -Name dex -Value DockerExec
-Set-Alias -Name dil -Value DockerImageList
-Set-Alias -Name dcl -Value DockerContainerList
-Set-Alias -Name regctl -Value RegCtlCmd
-
-#endregion
 
 #region DEFAULT PARAMETER VALUES
 $PSDefaultParameterValues['Use-AzProfile:Name'] = 'Lab'
+Write-ProfileTime 'After default parameter values'
 
 #endregion
 
-#region PROMPT FUNCTION
-# Two-line prompt with box-drawing characters
-# Format:
-#   ╭─( [az:Lab] [mg:Lab] (venv) ~/path/to/directory [git-status]
-#   ╰╴>
-function prompt {
-	# Restore the PSReadLine Vi insert cursor after terminal applications exit.
-	if ($PSVersionTable.PSEdition -eq 'Core') {
-        Write-Host -NoNewline "`e[5 q"
-	}
-	Initialize-PromptPoshGit
-	Initialize-AICommitEnvironment
+# Load profile prompt into the current profile scope.
+Write-ProfileTime 'Before profile prompt import'
+. "$profileFeatureDir/profile-prompt.ps1"
+Write-ProfileTime 'After profile prompt import'
 
-	$pythonVenvPromptText = Get-PythonVenvPromptText
-
-	# Use different prompt styles based on PowerShell edition
-	if ($PSVersionTable.PSEdition -eq 'Core') {
-		# PowerShell Core with ANSI escape codes
-		$ESC = [char]0x1b                                            # ESC character for ANSI sequences
-		$azProfilePromptText = Get-AzProfilePromptText
-		$mgProfilePromptText = Get-MgProfilePromptText
-		$azProfilePromptStyledText = if ([string]::IsNullOrWhiteSpace($azProfilePromptText)) {
-			''
-		}
-		else {
-			"$ESC[38;2;0;120;212m$azProfilePromptText$ESC[38;2;0;179;226m"
-		}
-		$mgProfilePromptStyledText = if ([string]::IsNullOrWhiteSpace($mgProfilePromptText)) {
-			''
-		}
-		else {
-			"$ESC[38;2;76;220;100m$mgProfilePromptText$ESC[38;2;0;179;226m"
-		}
-		$pythonVenvPromptStyledText = if ([string]::IsNullOrWhiteSpace($pythonVenvPromptText)) {
-			''
-		}
-		else {
-			"$ESC[38;2;76;220;100m$pythonVenvPromptText$ESC[0m$ESC[38;2;0;179;226m"
-		}
-		"`n" +                                                       # New line
-		"$ESC[38;2;0;179;226m" +                                     # Set foreground color to cyan RGB(0,179,226)
-		'╭─( ' +                                                     # Box drawing characters and opening parenthesis
-		"$ESC[3m" +                                                  # Start italic mode
-		"$ESC[2m" +                                                  # Start dim/faint mode
-		"$azProfilePromptStyledText$mgProfilePromptStyledText$pythonVenvPromptStyledText$(Get-MyPromptPath)" + # Display optional context labels and shortened path
-		"$ESC[22m" +                                                 # Reset dim/faint mode
-		"$(if ($script:PoshGitLoaded) { "$(Get-GitPromptStatusText)" })" +   # Git status if in git repo
-		"$ESC[23m" +                                                 # Reset italic mode
-		"`n" +                                                       # New line
-		"$ESC[38;2;0;179;226m" +                                     # Set foreground color to cyan RGB(0,179,226)
-		'╰╴' +                                                       # Box drawing characters
-		"$ESC[0m" +                                                  # Reset all ANSI formatting
-		$(if (Test-Path variable:/PSDebugContext) { '[DBG]: ' } else { '' }) +  # Debug indicator
-		'> '                                                         # Prompt character
-	}
-	else {
-		# Windows PowerShell 5.1 - Cannot use ANSI, build prompt string
-		"`n" +                                                       # New line
-		'╭─( ' +                                                     # Box drawing characters and opening parenthesis
-		"$(Get-MyPromptPath)" +                                      # Display shortened path
-		"`n" +                                                       # New line
-		'╰╴' +                                                       # Box drawing characters
-		$(if (Test-Path variable:/PSDebugContext) { '[DBG]: ' } else { '' }) +  # Debug indicator
-		'> '                                                         # Prompt character
-	}
-}
-
-#endregion
 
 #region LOAD EXTERNAL SCRIPTS
 
 # Prefer the known OneDrive profile root and resolve the script path only when it is unavailable.
+Write-ProfileTime 'Before profile directory resolution'
 $profileDir = if (-not [string]::IsNullOrWhiteSpace($env:OneDriveConsumer)) {
 	"$env:OneDriveConsumer/Apps/Profiles/PowerShell"
 }
 else {
 	Split-Path -Parent $PSCommandPath
 }
+Write-ProfileTime 'After profile directory resolution'
 
 # Load custom functions
 if ($PSVersionTable.PSEdition -eq 'Core' -and [System.IO.File]::Exists("$profileDir/functions.ps1")) {
@@ -219,829 +135,28 @@ if ($PSVersionTable.PSEdition -eq 'Core' -and [System.IO.File]::Exists("$profile
 }
 Write-ProfileTime 'After custom functions'
 
-# Resolve profile-owned configuration paths for profile configuration loading.
-Write-ProfileTime 'Before personal configuration path resolution'
-$personalConfigPath = if ($env:MSCLOUDPROFILE_PERSONAL_CONFIG_PATH) {
-	Write-ProfileTime 'Personal path source: environment override'
-	$env:MSCLOUDPROFILE_PERSONAL_CONFIG_PATH
-}
-elseif ($env:OneDriveConsumer) {
-	Write-ProfileTime ('Before personal path composition using OneDriveConsumer (Management loaded: {0})' -f [bool](Get-Module -Name Microsoft.PowerShell.Management))
-	[System.IO.Path]::Combine([string[]]@($env:OneDriveConsumer, 'Apps', 'PowerShell', 'PersonalConfig.psd1'))
-}
-else {
-	Write-ProfileTime ('Before personal path composition using HOME fallback (Management loaded: {0})' -f [bool](Get-Module -Name Microsoft.PowerShell.Management))
-	[System.IO.Path]::Combine([string[]]@($HOME, 'OneDrive', 'Apps', 'PowerShell', 'PersonalConfig.psd1'))
-}
-Write-ProfileTime ('After personal configuration path (Management loaded: {0})' -f [bool](Get-Module -Name Microsoft.PowerShell.Management))
-
-# Load personal configuration into the global profile variable when available.
-if ([System.IO.File]::Exists($personalConfigPath)) {
-	$Personal = $Per = Import-PowerShellDataFile -Path $personalConfigPath
-}
-Write-ProfileTime 'After personal configuration import'
-
-$workConfigPath = if ($env:MSCLOUDPROFILE_WORK_CONFIG_PATH) {
-	$env:MSCLOUDPROFILE_WORK_CONFIG_PATH
-}
-elseif ($env:OneDriveCommercial) {
-	[System.IO.Path]::Combine([string[]]@($env:OneDriveCommercial, 'Code', 'PowerShell', 'Config', 'WorkConfig.psd1'))
-}
-else {
-	[System.IO.Path]::Combine([string[]]@($HOME, 'OneDrive - Quisitive', 'Code', 'PowerShell', 'Config', 'WorkConfig.psd1'))
-}
-Write-ProfileTime 'After work configuration path'
-
-# Load work configuration into the global profile variable when available.
-if ([System.IO.File]::Exists($workConfigPath)) {
-	$Work = Import-PowerShellDataFile -Path $workConfigPath
-}
-Write-ProfileTime 'After work configuration import'
-
-Write-ProfileTime 'After profile configuration'
-
-# Define immediate-use profile commands while deferring the complete MSCloudProfile module import.
-if ($PSVersionTable.PSEdition -eq 'Core') {
-	#region DEFERRED CLOUD PROFILE COMMANDS
-	# Expose profile switching and discovery commands without importing the full module at startup.
-	function Import-MSCloudProfile {
-		# Load the complete module the first time a profile-switching command is invoked.
-		if (Get-Module -Name MSCloudProfile) {
-			return
-		}
-
-		$msCloudProfileManifest = "$profileDir/Modules/MSCloudProfile/MSCloudProfile.psd1"
-		if (-not [System.IO.File]::Exists($msCloudProfileManifest)) {
-			throw "MSCloudProfile module manifest was not found: $msCloudProfileManifest"
-		}
-
-		Import-Module -Name $msCloudProfileManifest -Global -ErrorAction Stop
-		& MSCloudProfile\Set-MSCloudProfileConfiguration -PersonalPath $personalConfigPath -WorkPath $workConfigPath | Out-Null
-	}
-
-	function Use-AzProfile {
-		# Import and invoke the Azure profile-switching command on first use.
-		[CmdletBinding()]
-		param(
-			[Parameter(Mandatory, Position = 0)]
-			[string]$Name,
-
-			[Parameter()]
-			[switch]$Force,
-
-			[Parameter()]
-			[switch]$SelectAccount
-		)
-
-		Import-MSCloudProfile
-		& MSCloudProfile\Use-AzProfile @PSBoundParameters
-	}
-
-	function Get-AllAzProfiles {
-		# Import and invoke Azure profile discovery on first use.
-		[CmdletBinding()]
-		param()
-
-		Import-MSCloudProfile
-		& MSCloudProfile\Get-AllAzProfiles @PSBoundParameters
-	}
-
-	function Get-CurrentAzProfile {
-		# Import and invoke Azure current-profile inspection on first use.
-		[CmdletBinding()]
-		param()
-
-		Import-MSCloudProfile
-		& MSCloudProfile\Get-CurrentAzProfile @PSBoundParameters
-	}
-
-	function Use-MgProfile {
-		# Import and invoke the Microsoft Graph profile-switching command on first use.
-		[CmdletBinding()]
-		param(
-			[Parameter(Mandatory, Position = 0)]
-			[string]$Name,
-
-			[Parameter()]
-			[string[]]$Scopes,
-
-			[Parameter()]
-			[string]$ClientId,
-
-			[Parameter()]
-			[string]$LoginHint,
-
-			[Parameter()]
-			[switch]$NoWelcome,
-
-			[Parameter()]
-			[switch]$Force
-		)
-
-		Import-MSCloudProfile
-		& MSCloudProfile\Use-MgProfile @PSBoundParameters
-	}
-
-	function Get-AllMgProfiles {
-		# Import and invoke Microsoft Graph profile discovery on first use.
-		[CmdletBinding()]
-		param()
-
-		Import-MSCloudProfile
-		& MSCloudProfile\Get-AllMgProfiles @PSBoundParameters
-	}
-
-	function Get-CurrentMgProfile {
-		# Import and invoke Microsoft Graph current-profile inspection on first use.
-		[CmdletBinding()]
-		param()
-
-		Import-MSCloudProfile
-		& MSCloudProfile\Get-CurrentMgProfile @PSBoundParameters
-	}
-	#endregion
-
-}
+# Load profile cloud configuration into the current profile scope.
+Write-ProfileTime 'Before profile cloud configuration import'
+. "$profileFeatureDir/profile-cloud.ps1"
+Write-ProfileTime 'After profile cloud configuration import'
 #endregion
 
 
-#region PSREADLINE CONFIGURATION
+# Load profile line editing into the current profile scope.
+Write-ProfileTime 'Before profile line editing import'
+. "$profileFeatureDir/profile-readline.ps1"
+Write-ProfileTime 'After profile line editing import'
 
-# Determine whether this process will present an interactive PowerShell prompt.
-$profileStartupArguments = [Environment]::GetCommandLineArgs()
-$profileHasNoExitArgument = [bool]($profileStartupArguments -match '^(?i)-NoExit$')
-$profileHasNonInteractiveArgument = [bool]($profileStartupArguments -match '^(?i)-NonInteractive$')
-$profileHasCommandArgument = [bool]($profileStartupArguments -match '^(?i)-(?:Command|CommandWithArgs|EncodedCommand|File)$')
-$profileShouldConfigurePSReadLine = $Host.Name -eq 'ConsoleHost' -and
-    -not [Console]::IsInputRedirected -and
-    -not $profileHasNonInteractiveArgument -and
-    (-not $profileHasCommandArgument -or $profileHasNoExitArgument)
 
-# Configure line editing only when this process will present an interactive prompt.
-if ($profileShouldConfigurePSReadLine) {
+# Load profile prompt support into the current profile scope.
+Write-ProfileTime 'Before profile prompt support import'
+. "$profileFeatureDir/profile-prompt-support.ps1"
+Write-ProfileTime 'After profile prompt support import'
 
-	# Import PSReadLine module
-	Write-ProfileTime 'Before PSReadLine import'
-	if (-not (Get-Module PSReadline)) { Import-Module PSReadLine }
-	Write-ProfileTime 'After PSReadLine import'
 
-	# Basic PSReadLine options
-	Set-PSReadLineOption -EditMode Vi
-	Write-ProfileTime 'After Vi edit mode'
-	Set-PSReadLineOption -ContinuationPrompt ''
+# Load profile Herdr integration into the current profile scope.
+Write-ProfileTime 'Before profile Herdr integration import'
+. "$profileFeatureDir/profile-herdr.ps1"
+Write-ProfileTime 'After profile Herdr integration import'
 
-	# Avoids question marks when prompt spans multiple lines
-	Set-PSReadLineOption -ExtraPromptLineCount 1
-
-	# PredictionViewStyle requires PSReadLine 2.1.0+ (PowerShell Core)
-	if ($PSVersionTable.PSEdition -eq 'Core') {
-		Set-PSReadLineOption -PredictionViewStyle ListView -ErrorAction SilentlyContinue
-	}
-
-	# Configure prediction source (edition-specific)
-	if ($PSVersionTable.PSEdition -eq 'Core') {
-		Set-PSReadLineOption -PredictionSource HistoryAndPlugin -ErrorAction SilentlyContinue
-	}
-	Write-ProfileTime 'After PSReadLine options'
-
-	# Tab completion key handlers
-	$tabKeyHandler = {
-		param($key, $arg)
-
-		# Insert spaces if only whitespace precedes cursor on current line, otherwise complete
-		$line = $null
-		$cursor = $null
-		[Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
-
-		# Find the start of the current line (last newline before cursor, or beginning)
-		$lastNewline = $line.LastIndexOf("`n", $cursor - 1)
-		$lineStart = if ($lastNewline -ge 0) { $lastNewline + 1 } else { 0 }
-		$textBeforeCursor = $line.Substring($lineStart, $cursor - $lineStart)
-
-		if ($textBeforeCursor -notmatch '\S') {
-			[Microsoft.PowerShell.PSConsoleReadLine]::Insert('    ')
-		}
-		else {
-			[Microsoft.PowerShell.PSConsoleReadLine]::MenuComplete()
-		}
-	}
-	Set-PSReadLineKeyHandler -ViMode Insert  -Key Tab -ScriptBlock $tabKeyHandler
-	Set-PSReadLineKeyHandler -ViMode Command -Key Tab -Function MenuComplete
-	Set-PSReadLineKeyHandler -ViMode Insert  -Chord Shift+Tab -Function TabCompletePrevious
-	Set-PSReadLineKeyHandler -ViMode Command -Chord Shift+Tab -Function TabCompletePrevious
-
-	Set-PSReadLineKeyHandler -Chord Ctrl+V -Function Paste
-
-	# Use the arrow keys to choose a completion and Enter to accept it.
-	Set-PSReadLineKeyHandler -Key Enter -Function AcceptLine
-
-	# Prediction navigation (PowerShell Core with newer PSReadLine)
-	Set-PSReadLineKeyHandler -Key RightArrow -Function ForwardWord
-	if ($PSVersionTable.PSEdition -eq 'Core') {
-		Set-PSReadLineKeyHandler -Key Ctrl+RightArrow -Function AcceptSuggestion -ErrorAction SilentlyContinue
-	}
-
-	# Vi mode configuration
-	if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
-		Set-PSReadLineOption -ViModeIndicator 'Cursor'
-		$env:EDITOR = 'nvim'
-
-		# Vi mode key handlers for both Command and Insert modes
-		foreach ($mode in 'Command', 'Insert') {
-			Set-PSReadLineKeyHandler -Chord Ctrl+p -Function PreviousHistory -ViMode $mode
-			Set-PSReadLineKeyHandler -Chord Ctrl+n -Function NextHistory -ViMode $mode
-			Set-PSReadLineKeyHandler -Chord Alt+b -Function BackwardWord -ViMode $mode
-			Set-PSReadLineKeyHandler -Chord Alt+f -Function ForwardWord -ViMode $mode
-			Set-PSReadLineKeyHandler -Chord Ctrl+e -Function EndOfLine -ViMode $mode
-			Set-PSReadLineKeyHandler -Chord Ctrl+a -Function BeginningOfLine -ViMode $mode
-			Set-PSReadLineKeyHandler -Chord Ctrl+k -Function KillLine -ViMode $mode
-			Set-PSReadLineKeyHandler -Chord Ctrl+u -Function BackwardKillInput -ViMode $mode
-			Set-PSReadLineKeyHandler -Chord Ctrl+w -Function BackwardKillWord -ViMode $mode
-			Set-PSReadLineKeyHandler -Chord Shift+Enter -Function AddLine -ViMode $mode
-		}
-
-		# Custom cursor styles (PowerShell Core only - uses VT100 escape sequences)
-		if ($PSVersionTable.PSEdition -eq 'Core') {
-			function OnViModeChange {
-				if ($args[0] -eq 'Command') {
-					# Set the cursor to a blinking block
-					Write-Host -NoNewline "`e[1 q"
-				}
-				else {
-					# Set the cursor to a blinking line
-					Write-Host -NoNewline "`e[5 q"
-				}
-			}
-			Set-PSReadLineOption -ViModeIndicator Script -ViModeChangeHandler $Function:OnViModeChange
-
-			# Set initial cursor to blinking line for Insert mode
-			Write-Host -NoNewline "`e[5 q"
-		}
-
-	}
-	Write-ProfileTime 'After PSReadLine key handlers'
-
-	# Load PSFzf after Vi mode and custom key handlers are configured.
-	Write-ProfileTime 'Before PSFzf import'
-	Import-Module PSFzf
-	Write-ProfileTime 'After PSFzf import'
-	Set-PsFzfOption `
-		-PSReadlineChordProvider 'Ctrl+t' `
-		-PSReadlineChordReverseHistory 'Ctrl+r'
-	Write-ProfileTime 'After PSFzf configuration'
-}
-else {
-    # Avoid loading interactive editing modules for command-only PowerShell processes.
-    Write-ProfileTime 'Skipped PSReadLine and PSFzf for non-interactive session'
-}
-#endregion
-
-#region PROMPT AND GIT SUPPORT FUNCTIONS
-
-Write-ProfileTime 'Before prompt and Git support functions'
-
-function Get-AzProfilePromptText {
-	# Resolve the active named Azure CLI profile without invoking Azure commands.
-	$configDir = $env:AZURE_CONFIG_DIR
-	if ([string]::IsNullOrWhiteSpace($configDir)) {
-		return ''
-	}
-
-	try {
-		# Accept native or alternate directory separators and ignore a trailing separator.
-		$trimCharacters = [char[]]@('\', '/')
-		$trimmedConfigDir = $configDir.TrimEnd($trimCharacters)
-		$profileName = [System.IO.Path]::GetFileName($trimmedConfigDir)
-		$profileDirectory = [System.IO.Path]::GetDirectoryName($trimmedConfigDir)
-		$expectedProfileDirectory = [System.IO.Path]::Combine([string[]]@($HOME, '.azure', 'profiles'))
-
-		# Display only directories created for named profiles under ~/.azure/profiles.
-		if (
-			[string]::IsNullOrWhiteSpace($profileName) -or
-			[string]::IsNullOrWhiteSpace($profileDirectory) -or
-			[System.IO.Path]::GetFullPath($profileDirectory).TrimEnd($trimCharacters) -ine
-			[System.IO.Path]::GetFullPath($expectedProfileDirectory).TrimEnd($trimCharacters)
-		) {
-			return ''
-		}
-
-		# Read the Azure CLI's active subscription from the named profile's local state.
-		$subscriptionSuffix = ''
-		$azureProfilePath = [System.IO.Path]::Combine([string[]]@($trimmedConfigDir, 'azureProfile.json'))
-		if ([System.IO.File]::Exists($azureProfilePath)) {
-			try {
-				$azureProfile = [System.IO.File]::ReadAllText($azureProfilePath) | ConvertFrom-Json
-				$currentSubscription = @($azureProfile.subscriptions | Where-Object { $_.isDefault })[0]
-				if ($currentSubscription -and -not [string]::IsNullOrWhiteSpace($currentSubscription.name)) {
-					$subscriptionSuffix = " - $($currentSubscription.name)"
-				}
-			}
-			catch {
-				# Keep unavailable local Azure CLI state from interrupting prompt rendering.
-			}
-		}
-
-		return "[az:$profileName$subscriptionSuffix] "
-	}
-	catch {
-		# Keep invalid profile paths from interrupting prompt rendering.
-		return ''
-	}
-}
-
-function Get-MgProfilePromptText {
-	# Resolve the active named Microsoft Graph profile from process-local session state.
-	try {
-		$stateVariable = Get-Variable -Name MSCloudMgProfileName -Scope Global -ErrorAction SilentlyContinue
-		if (-not $stateVariable) {
-			return ''
-		}
-
-		$profileName = [string]$stateVariable.Value
-		if (
-			[string]::IsNullOrWhiteSpace($profileName) -or
-			$profileName -ieq '(default)' -or
-			$profileName -ieq 'default'
-		) {
-			return ''
-		}
-
-		return "[mg:$profileName] "
-	}
-	catch {
-		# Keep unavailable session state from interrupting prompt rendering.
-		return ''
-	}
-}
-
-function Get-PythonVenvPromptText {
-	# Resolve active Python venv label exactly as set by Activate.ps1 when present.
-	$venvPrompt = $null
-	$promptLabels = @()
-
-	if (Get-Variable -Name '_PYTHON_VENV_PROMPT_PREFIX' -Scope Global -ErrorAction SilentlyContinue) {
-		$venvPrompt = (Get-Variable -Name '_PYTHON_VENV_PROMPT_PREFIX' -Scope Global -ValueOnly)
-	}
-	elseif (-not [string]::IsNullOrWhiteSpace($env:VIRTUAL_ENV_PROMPT)) {
-		$venvPrompt = $env:VIRTUAL_ENV_PROMPT
-	}
-	elseif (-not [string]::IsNullOrWhiteSpace($env:VIRTUAL_ENV)) {
-		$venvPrompt = Split-Path -Path $env:VIRTUAL_ENV -Leaf
-	}
-
-	if ([string]::IsNullOrWhiteSpace($venvPrompt)) {
-		$venvPrompt = $null
-	}
-
-	if (-not [string]::IsNullOrWhiteSpace($venvPrompt)) {
-		$promptLabels += "($venvPrompt)"
-	}
-
-	$condaPrompt = $null
-	if (-not [string]::IsNullOrWhiteSpace($env:CONDA_PROMPT_MODIFIER)) {
-		$condaPrompt = $env:CONDA_PROMPT_MODIFIER.Trim()
-	}
-	elseif (-not [string]::IsNullOrWhiteSpace($env:CONDA_DEFAULT_ENV)) {
-		$condaPrompt = "($($env:CONDA_DEFAULT_ENV))"
-	}
-
-	if (-not [string]::IsNullOrWhiteSpace($condaPrompt)) {
-		$promptLabels += $condaPrompt
-	}
-
-	if ($promptLabels.Count -eq 0) {
-		return ''
-	}
-
-	($promptLabels -join ' ') + ' '
-}
-
-function Test-GitDirectory {
-	# Check the current directory without scanning the working tree.
-	if (-not $script:GitCommandChecked) {
-		$script:GitCommand = Get-Command -Name git.exe -CommandType Application -ErrorAction SilentlyContinue
-		$script:GitCommandChecked = $true
-	}
-
-	if (-not $script:GitCommand) {
-		return $false
-	}
-
-	try {
-		$insideWorkTree = & $script:GitCommand.Path rev-parse --is-inside-work-tree 2>$null
-		return $LASTEXITCODE -eq 0 -and $insideWorkTree -contains 'true'
-	}
-	catch {
-		# Ignore errors from Git when the location is not a file-system repository.
-		return $false
-	}
-}
-
-function Initialize-AICommitEnvironment {
-	# Load the commit-hook key once when entering a Git worktree and clear it on exit.
-	$locationPath = (Get-Location).Path
-	if ($script:AICommitProbePath -eq $locationPath) {
-		return
-	}
-
-	$script:AICommitProbePath = $locationPath
-	$insideGitWorktree = Test-GitDirectory
-	if (-not $insideGitWorktree) {
-		Remove-Item Env:AI_COMMIT_BASE_URL -ErrorAction SilentlyContinue
-		Remove-Item Env:AI_COMMIT_MODEL -ErrorAction SilentlyContinue
-		Remove-Item Env:AI_COMMIT_API_KEY -ErrorAction SilentlyContinue
-		return
-	}
-
-	$env:AI_COMMIT_BASE_URL = 'https://openrouter.ai/api/v1'
-	$env:AI_COMMIT_MODEL = 'google/gemini-2.5-flash'
-
-	if (-not $script:AICommitKeyLoadAttempted) {
-		$script:AICommitKeyLoadAttempted = $true
-		try {
-			$script:AICommitApiKey = Get-Secret -Name AI_COMMIT_API_KEY -AsPlainText -ErrorAction Stop
-		}
-		catch {
-			$script:AICommitApiKey = $null
-		}
-	}
-
-	if ([string]::IsNullOrWhiteSpace($script:AICommitApiKey)) {
-		Remove-Item Env:AI_COMMIT_API_KEY -ErrorAction SilentlyContinue
-		Write-Warning 'Git commit message key unavailable; unlock SecretStore or verify AI_COMMIT_API_KEY.'
-		return
-	}
-
-	$env:AI_COMMIT_API_KEY = $script:AICommitApiKey
-}
-
-function Initialize-PromptPoshGit {
-	# Load Posh-Git only after entering a repository that has not been checked.
-	if ($script:PoshGitLoaded -or $PSVersionTable.PSEdition -ne 'Core') {
-		return
-	}
-
-	$locationPath = (Get-Location).Path
-	if ($script:GitProbePath -eq $locationPath) {
-		return
-	}
-
-	$script:GitProbePath = $locationPath
-	if (Test-GitDirectory) {
-		$script:PoshGitLoaded = Initialize-PoshGit
-	}
-}
-
-function Get-GitPromptStatusText {
-	# Get prompt status and include upstream tracking branch when available.
-	if (-not $script:PoshGitLoaded) {
-		return ''
-	}
-
-	# Create prompt metadata only when a loaded Posh-Git prompt needs it.
-	if ($null -eq $script:GitPromptMetaCache) {
-		$script:GitPromptMetaCache = @{}
-	}
-
-	$cacheKey = "$(Get-Location)"
-	$cacheNow = [datetime]::UtcNow
-	$cacheTtlSeconds = 5
-	$cache = if ($script:GitPromptMetaCache.ContainsKey($cacheKey)) { $script:GitPromptMetaCache[$cacheKey] } else { $null }
-
-	$gitStatusText = & $GitPromptScriptBlock
-	if ([string]::IsNullOrWhiteSpace($gitStatusText)) {
-		return $gitStatusText
-	}
-
-	$branchMatch = [regex]::Match($gitStatusText, '^\s*(?:\x1b\[[0-9;]*m)*\[(?<branch>[^\s\]]+)')
-	if (-not $branchMatch.Success) {
-		return $gitStatusText
-	}
-	$branchName = $branchMatch.Groups['branch'].Value
-
-	if (-not $cache) {
-		$cache = @{}
-	}
-	if (-not $cache.ContainsKey('RemoteCheckedAt')) {
-		$cache.RemoteCheckedAt = [datetime]::MinValue
-	}
-	if (-not $cache.ContainsKey('RemoteCount')) {
-		$cache.RemoteCount = $null
-	}
-	if (-not $cache.ContainsKey('UpstreamByBranch') -or $null -eq $cache.UpstreamByBranch) {
-		$cache.UpstreamByBranch = @{}
-	}
-	if (-not $cache.ContainsKey('UpstreamCheckedAtByBranch') -or $null -eq $cache.UpstreamCheckedAtByBranch) {
-		$cache.UpstreamCheckedAtByBranch = @{}
-	}
-
-	$remoteCount = $null
-	if ($cache.RemoteCount -ne $null -and (($cacheNow - $cache.RemoteCheckedAt).TotalSeconds -lt $cacheTtlSeconds)) {
-		$remoteCount = [int]$cache.RemoteCount
-	}
-	else {
-		$remoteNames = @()
-		try {
-			$remoteNames = @(git remote 2>$null)
-		}
-		catch {
-			$remoteNames = @()
-		}
-
-		$remoteCount = @($remoteNames | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }).Count
-	}
-
-	$cache.RemoteCheckedAt = $cacheNow
-	$cache.RemoteCount = $remoteCount
-	$script:GitPromptMetaCache[$cacheKey] = $cache
-
-	if ($remoteCount -le 1) {
-		return $gitStatusText
-	}
-
-	$upstream = if ($cache.UpstreamByBranch.ContainsKey($branchName)) { $cache.UpstreamByBranch[$branchName] } else { $null }
-	$upstreamCheckedAt = if ($cache.UpstreamCheckedAtByBranch.ContainsKey($branchName)) { $cache.UpstreamCheckedAtByBranch[$branchName] } else { [datetime]::MinValue }
-	if ([string]::IsNullOrWhiteSpace($upstream) -or (($cacheNow - $upstreamCheckedAt).TotalSeconds -ge $cacheTtlSeconds)) {
-		try {
-			$upstream = git rev-parse --abbrev-ref --symbolic-full-name '@{u}' 2>$null
-		}
-		catch {
-			$upstream = $null
-		}
-
-		$cache.UpstreamByBranch[$branchName] = $upstream
-		$cache.UpstreamCheckedAtByBranch[$branchName] = $cacheNow
-		$script:GitPromptMetaCache[$cacheKey] = $cache
-	}
-
-	if ([string]::IsNullOrWhiteSpace($upstream)) {
-		return $gitStatusText
-	}
-
-	$statusPrefix = $gitStatusText.Substring(0, $branchMatch.Index)
-	$statusSuffix = $gitStatusText.Substring($branchMatch.Index + $branchMatch.Length)
-	"$statusPrefix [$($branchMatch.Groups['branch'].Value) -> $upstream$statusSuffix"
-}
-
-function Get-MyPromptPath {
-	<#
-    .SYNOPSIS
-        Get shortened path for prompt display
-
-    .DESCRIPTION
-        Returns a shortened version of the current path for display in the prompt.
-        Paths under the user profile are displayed with ~ prefix.
-        Long paths are shortened by keeping the first 3 folders and last 2 folders.
-        Works on both Windows and Linux systems.
-
-    .NOTES
-        Debug mode: Set $DebugPrompt = $true at the start of the function to see detailed path processing
-    #>
-
-	$DebugPrompt = $false
-
-	# Detect OS and set path separator
-	$onWindows = if ($PSVersionTable.PSEdition -eq 'Core') {
-		(Get-Variable -Name 'IsWindows' -ValueOnly -ErrorAction SilentlyContinue) -ne $false
-	}
-	else {
-		$true  # Windows PowerShell 5.1 is always Windows
-	}
-	$pathSep = if ($onWindows) { '\' } else { '/' }
-	$pathSepRegex = if ($onWindows) { '\\' } else { '/' }
-
-	# Get shortened path for prompt display
-	$location = "$(Get-Location)"
-
-	if ($DebugPrompt) {
-		Write-Host "[DEBUG] location: $location" -ForegroundColor Magenta
-		Write-Host "[DEBUG] onWindows: $onWindows" -ForegroundColor Magenta
-		Write-Host "[DEBUG] pathSep: $pathSep" -ForegroundColor Magenta
-	}
-
-	# Remove trailing slash except for root paths (e.g., 'C:\' or '/')
-	$isRootPath = if ($onWindows) {
-		$location.EndsWith(':\')
-	}
-	else {
-		$location -eq '/'
-	}
-
-	if ($location.EndsWith($pathSep) -and -not $isRootPath) {
-		$location = $location.TrimEnd($pathSep)
-		if ($DebugPrompt) {
-			Write-Host "[DEBUG] location (trimmed): $location" -ForegroundColor Magenta
-		}
-	}
-
-	# Get user profile path (cross-platform)
-	$userProfilePath = if ($onWindows) { $env:USERPROFILE } else { $env:HOME }
-
-	if ($DebugPrompt) {
-		Write-Host "[DEBUG] userProfilePath: $userProfilePath" -ForegroundColor Magenta
-		Write-Host "[DEBUG] location.Contains(userProfilePath): $($location.Contains($userProfilePath))" -ForegroundColor Magenta
-	}
-
-	if ($location.Contains($userProfilePath)) {
-		if ($location.Equals($userProfilePath)) {
-			$promptPath = '~'
-			if ($DebugPrompt) {
-				Write-Host "[DEBUG] At home directory, promptPath: $promptPath" -ForegroundColor Magenta
-			}
-		}
-		else {
-			# Extract the relative path from user profile
-			# The -split operator uses regex, so escape the path separator for regex
-			$escapedProfilePath = $userProfilePath -replace ([regex]::Escape($pathSep)), ([regex]::Escape($pathSep))
-			$relativelocation = ($location -split $escapedProfilePath)[1]
-
-			if ($DebugPrompt) {
-				Write-Host "[DEBUG] relativelocation: $relativelocation" -ForegroundColor Magenta
-				Write-Host "[DEBUG] relativelocation.Length: $($relativelocation.Length)" -ForegroundColor Magenta
-			}
-
-			if ($relativelocation.Length -le 50) {
-				$promptPath = '~' + $relativelocation
-				if ($DebugPrompt) {
-					Write-Host "[DEBUG] Short path, promptPath: $promptPath" -ForegroundColor Magenta
-				}
-			}
-			else {
-				# Path is long, so shorten it by keeping first 3 folders and last 2 folders
-				$matches = [regex]::matches($relativelocation, $pathSepRegex)
-
-				if ($DebugPrompt) {
-					Write-Host "[DEBUG] Long path detected, matches.count: $($matches.count)" -ForegroundColor Magenta
-				}
-
-				switch ($matches.count) {
-					# Display full relative path if 4 or fewer folders
-					{ $_ -ge 1 -and $_ -le 4 } {
-						$promptPath = '~' + $relativelocation
-						if ($DebugPrompt) {
-							Write-Host "[DEBUG] 4 or fewer folders, promptPath: $promptPath" -ForegroundColor Magenta
-						}
-						break
-					}
-					# Path is long, so add '...' in the middle
-					default {
-						$leftPath   = $relativelocation.Substring(0, $matches[2].index)
-						$rightPath  = $relativelocation.Substring($matches[$matches.count - 2].index)
-						$promptPath = '~' + $leftPath + $pathSep + '...' + $rightPath
-						if ($DebugPrompt) {
-							Write-Host '[DEBUG] Shortened path:' -ForegroundColor Magenta
-							Write-Host "[DEBUG]   leftPath: $leftPath" -ForegroundColor Magenta
-							Write-Host "[DEBUG]   rightPath: $rightPath" -ForegroundColor Magenta
-							Write-Host "[DEBUG]   promptPath: $promptPath" -ForegroundColor Magenta
-						}
-					}
-				}
-			}
-		}
-	}
-	else {
-		# Build prompt path for locations outside of user profile (e.g., 'C:\Windows\System32' or '/etc/nginx')
-		if ($DebugPrompt) {
-			Write-Host '[DEBUG] Outside user profile' -ForegroundColor Magenta
-		}
-
-		$matches = [regex]::matches($location, $pathSepRegex)
-
-		if ($DebugPrompt) {
-			Write-Host "[DEBUG] matches.count: $($matches.count)" -ForegroundColor Magenta
-		}
-
-		switch ($matches.count) {
-			{ $_ -ge 1 -and $_ -le 4 } {
-				$promptPath = $location
-				if ($DebugPrompt) {
-					Write-Host "[DEBUG] Short outside path, promptPath: $promptPath" -ForegroundColor Magenta
-				}
-				break
-			}
-			default {
-				$leftPath   = $location.Substring(0, $matches[2].index)
-				$rightPath  = $location.Substring($matches[$_ - 2].index)
-				$promptPath = $leftPath + $pathSep + '...' + $rightPath
-				if ($DebugPrompt) {
-					Write-Host '[DEBUG] Long outside path:' -ForegroundColor Magenta
-					Write-Host "[DEBUG]   leftPath: $leftPath" -ForegroundColor Magenta
-					Write-Host "[DEBUG]   rightPath: $rightPath" -ForegroundColor Magenta
-					Write-Host "[DEBUG]   promptPath: $promptPath" -ForegroundColor Magenta
-				}
-			}
-		}
-	}
-
-	if ($DebugPrompt) {
-		Write-Host "[DEBUG] Final promptPath: $promptPath" -ForegroundColor Magenta
-	}
-
-	$promptPath
-}
-
-function Initialize-PoshGit {
-	# Initialize Posh-Git module and settings
-	# Called only after the prompt has confirmed the current directory is a Git repository.
-
-	if ($PSVersionTable.PSEdition -ne 'Core') {
-		return $false
-	}
-
-	try {
-		Import-Module Posh-Git -ErrorAction Stop
-
-		# Configure Posh-Git settings
-		$GitPromptSettings.DefaultPromptPath            = ''
-		$GitPromptSettings.DefaultPromptSuffix          = ''
-		$GitPromptSettings.DefaultPromptDebug           = ''
-		$GitPromptSettings.EnableStashStatus            = $true
-		$GitPromptSettings.BeforeStatus.ForegroundColor = 0x00B3E2      # Cyan RGB(0, 179, 226)
-		$GitPromptSettings.AfterStatus.ForegroundColor  = 0x00B3E2
-		$GitPromptSettings.WorkingColor.ForegroundColor = 0x8A0ACC      # Purple RGB(138, 10, 204)
-		$StashColor                                     = 0xAFB178      # Sage RGB(175, 177, 120)
-		$GitPromptSettings.StashColor.ForegroundColor   = $StashColor
-		$GitPromptSettings.BeforeStash.ForegroundColor  = $StashColor
-		$GitPromptSettings.AfterStash.ForegroundColor   = $StashColor
-
-		return $true
-	}
-	catch {
-		# Posh-Git not available, continue without it
-		return $false
-	}
-}
-
-#endregion
-Write-ProfileTime 'After prompt and Git support functions'
-
-#region HERDR CLIENT INTEGRATION
-# Load the client integration only when the current PowerShell edition supports it.
-Write-ProfileTime 'Before Herdr integration'
-if ($script:HerdrIntegrationEnabled -and $PSVersionTable.PSEdition -eq 'Core' -and $IsWindows) {
-	$herdrModulePath = [System.IO.Path]::Combine([string[]]@($profileDir, 'HerdrClient.psm1'))
-
-	# Leave the existing profile available if the helper is not installed.
-	if ([IO.File]::Exists($herdrModulePath)) {
-		try {
-			Write-ProfileTime 'Before Herdr module import'
-			Import-Module $herdrModulePath -ErrorAction Stop
-			Write-ProfileTime 'After Herdr module import'
-
-			# Identify interactive shells and recognized Herdr pane startup.
-			$herdrArgs = [Environment]::GetCommandLineArgs()
-			$herdrInteractive = [Environment]::UserInteractive -and $Host.Name -eq 'ConsoleHost' -and
-				-not [Console]::IsInputRedirected -and -not (Test-HerdrNonInteractiveArgument -Arguments $herdrArgs)
-			$herdrCommand = Test-HerdrCommandArgument -Arguments $herdrArgs
-			$herdrNoExit = [bool]($herdrArgs -match '^(?i)-noexit$')
-			$herdrManagedStartup = $herdrNoExit -and [bool]($herdrArgs -match '(?i)^\s*if\s*\(\s*\$null\s+-eq\s+\$global:__HerdrOriginalPrompt\s*\)')
-
-			# Initialize trusted projects inside managed interactive panes.
-			if ($herdrInteractive -and $env:HERDR_ENV -eq '1' -and
-				(-not $herdrCommand -or $herdrManagedStartup) -and -not $global:HerdrProjectProfileLoaded) {
-				# Load the approved project script in this shell's persistent scope.
-				$global:HerdrProjectProfileLoaded = $true
-				$herdrProjectScript = Get-HerdrTrustedProjectProfile
-				if ($herdrProjectScript) {
-					. $herdrProjectScript
-				}
-			}
-
-			# Attach eligible outer consoles after their startup commands complete.
-			elseif ($env:WT_SESSION -and $env:TERM_PROGRAM -ne 'vscode' -and (Test-HerdrAutostartEligibility)) {
-				if ($env:TERM_PROGRAM -eq 'vscode' -and $env:VSCODE_INJECTION -eq '1' -and $herdrCommand) {
-					# Wait until VS Code's injected shell integration has finished.
-					$global:HerdrOriginalPrompt = $function:prompt
-					$global:HerdrAttachPending = $true
-
-					# Preserve the prompt while deferring attachment until its first invocation.
-					function global:prompt {
-						# Attach once and then preserve the original prompt.
-						if ($global:HerdrAttachPending) {
-							$global:HerdrAttachPending = $false
-							if (Test-HerdrAutostartEligibility) {
-								Start-HerdrClient
-							}
-						}
-
-						# Render the original prompt after the one-time attachment.
-						& $global:HerdrOriginalPrompt
-					}
-				}
-
-				# Attach directly when no injected startup command needs to finish.
-				else {
-					Start-HerdrClient
-				}
-			}
-		}
-
-		# Keep the PowerShell prompt usable if integration initialization fails.
-		catch {
-			Write-Warning "Herdr profile: $($_.Exception.Message)"
-		}
-	}
-}
-#endregion
-Write-ProfileTime 'After Herdr integration'
 Write-ProfileTime 'Profile end'
