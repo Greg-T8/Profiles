@@ -45,6 +45,26 @@ vim.keymap.set("n", "<leader>e", "<Cmd>Neotree toggle<CR>", { desc = "Toggle fil
 vim.keymap.set("n", "<leader>pv", "<Cmd>Neotree filesystem reveal toggle<CR>", { desc = "Project explorer", noremap = true, silent = true })
 
 -- ==============================================================================
+-- FUZZY SEARCH (TELESCOPE)
+-- ==============================================================================
+-- Search files, text, open buffers, and Neovim help in the current workspace.
+vim.keymap.set("n", "<C-p>", function()
+    require("telescope.builtin").find_files()
+end, { desc = "Telescope find files" })
+vim.keymap.set("n", "<leader>ff", function()
+    require("telescope.builtin").find_files()
+end, { desc = "Telescope find files" })
+vim.keymap.set("n", "<leader>fg", function()
+    require("telescope.builtin").live_grep()
+end, { desc = "Telescope live grep" })
+vim.keymap.set("n", "<leader>fb", function()
+    require("telescope.builtin").buffers()
+end, { desc = "Telescope buffers" })
+vim.keymap.set("n", "<leader>fh", function()
+    require("telescope.builtin").help_tags()
+end, { desc = "Telescope help tags" })
+
+-- ==============================================================================
 -- TERMINAL MODE NAVIGATION
 -- ==============================================================================
 -- Navigate to windows from terminal mode using Ctrl+hjkl

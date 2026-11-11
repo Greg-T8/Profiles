@@ -2,8 +2,9 @@
 # Description   : Configure the interactive PowerShell environment and prompt.
 # Context       : Personal cross-host profile ($Profile.CurrentUserAllHosts).
 # Author        : Greg Tate, with help from a coding agent
-# Last Modified : 2026-11-10
+# Last Modified : 2026-11-11
 # Revision History:
+#   2026-11-11 - Limit automatic Herdr startup to Windows Terminal.
 #   2026-11-10 - Show Tab completions in a selectable menu.
 #   2026-11-09 - Preserve AllScope when setting the Neovim alias.
 #   2026-11-08 - Clarify profile sections and navigation for readability.
@@ -31,8 +32,8 @@ function script:Write-ProfileTime {
 }
 Write-ProfileTime 'Profile start'
 
-# Enable or disable Herdr startup and managed-pane integration.
-$script:HerdrIntegrationEnabled = $false
+# Enable Herdr startup and managed-pane integration for Windows Terminal sessions.
+$script:HerdrIntegrationEnabled = $true
 
 # Keep Python venv activation from replacing the custom prompt function.
 $env:VIRTUAL_ENV_DISABLE_PROMPT = '1'
@@ -957,7 +958,7 @@ if ($script:HerdrIntegrationEnabled -and $PSVersionTable.PSEdition -eq 'Core' -a
 			}
 
 			# Attach eligible outer consoles after their startup commands complete.
-			elseif (Test-HerdrAutostartEligibility) {
+			elseif ($env:WT_SESSION -and $env:TERM_PROGRAM -ne 'vscode' -and (Test-HerdrAutostartEligibility)) {
 				if ($env:TERM_PROGRAM -eq 'vscode' -and $env:VSCODE_INJECTION -eq '1' -and $herdrCommand) {
 					# Wait until VS Code's injected shell integration has finished.
 					$global:HerdrOriginalPrompt = $function:prompt
