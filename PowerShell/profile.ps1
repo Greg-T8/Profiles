@@ -4,6 +4,12 @@
 # Author        : Greg Tate, with help from a coding agent
 # Last Modified : 2026-11-11
 # Revision History:
+#   2026-11-11 - Skip PSReadLine and PSFzf setup for non-interactive commands.
+#   2026-11-11 - Replace Join-Path calls with System.IO.Path.Combine.
+#   2026-11-11 - Show Management module state around personal path resolution.
+#   2026-11-11 - Add timing checkpoints for personal path selection and Join-Path.
+#   2026-11-11 - Add a checkpoint before personal configuration path resolution.
+#   2026-11-11 - Add detailed startup timing checkpoints.
 #   2026-11-11 - Add PSFzf provider and reverse-history shortcuts.
 #   2026-11-11 - Limit automatic Herdr startup to Windows Terminal.
 #   2026-11-10 - Show Tab completions in a selectable menu.
@@ -34,16 +40,19 @@ function script:Write-ProfileTime {
 Write-ProfileTime 'Profile start'
 
 # Enable Herdr startup and managed-pane integration for Windows Terminal sessions.
-$script:HerdrIntegrationEnabled = $true
+$script:HerdrIntegrationEnabled = $false
+Write-ProfileTime 'After Herdr integration setting'
 
 # Keep Python venv activation from replacing the custom prompt function.
 $env:VIRTUAL_ENV_DISABLE_PROMPT = '1'
+Write-ProfileTime 'After environment variables'
 
 # Set PSStyle formatting colors (PowerShell Core only)
 if ($PSVersionTable.PSEdition -eq 'Core') {
 	$PSStyle.Formatting.Verbose = $PSStyle.Foreground.Cyan
 	$PSStyle.Formatting.Warning = $PSStyle.Foreground.Yellow
 }
+Write-ProfileTime 'After PSStyle configuration'
 
 # Force UTF-8 encoding to avoid question marks in the prompt when using non-ASCII characters (e.g., box-drawing characters)
 # See open bug: https://github.com/PowerShell/PSReadLine/issues/2866
@@ -200,6 +209,7 @@ else {
 # Load custom functions
 if ($PSVersionTable.PSEdition -eq 'Core' -and [System.IO.File]::Exists("$profileDir/functions.ps1")) {
 	try {
+		Write-ProfileTime 'Before functions.ps1 import'
 		. "$profileDir/functions.ps1"
 	}
 	catch {
@@ -210,35 +220,43 @@ if ($PSVersionTable.PSEdition -eq 'Core' -and [System.IO.File]::Exists("$profile
 Write-ProfileTime 'After custom functions'
 
 # Resolve profile-owned configuration paths for profile configuration loading.
+Write-ProfileTime 'Before personal configuration path resolution'
 $personalConfigPath = if ($env:MSCLOUDPROFILE_PERSONAL_CONFIG_PATH) {
+	Write-ProfileTime 'Personal path source: environment override'
 	$env:MSCLOUDPROFILE_PERSONAL_CONFIG_PATH
 }
 elseif ($env:OneDriveConsumer) {
-	Join-Path $env:OneDriveConsumer 'Apps\PowerShell\PersonalConfig.psd1'
+	Write-ProfileTime ('Before personal path composition using OneDriveConsumer (Management loaded: {0})' -f [bool](Get-Module -Name Microsoft.PowerShell.Management))
+	[System.IO.Path]::Combine([string[]]@($env:OneDriveConsumer, 'Apps', 'PowerShell', 'PersonalConfig.psd1'))
 }
 else {
-	Join-Path $HOME 'OneDrive\Apps\PowerShell\PersonalConfig.psd1'
+	Write-ProfileTime ('Before personal path composition using HOME fallback (Management loaded: {0})' -f [bool](Get-Module -Name Microsoft.PowerShell.Management))
+	[System.IO.Path]::Combine([string[]]@($HOME, 'OneDrive', 'Apps', 'PowerShell', 'PersonalConfig.psd1'))
 }
+Write-ProfileTime ('After personal configuration path (Management loaded: {0})' -f [bool](Get-Module -Name Microsoft.PowerShell.Management))
 
 # Load personal configuration into the global profile variable when available.
 if ([System.IO.File]::Exists($personalConfigPath)) {
 	$Personal = $Per = Import-PowerShellDataFile -Path $personalConfigPath
 }
+Write-ProfileTime 'After personal configuration import'
 
 $workConfigPath = if ($env:MSCLOUDPROFILE_WORK_CONFIG_PATH) {
 	$env:MSCLOUDPROFILE_WORK_CONFIG_PATH
 }
 elseif ($env:OneDriveCommercial) {
-	Join-Path $env:OneDriveCommercial 'Code\PowerShell\Config\WorkConfig.psd1'
+	[System.IO.Path]::Combine([string[]]@($env:OneDriveCommercial, 'Code', 'PowerShell', 'Config', 'WorkConfig.psd1'))
 }
 else {
-	Join-Path $HOME 'OneDrive - Quisitive\Code\PowerShell\Config\WorkConfig.psd1'
+	[System.IO.Path]::Combine([string[]]@($HOME, 'OneDrive - Quisitive', 'Code', 'PowerShell', 'Config', 'WorkConfig.psd1'))
 }
+Write-ProfileTime 'After work configuration path'
 
 # Load work configuration into the global profile variable when available.
 if ([System.IO.File]::Exists($workConfigPath)) {
 	$Work = Import-PowerShellDataFile -Path $workConfigPath
 }
+Write-ProfileTime 'After work configuration import'
 
 Write-ProfileTime 'After profile configuration'
 
@@ -349,116 +367,138 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 
 #region PSREADLINE CONFIGURATION
 
-# Import PSReadLine module
-Write-ProfileTime 'Before PSReadLine import'
-if (-not (Get-Module PSReadline)) { Import-Module PSReadLine }
-Write-ProfileTime 'After PSReadLine import'
+# Determine whether this process will present an interactive PowerShell prompt.
+$profileStartupArguments = [Environment]::GetCommandLineArgs()
+$profileHasNoExitArgument = [bool]($profileStartupArguments -match '^(?i)-NoExit$')
+$profileHasNonInteractiveArgument = [bool]($profileStartupArguments -match '^(?i)-NonInteractive$')
+$profileHasCommandArgument = [bool]($profileStartupArguments -match '^(?i)-(?:Command|CommandWithArgs|EncodedCommand|File)$')
+$profileShouldConfigurePSReadLine = $Host.Name -eq 'ConsoleHost' -and
+    -not [Console]::IsInputRedirected -and
+    -not $profileHasNonInteractiveArgument -and
+    (-not $profileHasCommandArgument -or $profileHasNoExitArgument)
 
-# Basic PSReadLine options
-Set-PSReadLineOption -EditMode Vi
-Write-ProfileTime 'After Vi edit mode'
-Set-PSReadLineOption -ContinuationPrompt ''
+# Configure line editing only when this process will present an interactive prompt.
+if ($profileShouldConfigurePSReadLine) {
 
-# Avoids question marks when prompt spans multiple lines
-Set-PSReadLineOption -ExtraPromptLineCount 1
+	# Import PSReadLine module
+	Write-ProfileTime 'Before PSReadLine import'
+	if (-not (Get-Module PSReadline)) { Import-Module PSReadLine }
+	Write-ProfileTime 'After PSReadLine import'
 
-# PredictionViewStyle requires PSReadLine 2.1.0+ (PowerShell Core)
-if ($PSVersionTable.PSEdition -eq 'Core') {
-	Set-PSReadLineOption -PredictionViewStyle ListView -ErrorAction SilentlyContinue
-}
+	# Basic PSReadLine options
+	Set-PSReadLineOption -EditMode Vi
+	Write-ProfileTime 'After Vi edit mode'
+	Set-PSReadLineOption -ContinuationPrompt ''
 
-# Configure prediction source (edition-specific)
-if ($PSVersionTable.PSEdition -eq 'Core') {
-	Set-PSReadLineOption -PredictionSource HistoryAndPlugin -ErrorAction SilentlyContinue
-}
-Write-ProfileTime 'After PSReadLine options'
+	# Avoids question marks when prompt spans multiple lines
+	Set-PSReadLineOption -ExtraPromptLineCount 1
 
-# Tab completion key handlers
-$tabKeyHandler = {
-	param($key, $arg)
-
-	# Insert spaces if only whitespace precedes cursor on current line, otherwise complete
-	$line = $null
-	$cursor = $null
-	[Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
-
-	# Find the start of the current line (last newline before cursor, or beginning)
-	$lastNewline = $line.LastIndexOf("`n", $cursor - 1)
-	$lineStart = if ($lastNewline -ge 0) { $lastNewline + 1 } else { 0 }
-	$textBeforeCursor = $line.Substring($lineStart, $cursor - $lineStart)
-
-	if ($textBeforeCursor -notmatch '\S') {
-		[Microsoft.PowerShell.PSConsoleReadLine]::Insert('    ')
-	}
-	else {
-		[Microsoft.PowerShell.PSConsoleReadLine]::MenuComplete()
-	}
-}
-Set-PSReadLineKeyHandler -ViMode Insert  -Key Tab -ScriptBlock $tabKeyHandler
-Set-PSReadLineKeyHandler -ViMode Command -Key Tab -Function MenuComplete
-Set-PSReadLineKeyHandler -ViMode Insert  -Chord Shift+Tab -Function TabCompletePrevious
-Set-PSReadLineKeyHandler -ViMode Command -Chord Shift+Tab -Function TabCompletePrevious
-
-Set-PSReadLineKeyHandler -Chord Ctrl+V -Function Paste
-
-# Use the arrow keys to choose a completion and Enter to accept it.
-Set-PSReadLineKeyHandler -Key Enter -Function AcceptLine
-
-# Prediction navigation (PowerShell Core with newer PSReadLine)
-Set-PSReadLineKeyHandler -Key RightArrow -Function ForwardWord
-if ($PSVersionTable.PSEdition -eq 'Core') {
-	Set-PSReadLineKeyHandler -Key Ctrl+RightArrow -Function AcceptSuggestion -ErrorAction SilentlyContinue
-}
-
-# Vi mode configuration
-if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
-	Set-PSReadLineOption -ViModeIndicator 'Cursor'
-	$env:EDITOR = 'nvim'
-
-	# Vi mode key handlers for both Command and Insert modes
-	foreach ($mode in 'Command', 'Insert') {
-		Set-PSReadLineKeyHandler -Chord Ctrl+p -Function PreviousHistory -ViMode $mode
-		Set-PSReadLineKeyHandler -Chord Ctrl+n -Function NextHistory -ViMode $mode
-		Set-PSReadLineKeyHandler -Chord Alt+b -Function BackwardWord -ViMode $mode
-		Set-PSReadLineKeyHandler -Chord Alt+f -Function ForwardWord -ViMode $mode
-		Set-PSReadLineKeyHandler -Chord Ctrl+e -Function EndOfLine -ViMode $mode
-		Set-PSReadLineKeyHandler -Chord Ctrl+a -Function BeginningOfLine -ViMode $mode
-		Set-PSReadLineKeyHandler -Chord Ctrl+k -Function KillLine -ViMode $mode
-		Set-PSReadLineKeyHandler -Chord Ctrl+u -Function BackwardKillInput -ViMode $mode
-		Set-PSReadLineKeyHandler -Chord Ctrl+w -Function BackwardKillWord -ViMode $mode
-		Set-PSReadLineKeyHandler -Chord Shift+Enter -Function AddLine -ViMode $mode
-	}
-
-	# Custom cursor styles (PowerShell Core only - uses VT100 escape sequences)
+	# PredictionViewStyle requires PSReadLine 2.1.0+ (PowerShell Core)
 	if ($PSVersionTable.PSEdition -eq 'Core') {
-		function OnViModeChange {
-			if ($args[0] -eq 'Command') {
-				# Set the cursor to a blinking block
-				Write-Host -NoNewline "`e[1 q"
-			}
-			else {
-				# Set the cursor to a blinking line
-				Write-Host -NoNewline "`e[5 q"
-			}
-		}
-		Set-PSReadLineOption -ViModeIndicator Script -ViModeChangeHandler $Function:OnViModeChange
-
-		# Set initial cursor to blinking line for Insert mode
-		Write-Host -NoNewline "`e[5 q"
+		Set-PSReadLineOption -PredictionViewStyle ListView -ErrorAction SilentlyContinue
 	}
 
+	# Configure prediction source (edition-specific)
+	if ($PSVersionTable.PSEdition -eq 'Core') {
+		Set-PSReadLineOption -PredictionSource HistoryAndPlugin -ErrorAction SilentlyContinue
+	}
+	Write-ProfileTime 'After PSReadLine options'
+
+	# Tab completion key handlers
+	$tabKeyHandler = {
+		param($key, $arg)
+
+		# Insert spaces if only whitespace precedes cursor on current line, otherwise complete
+		$line = $null
+		$cursor = $null
+		[Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
+
+		# Find the start of the current line (last newline before cursor, or beginning)
+		$lastNewline = $line.LastIndexOf("`n", $cursor - 1)
+		$lineStart = if ($lastNewline -ge 0) { $lastNewline + 1 } else { 0 }
+		$textBeforeCursor = $line.Substring($lineStart, $cursor - $lineStart)
+
+		if ($textBeforeCursor -notmatch '\S') {
+			[Microsoft.PowerShell.PSConsoleReadLine]::Insert('    ')
+		}
+		else {
+			[Microsoft.PowerShell.PSConsoleReadLine]::MenuComplete()
+		}
+	}
+	Set-PSReadLineKeyHandler -ViMode Insert  -Key Tab -ScriptBlock $tabKeyHandler
+	Set-PSReadLineKeyHandler -ViMode Command -Key Tab -Function MenuComplete
+	Set-PSReadLineKeyHandler -ViMode Insert  -Chord Shift+Tab -Function TabCompletePrevious
+	Set-PSReadLineKeyHandler -ViMode Command -Chord Shift+Tab -Function TabCompletePrevious
+
+	Set-PSReadLineKeyHandler -Chord Ctrl+V -Function Paste
+
+	# Use the arrow keys to choose a completion and Enter to accept it.
+	Set-PSReadLineKeyHandler -Key Enter -Function AcceptLine
+
+	# Prediction navigation (PowerShell Core with newer PSReadLine)
+	Set-PSReadLineKeyHandler -Key RightArrow -Function ForwardWord
+	if ($PSVersionTable.PSEdition -eq 'Core') {
+		Set-PSReadLineKeyHandler -Key Ctrl+RightArrow -Function AcceptSuggestion -ErrorAction SilentlyContinue
+	}
+
+	# Vi mode configuration
+	if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
+		Set-PSReadLineOption -ViModeIndicator 'Cursor'
+		$env:EDITOR = 'nvim'
+
+		# Vi mode key handlers for both Command and Insert modes
+		foreach ($mode in 'Command', 'Insert') {
+			Set-PSReadLineKeyHandler -Chord Ctrl+p -Function PreviousHistory -ViMode $mode
+			Set-PSReadLineKeyHandler -Chord Ctrl+n -Function NextHistory -ViMode $mode
+			Set-PSReadLineKeyHandler -Chord Alt+b -Function BackwardWord -ViMode $mode
+			Set-PSReadLineKeyHandler -Chord Alt+f -Function ForwardWord -ViMode $mode
+			Set-PSReadLineKeyHandler -Chord Ctrl+e -Function EndOfLine -ViMode $mode
+			Set-PSReadLineKeyHandler -Chord Ctrl+a -Function BeginningOfLine -ViMode $mode
+			Set-PSReadLineKeyHandler -Chord Ctrl+k -Function KillLine -ViMode $mode
+			Set-PSReadLineKeyHandler -Chord Ctrl+u -Function BackwardKillInput -ViMode $mode
+			Set-PSReadLineKeyHandler -Chord Ctrl+w -Function BackwardKillWord -ViMode $mode
+			Set-PSReadLineKeyHandler -Chord Shift+Enter -Function AddLine -ViMode $mode
+		}
+
+		# Custom cursor styles (PowerShell Core only - uses VT100 escape sequences)
+		if ($PSVersionTable.PSEdition -eq 'Core') {
+			function OnViModeChange {
+				if ($args[0] -eq 'Command') {
+					# Set the cursor to a blinking block
+					Write-Host -NoNewline "`e[1 q"
+				}
+				else {
+					# Set the cursor to a blinking line
+					Write-Host -NoNewline "`e[5 q"
+				}
+			}
+			Set-PSReadLineOption -ViModeIndicator Script -ViModeChangeHandler $Function:OnViModeChange
+
+			# Set initial cursor to blinking line for Insert mode
+			Write-Host -NoNewline "`e[5 q"
+		}
+
+	}
+	Write-ProfileTime 'After PSReadLine key handlers'
+
+	# Load PSFzf after Vi mode and custom key handlers are configured.
+	Write-ProfileTime 'Before PSFzf import'
+	Import-Module PSFzf
+	Write-ProfileTime 'After PSFzf import'
+	Set-PsFzfOption `
+		-PSReadlineChordProvider 'Ctrl+t' `
+		-PSReadlineChordReverseHistory 'Ctrl+r'
+	Write-ProfileTime 'After PSFzf configuration'
 }
-Write-ProfileTime 'After PSReadLine key handlers'
-
-# Load PSFzf after Vi mode and custom key handlers are configured.
-Import-Module PSFzf
-Set-PsFzfOption `
-	-PSReadlineChordProvider 'Ctrl+t' `
-	-PSReadlineChordReverseHistory 'Ctrl+r'
-
+else {
+    # Avoid loading interactive editing modules for command-only PowerShell processes.
+    Write-ProfileTime 'Skipped PSReadLine and PSFzf for non-interactive session'
+}
 #endregion
 
 #region PROMPT AND GIT SUPPORT FUNCTIONS
+
+Write-ProfileTime 'Before prompt and Git support functions'
 
 function Get-AzProfilePromptText {
 	# Resolve the active named Azure CLI profile without invoking Azure commands.
@@ -473,7 +513,7 @@ function Get-AzProfilePromptText {
 		$trimmedConfigDir = $configDir.TrimEnd($trimCharacters)
 		$profileName = [System.IO.Path]::GetFileName($trimmedConfigDir)
 		$profileDirectory = [System.IO.Path]::GetDirectoryName($trimmedConfigDir)
-		$expectedProfileDirectory = Join-Path (Join-Path $HOME '.azure') 'profiles'
+		$expectedProfileDirectory = [System.IO.Path]::Combine([string[]]@($HOME, '.azure', 'profiles'))
 
 		# Display only directories created for named profiles under ~/.azure/profiles.
 		if (
@@ -487,7 +527,7 @@ function Get-AzProfilePromptText {
 
 		# Read the Azure CLI's active subscription from the named profile's local state.
 		$subscriptionSuffix = ''
-		$azureProfilePath = Join-Path $trimmedConfigDir 'azureProfile.json'
+		$azureProfilePath = [System.IO.Path]::Combine([string[]]@($trimmedConfigDir, 'azureProfile.json'))
 		if ([System.IO.File]::Exists($azureProfilePath)) {
 			try {
 				$azureProfile = [System.IO.File]::ReadAllText($azureProfilePath) | ConvertFrom-Json
@@ -933,17 +973,20 @@ function Initialize-PoshGit {
 }
 
 #endregion
-Write-ProfileTime 'Profile end'
+Write-ProfileTime 'After prompt and Git support functions'
 
 #region HERDR CLIENT INTEGRATION
 # Load the client integration only when the current PowerShell edition supports it.
+Write-ProfileTime 'Before Herdr integration'
 if ($script:HerdrIntegrationEnabled -and $PSVersionTable.PSEdition -eq 'Core' -and $IsWindows) {
-	$herdrModulePath = Join-Path $profileDir 'HerdrClient.psm1'
+	$herdrModulePath = [System.IO.Path]::Combine([string[]]@($profileDir, 'HerdrClient.psm1'))
 
 	# Leave the existing profile available if the helper is not installed.
 	if ([IO.File]::Exists($herdrModulePath)) {
 		try {
+			Write-ProfileTime 'Before Herdr module import'
 			Import-Module $herdrModulePath -ErrorAction Stop
+			Write-ProfileTime 'After Herdr module import'
 
 			# Identify interactive shells and recognized Herdr pane startup.
 			$herdrArgs = [Environment]::GetCommandLineArgs()
@@ -1000,3 +1043,5 @@ if ($script:HerdrIntegrationEnabled -and $PSVersionTable.PSEdition -eq 'Core' -a
 	}
 }
 #endregion
+Write-ProfileTime 'After Herdr integration'
+Write-ProfileTime 'Profile end'

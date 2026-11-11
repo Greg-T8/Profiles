@@ -1,14 +1,20 @@
-# -------------------------------------------------------------------------
-# Program: functions.ps1
-# Description: Provides custom interactive PowerShell profile functions.
-# Context: Personal cross-host PowerShell profile.
-# Author: Greg Tate
-# -------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Description   : Provide custom interactive PowerShell profile functions.
+# Context       : Personal cross-host PowerShell profile.
+# Author        : Greg Tate & coding agent
+# Last Modified : 2026-11-11
+# Revision History:
+#   2026-11-11 - Add per-function profile load timing checkpoints.
+# ---------------------------------------------------------------------------
 
 #region PROFILE COMMAND FUNCTIONS
 # Commands used by the profile aliases for Git, GitHub, Azure DevOps, and Docker workflows.
 
+# Record when this file begins executing after PowerShell has parsed it.
+Write-ProfileTime 'functions.ps1 execution started after parsing'
+
 function Set-GitRepoRoot { Set-Location (git rev-parse --show-toplevel) }
+Write-ProfileTime 'After function: Set-GitRepoRoot'
 
 function Show-GhFailedRunLog {
 	param(
@@ -64,6 +70,7 @@ function Show-GhFailedRunLog {
 			$_.Context.PostContext
 		}
 }
+Write-ProfileTime 'After function: Show-GhFailedRunLog'
 
 function Show-AdoFailedRunLog {
 	[CmdletBinding()]
@@ -266,14 +273,19 @@ function Show-AdoFailedRunLog {
 		}
 	}
 }
+Write-ProfileTime 'After function: Show-AdoFailedRunLog'
 
 function DockerExec { docker exec -it @args }
+Write-ProfileTime 'After function: DockerExec'
 
 function DockerImageList { docker image ls -a --no-trunc @args }
+Write-ProfileTime 'After function: DockerImageList'
 
 function DockerContainerList { docker container ls -a --no-trunc @args }
+Write-ProfileTime 'After function: DockerContainerList'
 
 function RegCtlCmd { docker run --rm regclient/regctl @args }
+Write-ProfileTime 'After function: RegCtlCmd'
 
 #endregion
 
@@ -283,12 +295,14 @@ function RegCtlCmd { docker run --rm regclient/regctl @args }
 function dir {
     cmd /c dir $args
 }
+Write-ProfileTime 'After function: dir'
 
 
 # Converts tab-delimited clipboard data to PowerShell objects (for Excel copy-paste).
 function Get-ClipboardExcel {
     Get-Clipboard | ConvertFrom-Csv -Delimiter "`t"
 }
+Write-ProfileTime 'After function: Get-ClipboardExcel'
 # Retrieves the installed Windows edition, release version, build, and architecture.
 function Get-WindowsVersion {
     [CmdletBinding()]
@@ -341,6 +355,7 @@ function Get-WindowsVersion {
         Architecture = if ([Environment]::Is64BitOperatingSystem) { '64-bit' } else { '32-bit' }
     }
 }
+Write-ProfileTime 'After function: Get-WindowsVersion'
 
 # Opens VSCode with a temporary user data directory, or cleans up the temp directory if -Clean is specified.
 function tempcode {
@@ -360,6 +375,7 @@ function tempcode {
         }
     }
 }
+Write-ProfileTime 'After function: tempcode'
 
 
 # Calculates the elapsed time between two clock values with AM implied unless PM is specified.
@@ -415,6 +431,7 @@ function Get-TimeDifference {
     $duration = $endTime - $startTime
     '{0}:{1:D2}' -f [math]::Floor($duration.TotalHours), $duration.Minutes
 }
+Write-ProfileTime 'After function: Get-TimeDifference'
 # Downloads and outputs the Microsoft license catalog as PowerShell objects.
 function GetMicrosoftLicenseCatalog {
     [OutputType([PSCustomObject[]])]
@@ -426,6 +443,7 @@ function GetMicrosoftLicenseCatalog {
     $licenseCatalog = $licenseCatalog | ConvertFrom-Csv
     Write-Output $licenseCatalog
 }
+Write-ProfileTime 'After function: GetMicrosoftLicenseCatalog'
 
 # Runs Snagit capture cleanup via the dedicated maintenance script.
 function CleanUpSnagitFolder {
@@ -438,6 +456,7 @@ function CleanUpSnagitFolder {
 
     & $cleanupScriptPath
 }
+Write-ProfileTime 'After function: CleanUpSnagitFolder'
 
 # Creates a file if it doesn't exist, or updates its last modified time if it does (like Unix 'touch').
 function touch {
@@ -455,6 +474,7 @@ function touch {
         New-Item -ItemType File -Path $Path | Out-Null
     }
 }
+Write-ProfileTime 'After function: touch'
 
 # Retrieves the Windows Experience Index (WEI) score and assessment date.
 function Get-WinExperienceIndex {
@@ -495,6 +515,7 @@ function Get-WinExperienceIndex {
         AssessmentDate  = $assessmentDate
     }
 }
+Write-ProfileTime 'After function: Get-WinExperienceIndex'
 
 function Get-WinGetUpdates {
     param(
@@ -512,6 +533,7 @@ function Get-WinGetUpdates {
         Select-Object Name, Id, InstalledVersion, IsUpdateAvailable,
             @{n='AvailableVersions'; e={ $_.AvailableVersions | Select-Object -First 1 }}
 }
+Write-ProfileTime 'After function: Get-WinGetUpdates'
 
 function Measure-ProfileLoad {
     <#
@@ -735,6 +757,7 @@ function Measure-ProfileLoad {
         ProfileTimes    = $profileTimes  | ForEach-Object { [math]::Round($_, 2) }
     }
 }
+Write-ProfileTime 'After function: Measure-ProfileLoad'
 
 function Install-WSLDistribution {
     <#
@@ -932,6 +955,7 @@ function Install-WSLDistribution {
     Write-Host "`nTo start the distribution, run: wsl -d $Name" -ForegroundColor Yellow
     Write-Host "To set it as default, run: wsl" '--set-default' "$Name" -ForegroundColor Yellow
 }
+Write-ProfileTime 'After function: Install-WSLDistribution'
 
 #endregion
 
@@ -1015,5 +1039,6 @@ function Get-BillingSubscriptions {
 
     return $subscriptions | Sort-Object -Property SubscriptionName
 }
+Write-ProfileTime 'After function: Get-BillingSubscriptions'
 
 #endregion
