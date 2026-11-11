@@ -4,6 +4,7 @@
 # Author        : Greg Tate, with help from a coding agent
 # Last Modified : 2026-11-11
 # Revision History:
+#   2026-11-11 - Add PSFzf provider and reverse-history shortcuts.
 #   2026-11-11 - Limit automatic Herdr startup to Windows Terminal.
 #   2026-11-10 - Show Tab completions in a selectable menu.
 #   2026-11-09 - Preserve AllScope when setting the Neovim alias.
@@ -448,6 +449,12 @@ if ((Get-PSReadLineOption).EditMode -eq 'Vi') {
 
 }
 Write-ProfileTime 'After PSReadLine key handlers'
+
+# Load PSFzf after Vi mode and custom key handlers are configured.
+Import-Module PSFzf
+Set-PsFzfOption `
+	-PSReadlineChordProvider 'Ctrl+t' `
+	-PSReadlineChordReverseHistory 'Ctrl+r'
 
 #endregion
 
