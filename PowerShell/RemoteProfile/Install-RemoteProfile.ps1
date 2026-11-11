@@ -1,9 +1,13 @@
 # -------------------------------------------------------------------------
-# Program: Install-RemoteProfile.ps1
-# Description: Bootstrap script to quickly install PowerShell profile customizations
-#              from GitHub into a remote development session
-# Context: Remote Development Setup (Microsoft Azure Administrator)
-# Author: Greg Tate
+# Description   : Install PowerShell profile customizations from GitHub.
+# Context       : Remote development setup, Microsoft Azure Administrator.
+# Author        : Greg Tate & coding agent
+# Last Modified : 2026-11-11
+# Revision History:
+#   2026-11-11 - Install the consolidated Herdr profile script.
+#   2026-11-11 - Install the renamed Herdr profile module.
+#   2026-11-11 - Install the complete Profile folder and a standard entry point.
+#   2026-11-11 - Update payload for the renamed profile functions script.
 # -------------------------------------------------------------------------
 
 <#
@@ -17,8 +21,7 @@
     2. Download individual files directly from GitHub (fallback method)
 
     Files installed:
-    - profile.ps1
-    - functions.ps1
+    - Profile/profile.ps1 and its feature scripts
     - Modules/MSCloudProfile/MSCloudProfile.psd1
     - Modules/MSCloudProfile/MSCloudProfile.psm1
     - Modules/MSCloudProfile/MSCloudProfile.format.ps1xml
@@ -260,8 +263,15 @@ $Helpers = {
     function Get-ProfilePayload {
         # Return the complete relative file set required by profile.ps1 at runtime.
         @(
-            'profile.ps1'
-            'functions.ps1'
+            'Profile/profile.ps1'
+            'Profile/profile-aliases.ps1'
+            'Profile/profile-cloud.ps1'
+            'Profile/profile-functions.ps1'
+            'Profile/profile-herdr.ps1'
+            'Profile/profile-prompt.ps1'
+            'Profile/profile-prompt-support.ps1'
+            'Profile/profile-readline.ps1'
+            'Maintenance/Invoke-SnagitCaptureFolderCleanup.ps1'
             'Modules/MSCloudProfile/MSCloudProfile.psd1'
             'Modules/MSCloudProfile/MSCloudProfile.psm1'
             'Modules/MSCloudProfile/MSCloudProfile.format.ps1xml'
@@ -563,12 +573,22 @@ if ($psReadLine) {
             $resolvedDestination = (Resolve-Path -LiteralPath $destinationRoot).Path
             if ($resolvedSource -eq $resolvedDestination) {
                 Write-Host "  $profileName profile payload already in place at: $destinationRoot" -ForegroundColor Green
-                continue
+            }
+            else {
+                Write-Host "  Updating $profileName profile payload: $destinationRoot" -ForegroundColor Yellow
+                Copy-ProfilePayload -SourceRoot $sourceRoot -DestinationRoot $destinationRoot
+                Write-Host "  [OK] $profileName profile payload updated" -ForegroundColor Green
             }
 
-            Write-Host "  Updating $profileName profile payload: $destinationRoot" -ForegroundColor Yellow
-            Copy-ProfilePayload -SourceRoot $sourceRoot -DestinationRoot $destinationRoot
-            Write-Host "  [OK] $profileName profile payload updated" -ForegroundColor Green
+            # Load the moved profile from PowerShell's standard all-hosts entry point.
+            $entryPoint = Join-Path $destinationRoot 'profile.ps1'
+            $existingEntry = Get-Item -LiteralPath $entryPoint -Force -ErrorAction SilentlyContinue
+            if ($existingEntry -and $existingEntry.LinkType) {
+                Write-Warning "Preserving the existing linked profile at $entryPoint; verify that it targets the intended profile."
+            }
+            else {
+                Set-Content -LiteralPath $entryPoint -Value '. "$PSScriptRoot/Profile/profile.ps1"' -Encoding UTF8
+            }
         }
     }
 
@@ -622,8 +642,8 @@ if ($psReadLine) {
         # Display completion message
         Write-Host "`n=== Installation Complete ===" -ForegroundColor Cyan
         Write-Host "`nInstalled file:" -ForegroundColor Gray
-        Write-Host "  - profile.ps1 (root profile entrypoint)" -ForegroundColor Gray
-        Write-Host "  - functions.ps1 (PowerShell 7 productivity commands)" -ForegroundColor Gray
+        Write-Host "  - profile.ps1 (standard PowerShell entrypoint)" -ForegroundColor Gray
+        Write-Host "  - Profile/ (profile scripts and Herdr integration)" -ForegroundColor Gray
         Write-Host "  - Modules/MSCloudProfile (Az, Graph, and Entra profile management)" -ForegroundColor Gray
         Write-Host ""
     }

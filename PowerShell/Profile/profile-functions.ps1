@@ -4,6 +4,8 @@
 # Author        : Greg Tate & coding agent
 # Last Modified : 2026-11-11
 # Revision History:
+#   2026-11-11 - Resolve maintenance and WSL scripts from the Profile folder.
+#   2026-11-11 - Update timing label for the renamed functions script.
 #   2026-11-11 - Measure console-attached startup and first prompt calculation.
 #   2026-11-11 - Add per-function profile load timing checkpoints.
 # ---------------------------------------------------------------------------
@@ -12,7 +14,7 @@
 # Commands used by the profile aliases for Git, GitHub, Azure DevOps, and Docker workflows.
 
 # Record when this file begins executing after PowerShell has parsed it.
-Write-ProfileTime 'functions.ps1 execution started after parsing'
+Write-ProfileTime 'profile-functions.ps1 execution started after parsing'
 
 function Set-GitRepoRoot { Set-Location (git rev-parse --show-toplevel) }
 Write-ProfileTime 'After function: Set-GitRepoRoot'
@@ -448,7 +450,7 @@ Write-ProfileTime 'After function: GetMicrosoftLicenseCatalog'
 
 # Runs Snagit capture cleanup via the dedicated maintenance script.
 function CleanUpSnagitFolder {
-    $cleanupScriptPath = Join-Path -Path $PSScriptRoot -ChildPath 'Maintenance\Invoke-SnagitCaptureFolderCleanup.ps1'
+    $cleanupScriptPath = Join-Path -Path $PSScriptRoot -ChildPath '..\Maintenance\Invoke-SnagitCaptureFolderCleanup.ps1'
 
     if (-not (Test-Path -Path $cleanupScriptPath)) {
         Write-Error "Cleanup script not found: $cleanupScriptPath"
@@ -920,7 +922,7 @@ function Install-WSLDistribution {
     Write-Host "`n✓ Successfully installed $Name to $targetPath" -ForegroundColor Green
 
     # Run initialization script
-    $initScript = "$PSScriptRoot\..\Linux\init-wsl.sh"
+    $initScript = "$PSScriptRoot\..\..\Linux\init-wsl.sh"
     if (Test-Path $initScript) {
         Write-Host "`nRunning initialization script..." -ForegroundColor Cyan
 

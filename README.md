@@ -118,14 +118,14 @@ git clone https://github.com/Greg-T8/Profiles.git "$env:OneDrive\Apps\Profiles"
 cd "$env:OneDrive\Apps\Profiles\PowerShell"
 
 # Run installer
-.\Install-RemoteProfile.ps1
+.\RemoteProfile\Install-RemoteProfile.ps1
 ```
 
 Or use the bootstrap one-liner (see Quick Bootstrap section above).
 
 **What it does:**
 
-- Creates symlinks to PowerShell profile files
+- Installs a PowerShell profile entry point and its feature scripts
 - Sets up profile directory structure
 - Configures PSReadLine with Vi mode
 - Installs custom prompt with Git integration
@@ -134,7 +134,7 @@ Or use the bootstrap one-liner (see Quick Bootstrap section above).
 
 ```powershell
 # Create symlink to PowerShell profile
-New-Item -ItemType SymbolicLink -Path $PROFILE.CurrentUserAllHosts -Target "C:\path\to\Profiles\PowerShell\profile.ps1"
+New-Item -ItemType SymbolicLink -Path $PROFILE.CurrentUserAllHosts -Target "C:\path\to\Profiles\PowerShell\Profile\profile.ps1"
 ```
 
 **Features:**

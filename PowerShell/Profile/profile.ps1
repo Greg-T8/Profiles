@@ -1,9 +1,11 @@
 ﻿# ---------------------------------------------------------------------------
 # Description   : Configure the interactive PowerShell environment and prompt.
 # Context       : Personal cross-host profile ($Profile.CurrentUserAllHosts).
-# Author        : Greg Tate, with help from a coding agent
+# Author        : Greg Tate & coding agent
 # Last Modified : 2026-11-11
 # Revision History:
+#   2026-11-11 - Resolve profile features from the dedicated Profile folder.
+#   2026-11-11 - Load and measure the renamed profile functions script.
 #   2026-11-11 - Show elapsed time between profile timing checkpoints.
 #   2026-11-11 - Sample functions file read and parsing during timing runs.
 #   2026-11-11 - Split profile features into dot-sourced scripts.
@@ -73,7 +75,7 @@ Write-ProfileTime 'After startup initialization'
 # Resolve feature scripts beside the profile or its OneDrive-backed target.
 $profileEntryDir = [System.IO.Path]::GetDirectoryName($PSCommandPath)
 $profileOneDriveDir = if (-not [string]::IsNullOrWhiteSpace($env:OneDriveConsumer)) {
-    "$env:OneDriveConsumer/Apps/Profiles/PowerShell"
+    "$env:OneDriveConsumer/Apps/Profiles/PowerShell/Profile"
 }
 else {
     $null
@@ -117,49 +119,44 @@ Write-ProfileTime 'After profile prompt import'
 
 #region LOAD EXTERNAL SCRIPTS
 
-# Prefer the known OneDrive profile root and resolve the script path only when it is unavailable.
+# Keep shared modules and maintenance scripts relative to the Profile folder.
 Write-ProfileTime 'Before profile directory resolution'
-$profileDir = if (-not [string]::IsNullOrWhiteSpace($env:OneDriveConsumer)) {
-	"$env:OneDriveConsumer/Apps/Profiles/PowerShell"
-}
-else {
-	Split-Path -Parent $PSCommandPath
-}
+$profileDir = [System.IO.Path]::GetDirectoryName($profileFeatureDir)
 Write-ProfileTime 'After profile directory resolution'
 
 # Load custom functions
-if ($PSVersionTable.PSEdition -eq 'Core' -and [System.IO.File]::Exists("$profileDir/functions.ps1")) {
+if ($PSVersionTable.PSEdition -eq 'Core' -and [System.IO.File]::Exists("$profileFeatureDir/profile-functions.ps1")) {
 	try {
         # Sample reading and parsing separately without changing the dot-sourced script.
         if ($env:PROFILE_TIMING) {
             try {
-                Write-ProfileTime 'Diagnostic sample: before functions.ps1 file read'
-                $functionsTimingText = [System.IO.File]::ReadAllText("$profileDir/functions.ps1")
-                Write-ProfileTime 'Diagnostic sample: after functions.ps1 file read'
+                Write-ProfileTime 'Diagnostic sample: before profile-functions.ps1 file read'
+                $functionsTimingText = [System.IO.File]::ReadAllText("$profileFeatureDir/profile-functions.ps1")
+                Write-ProfileTime 'Diagnostic sample: after profile-functions.ps1 file read'
                 $functionsTimingTokens = $null
                 $functionsTimingErrors = $null
-                Write-ProfileTime 'Diagnostic sample: before functions.ps1 text parse'
+                Write-ProfileTime 'Diagnostic sample: before profile-functions.ps1 text parse'
                 $null = [System.Management.Automation.Language.Parser]::ParseInput(
                     $functionsTimingText,
-                    "$profileDir/functions.ps1",
+                    "$profileFeatureDir/profile-functions.ps1",
                     [ref]$functionsTimingTokens,
                     [ref]$functionsTimingErrors
                 )
-                Write-ProfileTime ('Diagnostic sample: after functions.ps1 text parse (errors: {0})' -f $functionsTimingErrors.Count)
+                Write-ProfileTime ('Diagnostic sample: after profile-functions.ps1 text parse (errors: {0})' -f $functionsTimingErrors.Count)
             }
             catch {
                 # Continue with the normal import if the diagnostic sample fails.
-                Write-ProfileTime 'Diagnostic sample failed; continuing with functions.ps1 import'
+                Write-ProfileTime 'Diagnostic sample failed; continuing with profile-functions.ps1 import'
             }
             $functionsTimingText = $null
             $functionsTimingTokens = $null
             $functionsTimingErrors = $null
         }
-		Write-ProfileTime 'Before functions.ps1 import'
-		. "$profileDir/functions.ps1"
+		Write-ProfileTime 'Before profile-functions.ps1 import'
+		. "$profileFeatureDir/profile-functions.ps1"
 	}
 	catch {
-		Write-Host "ERROR loading functions.ps1: $_" -ForegroundColor Red
+		Write-Host "ERROR loading profile-functions.ps1: $_" -ForegroundColor Red
 		Write-Host "Error details: $($_.Exception.Message)" -ForegroundColor Red
 	}
 }

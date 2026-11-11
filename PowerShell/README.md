@@ -72,8 +72,8 @@ The installer copies these files to your system:
 
 | File | Description |
 |------|-------------|
-| `profile.ps1` | Root profile configuration, aliases, PSReadLine settings, and prompt |
-| `functions.ps1` | Custom PowerShell functions for productivity |
+| `profile.ps1` | Standard PowerShell entry point loading `Profile/profile.ps1` |
+| `Profile/` | Profile configuration, feature scripts, and Herdr client module |
 | `Modules/MSCloudProfile/MSCloudProfile.psd1` | Module manifest and public command contract |
 | `Modules/MSCloudProfile/MSCloudProfile.psm1` | Bundled Az, Graph, and Entra profile implementation |
 | `Modules/MSCloudProfile/README.md` | MSCloudProfile configuration and usage guide |
@@ -84,8 +84,15 @@ The installer copies these files to your system:
 
 ```text
 PowerShell/
-├── profile.ps1
-├── functions.ps1
+├── Profile/
+│   ├── profile.ps1
+│   ├── profile-functions.ps1
+│   ├── profile-aliases.ps1
+│   ├── profile-cloud.ps1
+│   ├── profile-herdr.ps1
+│   ├── profile-prompt.ps1
+│   ├── profile-prompt-support.ps1
+│   └── profile-readline.ps1
 ├── Modules/
 │   └── MSCloudProfile/
 │       ├── MSCloudProfile.psd1
@@ -99,8 +106,8 @@ PowerShell/
 └── PSScriptAnalyzerSettings.psd1
 ```
 
-`profile.ps1` remains the root entrypoint. PowerShell 7 dot-sources
-`functions.ps1`, resolves personal and work configuration paths, and then lazily
+The installed `profile.ps1` loads `Profile/profile.ps1`. PowerShell 7 dot-sources
+`Profile/profile-functions.ps1`, resolves personal and work configuration paths, and then lazily
 imports the `MSCloudProfile` manifest by its relative path. See [Modules/MSCloudProfile/README.md](Modules/MSCloudProfile/README.md) for configuration and command guidance.
 
 ### Profile Features
@@ -131,7 +138,7 @@ imports the `MSCloudProfile` manifest by its relative path. See [Modules/MSCloud
 - `Measure-ProfileLoad` - Analyze profile loading performance
 - `Get-AllAzProfiles` - List configured and discovered Azure profiles
 - `Get-AllMgProfiles` - List configured and cached Microsoft Graph profiles
-- And many more! (See `functions.ps1` and `Modules/MSCloudProfile` for the full list.)
+- And many more! (See `Profile/profile-functions.ps1` and `Modules/MSCloudProfile` for the full list.)
 
 ### Microsoft Graph Profile Caching
 
