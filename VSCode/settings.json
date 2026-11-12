@@ -834,7 +834,7 @@
   "powershell.integratedConsole.focusConsoleOnExecute": true,
   "powershell.integratedConsole.showOnStartup": false,
   "powershell.integratedConsole.startInBackground": false,
-  "powershell.powerShellDefaultVersion": "PowerShell (x64)",
+  "powershell.powerShellDefaultVersion": "PowerShell (Store)",
   "powershell.promptToUpdatePowerShell": false,
   "powershell.scriptAnalysis.enable": true,
   "powershell.scriptAnalysis.settingsPath": "C:/Users/gregt/OneDrive/Code/PowerShell/PSScriptAnalyzerSettings.psd1",
@@ -942,7 +942,7 @@
     "JavaScript Debug Terminal": null,
     "PowerShell": {
       "icon": "terminal-powershell",
-      "source": "PowerShell"
+      "path": "C:/Users/gregt/AppData/Local/Microsoft/WindowsApps/pwsh.exe"
     },
     "PowerShell (No Profile)": {
       "args": [
