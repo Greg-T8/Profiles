@@ -8,6 +8,21 @@
 #   2026-11-11 - Extract feature from the PowerShell profile.
 # ---------------------------------------------------------------------------
 
+# Alias reference: alias = command
+# ll = Get-ChildItem                 cfj = ConvertFrom-Json
+# gim = Get-InstalledModule          rdn = Resolve-DNSName
+# uap = Use-AzProfile                ugp = Use-MgProfile
+# gcap = Get-CurrentAzProfile        gcgp = Get-CurrentMgProfile
+# uaps = Use-AzProfileSubscription   gbs = Get-BillingSubscriptions
+# td = Get-TimeDifference            tf = terraform
+# he = herdr                         nv = nvim
+# gs = Invoke-GitStatus              ga = Invoke-GitAdd
+# gd = Invoke-GitDiff                gco = Invoke-GitCommit
+# gpu = Invoke-GitPush               sgr = Set-GitRepoRoot
+# ghel = Show-GhFailedRunLog         adel = Show-AdoFailedRunLog
+# dex = DockerExec                   dil = DockerImageList
+# dcl = DockerContainerList          regctl = RegCtlCmd
+
 #region ALIASES
 
 # Create profile aliases through the built-in Alias provider rather than Set-Alias.
