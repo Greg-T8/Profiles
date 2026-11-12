@@ -950,7 +950,7 @@
         "-NoProfile"
       ],
       "icon": "terminal-powershell",
-      "path": "C:/Program Files/PowerShell/7/pwsh.exe"
+      "path": "C:/Users/gregt/AppData/Local/Microsoft/WindowsApps/pwsh.exe"
     },
     "Ubuntu": {
       "args": [
