@@ -51,7 +51,7 @@ function script:Write-ProfileTime {
 Write-ProfileTime 'Profile start'
 
 # Enable Herdr startup and managed-pane integration for Windows Terminal sessions.
-$script:HerdrIntegrationEnabled = $false
+$script:HerdrIntegrationEnabled = $true
 Write-ProfileTime 'After Herdr integration setting'
 
 # Keep Python venv activation from replacing the custom prompt function.
