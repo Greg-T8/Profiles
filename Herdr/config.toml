@@ -23,6 +23,7 @@ split_vertical = "prefix+|"
 
 # Terminal settings
 [terminal]
+default_shell = 'C:\Users\gregt\AppData\Local\Microsoft\WindowsApps\pwsh.exe'
 new_cwd = "follow"
 
 [ui.toast]
