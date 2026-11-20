@@ -20,6 +20,9 @@ status_indicators = "symbols"
 [keys]
 prefix = "ctrl+backtick"
 split_vertical = "prefix+|"
+previous_workspace = "prefix+up"
+next_workspace = "prefix+down"
+switch_workspace = "prefix+shift+1..9"
 
 # Terminal settings
 [terminal]
