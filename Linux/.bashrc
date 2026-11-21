@@ -4,6 +4,7 @@
 # Author        : Greg Tate & coding agent
 # Last Modified : 2026-11-21
 # Revision History:
+#   2026-11-21 - Fix root fzf installation and defer the Vi mode indicator setting
 #   2026-11-21 - Mirror configured Readline Vi bindings in ble.sh
 #   2026-11-21 - Hide ble.sh Vi indicator and apply Readline bindings before loading it
 #   2026-11-21 - Add ble.sh automatic history completion menu
@@ -89,15 +90,17 @@ HISTFILESIZE=2000                      # Commands to save in history file
 
 # Install fzf on Debian-based systems when it is missing.
 if ! command -v fzf >/dev/null 2>&1; then
-    if command -v apt-get >/dev/null 2>&1 && command -v sudo >/dev/null 2>&1; then
+    if command -v apt-get >/dev/null 2>&1 && { [ "$EUID" -eq 0 ] || command -v sudo >/dev/null 2>&1; }; then
         printf 'fzf is missing; installing it with apt-get...\n'
-        if sudo apt-get update && sudo apt-get install -y fzf; then
+        # Use apt-get directly as root and sudo for an unprivileged user.
+        if { [ "$EUID" -eq 0 ] && apt-get update && apt-get install -y fzf; } ||
+            { [ "$EUID" -ne 0 ] && sudo apt-get update && sudo apt-get install -y fzf; }; then
             printf 'fzf was installed successfully.\n'
         else
             printf 'fzf installation failed; continuing without the history picker.\n' >&2
         fi
     else
-        printf 'fzf is missing. Install it with: sudo apt-get install fzf\n' >&2
+        printf 'fzf is missing. Install it using your system package manager.\n' >&2
     fi
 fi
 
@@ -264,13 +267,14 @@ fi
 
 # Enable a delayed, linewise menu for automatic history completions.
 if [ -n "${BLE_VERSION:-}" ]; then
-    bleopt keymap_vi_mode_show=
     bleopt complete_auto_menu=500
     bleopt complete_menu_style=linewise
     bleopt complete_menu_maxlines=10
 
     # Register ble.sh-native equivalents for the custom Readline Vi bindings.
     ble_configure_vi_bindings() {
+        # Hide the Vi mode indicator after its option is registered.
+        bleopt keymap_vi_mode_show=
         # Enable Meta-key sequences in insert mode before binding Alt+B and Alt+F.
         ble-decode/keymap:vi_imap/define-meta-bindings
 
