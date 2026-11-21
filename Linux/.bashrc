@@ -4,6 +4,7 @@
 # Author        : Greg Tate & coding agent
 # Last Modified : 2026-11-21
 # Revision History:
+#   2026-11-21 - Preconfigure the ble.sh Vi indicator before keymap initialization
 #   2026-11-21 - Fix root fzf installation and defer the Vi mode indicator setting
 #   2026-11-21 - Mirror configured Readline Vi bindings in ble.sh
 #   2026-11-21 - Hide ble.sh Vi indicator and apply Readline bindings before loading it
@@ -63,6 +64,10 @@ fi
 # Load ble.sh without attaching until the remaining Bash settings are applied.
 if [ -r "$HOME/.local/share/blesh/ble.sh" ]; then
     source -- "$HOME/.local/share/blesh/ble.sh" --attach=none
+    # Define the lazy-loaded Vi option before ble.sh initializes the keymap.
+    if [ -n "${BLE_VERSION:-}" ]; then
+        bleopt keymap_vi_mode_show:=
+    fi
 fi
 
 # ==============================================================================
@@ -274,7 +279,7 @@ if [ -n "${BLE_VERSION:-}" ]; then
     # Register ble.sh-native equivalents for the custom Readline Vi bindings.
     ble_configure_vi_bindings() {
         # Hide the Vi mode indicator after its option is registered.
-        bleopt keymap_vi_mode_show=
+        bleopt keymap_vi_mode_show:=
         # Enable Meta-key sequences in insert mode before binding Alt+B and Alt+F.
         ble-decode/keymap:vi_imap/define-meta-bindings
 

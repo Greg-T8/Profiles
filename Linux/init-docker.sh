@@ -5,6 +5,7 @@
 # Author        : Greg Tate & coding agent
 # Last Modified : 2026-11-21
 # Revision History:
+#   2026-11-21 - Install fzf and ble.sh with basic tools and report failures
 #   2026-11-21 - Start an interactive Bash shell to load the installed profile
 # -------------------------------------------------------------------------
 #
@@ -47,6 +48,7 @@ TOOLS=(
     "vim"           # Text editor
     "less"          # Pager for viewing files
     "procps"        # Process utilities (ps, top, etc.)
+    "fzf"           # Fuzzy command history picker
     # "git"         # Version control
 )
 
@@ -74,7 +76,7 @@ main() {
     fi
 
     # Execute setup functions
-    install_tools
+    install_tools || warning "Basic tools setup was incomplete"
     download_configs
 
     # Display completion message
@@ -200,6 +202,13 @@ download_configs() {
 install_tools() {
     section "Installing Basic Tools"
 
+    # Track failures while allowing the remaining tools to be installed.
+    local failures=0
+    local -a privilege=()
+    if [ "$EUID" -ne 0 ] && command -v sudo >/dev/null 2>&1; then
+        privilege=(sudo)
+    fi
+
     # Set environment variables to avoid interactive prompts during installation
     export DEBIAN_FRONTEND=noninteractive
     export TZ=America/Chicago
@@ -221,23 +230,23 @@ install_tools() {
     else
         warning "No supported package manager found (apt-get, yum, zypper, apk)"
         warning "Skipping package installation"
-        return 0
+        return 1
     fi
 
     # Update package lists
     info "Updating package lists..."
     case $pkg_manager in
         apt-get)
-            apt-get update -qq
+            "${privilege[@]}" apt-get update -qq || failures=1
             ;;
         yum)
             yum check-update -q || true
             ;;
         zypper)
-            zypper refresh
+            "${privilege[@]}" zypper refresh || failures=1
             ;;
         apk)
-            apk update -q
+            "${privilege[@]}" apk update -q || failures=1
             ;;
     esac
 
@@ -249,22 +258,77 @@ install_tools() {
             info "Installing $tool..."
             case $pkg_manager in
                 apt-get)
-                    apt-get install -y -qq "$tool"
+                    "${privilege[@]}" apt-get install -y -qq "$tool" || failures=1
                     ;;
                 yum)
-                    yum install -y -q "$tool"
+                    "${privilege[@]}" yum install -y -q "$tool" || failures=1
                     ;;
                 zypper)
-                    zypper install -y "$tool"
+                    "${privilege[@]}" zypper install -y "$tool" || failures=1
                     ;;
                 apk)
-                    apk add -q "$tool"
+                    "${privilege[@]}" apk add -q "$tool" || failures=1
                     ;;
             esac
         fi
     done
 
-    success "Tool installation completed"
+    # Confirm the history picker is available after package installation.
+    if command -v fzf >/dev/null 2>&1; then
+        success "fzf is available"
+    else
+        error "fzf is not available after package installation"
+        failures=1
+    fi
+
+    # Install ble.sh from its official release in the current user's home.
+    if [ -r "$HOME/.local/share/blesh/ble.sh" ]; then
+        info "ble.sh is already installed"
+    else
+        info "Installing ble.sh..."
+        if install_ble_sh_tool "$pkg_manager"; then
+            success "ble.sh installed successfully"
+        else
+            error "ble.sh installation failed"
+            failures=1
+        fi
+    fi
+
+    # Report incomplete installations accurately.
+    if [ "$failures" -eq 0 ]; then
+        success "Tool installation completed"
+    else
+        warning "Some tools could not be installed; review the errors above"
+        return 1
+    fi
+}
+
+# Install ble.sh and the tools needed to unpack its release archive.
+install_ble_sh_tool() {
+    local pkg_manager="$1"
+    local install_directory
+
+    # Install missing archive utilities for the detected package manager.
+    if ! command -v tar >/dev/null 2>&1 || ! command -v xz >/dev/null 2>&1; then
+        case "$pkg_manager" in
+            apt-get) "${privilege[@]}" apt-get install -y -qq tar xz-utils || return 1 ;;
+            yum) "${privilege[@]}" yum install -y -q tar xz || return 1 ;;
+            zypper) "${privilege[@]}" zypper install -y tar xz || return 1 ;;
+            apk) "${privilege[@]}" apk add -q tar xz || return 1 ;;
+        esac
+    fi
+
+    # Download and install the official nightly build, then remove its staging directory.
+    install_directory=$(mktemp -d) || return 1
+    if curl -fsSL https://github.com/akinomyoga/ble.sh/releases/download/nightly/ble-nightly.tar.xz -o "$install_directory/ble.tar.xz" &&
+        tar -xJf "$install_directory/ble.tar.xz" -C "$install_directory" &&
+        bash "$install_directory/ble-nightly/ble.sh" --install "$HOME/.local/share" &&
+        [ -r "$HOME/.local/share/blesh/ble.sh" ]; then
+        rm -rf -- "$install_directory"
+        return 0
+    fi
+    rm -rf -- "$install_directory"
+    return 1
 }
 
 # Display summary and next steps
@@ -272,7 +336,7 @@ show_summary() {
     section "Installation Summary"
 
     echo ""
-    success "Docker container initialization completed successfully!"
+    info "Docker container initialization finished. Review any warnings above."
     echo ""
     info "To activate the configuration in your current session, run:"
     echo -e "  ${GREEN}exec bash${NC}"
