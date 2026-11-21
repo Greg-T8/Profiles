@@ -25,6 +25,10 @@
     {
       "id": "unbound",
       "keys": "ctrl+alt+k"
+    },
+    {
+      "id": "paste",
+      "keys": "ctrl+v"
     }
   ],
   "newTabMenu": [
