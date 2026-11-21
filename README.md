@@ -11,7 +11,7 @@ A collection of configuration files and profiles for various development tools a
 irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/RemoteProfile/bootstrap.ps1 | iex
 ```
 
-### Remote Linux Setup
+### Linux Profile
 
 The setup is intended for APT-based distributions such as Debian and Ubuntu,
 including remote VMs and containers. Run it as the user whose profile you want
