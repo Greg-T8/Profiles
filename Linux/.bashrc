@@ -4,6 +4,7 @@
 # Author        : Greg Tate & coding agent
 # Last Modified : 2026-11-21
 # Revision History:
+#   2026-11-21 - Add ble.sh automatic history completion menu
 #   2026-11-21 - Show fzf history results in a compact dropdown and load Bash integration
 #   2026-11-21 - Install fzf when missing on Debian-based systems
 #   2026-11-21 - Enable fzf command history picker
@@ -21,6 +22,39 @@ case $- in
     *i*) ;;
       *) return;;
 esac
+
+# Install ble.sh in the user's local data directory when it is not already available.
+install_ble_sh() {
+    local install_directory
+    install_directory=$(mktemp -d) || return 1
+
+    # Download and install ble.sh from its official nightly build in a temporary directory.
+    if curl -fsSL https://github.com/akinomyoga/ble.sh/releases/download/nightly/ble-nightly.tar.xz |
+        tar -xJf - -C "$install_directory" &&
+        bash "$install_directory/ble-nightly/ble.sh" --install "$HOME/.local/share"; then
+        rm -rf -- "$install_directory"
+        return 0
+    fi
+
+    rm -rf -- "$install_directory"
+    return 1
+}
+
+# Install and load ble.sh only in interactive shells so it can manage line editing.
+if [ ! -r "$HOME/.local/share/blesh/ble.sh" ]; then
+    if command -v curl >/dev/null 2>&1 && command -v tar >/dev/null 2>&1 && command -v xz >/dev/null 2>&1; then
+        if ! install_ble_sh; then
+            printf 'ble.sh installation failed; continuing with the standard Bash line editor.\n' >&2
+        fi
+    else
+        printf 'ble.sh needs curl, tar, and xz; continuing with the standard Bash line editor.\n' >&2
+    fi
+fi
+
+# Load ble.sh without attaching until the remaining Bash settings are applied.
+if [ -r "$HOME/.local/share/blesh/ble.sh" ]; then
+    source -- "$HOME/.local/share/blesh/ble.sh" --attach=none
+fi
 
 # ==============================================================================
 # TERMINAL SETTINGS
@@ -67,22 +101,6 @@ if ! command -v fzf >/dev/null 2>&1; then
         fi
     else
         printf 'fzf is missing. Install it with: sudo apt-get install fzf\n' >&2
-    fi
-fi
-
-# Configure the history picker as a compact list below the command line.
-if command -v fzf >/dev/null 2>&1; then
-    export FZF_CTRL_R_OPTS='--height=~40% --layout=reverse --border'
-
-    # Load the modern integration or a packaged key-binding script for older fzf releases.
-    if fzf --bash >/dev/null 2>&1; then
-        eval "$(fzf --bash)"
-    elif [ -r /usr/share/doc/fzf/examples/key-bindings.bash ]; then
-        . /usr/share/doc/fzf/examples/key-bindings.bash
-    elif [ -r /usr/share/fzf/key-bindings.bash ]; then
-        . /usr/share/fzf/key-bindings.bash
-    else
-        printf 'fzf Bash bindings were not found; Ctrl+R will use Bash reverse search.\n' >&2
     fi
 fi
 
@@ -245,4 +263,34 @@ if ! shopt -oq posix; then
   elif [ -f /etc/bash_completion ]; then
     . /etc/bash_completion
   fi
+fi
+
+# Enable a delayed, linewise menu for automatic history completions.
+if [ -n "${BLE_VERSION:-}" ]; then
+    bleopt complete_auto_menu=500
+    bleopt complete_menu_style=linewise
+    bleopt complete_menu_maxlines=10
+
+    # Use ble.sh's compatibility layer for fzf key bindings when fzf is installed.
+    if command -v fzf >/dev/null 2>&1; then
+        export FZF_CTRL_R_OPTS='--height=~40% --layout=reverse --border'
+        ble-import -d integration/fzf-completion
+        ble-import -d integration/fzf-key-bindings
+    fi
+
+    # Attach ble.sh after the rest of the shell configuration is loaded.
+    ble-attach
+elif command -v fzf >/dev/null 2>&1; then
+    export FZF_CTRL_R_OPTS='--height=~40% --layout=reverse --border'
+
+    # Load fzf's modern integration or a packaged key-binding script for older releases.
+    if fzf --bash >/dev/null 2>&1; then
+        eval "$(fzf --bash)"
+    elif [ -r /usr/share/doc/fzf/examples/key-bindings.bash ]; then
+        . /usr/share/doc/fzf/examples/key-bindings.bash
+    elif [ -r /usr/share/fzf/key-bindings.bash ]; then
+        . /usr/share/fzf/key-bindings.bash
+    else
+        printf 'fzf Bash bindings were not found; Ctrl+R will use Bash reverse search.\n' >&2
+    fi
 fi
