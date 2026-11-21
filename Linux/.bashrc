@@ -4,6 +4,7 @@
 # Author        : Greg Tate & coding agent
 # Last Modified : 2026-11-21
 # Revision History:
+#   2026-11-21 - Hide ble.sh Vi indicator and apply Readline bindings before loading it
 #   2026-11-21 - Add ble.sh automatic history completion menu
 #   2026-11-21 - Show fzf history results in a compact dropdown and load Bash integration
 #   2026-11-21 - Install fzf when missing on Debian-based systems
@@ -22,6 +23,12 @@ case $- in
     *i*) ;;
       *) return;;
 esac
+
+# Configure Bash's Vi mode and Readline bindings before ble.sh wraps Readline.
+set -o vi
+if [ -f ~/.inputrc ]; then
+    bind -f ~/.inputrc
+fi
 
 # Install ble.sh in the user's local data directory when it is not already available.
 install_ble_sh() {
@@ -61,17 +68,6 @@ fi
 # ==============================================================================
 # Disable line wrapping for output (allows horizontal scrolling)
 tput rmam
-
-# ==============================================================================
-# VI MODE CONFIGURATION
-# ==============================================================================
-# Enable vi command line editing mode (uses ~/.inputrc vi settings)
-set -o vi
-
-# Load inputrc configuration if it exists
-if [ -f ~/.inputrc ]; then
-    bind -f ~/.inputrc
-fi
 
 # Set default editors for CLI tools (git, crontab, etc.)
 export EDITOR=vim
@@ -267,6 +263,7 @@ fi
 
 # Enable a delayed, linewise menu for automatic history completions.
 if [ -n "${BLE_VERSION:-}" ]; then
+    bleopt keymap_vi_mode_show=
     bleopt complete_auto_menu=500
     bleopt complete_menu_style=linewise
     bleopt complete_menu_maxlines=10
