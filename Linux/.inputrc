@@ -70,21 +70,21 @@ set mark-directories on
 set keymap vi-insert
 
 # History navigation
-"\C-p": previous-history          # Ctrl+P: previous command
-"\C-n": next-history              # Ctrl+N: next command
+"\C-p": previous-history
+"\C-n": next-history
 
 # Word movement
-"\eb": backward-word              # Alt+B: move backward one word
-"\ef": forward-word               # Alt+F: move forward one word
+"\eb": backward-word
+"\ef": forward-word
 
 # Line navigation
-"\C-a": beginning-of-line         # Ctrl+A: go to start of line
-"\C-e": end-of-line               # Ctrl+E: go to end of line
+"\C-a": beginning-of-line
+"\C-e": end-of-line
 
 # Line editing
-"\C-k": kill-line                 # Ctrl+K: delete from cursor to end of line
-"\C-u": backward-kill-line        # Ctrl+U: delete from cursor to start of line
-"\C-w": backward-kill-word        # Ctrl+W: delete word before cursor
+"\C-k": kill-line
+"\C-u": backward-kill-line
+"\C-w": backward-kill-word
 
 # ==============================================================================
 # KEYBINDINGS - COMMAND MODE
@@ -92,18 +92,18 @@ set keymap vi-insert
 set keymap vi-command
 
 # History navigation (same as insert mode for consistency)
-"\C-p": previous-history          # Ctrl+P: previous command
-"\C-n": next-history              # Ctrl+N: next command
+"\C-p": previous-history
+"\C-n": next-history
 
 # Word movement
-"\eb": backward-word              # Alt+B: move backward one word
-"\ef": forward-word               # Alt+F: move forward one word
+"\eb": backward-word
+"\ef": forward-word
 
 # Line navigation
-"\C-a": beginning-of-line         # Ctrl+A: go to start of line
-"\C-e": end-of-line               # Ctrl+E: go to end of line
+"\C-a": beginning-of-line
+"\C-e": end-of-line
 
 # Line editing
-"\C-k": kill-line                 # Ctrl+K: delete from cursor to end of line
-"\C-u": backward-kill-line        # Ctrl+U: delete from cursor to start of line
-"\C-w": backward-kill-word        # Ctrl+W: delete word before cursor
+"\C-k": kill-line
+"\C-u": backward-kill-line
+"\C-w": backward-kill-word
