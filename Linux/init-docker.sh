@@ -1,9 +1,11 @@
 #!/bin/bash
 # -------------------------------------------------------------------------
-# Program: init-docker.sh
-# Description: Quick setup script for Docker container CLI environments
-# Context: Installs bash, vim, and inputrc configurations only
-# Author: Greg Tate
+# Description   : Set up command-line configuration in Docker containers
+# Context       : Linux container setup — install tools and configure Bash
+# Author        : Greg Tate & coding agent
+# Last Modified : 2026-11-21
+# Revision History:
+#   2026-11-21 - Start an interactive Bash shell to load the installed profile
 # -------------------------------------------------------------------------
 #
 # USAGE:
@@ -84,9 +86,9 @@ main() {
     # Change to home directory
     cd ~
 
-    # Start a new interactive bash shell with the configurations loaded
+    # Force interactive startup so Bash reads the newly installed .bashrc.
     info "Starting new bash shell with configurations..."
-    exec bash
+    exec bash -i
 }
 
 # ==============================================================================
