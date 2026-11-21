@@ -11,17 +11,22 @@ A collection of configuration files and profiles for various development tools a
 irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/RemoteProfile/bootstrap.ps1 | iex
 ```
 
-### Linux/Docker Container Setup
+### Remote Linux Setup
+
+The setup is intended for APT-based distributions such as Debian and Ubuntu,
+including remote VMs and containers. Run it as the user whose profile you want
+to configure; it uses `sudo` for package installation when needed.
 
 ```bash
-# One-liner to setup Linux/Docker environment from GitHub
-curl -fsSL https://raw.githubusercontent.com/Greg-T8/Profiles/main/Linux/bootstrap-docker.sh | sudo bash
+# Set up the current user's Linux profile from GitHub
+curl -fsSL https://raw.githubusercontent.com/Greg-T8/Profiles/main/Linux/bootstrap-linux.sh | bash
 ```
 
-For minimal Docker images without curl or wget pre-installed:
+For a minimal APT-based system without curl, install it first:
 
 ```bash
-apt-get update && apt-get install -y curl && curl -fsSL https://raw.githubusercontent.com/Greg-T8/Profiles/main/Linux/init-docker.sh | sudo bash
+sudo apt-get update && sudo apt-get install -y curl
+curl -fsSL https://raw.githubusercontent.com/Greg-T8/Profiles/main/Linux/bootstrap-linux.sh | bash
 ```
 
 ## 🚀 Manual Setup
@@ -30,9 +35,9 @@ For manual configuration or customization, use the following setup instructions.
 
 ### Linux Configurations
 
-#### Docker Container Quick Setup
+#### Remote Linux Quick Setup
 
-The `init-docker.sh` script provides automated setup for Docker containers:
+The `init-linux.sh` script provides automated setup for remote Linux systems:
 
 ```bash
 # Clone repository first
@@ -40,16 +45,16 @@ git clone https://github.com/Greg-T8/Profiles.git ~/profiles
 cd ~/profiles/Linux
 
 # Make executable and run
-chmod +x init-docker.sh
-./init-docker.sh
+chmod +x init-linux.sh
+./init-linux.sh
 ```
 
 **What it does:**
 
-- Automatically installs vim, git, curl, wget
-- Creates symlinks for .bashrc, .vimrc, .inputrc
+- Installs curl, wget, vim, less, procps, and fzf
+- Downloads .bashrc, .vimrc, and .inputrc, backing up existing files
 - Configures vi mode and custom prompt
-- Works with apt-get, yum, and apk package managers
+- Supports apt-get, yum, zypper, and apk; the package list is geared toward APT
 
 #### Vim
 

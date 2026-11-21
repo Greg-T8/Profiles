@@ -1,10 +1,11 @@
 #!/bin/bash
 # -------------------------------------------------------------------------
-# Description   : Set up command-line configuration in Docker containers
-# Context       : Linux container setup — install tools and configure Bash
+# Description   : Set up command-line tools and configuration on Linux
+# Context       : Remote Linux setup — install tools and configure Bash
 # Author        : Greg Tate & coding agent
 # Last Modified : 2026-11-21
 # Revision History:
+#   2026-11-21 - Rename Linux setup and clarify APT-based usage
 #   2026-11-21 - Remove ble.sh installation while retaining fzf
 #   2026-11-21 - Install fzf and ble.sh with basic tools and report failures
 #   2026-11-21 - Start an interactive Bash shell to load the installed profile
@@ -12,21 +13,21 @@
 #
 # USAGE:
 #   1. Make the script executable:
-#      chmod +x init-docker.sh
+#      chmod +x init-linux.sh
 #
 #   2. Run the script:
-#      ./init-docker.sh
+#      ./init-linux.sh
 #
 #   3. After completion, restart your terminal or run:
 #      exec bash
 #
 # WHAT THIS SCRIPT DOES:
 #   - Downloads profile dotfiles from GitHub (.bashrc, .vimrc, .inputrc)
-#   - Installs basic tools (vim, git, curl, wget)
+#   - Installs basic tools (curl, wget, vim, less, procps, fzf)
 #   - Configures bash with vi mode and custom prompt
 #
 # REQUIREMENTS:
-#   - Linux environment (Docker container, VM, etc.)
+#   - Linux environment, preferably an APT-based distribution
 #   - Sudo privileges or run as root
 #
 # -------------------------------------------------------------------------
@@ -42,7 +43,7 @@ GITHUB_REPO="https://raw.githubusercontent.com/Greg-T8/Profiles/main/Linux"
 DOTFILES=(".bashrc" ".inputrc" ".vimrc")
 
 # List of essential tools to install
-# Add or remove tools as needed for your container environment
+# Add or remove tools as needed for your Linux environment
 TOOLS=(
     "curl"          # URL transfer tool
     "wget"          # File downloader
@@ -59,7 +60,7 @@ TOOLS=(
 
 main() {
     echo ""
-    info "Docker Container Initialization Script"
+    info "Linux Initialization Script"
     info "Author: Greg Tate"
     info "Date: $(date)"
     echo ""
@@ -296,7 +297,7 @@ show_summary() {
     section "Installation Summary"
 
     echo ""
-    info "Docker container initialization finished. Review any warnings above."
+    info "Linux initialization finished. Review any warnings above."
     echo ""
     info "To activate the configuration in your current session, run:"
     echo -e "  ${GREEN}exec bash${NC}"
