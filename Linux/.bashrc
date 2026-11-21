@@ -4,6 +4,7 @@
 # Author        : Greg Tate & coding agent
 # Last Modified : 2026-11-21
 # Revision History:
+#   2026-11-21 - Avoid reloading Readline and ble.sh when sourcing the profile
 #   2026-11-21 - Preconfigure the ble.sh Vi indicator before keymap initialization
 #   2026-11-21 - Fix root fzf installation and defer the Vi mode indicator setting
 #   2026-11-21 - Mirror configured Readline Vi bindings in ble.sh
@@ -27,10 +28,13 @@ case $- in
       *) return;;
 esac
 
-# Configure Bash's Vi mode and Readline bindings before ble.sh wraps Readline.
-set -o vi
-if [ -f ~/.inputrc ]; then
-    bind -f ~/.inputrc
+# Configure Readline only before ble.sh takes over the line editor.
+_profile_ble_already_loaded=${BLE_VERSION:+yes}
+if [ -z "$_profile_ble_already_loaded" ]; then
+    set -o vi
+    if [ -f ~/.inputrc ]; then
+        builtin bind -f ~/.inputrc
+    fi
 fi
 
 # Install ble.sh in the user's local data directory when it is not already available.
@@ -62,7 +66,7 @@ if [ ! -r "$HOME/.local/share/blesh/ble.sh" ]; then
 fi
 
 # Load ble.sh without attaching until the remaining Bash settings are applied.
-if [ -r "$HOME/.local/share/blesh/ble.sh" ]; then
+if [ -z "$_profile_ble_already_loaded" ] && [ -r "$HOME/.local/share/blesh/ble.sh" ]; then
     source -- "$HOME/.local/share/blesh/ble.sh" --attach=none
     # Define the lazy-loaded Vi option before ble.sh initializes the keymap.
     if [ -n "${BLE_VERSION:-}" ]; then
@@ -320,8 +324,10 @@ if [ -n "${BLE_VERSION:-}" ]; then
         ble-import -d integration/fzf-key-bindings
     fi
 
-    # Attach ble.sh after the rest of the shell configuration is loaded.
-    ble-attach
+    # Attach ble.sh only when this profile loaded it in the current shell.
+    if [ -z "$_profile_ble_already_loaded" ]; then
+        ble-attach
+    fi
 elif command -v fzf >/dev/null 2>&1; then
     export FZF_CTRL_R_OPTS='--height=~40% --layout=reverse --border'
 
@@ -336,3 +342,6 @@ elif command -v fzf >/dev/null 2>&1; then
         printf 'fzf Bash bindings were not found; Ctrl+R will use Bash reverse search.\n' >&2
     fi
 fi
+
+# Remove the temporary state used to detect a repeated profile load.
+unset _profile_ble_already_loaded
