@@ -5,7 +5,7 @@
   "alwaysShowNotificationIcon": false,
   "copyFormatting": "rtf",
   "copyOnSelect": true,
-  "defaultProfile": "{574e775e-4f2a-5b96-ac1e-a2962a402336}",
+  "defaultProfile": "{fd453e74-4dc5-411d-8875-4512c3d35c09}",
   "disabledProfileSources": [
     "Windows.Terminal.PowerShellCore"
   ],
@@ -30,7 +30,7 @@
   "newTabMenu": [
     {
       "icon": null,
-      "profile": "{81f16587-1b55-49b8-8ced-9042f7c60d19}",
+      "profile": "{fd453e74-4dc5-411d-8875-4512c3d35c09}",
       "type": "profile"
     },
     {
@@ -58,7 +58,7 @@
       {
         "colorScheme": "CGA",
         "commandline": "\"%LOCALAPPDATA%\\Microsoft\\WindowsApps\\pwsh.exe\"",
-        "guid": "{81f16587-1b55-49b8-8ced-9042f7c60d19}",
+        "guid": "{fd453e74-4dc5-411d-8875-4512c3d35c09}",
         "hidden": false,
         "icon": "ms-appx:///ProfileIcons/pwsh.png",
         "name": "PowerShell",

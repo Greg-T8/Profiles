@@ -1,110 +1,7 @@
 {
   "$help": "https://aka.ms/terminal-documentation",
   "$schema": "https://aka.ms/terminal-profiles-schema",
-  "actions": [
-    {
-      "command": {
-        "action": "copy",
-        "singleLine": false
-      },
-      "id": "User.copy.644BA8F2"
-    },
-    {
-      "command": {
-        "action": "newTab"
-      },
-      "id": "User.newTab"
-    },
-    {
-      "command": {
-        "action": "moveFocus",
-        "direction": "right"
-      },
-      "id": "User.moveFocus.right"
-    },
-    {
-      "command": "paste",
-      "id": "User.paste"
-    },
-    {
-      "command": {
-        "action": "splitPane",
-        "split": "auto",
-        "splitMode": "duplicate"
-      },
-      "id": "User.splitPane.A6751878"
-    },
-    {
-      "command": "find",
-      "id": "User.find"
-    },
-    {
-      "command": {
-        "action": "moveFocus",
-        "direction": "up"
-      },
-      "id": "User.moveFocus.up"
-    },
-    {
-      "command": {
-        "action": "splitPane",
-        "split": "right",
-        "splitMode": "duplicate"
-      },
-      "id": "User.splitPane.right"
-    },
-    {
-      "command": {
-        "action": "splitPane",
-        "split": "down",
-        "splitMode": "duplicate"
-      },
-      "id": "User.splitPane.down"
-    },
-    {
-      "command": "closePane",
-      "id": "User.closePane"
-    },
-    {
-      "command": {
-        "action": "moveFocus",
-        "direction": "left"
-      },
-      "id": "User.moveFocus.left"
-    },
-    {
-      "command": {
-        "action": "nextTab"
-      },
-      "id": "User.nextTab"
-    },
-    {
-      "command": {
-        "action": "moveFocus",
-        "direction": "down"
-      },
-      "id": "User.moveFocus.down"
-    },
-    {
-      "command": {
-        "action": "closeTab"
-      },
-      "id": "User.closeTab"
-    },
-    {
-      "command": {
-        "action": "prevTab"
-      },
-      "id": "User.prevTab"
-    },
-    {
-      "command": {
-        "action": "sendInput",
-        "input": "\u001b\r"
-      },
-      "id": "User.sendInput.8F63D3A9"
-    }
-  ],
+  "actions": [],
   "alwaysShowNotificationIcon": false,
   "copyFormatting": "rtf",
   "copyOnSelect": true,
@@ -117,22 +14,19 @@
   "initialCols": 180,
   "initialRows": 50,
   "keybindings": [
-    "keybindings": [
-      {
-        "id": "unbound",
-        "keys": "alt+shift+left"
-      },
-      {
-        "id": "unbound",
-        "keys": "alt+shift+right"
-      },
-      {
-        "id": "unbound",
-        "keys": "ctrl+alt+k"
-      }
-    ],
+    {
+      "id": "unbound",
+      "keys": "alt+shift+left",
+    },
+    {
+      "id": "unbound",
+      "keys": "alt+shift+right"
+    },
+    {
+      "id": "unbound",
+      "keys": "ctrl+alt+k"
+    }
   ],
-  "minimizeToNotificationArea": true,
   "newTabMenu": [
     {
       "icon": null,
@@ -231,6 +125,7 @@
   "themes": [],
   "trimBlockSelection": true,
   "useAcrylicInTabRow": true,
+  "warning.confirmOnClose": "never",
   "warning.largePaste": false,
   "warning.multiLinePaste": "automatic",
   "windowingBehavior": "useNew"
