@@ -4,6 +4,7 @@
 # Author        : Greg Tate & coding agent
 # Last Modified : 2026-11-21
 # Revision History:
+#   2026-11-21 - Centralize the Windows Terminal profile ID gate here.
 #   2026-11-21 - Move the Preview profile ID to the configuration section.
 #   2026-11-21 - Limit automatic attachment to the Preview PowerShell profile.
 #   2026-11-11 - Combine Herdr helpers and startup in one profile script.
@@ -16,9 +17,10 @@
 $herdrPreviewProfileId = '{fd453e74-4dc5-411d-8875-4512c3d35c09}'
 
 #region HERDR CLIENT INTEGRATION
-# Initialize Herdr only when profile integration is enabled and supported.
+# Initialize Herdr only in its configured Windows Terminal Preview profile.
 Write-ProfileTime 'Before Herdr integration'
-if ($script:HerdrIntegrationEnabled -and $PSVersionTable.PSEdition -eq 'Core' -and $IsWindows) {
+if ($env:WT_PROFILE_ID -eq $herdrPreviewProfileId -and
+    $PSVersionTable.PSEdition -eq 'Core' -and $IsWindows) {
     try {
         # Define the integration helpers in the profile session when enabled.
         Write-ProfileTime 'Before Herdr helper initialization'
@@ -318,9 +320,8 @@ if ($script:HerdrIntegrationEnabled -and $PSVersionTable.PSEdition -eq 'Core' -a
             }
         }
 
-        # Attach only from the dedicated Windows Terminal Preview profile.
-        elseif ($env:WT_SESSION -and $env:WT_PROFILE_ID -eq $herdrPreviewProfileId -and
-            $env:TERM_PROGRAM -ne 'vscode' -and (Test-HerdrAutostartEligibility)) {
+        # Attach from an active Windows Terminal session after the profile ID gate above.
+        elseif ($env:WT_SESSION -and $env:TERM_PROGRAM -ne 'vscode' -and (Test-HerdrAutostartEligibility)) {
             if ($env:TERM_PROGRAM -eq 'vscode' -and $env:VSCODE_INJECTION -eq '1' -and $herdrCommand) {
                 # Wait until VS Code's injected shell integration has finished.
                 $global:HerdrOriginalPrompt = $function:prompt

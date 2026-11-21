@@ -2,8 +2,9 @@
 # Description   : Configure the interactive PowerShell environment and prompt.
 # Context       : Personal cross-host profile ($Profile.CurrentUserAllHosts).
 # Author        : Greg Tate & coding agent
-# Last Modified : 2026-11-11
+# Last Modified : 2026-11-21
 # Revision History:
+#   2026-11-21 - Move the Herdr profile ID gate into its feature script.
 #   2026-11-11 - Resolve profile features from the dedicated Profile folder.
 #   2026-11-11 - Load and measure the renamed profile functions script.
 #   2026-11-11 - Show elapsed time between profile timing checkpoints.
@@ -49,10 +50,6 @@ function script:Write-ProfileTime {
     }
 }
 Write-ProfileTime 'Profile start'
-
-# Enable Herdr startup and managed-pane integration for Windows Terminal sessions.
-$script:HerdrIntegrationEnabled = $true
-Write-ProfileTime 'After Herdr integration setting'
 
 # Keep Python venv activation from replacing the custom prompt function.
 $env:VIRTUAL_ENV_DISABLE_PROMPT = '1'
