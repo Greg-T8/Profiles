@@ -4,6 +4,7 @@
 # Author        : Greg Tate & coding agent
 # Last Modified : 2026-11-21
 # Revision History:
+#   2026-11-21 - Restore Readline and use fzf for Ctrl+R history search
 #   2026-11-21 - Avoid reloading Readline and ble.sh when sourcing the profile
 #   2026-11-21 - Preconfigure the ble.sh Vi indicator before keymap initialization
 #   2026-11-21 - Fix root fzf installation and defer the Vi mode indicator setting
@@ -28,50 +29,10 @@ case $- in
       *) return;;
 esac
 
-# Configure Readline only before ble.sh takes over the line editor.
-_profile_ble_already_loaded=${BLE_VERSION:+yes}
-if [ -z "$_profile_ble_already_loaded" ]; then
-    set -o vi
-    if [ -f ~/.inputrc ]; then
-        builtin bind -f ~/.inputrc
-    fi
-fi
-
-# Install ble.sh in the user's local data directory when it is not already available.
-install_ble_sh() {
-    local install_directory
-    install_directory=$(mktemp -d) || return 1
-
-    # Download and install ble.sh from its official nightly build in a temporary directory.
-    if curl -fsSL https://github.com/akinomyoga/ble.sh/releases/download/nightly/ble-nightly.tar.xz |
-        tar -xJf - -C "$install_directory" &&
-        bash "$install_directory/ble-nightly/ble.sh" --install "$HOME/.local/share"; then
-        rm -rf -- "$install_directory"
-        return 0
-    fi
-
-    rm -rf -- "$install_directory"
-    return 1
-}
-
-# Install and load ble.sh only in interactive shells so it can manage line editing.
-if [ ! -r "$HOME/.local/share/blesh/ble.sh" ]; then
-    if command -v curl >/dev/null 2>&1 && command -v tar >/dev/null 2>&1 && command -v xz >/dev/null 2>&1; then
-        if ! install_ble_sh; then
-            printf 'ble.sh installation failed; continuing with the standard Bash line editor.\n' >&2
-        fi
-    else
-        printf 'ble.sh needs curl, tar, and xz; continuing with the standard Bash line editor.\n' >&2
-    fi
-fi
-
-# Load ble.sh without attaching until the remaining Bash settings are applied.
-if [ -z "$_profile_ble_already_loaded" ] && [ -r "$HOME/.local/share/blesh/ble.sh" ]; then
-    source -- "$HOME/.local/share/blesh/ble.sh" --attach=none
-    # Define the lazy-loaded Vi option before ble.sh initializes the keymap.
-    if [ -n "${BLE_VERSION:-}" ]; then
-        bleopt keymap_vi_mode_show:=
-    fi
+# Configure Bash's Vi mode and load the user's Readline bindings.
+set -o vi
+if [ -f ~/.inputrc ]; then
+    builtin bind -f ~/.inputrc
 fi
 
 # ==============================================================================
@@ -274,61 +235,8 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# Enable a delayed, linewise menu for automatic history completions.
-if [ -n "${BLE_VERSION:-}" ]; then
-    bleopt complete_auto_menu=500
-    bleopt complete_menu_style=linewise
-    bleopt complete_menu_maxlines=10
-
-    # Register ble.sh-native equivalents for the custom Readline Vi bindings.
-    ble_configure_vi_bindings() {
-        # Hide the Vi mode indicator after its option is registered.
-        bleopt keymap_vi_mode_show:=
-        # Enable Meta-key sequences in insert mode before binding Alt+B and Alt+F.
-        ble-decode/keymap:vi_imap/define-meta-bindings
-
-        # Match the Readline bindings used while entering a command.
-        ble-bind -m vi_imap -f C-p history-prev
-        ble-bind -m vi_imap -f C-n history-next
-        ble-bind -m vi_imap -f M-b backward-cword
-        ble-bind -m vi_imap -f M-f forward-cword
-        ble-bind -m vi_imap -f C-a beginning-of-line
-        ble-bind -m vi_imap -f C-e end-of-line
-        ble-bind -m vi_imap -f C-k kill-forward-line
-        ble-bind -m vi_imap -f C-u kill-backward-line
-        ble-bind -m vi_imap -f C-w kill-backward-uword
-        ble-bind -m vi_imap -f up history-search-backward
-        ble-bind -m vi_imap -f down history-search-forward
-
-        # Match the corresponding custom bindings in Vi command mode.
-        ble-bind -m vi_nmap -f C-p vi-command/history-prev
-        ble-bind -m vi_nmap -f C-n vi-command/history-next
-        ble-bind -m vi_nmap -f M-b backward-cword
-        ble-bind -m vi_nmap -f M-f forward-cword
-        ble-bind -m vi_nmap -f C-a beginning-of-line
-        ble-bind -m vi_nmap -f C-e end-of-line
-        ble-bind -m vi_nmap -f C-k kill-forward-line
-        ble-bind -m vi_nmap -f C-u kill-backward-line
-        ble-bind -m vi_nmap -f C-w kill-backward-uword
-
-        # Preserve the configured block and line cursor shapes in each mode.
-        ble-bind -m vi_imap --cursor 6
-        ble-bind -m vi_nmap --cursor 2
-    }
-    blehook/eval-after-load keymap_vi ble_configure_vi_bindings
-
-    # Use ble.sh's compatibility layer for fzf key bindings when fzf is installed.
-    if command -v fzf >/dev/null 2>&1; then
-        export FZF_CTRL_R_OPTS='--height=~40% --layout=reverse --border'
-        ble-import -d integration/fzf-completion
-        ble-import -d integration/fzf-key-bindings
-    fi
-
-    # Attach ble.sh only when this profile loaded it in the current shell.
-    if [ -z "$_profile_ble_already_loaded" ]; then
-        ble-attach
-    fi
-elif command -v fzf >/dev/null 2>&1; then
+# Load fzf's Ctrl+R history picker for Readline.
+if command -v fzf >/dev/null 2>&1; then
     export FZF_CTRL_R_OPTS='--height=~40% --layout=reverse --border'
 
     # Load fzf's modern integration or a packaged key-binding script for older releases.
@@ -342,6 +250,3 @@ elif command -v fzf >/dev/null 2>&1; then
         printf 'fzf Bash bindings were not found; Ctrl+R will use Bash reverse search.\n' >&2
     fi
 fi
-
-# Remove the temporary state used to detect a repeated profile load.
-unset _profile_ble_already_loaded

@@ -5,6 +5,7 @@
 # Author        : Greg Tate & coding agent
 # Last Modified : 2026-11-21
 # Revision History:
+#   2026-11-21 - Remove ble.sh installation while retaining fzf
 #   2026-11-21 - Install fzf and ble.sh with basic tools and report failures
 #   2026-11-21 - Start an interactive Bash shell to load the installed profile
 # -------------------------------------------------------------------------
@@ -281,19 +282,6 @@ install_tools() {
         failures=1
     fi
 
-    # Install ble.sh from its official release in the current user's home.
-    if [ -r "$HOME/.local/share/blesh/ble.sh" ]; then
-        info "ble.sh is already installed"
-    else
-        info "Installing ble.sh..."
-        if install_ble_sh_tool "$pkg_manager"; then
-            success "ble.sh installed successfully"
-        else
-            error "ble.sh installation failed"
-            failures=1
-        fi
-    fi
-
     # Report incomplete installations accurately.
     if [ "$failures" -eq 0 ]; then
         success "Tool installation completed"
@@ -301,34 +289,6 @@ install_tools() {
         warning "Some tools could not be installed; review the errors above"
         return 1
     fi
-}
-
-# Install ble.sh and the tools needed to unpack its release archive.
-install_ble_sh_tool() {
-    local pkg_manager="$1"
-    local install_directory
-
-    # Install missing archive utilities for the detected package manager.
-    if ! command -v tar >/dev/null 2>&1 || ! command -v xz >/dev/null 2>&1; then
-        case "$pkg_manager" in
-            apt-get) "${privilege[@]}" apt-get install -y -qq tar xz-utils || return 1 ;;
-            yum) "${privilege[@]}" yum install -y -q tar xz || return 1 ;;
-            zypper) "${privilege[@]}" zypper install -y tar xz || return 1 ;;
-            apk) "${privilege[@]}" apk add -q tar xz || return 1 ;;
-        esac
-    fi
-
-    # Download and install the official nightly build, then remove its staging directory.
-    install_directory=$(mktemp -d) || return 1
-    if curl -fsSL https://github.com/akinomyoga/ble.sh/releases/download/nightly/ble-nightly.tar.xz -o "$install_directory/ble.tar.xz" &&
-        tar -xJf "$install_directory/ble.tar.xz" -C "$install_directory" &&
-        bash "$install_directory/ble-nightly/ble.sh" --install "$HOME/.local/share" &&
-        [ -r "$HOME/.local/share/blesh/ble.sh" ]; then
-        rm -rf -- "$install_directory"
-        return 0
-    fi
-    rm -rf -- "$install_directory"
-    return 1
 }
 
 # Display summary and next steps
