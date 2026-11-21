@@ -16,6 +16,9 @@ accent = "#61AFEF"
 active_row_bg = "#2C313A"
 selection_bg = "#3E4451"
 
+# Brighter green for status indicators
+green = "#A6E3A1"
+
 [ui]
 host_cursor = "native"
 sidebar_collapsed_mode = "hidden"
