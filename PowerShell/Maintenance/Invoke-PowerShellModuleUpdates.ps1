@@ -60,6 +60,8 @@ Task Scheduler folder path used with -Register or -Unregister. Defaults to \Cust
 Program: Invoke-PowerShellModuleUpdates.ps1
 Last Modified: 2026-11-21
 Revision History:
+    2026-11-21 - Batch cleanup discovery and log maintenance progress.
+    2026-11-21 - Run cleanup for skipped and up-to-date modules.
     2026-11-21 - Remove leftover user-scoped module version folders.
 #>
 #endregion
@@ -605,15 +607,13 @@ $Helpers = {
         }
 
         process {
-            # Discover all installed module entries (all versions) for the targets
-            $installed = foreach ($pattern in ($targets | Select-Object -Unique)) {
-                try {
-                    Get-InstalledModule -Name $pattern -AllVersions -ErrorAction Stop
-                }
-                catch {
-                    Write-Verbose "No installed modules matched pattern '$pattern'."
-                }
-            }
+            # Discover installed versions once, then apply the requested name patterns.
+            Write-Host 'Cleanup: discovering installed module versions.'
+            $installed = @(Get-Package -ProviderName PowerShellGet -AllVersions -ErrorAction Stop | Where-Object {
+                    $module = $_
+                    $module.Metadata['Type'] -eq 'Module' -and
+                    @($targets | Where-Object { $module.Name -like $_ }).Count -gt 0
+                })
 
             if (-not $installed) {
                 Write-Verbose 'No matching installed modules found.'
@@ -638,6 +638,7 @@ $Helpers = {
             foreach ($group in $byName) {
                 $groupIndex++
                 $cleanupPercent = [int](($groupIndex / $groupCount) * 100)
+                Write-Host "Cleanup progress: checking $groupIndex of $groupCount modules: $($group.Name)"
                 Write-Progress -Id 2 -ParentId 1 -Activity 'PowerShell module maintenance cleanup' -Status "Cleanup phase: checking $groupIndex of $groupCount modules" -PercentComplete $cleanupPercent
 
                 $name = $group.Name
@@ -917,24 +918,25 @@ $Helpers = {
                 Write-Warning "[WARN] Failed to update '$moduleName': $_"
             }
 
-            # Run old-version cleanup for this module immediately after update.
-            if (-not $SkipRemoveOldVersions -and (Get-Command Remove-OldModuleVersions -ErrorAction SilentlyContinue)) {
-                try {
-                    $cleanupStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
-                    Remove-OldModuleVersions -Name $moduleName -Confirm:$false
-                    $cleanupStopwatch.Stop()
-                    if ($ShowTiming) {
-                        Write-Host ('Timing: [{0}] Remove-OldModuleVersions: {1:N2}s' -f $moduleName, $cleanupStopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkCyan
-                    }
-                }
-                catch {
-                    Write-Warning "[WARN] Failed to remove old module versions for '$moduleName': $_"
-                }
-            }
-
             $moduleStopwatch.Stop()
             if ($ShowTiming) {
                 Write-Host ('Timing: [{0}] Total: {1:N2}s' -f $moduleName, $moduleStopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkCyan
+            }
+        }
+
+        # Clean old versions for eligible modules even when update checks skipped them.
+        $cleanupModuleNames = @($moduleNamesToProcess | Where-Object { $loadedModuleNames -notcontains $_ })
+        if (-not $SkipRemoveOldVersions -and $cleanupModuleNames -and (Get-Command Remove-OldModuleVersions -ErrorAction SilentlyContinue)) {
+            try {
+                $cleanupStopwatch = [System.Diagnostics.Stopwatch]::StartNew()
+                Remove-OldModuleVersions -Name $cleanupModuleNames -Confirm:$false
+                $cleanupStopwatch.Stop()
+                if ($ShowTiming) {
+                    Write-Host ('Timing: [all eligible modules] Remove-OldModuleVersions: {0:N2}s' -f $cleanupStopwatch.Elapsed.TotalSeconds) -ForegroundColor DarkCyan
+                }
+            }
+            catch {
+                Write-Warning "[WARN] Failed to remove old module versions: $_"
             }
         }
 
@@ -999,6 +1001,12 @@ $Helpers = {
                 # Show per-module processing status in console only.
                 if ($text -match '^Processing module:') {
                     $text | Out-Host
+                    "$(Get-Date -Format s) $text" | Out-File -FilePath $PowerShellLogPath -Append
+                }
+                # Record cleanup progress while preserving the final change summary.
+                elseif ($text -match '^Cleanup progress:' -or $text -eq 'Cleanup: discovering installed module versions.') {
+                    $text | Out-Host
+                    "$(Get-Date -Format s) $text" | Out-File -FilePath $PowerShellLogPath -Append
                 }
                 # Show per-call timing diagnostics in console only.
                 elseif ($text -match '^Timing:') {

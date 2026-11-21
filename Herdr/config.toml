@@ -10,6 +10,12 @@ onboarding = false
 name = "one-dark"
 auto_switch = false
 
+# Theme overrides
+[theme.custom]
+accent = "#61AFEF"
+active_row_bg = "#2C313A"
+selection_bg = "#3E4451"
+
 [ui]
 host_cursor = "native"
 sidebar_collapsed_mode = "hidden"
@@ -20,32 +26,46 @@ pane_outer_borders = false
 window_title = "{workspace} | {tab} | Herdr"
 tab_bar_right = [
 	{ type = "zoom" },
-	{ type = "datetime", format = "%H:%M" }
+	{ type = "datetime", format = "%-I:%M %p" }
 ]
-# tab_bar_right_separator = " · "
-
-# Configure Herdr's prefix and vertical pane split shortcut.
+tab_bar_right_separator = " · "
 status_indicators = "symbols"
-[keys]
-prefix = "ctrl+backtick"
-split_vertical = "prefix+|"
-previous_workspace = "prefix+up"
-next_workspace = "prefix+down"
-switch_workspace = "prefix+shift+1..9"
 
-# Move active tab left or right
-move_tab_previous = "prefix+shift+left"
-move_tab_next = "prefix+shift+right"
+[ui.toast]
+delivery = "herdr"
+delay_seconds = 2
 
-# Terminal settings
+[ui.toast.herdr]
+position = "bottom-right"
+
 [terminal]
 default_shell = 'C:\Users\gregt\AppData\Local\Microsoft\WindowsApps\pwsh.exe'
 new_cwd = "follow"
 
-[ui.toast]
-delivery = "herdr"
+[keys]
+prefix = "ctrl+`"
 
-[theme.custom]
-accent = "#61AFEF"
-active_row_bg = "#2C313A"
-selection_bg = "#3E4451"
+# Vim-style pane navigation
+focus_pane_left = "alt+h"
+focus_pane_down = "alt+j"
+focus_pane_up = "alt+k"
+focus_pane_right = "alt+l"
+
+# Vim-style tab navigation
+previous_tab = "ctrl+alt+h"
+next_tab = "ctrl+alt+l"
+
+# Vim-style workspace navigation
+previous_workspace = "ctrl+alt+k"
+next_workspace = "ctrl+alt+j"
+
+# Navigate between workspaces.
+switch_workspace = "prefix+shift+1..9"
+
+# Split panes vertically.
+split_horizontal = "prefix+-"
+split_vertical = "prefix+|"
+
+# Move the active tab left or right.
+move_tab_previous = "alt+shift+h"
+move_tab_next = "alt+shift+l"
