@@ -27,7 +27,7 @@
       "keys": "ctrl+alt+k"
     },
     {
-      "id": "paste",
+      "id": "Terminal.PasteFromClipboard",
       "keys": "ctrl+v"
     }
   ],
