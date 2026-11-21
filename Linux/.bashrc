@@ -4,6 +4,7 @@
 # Author        : Greg Tate & coding agent
 # Last Modified : 2026-11-21
 # Revision History:
+#   2026-11-21 - Mirror configured Readline Vi bindings in ble.sh
 #   2026-11-21 - Hide ble.sh Vi indicator and apply Readline bindings before loading it
 #   2026-11-21 - Add ble.sh automatic history completion menu
 #   2026-11-21 - Show fzf history results in a compact dropdown and load Bash integration
@@ -267,6 +268,41 @@ if [ -n "${BLE_VERSION:-}" ]; then
     bleopt complete_auto_menu=500
     bleopt complete_menu_style=linewise
     bleopt complete_menu_maxlines=10
+
+    # Register ble.sh-native equivalents for the custom Readline Vi bindings.
+    ble_configure_vi_bindings() {
+        # Enable Meta-key sequences in insert mode before binding Alt+B and Alt+F.
+        ble-decode/keymap:vi_imap/define-meta-bindings
+
+        # Match the Readline bindings used while entering a command.
+        ble-bind -m vi_imap -f C-p history-prev
+        ble-bind -m vi_imap -f C-n history-next
+        ble-bind -m vi_imap -f M-b backward-cword
+        ble-bind -m vi_imap -f M-f forward-cword
+        ble-bind -m vi_imap -f C-a beginning-of-line
+        ble-bind -m vi_imap -f C-e end-of-line
+        ble-bind -m vi_imap -f C-k kill-forward-line
+        ble-bind -m vi_imap -f C-u kill-backward-line
+        ble-bind -m vi_imap -f C-w kill-backward-uword
+        ble-bind -m vi_imap -f up history-search-backward
+        ble-bind -m vi_imap -f down history-search-forward
+
+        # Match the corresponding custom bindings in Vi command mode.
+        ble-bind -m vi_nmap -f C-p vi-command/history-prev
+        ble-bind -m vi_nmap -f C-n vi-command/history-next
+        ble-bind -m vi_nmap -f M-b backward-cword
+        ble-bind -m vi_nmap -f M-f forward-cword
+        ble-bind -m vi_nmap -f C-a beginning-of-line
+        ble-bind -m vi_nmap -f C-e end-of-line
+        ble-bind -m vi_nmap -f C-k kill-forward-line
+        ble-bind -m vi_nmap -f C-u kill-backward-line
+        ble-bind -m vi_nmap -f C-w kill-backward-uword
+
+        # Preserve the configured block and line cursor shapes in each mode.
+        ble-bind -m vi_imap --cursor 6
+        ble-bind -m vi_nmap --cursor 2
+    }
+    blehook/eval-after-load keymap_vi ble_configure_vi_bindings
 
     # Use ble.sh's compatibility layer for fzf key bindings when fzf is installed.
     if command -v fzf >/dev/null 2>&1; then
