@@ -31,6 +31,9 @@ Greg Tate
 
 .NOTES
 Program: Monitor-CriticalEventAlert.ps1
+Last Modified: 2026-11-21
+Revision History:
+    2026-11-21 - Register tasks with the stable PowerShell app alias.
 #>
 
 [CmdletBinding(DefaultParameterSetName = 'Monitor')]
@@ -1030,7 +1033,7 @@ $RegistrationHelpers = {
     # Create the event-log checkpoint before task registration can trigger the monitor.
     function Initialize-CriticalEventAlertBaseline {
         # Use the installed monitor so the task and installer share the same state contract.
-        $powerShellPath = Join-Path $PSHOME 'pwsh.exe'
+        $powerShellPath = (Get-Command -Name 'pwsh.exe' -ErrorAction Stop).Source
         $monitorPath = Join-Path $InstallationPath 'Monitor-CriticalEventAlert.ps1'
         & $powerShellPath `
             -NoLogo `
@@ -1048,7 +1051,7 @@ $RegistrationHelpers = {
     function Register-CriticalEventAlertTask {
         # Build the current user's SID and PowerShell executable path for task registration.
         $currentUserSid = [Security.Principal.WindowsIdentity]::GetCurrent().User.Value
-        $powerShellPath = Join-Path $PSHOME 'pwsh.exe'
+        $powerShellPath = (Get-Command -Name 'pwsh.exe' -ErrorAction Stop).Source
         $monitorPath = Join-Path $InstallationPath 'Monitor-CriticalEventAlert.ps1'
 
         if (-not (Test-Path -LiteralPath $powerShellPath -PathType Leaf)) {
