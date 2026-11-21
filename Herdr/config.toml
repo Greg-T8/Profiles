@@ -14,6 +14,15 @@ auto_switch = false
 host_cursor = "native"
 sidebar_collapsed_mode = "hidden"
 sidebar_start_collapsed = true
+pane_borders = "auto"
+pane_gaps = false
+pane_outer_borders = false
+window_title = "{workspace} | {tab} | Herdr"
+tab_bar_right = [
+	{ type = "zoom" },
+	{ type = "datetime", format = "%H:%M" }
+]
+# tab_bar_right_separator = " · "
 
 # Configure Herdr's prefix and vertical pane split shortcut.
 status_indicators = "symbols"
@@ -35,3 +44,8 @@ new_cwd = "follow"
 
 [ui.toast]
 delivery = "herdr"
+
+[theme.custom]
+accent = "#61AFEF"
+active_row_bg = "#2C313A"
+selection_bg = "#3E4451"
