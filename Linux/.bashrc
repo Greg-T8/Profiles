@@ -4,6 +4,7 @@
 # Author        : Greg Tate & coding agent
 # Last Modified : 2026-11-21
 # Revision History:
+#   2026-11-21 - Install fzf when missing on Debian-based systems
 #   2026-11-21 - Enable fzf command history picker
 # ==============================================================================
 # ~/.bashrc: executed by bash(1) for non-login shells.
@@ -53,6 +54,20 @@ shopt -s histappend
 # History size settings
 HISTSIZE=1000                          # Commands to remember in current session
 HISTFILESIZE=2000                      # Commands to save in history file
+
+# Install fzf on Debian-based systems when it is missing.
+if ! command -v fzf >/dev/null 2>&1; then
+    if command -v apt-get >/dev/null 2>&1 && command -v sudo >/dev/null 2>&1; then
+        printf 'fzf is missing; installing it with apt-get...\n'
+        if sudo apt-get update && sudo apt-get install -y fzf; then
+            printf 'fzf was installed successfully.\n'
+        else
+            printf 'fzf installation failed; continuing without the history picker.\n' >&2
+        fi
+    else
+        printf 'fzf is missing. Install it with: sudo apt-get install fzf\n' >&2
+    fi
+fi
 
 # Load fzf's Bash bindings when available so Ctrl+R opens searchable history.
 if command -v fzf >/dev/null 2>&1; then
