@@ -4,6 +4,7 @@
 # Author        : Greg Tate & coding agent
 # Last Modified : 2026-11-21
 # Revision History:
+#   2026-11-21 - Show fzf history results in a compact dropdown and load Bash integration
 #   2026-11-21 - Install fzf when missing on Debian-based systems
 #   2026-11-21 - Enable fzf command history picker
 # ==============================================================================
@@ -69,12 +70,19 @@ if ! command -v fzf >/dev/null 2>&1; then
     fi
 fi
 
-# Load fzf's Bash bindings when available so Ctrl+R opens searchable history.
+# Configure the history picker as a compact list below the command line.
 if command -v fzf >/dev/null 2>&1; then
-    if [ -r /usr/share/doc/fzf/examples/key-bindings.bash ]; then
+    export FZF_CTRL_R_OPTS='--height=~40% --layout=reverse --border'
+
+    # Load the modern integration or a packaged key-binding script for older fzf releases.
+    if fzf --bash >/dev/null 2>&1; then
+        eval "$(fzf --bash)"
+    elif [ -r /usr/share/doc/fzf/examples/key-bindings.bash ]; then
         . /usr/share/doc/fzf/examples/key-bindings.bash
     elif [ -r /usr/share/fzf/key-bindings.bash ]; then
         . /usr/share/fzf/key-bindings.bash
+    else
+        printf 'fzf Bash bindings were not found; Ctrl+R will use Bash reverse search.\n' >&2
     fi
 fi
 

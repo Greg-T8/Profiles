@@ -15,13 +15,13 @@ irm https://raw.githubusercontent.com/Greg-T8/Profiles/main/PowerShell/RemotePro
 
 ```bash
 # One-liner to setup Linux/Docker environment from GitHub
-curl -fsSL https://raw.githubusercontent.com/Greg-T8/Profiles/main/Linux/bootstrap-docker.sh | bash
+curl -fsSL https://raw.githubusercontent.com/Greg-T8/Profiles/main/Linux/bootstrap-docker.sh | sudo bash
 ```
 
 For minimal Docker images without curl or wget pre-installed:
 
 ```bash
-apt-get update && apt-get install -y curl && curl -fsSL https://raw.githubusercontent.com/Greg-T8/Profiles/main/Linux/init-docker.sh | bash
+apt-get update && apt-get install -y curl && curl -fsSL https://raw.githubusercontent.com/Greg-T8/Profiles/main/Linux/init-docker.sh | sudo bash
 ```
 
 ## 🚀 Manual Setup
