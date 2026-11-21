@@ -1,5 +1,10 @@
 # ==============================================================================
-# BASH CONFIGURATION
+# Description   : Configure interactive Bash settings, prompt, history, and aliases
+# Context       : Profiles configuration — Linux Bash profile
+# Author        : Greg Tate & coding agent
+# Last Modified : 2026-11-21
+# Revision History:
+#   2026-11-21 - Enable fzf command history picker
 # ==============================================================================
 # ~/.bashrc: executed by bash(1) for non-login shells.
 # This configuration enables vi mode with visual feedback, custom prompts,
@@ -48,6 +53,15 @@ shopt -s histappend
 # History size settings
 HISTSIZE=1000                          # Commands to remember in current session
 HISTFILESIZE=2000                      # Commands to save in history file
+
+# Load fzf's Bash bindings when available so Ctrl+R opens searchable history.
+if command -v fzf >/dev/null 2>&1; then
+    if [ -r /usr/share/doc/fzf/examples/key-bindings.bash ]; then
+        . /usr/share/doc/fzf/examples/key-bindings.bash
+    elif [ -r /usr/share/fzf/key-bindings.bash ]; then
+        . /usr/share/fzf/key-bindings.bash
+    fi
+fi
 
 # ==============================================================================
 # SHELL OPTIONS
