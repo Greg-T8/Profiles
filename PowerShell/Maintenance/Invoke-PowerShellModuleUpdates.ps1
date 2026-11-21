@@ -12,7 +12,7 @@ The script records update and cleanup output to indexed log files under %APPDATA
 User login maintenance automation (Windows Task Scheduler)
 
 .AUTHOR
-Greg Tate
+Greg Tate & coding agent
 
 .PARAMETER RetentionDays
 Overrides the default log retention period (in days). Use a value from 0 to 3650.
@@ -58,6 +58,9 @@ Task Scheduler folder path used with -Register or -Unregister. Defaults to \Cust
 
 .NOTES
 Program: Invoke-PowerShellModuleUpdates.ps1
+Last Modified: 2026-11-21
+Revision History:
+    2026-11-21 - Remove leftover user-scoped module version folders.
 #>
 #endregion
 
@@ -623,6 +626,12 @@ $Helpers = {
             # Track whether cleanup removed any module versions.
             $removedAny = $false
 
+            # Check both standard per-user module roots for folders left behind by stale install metadata.
+            $userModuleRoots = @(
+                (Join-Path -Path $HOME -ChildPath 'Documents\PowerShell\Modules'),
+                (Join-Path -Path $HOME -ChildPath 'Documents\WindowsPowerShell\Modules')
+            )
+
             $groupCount = @($byName).Count
             $groupIndex = 0
 
@@ -680,11 +689,47 @@ $Helpers = {
                     if ($PSCmdlet.ShouldProcess($desc, 'Uninstall-Module')) {
                         try {
                             Uninstall-Module -Name $m.Name -RequiredVersion $m.Version -Force -ErrorAction Stop
-                            $removedAny = $true
-                            "Cleanup: removed $desc"
                         }
                         catch {
                             Write-Warning "Failed to uninstall $desc`: $($_.Exception.Message)"
+                            continue
+                        }
+
+                        $removedAny = $true
+                        "Cleanup: Uninstall-Module succeeded for $desc"
+
+                        # Remove only the exact version folder targeted by this successful uninstall.
+                        foreach ($userModuleRoot in $userModuleRoots) {
+                            try {
+                                $leftoverPath = Join-Path -Path (Join-Path -Path $userModuleRoot -ChildPath $m.Name) -ChildPath "$($m.Version)"
+                                if (-not (Test-Path -LiteralPath $leftoverPath -PathType Container)) {
+                                    continue
+                                }
+
+                                # Preserve any version that remains loaded after the unload attempt above.
+                                $loadedTargetVersion = Get-Module -Name $m.Name -All |
+                                    Where-Object { "$($_.Version)" -eq "$($m.Version)" }
+                                if ($loadedTargetVersion) {
+                                    Write-Warning "Leftover folder not removed because $desc is still loaded: $leftoverPath"
+                                    continue
+                                }
+
+                                # Do not recurse through a version-folder link into an unrelated target.
+                                $leftoverItem = Get-Item -LiteralPath $leftoverPath -Force -ErrorAction Stop
+                                if ($leftoverItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
+                                    Write-Warning "Leftover version path is a reparse point and was not removed: $leftoverPath"
+                                    continue
+                                }
+
+                                # Delete the verified leftover folder while honoring the function's WhatIf support.
+                                if ($PSCmdlet.ShouldProcess($leftoverPath, 'Remove leftover module version folder')) {
+                                    Remove-Item -LiteralPath $leftoverPath -Recurse -Force -ErrorAction Stop
+                                    "Cleanup: removed leftover folder for $desc at $leftoverPath"
+                                }
+                            }
+                            catch {
+                                Write-Warning "Failed to remove leftover folder for $desc`: $($_.Exception.Message)"
+                            }
                         }
                     }
                 }
