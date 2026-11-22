@@ -2,8 +2,9 @@
 # Description   : Configure interactive Bash settings, prompt, history, and aliases
 # Context       : Profiles configuration — Linux Bash profile
 # Author        : Greg Tate & coding agent
-# Last Modified : 2026-11-21
+# Last Modified : 2026-11-22
 # Revision History:
+#   2026-11-22 - Show the hostname in every interactive prompt
 #   2026-11-21 - Restore Readline and use fzf for Ctrl+R history search
 #   2026-11-21 - Avoid reloading Readline and ble.sh when sourcing the profile
 #   2026-11-21 - Preconfigure the ble.sh Vi indicator before keymap initialization
@@ -101,25 +102,16 @@ fi
 # PROMPT CONFIGURATION
 # ==============================================================================
 # ------------------------------------------------------------------------------
-# SSH Host Detection
+# Hostname Display
 # ------------------------------------------------------------------------------
-# Set hostname prefix (green) only when connected via SSH
-# Evaluated once at shell startup since SSH status doesn't change mid-session
-# Uses \001 and \002 (readline markers) with actual escape sequences
-if [[ -n "$SSH_CONNECTION" || -n "$SSH_CLIENT" ]]; then
-    _ssh_host=$'\001\e[32m\002'"$HOSTNAME"$'\001\e[36m\002 '
-else
-    _ssh_host=""
-fi
+# Keep the host prefix in every interactive prompt, including console and WSL sessions.
+_prompt_host=$'\001\e[32m\002'"$HOSTNAME"$'\001\e[36m\002 '
 
 # ------------------------------------------------------------------------------
 # Custom Prompt Function
 # ------------------------------------------------------------------------------
 # Two-line prompt with box-drawing characters
 # Format:
-#   ╭─( ~/path/to/directory
-#   ╰─$
-# When connected via SSH:
 #   ╭─( hostname ~/path/to/directory
 #   ╰─$
 setup_custom_prompt() {
@@ -130,10 +122,10 @@ setup_custom_prompt() {
         local cyan=$'\001\e[36m\002'   # Cyan color
         local reset=$'\001\e[0m\002'   # Reset color
         # Build custom PS1 prompt with color
-        PS1=$'\n'"${cyan}"$'╭─( '"${_ssh_host}"$'\w\n'"${cyan}"$'╰─'"${reset}"$'\$ '
+        PS1=$'\n'"${cyan}"$'╭─( '"${_prompt_host}"$'\w\n'"${cyan}"$'╰─'"${reset}"$'\$ '
     else
         # Build custom PS1 prompt without color
-        PS1=$'\n╭─( '"${_ssh_host}"$'\w\n╰─\$ '
+        PS1=$'\n╭─( '"${_prompt_host}"$'\w\n╰─\$ '
     fi
 }
 
