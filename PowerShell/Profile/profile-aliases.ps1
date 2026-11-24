@@ -2,8 +2,9 @@
 # Description   : Configure profile aliases and Git shortcuts.
 # Context       : Personal PowerShell profile feature initialization.
 # Author        : Greg Tate, with help from a coding agent
-# Last Modified : 2026-11-11
+# Last Modified : 2026-11-24
 # Revision History:
+#   2026-11-24 - Add the skills-atlas CLI alias.
 #   2026-11-11 - Use Set-Alias on Windows PowerShell for provider compatibility.
 #   2026-11-11 - Extract feature from the PowerShell profile.
 # ---------------------------------------------------------------------------
@@ -22,6 +23,7 @@
 # ghel = Show-GhFailedRunLog         adel = Show-AdoFailedRunLog
 # dex = DockerExec                   dil = DockerImageList
 # dcl = DockerContainerList          regctl = RegCtlCmd
+# sa = skills-atlas
 
 #region ALIASES
 
@@ -101,6 +103,7 @@ Write-ProfileTime ('After first alias (Utility loaded: {0})' -f [bool](Get-Modul
 . $script:ProfileAliasWriter -ProfileAliasName tf -ProfileAliasValue terraform
 . $script:ProfileAliasWriter -ProfileAliasName he -ProfileAliasValue herdr
 . $script:ProfileAliasWriter -ProfileAliasName nv -ProfileAliasValue nvim -ProfileAliasOptions AllScope -ProfileAliasForce
+. $script:ProfileAliasWriter -ProfileAliasName sa -ProfileAliasValue skills-atlas
 
 
 # Git aliases
