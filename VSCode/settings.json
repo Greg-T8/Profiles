@@ -903,6 +903,17 @@
     "dashboard.openOnStartup",
     "powershell.scriptAnalysis.settingsPath",
   ],
+  "sshfs.configs": [
+    {
+      "name": "hermes-ubuntu",
+      "label": "Hermes Ubuntu",
+      "host": "192.168.1.218",
+      "port": 22,
+      "username": "gtate",
+      "root": "/home/gtate/.hermes",
+      "privateKeyPath": "$OneDriveConsumer/Apps/ssh/id_ed25519_gregt8_gmail"
+    }
+  ],
   "terminal.integrated.commandsToSkipShell": [
     "workbench.action.toggleAuxiliaryBar",
     "workbench.action.toggleSidebarVisibility",
