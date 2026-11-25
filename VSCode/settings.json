@@ -1366,5 +1366,6 @@
   "chat.titleBar.openInAgentsWindow.enabled": true,
   "chat.agentSessions.showExternal": "recent",
   "chat.viewSessions.orientation": "stacked",
-  "explorer.incrementalNaming": "disabled"
+  "explorer.incrementalNaming": "disabled",
+  "chat.agentsWindowBanner.enabled": false
 }
