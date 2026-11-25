@@ -58,8 +58,9 @@ Task Scheduler folder path used with -Register or -Unregister. Defaults to \Cust
 
 .NOTES
 Program: Invoke-PowerShellModuleUpdates.ps1
-Last Modified: 2026-11-21
+Last Modified: 2026-11-25
 Revision History:
+    2026-11-25 - Support controller log reporting and presentation.
     2026-11-21 - Batch cleanup discovery and log maintenance progress.
     2026-11-21 - Run cleanup for skipped and up-to-date modules.
     2026-11-21 - Remove leftover user-scoped module version folders.
@@ -178,6 +179,9 @@ $Main = {
 
     $logContext = New-UpdateLogContext -LogRetentionConfig $LogRetentionConfig -RetentionDaysOverride $RetentionDays
 
+    # Identify the exact log before module discovery can fail.
+    if ($env:MAINTENANCE_LOG_POINTER) { Set-Content -LiteralPath $env:MAINTENANCE_LOG_POINTER -Value $logContext.PowerShellLogPath }
+
     $moduleScopeMode = 'Common'
     if ($useAllModules) { $moduleScopeMode = 'AllUserScoped' }
     if ($useModuleNameList) { $moduleScopeMode = 'ModuleNameList' }
@@ -185,7 +189,7 @@ $Main = {
     $moduleUpdateParameters = New-ModuleUpdateParameters -ModuleUpdateConfig $ModuleUpdateConfig -ScopeMode $moduleScopeMode -ModuleName $ModuleName -RecentHistoryLines $RecentHistoryLines -ShowTiming:$ShowTiming
     $powerShellChanged = Invoke-PowerShellModuleUpdates -PowerShellLogPath $logContext.PowerShellLogPath -ModuleUpdateParameters $moduleUpdateParameters
 
-    Open-UpdateLogs -PowerShellLogPath $logContext.PowerShellLogPath -RefreshedModulesLogPath $logContext.RefreshedModulesLogPath -PowerShellChanged:$powerShellChanged -RefreshLogCreated:$refreshLogCreated
+    if (-not $env:MAINTENANCE_LOG_POINTER) { Open-UpdateLogs -PowerShellLogPath $logContext.PowerShellLogPath -RefreshedModulesLogPath $logContext.RefreshedModulesLogPath -PowerShellChanged:$powerShellChanged -RefreshLogCreated:$refreshLogCreated }
 }
 #endregion
 

@@ -69,10 +69,12 @@
     User login maintenance automation (Windows Task Scheduler)
 
 .AUTHOR
-    Greg Tate
+    Greg Tate & coding agent
 
 .NOTES
-    Program: Invoke-WingetUpdates.ps1
+    Last Modified: 2026-11-25
+    Revision History:
+        2026-11-25 - Support controller log reporting and presentation.
 #>
 
 [CmdletBinding(DefaultParameterSetName = 'Maintenance')]
@@ -169,8 +171,10 @@ $Main = {
         Invoke-WinGetToastTest -WinGetLogPath $logContext.WinGetLogPath
     }
     else {
+        # Identify the exact log for the controller before starting the update.
+        if ($env:MAINTENANCE_LOG_POINTER) { Set-Content -LiteralPath $env:MAINTENANCE_LOG_POINTER -Value $logContext.WinGetLogPath }
         $wingetChanged = Invoke-WinGetUpdate -WinGetLogPath $logContext.WinGetLogPath
-        Open-UpdateLog -WinGetLogPath $logContext.WinGetLogPath -WingetChanged:$wingetChanged
+        if (-not $env:MAINTENANCE_LOG_POINTER) { Open-UpdateLog -WinGetLogPath $logContext.WinGetLogPath -WingetChanged:$wingetChanged }
     }
 }
 
@@ -997,6 +1001,9 @@ $toast = [Windows.UI.Notifications.ToastNotification]::new($toastXml)
 
                 # Write compact summary and grouped package result lines.
                 "Summary: $installedPackageCount packages checked, $successfulUpdates updated, $($skippedPackageLines.Count) skipped." | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
+
+                # Record individual failures so the controller can report partial results.
+                $skippedPackageLines | Where-Object { $_ -match '\(error:' } | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
 
                 if ($updatedPackageLines.Count -gt 0) {
                     'Updated packages:' | Tee-Object -FilePath $WinGetLogPath -Append | Out-Null
