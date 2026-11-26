@@ -15,6 +15,7 @@
 .NOTES
     Last Modified: 2026-11-25
     Revision History:
+        2026-11-25 - Fix evidence filter pattern syntax.
         2026-11-25 - Include npm run timing and package-change summary.
         2026-11-25 - Initial version.
 #>
@@ -137,7 +138,7 @@ $Helpers = {
             else {
                 $lines.Add("Log: $log")
                 $content = @(Get-Content -LiteralPath $log)
-                $evidence = @($content | Where-Object { $_ -match '^(===== npm global update (started|completed):|changed \d+ packages? in |Summary:|Version comparison:|Updated:|Added:|Removed:|Dependency versions changed:|WARNING:|ERROR:|WinGet module update failed:|Updated packages:|\s+- .*\([^)]* -> [^)]*\)|\s+- .*\(error:)|^[^:]+:\s+\S+\s+->\s+\S+)' })
+                $evidence = @($content | Where-Object { $_ -match '^(===== npm global update (started|completed):|changed \d+ packages? in |Summary:|Version comparison:|Updated:|Added:|Removed:|Dependency versions changed:|WARNING:|ERROR:|WinGet module update failed:|Updated packages:|\s+- .*\([^)]* -> [^)]*\)|\s+- .*\(error:.*|^[^:]+:\s+\S+\s+->\s+\S+)' })
                 foreach ($item in $evidence) { $lines.Add($item) }
                 if (-not ($content | Where-Object { $_ -like "*$($Stage.Completion)*" })) {
                     $lines.Add('ERROR: Completion marker missing from stage log.')
