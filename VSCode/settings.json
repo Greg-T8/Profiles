@@ -112,43 +112,24 @@
     ],
     "editor.tabSize": 2
   },
-  "@azure.argTenant": "547b168b-bd3f-4cfc-ae2b-665f52672fae",
-  "@azure.enableCustomModeRecommendations": false,
-  "azureMcp.readOnly": true,
-  "azureResourceGroups.enableChatStandIn": false,
-  "azureResourceGroups.selectedSubscriptions": [
-    "547b168b-bd3f-4cfc-ae2b-665f52672fae/e091f6e7-031a-4924-97bb-8c983ca5d21a",
-    "547b168b-bd3f-4cfc-ae2b-665f52672fae/e6ad7655-b3ba-4324-8361-fcfdc59973a5"
-  ],
-  "azureTerraform.survey": {
-    "surveyPromptDate": "never",
-    "surveyPromptIgnoredCount": 0
-  },
   "betterAlign.alignAfterTypeEnter": false,
   "betterAlign.indentBase": "firstline",
   "chat.agent.enabled": true,
   "chat.agent.maxRequests": 200,
-  "chat.agent.thinking.collapsedTools": "off",
   "chat.agent.thinking.generateTitles": true,
-  "chat.agent.thinking.terminalTools": true,
-  "chat.agent.thinkingStyle": "fixedScrolling",
   "chat.agentSkillsLocations": {
     "~/LocalCode/Agent-Toolkit/skills": true
   },
   "chat.checkpoints.enabled": true,
-  "chat.customAgentInSubagent.enabled": false,
   "chat.editing.confirmEditRequestRemoval": false,
+  "chat.editor.codex.preferAgentHost": true,
   "chat.instructionsFilesLocations": {
     "~/.copilot/instructions": true,
     "~/LocalCode/Agent-Toolkit/instructions": true
   },
   "chat.mcp.gallery.enabled": true,
   "chat.notifyWindowOnResponseReceived": "off",
-  "chat.promptFilesLocations": {
-    "~/LocalCode/Agent-Toolkit/prompts": true
-  },
   "chat.requestQueuing.defaultAction": "steer",
-  "chat.requestQueuing.enabled": true,
   "chat.tools.autoExpandFailures": true,
   "chat.tools.terminal.autoApprove": {},
   "chat.tools.urls.autoApprove": {
@@ -178,7 +159,6 @@
   },
   "chat.viewProgressBadge.enabled": true,
   "chatgpt.followUpQueueMode": "steer",
-  "claudeCode.preferredLocation": "panel",
   "dashboard.displayProjectPath": true,
   "dashboard.openOnStartup": "empty workspace",
   "dashboard.projectData": [
@@ -599,7 +579,6 @@
   "git.enableSmartCommit": true,
   "git.openRepositoryInParentFolders": "always",
   "github.copilot.chat.agent.temperature": 0,
-  "github.copilot.chat.claudeAgent.enabled": true, //Disables auto-insertion of instruction files
   "github.copilot.chat.commitMessageGeneration.instructions": [
     {
       "text": "Generate a concise, informative Git commit message following Google's engineering practices for writing good change descriptions. FORMAT: Always output exactly one subject line, one blank line, and one explanatory body paragraph of 1–3 sentences. SUBJECT: Write a complete imperative sentence beginning with a capitalized verb (e.g., Add, Update, Fix, Remove, Refactor, Clarify). Use sentence case, end with a period, and limit the subject to 72 characters including punctuation. Describe the specific result of the change in terms that make sense independently of the body. Never use Conventional Commits prefixes (feat:, fix:, chore:, etc.) or bracketed tags. BODY: State the substantive changes directly and explain their purpose when supported by the diff. Focus on resulting requirements, behavior, or improvements rather than the process of editing files. Prefer concrete verbs such as Require, Standardize, Enforce, Simplify, and Define. Avoid procedural constructions such as 'Clarify X by specifying Y', 'Enhance X by updating Y', or 'Improve X by modifying Y'. Eliminate filler, promotional language, generic claims such as 'ensure compliance with best practices', and transitions such as 'Additionally' or 'Furthermore'. Combine related changes into concise, information-dense sentences. Do not repeat the subject, unnecessarily list files, invent benefits, or describe changes more broadly than the diff supports. LINE BREAKS: Keep each paragraph on one physical line without hard wrapping; allow VS Code to wrap text visually. Use exactly one blank line between the subject and body. GENERAL: Use plain text without Markdown, headings, bullet points, commentary, questions, signatures, or trailers. Preserve technical terminology and capitalization. Base the message on the actual Git diff, prioritizing staged changes. OUTPUT: Return only the completed commit message, verifying subject capitalization, imperative phrasing, the 72-character limit, the blank-line separator, and a concise body without artificial line breaks."
@@ -842,7 +821,6 @@
   "prettyxml.settings.indentSpaceLength": 2,
   "python.analysis.typeCheckingMode": "basic",
   "python.terminal.activateEnvironment": false,
-  "redhat.telemetry.enabled": true,
   "rewrap.autoWrap.enabled": false,
   "rewrap.autoWrap.notification": "icon",
   "rewrap.doubleSentenceSpacing": false,
@@ -1353,7 +1331,8 @@
     "workbench.view.showQuietly",
     "terminal.integrated.tabs.title",
     "workbench.sash.size",
-    "explorer.incrementalNaming"
+    "explorer.incrementalNaming",
+    "chat.agentHost.codexAgent.enabled"
   ],
   "workbench.settings.editor": "json",
   "workbench.settings.openDefaultSettings": false,
