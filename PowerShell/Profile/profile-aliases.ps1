@@ -2,8 +2,10 @@
 # Description   : Configure profile aliases and Git shortcuts.
 # Context       : Personal PowerShell profile feature initialization.
 # Author        : Greg Tate, with help from a coding agent
-# Last Modified : 2026-11-24
+# Last Modified : 2026-11-27
 # Revision History:
+#   2026-11-27 - Add the Git add-commit-push shortcut.
+#   2026-11-27 - Add the Git fetch shortcut.
 #   2026-11-24 - Add the skills-atlas CLI alias.
 #   2026-11-11 - Use Set-Alias on Windows PowerShell for provider compatibility.
 #   2026-11-11 - Extract feature from the PowerShell profile.
@@ -19,7 +21,8 @@
 # he = herdr                         nv = nvim
 # gs = Invoke-GitStatus              ga = Invoke-GitAdd
 # gd = Invoke-GitDiff                gco = Invoke-GitCommit
-# gpu = Invoke-GitPush               sgr = Set-GitRepoRoot
+# gpu = Invoke-GitPush               gf = Invoke-GitFetch
+# gca = Invoke-GitCommitAddPush      sgr = Set-GitRepoRoot
 # ghel = Show-GhFailedRunLog         adel = Show-AdoFailedRunLog
 # dex = DockerExec                   dil = DockerImageList
 # dcl = DockerContainerList          regctl = RegCtlCmd
@@ -136,6 +139,21 @@ function Invoke-GitPush {
 	git push @args
 }
 . $script:ProfileAliasWriter -ProfileAliasName gpu -ProfileAliasValue Invoke-GitPush
+
+# Forward the Git fetch shortcut to git.exe while preserving optional arguments.
+function Invoke-GitFetch {
+	git fetch @args
+}
+. $script:ProfileAliasWriter -ProfileAliasName gf -ProfileAliasValue Invoke-GitFetch
+
+# Stage changes, create a commit, and push it using native Git commands.
+function Invoke-GitCommitAddPush {
+	git add .
+	git commit @args
+	git push
+}
+. $script:ProfileAliasWriter -ProfileAliasName gca -ProfileAliasValue Invoke-GitCommitAddPush
+
 . $script:ProfileAliasWriter -ProfileAliasName sgr -ProfileAliasValue Set-GitRepoRoot
 . $script:ProfileAliasWriter -ProfileAliasName ghel -ProfileAliasValue Show-GhFailedRunLog
 
