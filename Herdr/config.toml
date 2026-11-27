@@ -78,3 +78,9 @@ swap_pane_left  = "prefix+shift+h"
 swap_pane_right = "prefix+shift+l"
 swap_pane_up    = "prefix+shift+k"
 swap_pane_down  = "prefix+shift+j"
+
+# Resize the active pane.
+resize_pane_left  = "ctrl+shift+h"
+resize_pane_right = "ctrl+shift+l"
+resize_pane_up    = "ctrl+shift+k"
+resize_pane_down  = "ctrl+shift+j"
